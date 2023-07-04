@@ -22,7 +22,7 @@ n2 = 200000000000
 #print(timeit.timeit(lambda: add(n1,n2)))
 #print(timeit.timeit(lambda: python_example.add(1,2)))
 print(python_example.add(2,3))
-obj = python_example.myClass()
+obj = python_example.myClass("peter")
 obj.addOne()
 print(obj.getNumber())
 

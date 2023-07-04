@@ -1,9 +1,11 @@
+#include <string>
 class myClass
 {
 public:
     int number;
+    std::string name;
 
-    myClass();
+    myClass(std::string name_);
     void addOne();
 
     int getNumber();

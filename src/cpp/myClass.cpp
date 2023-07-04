@@ -1,7 +1,9 @@
 #include "myClass.h"
+#include <string>
 
-myClass::myClass() {
+myClass::myClass(std::string name_) {
     number = 1;
+    name = name_;
 }
 void myClass::addOne() {
     number = number + 1;

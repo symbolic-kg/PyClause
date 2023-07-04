@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include "src/cpp/myClass.h"
+#include <string>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -37,7 +38,7 @@ PYBIND11_MODULE(python_example, m) {
     )pbdoc");
 
     py::class_<myClass>(m, "myClass")
-        .def(py::init<>())
+        .def(py::init<std::string>())
         .def("addOne", &myClass::addOne)
         .def("getNumber", &myClass::getNumber)
         .def("sumRange", &myClass::addRange) //name does not matter
