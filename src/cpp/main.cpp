@@ -14,7 +14,8 @@ int main(){
 
     Index* index = new Index();
     std::string dataPath = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
-    TripleStorage* data = new TripleStorage(dataPath, index);
+    TripleStorage data(index);
+    data.read(dataPath);
     std::cout<<"data loaded";
 
 

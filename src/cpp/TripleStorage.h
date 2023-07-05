@@ -14,24 +14,25 @@
 class TripleStorage
 {
 public:
-	TripleStorage(std::string filepath, Index* index);
+	TripleStorage(Index* index);
 
 	//CSR<int, int>* getCSR();
-	std::unordered_map<int, std::unordered_set<int>>* getRelCounter();
+	std::unordered_map<int, std::unordered_set<int>>& getRelCounter();
 	RelNodeToNodes& getRelHeadToTails();
 	RelNodeToNodes& getRelTailToHeads();
+	void read(std::string filepath);
+	void add(std::string head, std::string relation, std::string tail);
 
 protected:
 
 private:
 	Index* index;
 	//CSR<int, int>* csr;
-	std::unordered_map<int, std::unordered_set<int>>* relCounter;
+	std::unordered_map<int, std::unordered_set<int>> relCounter;
 	RelNodeToNodes relHeadToTails;
 	RelNodeToNodes relTailToHeads;
 
-	void read(std::string filepath, RelNodeToNodes& relHeadToTails, RelNodeToNodes& relTailToHeads, std::unordered_map<int, std::unordered_set<int>>* relCounter);
-	void add(std::string head, std::string relation, std::string tail, RelNodeToNodes& relHeadToTails, RelNodeToNodes& relTailToHeads, std::unordered_map<int, std::unordered_set<int>>* relCounter);
+	
 
 
 };

@@ -2,12 +2,8 @@
 
 #include "TripleStorage.h"
 
-TripleStorage::TripleStorage(std::string filepath, Index* index) {
-	this->index = index;
-	relCounter = new std::unordered_map<int, std::unordered_set<int>>;
-
-	read(filepath, relHeadToTails, relTailToHeads, relCounter);
-			
+TripleStorage::TripleStorage(Index* index) {
+	this->index = index;		
 	index->rehash();
 	for (int i = 0; i < index->getRelSize(); i++) {
 		relHeadToTails[i].rehash(relHeadToTails[i].size());
@@ -23,7 +19,7 @@ TripleStorage::TripleStorage(std::string filepath, Index* index) {
 //	return csr;
 //}
 
-std::unordered_map<int, std::unordered_set<int>>* TripleStorage::getRelCounter() {
+std::unordered_map<int, std::unordered_set<int>>& TripleStorage::getRelCounter() {
 	return relCounter;
 }
 
@@ -35,7 +31,7 @@ RelNodeToNodes& TripleStorage::getRelTailToHeads() {
 	return relTailToHeads;
 }
 
-void TripleStorage::read(std::string filepath, RelNodeToNodes& relHeadToTails, RelNodeToNodes& relTailToHeads, std::unordered_map<int, std::unordered_set<int>>* relCounter) {
+void TripleStorage::read(std::string filepath) {
 	std::string line;
 	std::ifstream myfile(filepath);
 	if (myfile.is_open())
@@ -48,7 +44,7 @@ void TripleStorage::read(std::string filepath, RelNodeToNodes& relHeadToTails, R
 				std::cout << "Unsupported Filetype, please make sure you have the following triple format {subject}{TAB}{predicate}{TAB}{object}" << std::endl;
 				//exit(-1);
 			}
-			add(results[0], results[1], results[2], relHeadToTails, relTailToHeads, relCounter);
+			add(results[0], results[1], results[2]);
 		}
 		myfile.close();
 	}
@@ -58,7 +54,7 @@ void TripleStorage::read(std::string filepath, RelNodeToNodes& relHeadToTails, R
 	}
 }
 
-void TripleStorage::add(std::string head, std::string relation, std::string tail, RelNodeToNodes& relHeadToTails, RelNodeToNodes& relTailToHeads, std::unordered_map<int, std::unordered_set<int>>* relCounter) {
+void TripleStorage::add(std::string head, std::string relation, std::string tail) {
 	//Get ids
 	index->addNode(head);
 	index->addNode(tail);
@@ -70,6 +66,7 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 
 	relHeadToTails[relId][headNodeId].insert(tailNodeId);
 	relTailToHeads[relId][tailNodeId].insert(headNodeId);
-	(*relCounter)[headNodeId].insert(tailNodeId);
-	(*relCounter)[tailNodeId].insert(headNodeId);
+	
+	relCounter[headNodeId].insert(tailNodeId);
+	relCounter[tailNodeId].insert(headNodeId);
 }
