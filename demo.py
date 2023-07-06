@@ -1,7 +1,7 @@
 import python_example
 import timeit
 import numpy as np
-
+import rulebackend
 
 def add(a,b):
     return a+b
@@ -34,5 +34,13 @@ end = 100000
 print(timeit.timeit(lambda: sumRange(start,end), number=100))
 print(timeit.timeit(lambda: obj.sumRange(start,end),number=100))
 print(timeit.timeit(lambda: np.sum(np.arange(start,end)),number=100))
+
+data = rulebackend.TripleStorage({"a":2})
+
+handler = handlerObject("peter")
+triples = handler.trainset
+## handler HOLDS DATASET
+prediction = handler.materialize_rule(rule_i) 
+
 
 

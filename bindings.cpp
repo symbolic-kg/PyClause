@@ -1,15 +1,36 @@
 #include <pybind11/pybind11.h>
 #include "src/cpp/myClass.h"
+#include "src/cpp/TripleStorage.h"
+#include "src/cpp/Index.h"
 #include <string>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
+
+
+
+
+// ***Pybind Examples**** 
 int add(int i, int j) {
     return i + j;
 }
 
 namespace py = pybind11;
+
+
+// ***Rules backend bindings***
+PYBIND11_MODULE(rulebackend, m) {
+    py::class_<TripleStorage>(m, "TripleStorage") // TODO is actually not needed and cannot invoked as index is not used 
+        .def(py::init<Index*>())
+        .def("read", &TripleStorage::read)
+    ;
+    #ifdef VERSION_INFO
+    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+#else
+    m.attr("__version__") = "dev";
+#endif
+}
 
 PYBIND11_MODULE(python_example, m) {
     m.doc() = R"pbdoc(
@@ -50,3 +71,5 @@ PYBIND11_MODULE(python_example, m) {
     m.attr("__version__") = "dev";
 #endif
 }
+
+

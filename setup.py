@@ -4,6 +4,7 @@ from setuptools.command.build_ext import build_ext
 import sys, re
 import setuptools
 import pybind11
+from glob import glob
 
 
 # (c) Sylvain Corlay, https://github.com/pybind/python_example
@@ -58,7 +59,16 @@ class BuildExt(build_ext):
 ext_modules = [
   Extension(
     'python_example',
-    ['bindings.cpp', 'src/cpp/myClass.cpp'],
+    ['bindings.cpp'] + glob("src/cpp/*.cpp"),
+    include_dirs=[
+      pybind11.get_include(False),
+      pybind11.get_include(True ),
+    ],
+    language='c++'
+  ),
+  Extension(
+    'rulebackend',
+    ['bindings.cpp'] + glob("src/cpp/*.cpp"),
     include_dirs=[
       pybind11.get_include(False),
       pybind11.get_include(True ),
@@ -69,7 +79,7 @@ ext_modules = [
 
 
 setup(
-  name             = 'python_example',
+  name             = 'PyClause',
   ext_modules      = ext_modules,
   install_requires = ['pybind11>=2.2.0'],
   cmdclass         = {'build_ext': BuildExt},

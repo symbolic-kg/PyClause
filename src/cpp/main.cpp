@@ -11,12 +11,13 @@ int main(){
     long end = 100000;
     std::cout<<ob.addRange(start,end)<<"\n";
 
-
+    // data loading
     Index* index = new Index();
-    std::string dataPath = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
+    std::string dataPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt";
     TripleStorage data(index);
     data.read(dataPath);
-    std::cout<<"data loaded";
+    std::cout<<"data loaded \n";
+    std::cout<<"bye";
 
 
 

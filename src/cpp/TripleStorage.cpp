@@ -49,7 +49,7 @@ void TripleStorage::read(std::string filepath) {
 		myfile.close();
 	}
 	else {
-		std::cout << "Unable to open train file " << filepath << std::endl;
+		std::cout << "Unable to open file " << filepath << std::endl;
 		exit(-1);
 	}
 }
