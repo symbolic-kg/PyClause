@@ -56,9 +56,9 @@ void TripleStorage::read(std::string filepath) {
 
 void TripleStorage::add(std::string head, std::string relation, std::string tail) {
 	//Get ids
-	index->addNode(head);
-	index->addNode(tail);
-	index->addRelation(relation);
+	//index->addNode(head);
+	//index->addNode(tail);
+	//index->addRelation(relation);
 
 	int headNodeId = *(index->getIdOfNodestring(head));
 	int relId = *(index->getIdOfRelationstring(relation));

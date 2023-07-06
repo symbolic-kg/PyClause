@@ -31,10 +31,6 @@ private:
 	std::unordered_map<int, std::unordered_set<int>> relCounter;
 	RelNodeToNodes relHeadToTails;
 	RelNodeToNodes relTailToHeads;
-
-	
-
-
 };
 
 #endif // TRIPLESTORAGE_H
