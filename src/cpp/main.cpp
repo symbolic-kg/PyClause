@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <memory>
 #include "myClass.h"
 #include "Index.h"
 #include "TripleStorage.h"
@@ -13,12 +14,10 @@ int main(){
     std::cout<<ob.addRange(start,end)<<"\n";
 
     // data loading
-    {
-    Index* index = new Index();
+    {std::shared_ptr<Index> index = std::make_shared<Index>();
     std::string dataPath = "/home/patrick/Desktop/kge/data/wikidata5m/train.txt";
     TripleStorage data(index);
-    data.read(dataPath);
-    } // destructor is called
+    data.read(dataPath);} // deconstructor
     std::cout<<"data loaded \n";
     std::cout<<"bye";
 

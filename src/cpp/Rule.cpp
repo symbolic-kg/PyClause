@@ -38,5 +38,9 @@ void Rule::computeBodyHash(){
 
 RuleB::RuleB(std::vector<int>& relations, std::vector<bool>& directions) {
 	this->relations = relations;
-    this->directions = directions;		
+    this->directions = directions;	
+
+    if(relations.size() != (directions.size() + 1)) {
+        throw std::invalid_argument("'Directions' size should be one less than 'relations' size in construction of RuleB");
+    }	
 }

@@ -3,10 +3,7 @@
 #ifndef TRIPLESTORAGE_H
 #define TRIPLESTORAGE_H
 
-#include <string>
-#include <fstream>
-#include <unordered_set>
-
+#include <memory>
 #include "Index.h"
 #include "Types.h"
 #include "Util.hpp"
@@ -14,7 +11,7 @@
 class TripleStorage
 {
 public:
-	TripleStorage(Index* index);
+	TripleStorage(std::shared_ptr<Index> index);
 
 	//CSR<int, int>* getCSR();
 	std::unordered_map<int, std::unordered_set<int>>& getRelCounter();
@@ -26,7 +23,7 @@ public:
 protected:
 
 private:
-	Index* index;
+	std::shared_ptr<Index> index;
 	//CSR<int, int>* csr;
 	std::unordered_map<int, std::unordered_set<int>> relCounter;
 	RelNodeToNodes relHeadToTails;
