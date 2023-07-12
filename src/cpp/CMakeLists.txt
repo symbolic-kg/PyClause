@@ -13,10 +13,12 @@ include(CPack)
 
 
 
-add_library(rules_backend SHARED myClass.cpp Index.cpp Rule.cpp TripleStorage.cpp Util.hpp)
+add_library(
+    rules_backend SHARED myClass.cpp Index.cpp Rule.cpp TripleStorage.cpp Util.hpp RuleStorage.cpp
+)
 
 add_executable(main main.cpp)
-# link the 'my_program_code' library into the main executable
+# link rules_backend library into the main executable
 target_link_libraries(main rules_backend)
 
 

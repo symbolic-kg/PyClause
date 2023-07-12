@@ -33,12 +33,13 @@ RelNodeToNodes& TripleStorage::getRelTailToHeads() {
 	return relTailToHeads;
 }
 
+// read a file with tab separated triples and create data
 void TripleStorage::read(std::string filepath) {
 	std::string line;
-	std::ifstream myfile(filepath);
-	if (myfile.is_open())
+	std::ifstream file(filepath);
+	if (file.is_open())
 	{
-		while (!util::safeGetline(myfile, line).eof())
+		while (!util::safeGetline(file, line).eof())
 		{
 			std::istringstream iss(line);
 			std::vector<std::string> results = util::split(line, '\t');
@@ -48,7 +49,7 @@ void TripleStorage::read(std::string filepath) {
 			}
 			add(results[0], results[1], results[2]);
 		}
-		myfile.close();
+		file.close();
 	}
 	else {
 		std::cout << "Unable to open file " << filepath << std::endl;

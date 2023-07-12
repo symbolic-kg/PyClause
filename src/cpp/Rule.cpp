@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "Rule.h"
 #include "Types.h"
 
@@ -11,7 +13,7 @@ void Rule::print(){
     throw std::runtime_error("Not implemented yet");
 }
 
-int& Rule::getID(){
+int Rule::getID(){
     return ID;
 }
 
@@ -41,7 +43,7 @@ int Rule::getTargetRel(){
 
 // ***RuleB implementation*** 
 
-RuleB::RuleB(std::vector<int> &relations, std::vector<bool> &directions) {
+RuleB::RuleB(std::vector<int>& relations, std::vector<bool>& directions) {
     if(relations.size() != (directions.size() + 1)) {
         throw std::invalid_argument("'Directions' size should be one less than 'relations' size in construction of RuleB");
     }
@@ -60,16 +62,18 @@ std::vector<std::vector<int>> RuleB::materialize(TripleStorage& triples){
     std::vector<std::vector<int>> predictions;
 
     RelNodeToNodes* relNtoN = nullptr;
-     // First body atom is (v1,v2)
+     // first body atom is (v1,v2)
     if (directions[0]){
          relNtoN =  &triples.getRelHeadToTails();
-    // First body atom is (v2,v1)    
+    // first body atom is (v2,v1)    
     }else{
          relNtoN =  &triples.getRelTailToHeads();
     }
-    auto it = (*relNtoN).find(relations[1]);
-    if (!(it==(*relNtoN).end())){
+     // first body relation
+    auto it = relNtoN->find(relations[1]);
+    if (!(it==relNtoN->end())){
         NodeToNodes& NtoN = it->second;
+         // start branches of the DFS search
          // every entity e that satisfies b1(e,someY) [or b1(someX, e)]
          for (auto const& pair: NtoN){
                 const int& e = pair.first;
@@ -86,6 +90,7 @@ std::vector<std::vector<int>> RuleB::materialize(TripleStorage& triples){
 
 }
 
+// recursive DFS from a startpoint currEntity, one substitution of the first body atom
 void RuleB::searchCurrGroundings(
 			int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples, Nodes& closingEntities
 		)
@@ -101,6 +106,101 @@ void RuleB::searchCurrGroundings(
             nextEntities = &(entIt->second);
 
             if (currAtomIdx == relations.size()-1){
+                //copies
+                for(int ent: *nextEntities){
+                    // respect object identity constraint
+                    if (substitutions.find(ent)==substitutions.end()){
+                        closingEntities.insert(ent);
+                    }
+                }
+            }else{
+                for(int ent: *nextEntities){
+                    if (substitutions.find(ent)==substitutions.end()){
+                        substitutions.insert(ent);
+                        searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities);
+                    }
+                }
+            }
+        }
+    } 
+}
+
+// ***RuleC implementation*** 
+
+RuleC::RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, std::array<int,2>& constants) {
+    if(relations.size() != (directions.size() + 1)) {
+        throw std::invalid_argument("'Directions' size should be one less than 'relations' size in construction of RuleC");
+    }
+    if(relations.size() < 2) {
+        throw std::invalid_argument("Cannot construct a RuleC with no body atom.");
+    }		
+	this->relations = relations;
+    this->directions = directions;
+    this->leftC = leftC;	
+    this->constants = constants;
+    this->targetRel = relations.front();
+    if (leftC){
+        this->_relations = relations;
+        this-> _directions = directions;
+    }else{
+        this->_relations = relations;
+        std::reverse(_relations.begin()+1, _relations.end());
+        this->_directions = directions;
+        this->_directions.flip();
+    }   
+}
+
+
+// TODO: dont return, just add predictions to a passed data structure
+// or not return a copy
+std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
+
+    std::vector<std::vector<int>> predictions;
+
+    RelNodeToNodes* relNtoN = nullptr;
+    if (_directions[0]){
+        relNtoN =  &triples.getRelHeadToTails();   
+    }else{
+        relNtoN =  &triples.getRelTailToHeads();
+    }
+    auto it = relNtoN->find(_relations[1]);
+    if (!(it==relNtoN->end())){
+        NodeToNodes& NtoN = it->second;
+        if (NtoN.count(constants[1])>0){
+            Nodes closingEntities;
+            //TODO OI for both the constants seems to make sense
+            std::set<int> substitutions = {constants[0], constants[1]};
+            searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities);
+            for (const int& cEnt:  closingEntities){
+                if (leftC){
+                    std::vector<int> pred = {constants[0], targetRel, cEnt};
+                }else{
+                    std::vector<int> pred = {cEnt, targetRel, constants[0]};
+                }
+                std::vector<int> pred = {constants[0], targetRel, cEnt};
+                predictions.push_back(pred);
+            }
+            return predictions;
+        }
+    }
+}
+// same implementation as in RuleB except that internal _relations and _directions is used such that both grounding
+// directions can be handled
+void RuleC::searchCurrGroundings(
+			int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples, Nodes& closingEntities
+		)
+{
+    Nodes* nextEntities = nullptr;
+    int currRel = _relations[currAtomIdx];
+    RelNodeToNodes& relNtoN = _directions[currAtomIdx-1] ? triples.getRelHeadToTails() : triples.getRelTailToHeads();
+    auto it = relNtoN.find(_relations[currAtomIdx]);
+    if (!(it==relNtoN.end())){
+        NodeToNodes& NtoN = it->second;
+        auto entIt = NtoN.find(currEntity);
+        if (!(entIt==NtoN.end())){
+            nextEntities = &(entIt->second);
+
+            if (currAtomIdx == _relations.size()-1){
                 //copies
                 for(int ent: *nextEntities){
                     // respect object identity constraint
