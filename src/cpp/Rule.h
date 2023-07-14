@@ -25,7 +25,10 @@ public:
 	long long getBodyHash();
 	void computeBodyHash();
 	int getTargetRel();
+	std::vector<int>& getRelations();
+    std::vector<bool>& getDirections();
 	virtual std::vector<std::vector<int>> materialize(TripleStorage& triples);
+
 	
 
 protected:
@@ -43,8 +46,9 @@ protected:
 	int sampledPredicted;
 	int sampledCpredicted;
 	int sampledConf;
-	
-
+	// see child classes
+	std::vector<int> relations;
+	std::vector<bool> directions;
 	std::string rulestring;
 	int targetRel;
 private:

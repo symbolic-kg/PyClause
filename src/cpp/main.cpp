@@ -54,15 +54,27 @@ int main(){
 
     RuleC rule(relations, directions, leftC, constants);
 
-    auto pred = rule.materialize(data);
+
+    //25 predictions? :"_has_part(X,Y) <= _has_part(A,X), _member_meronym(A,B), _derivationally_related_form(B,C), _derivationally_related_form(C,D), _has_part(D,Y)"
+    // parse a real B rule and materialize
+
+    //83 30 rule correct preds from christian _has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)
+    RuleStorage rules(index);
+    std::unique_ptr<Rule> ruleB = rules.parseAnytimeRule("_has_part(X,Y) <= _hypernym(A,X), _has_part(A,B), _hypernym(B,Y)");
+    std::vector<bool> dirs = ruleB->getDirections();
+    std::vector<int> rels = ruleB->getRelations();
 
      // print predictions for rule
     int counter = 0;
-    for (auto pred: rule.materialize(data)) {
+    for (auto pred: ruleB->materialize(data)) {
         counter +=1;
         std::cout << "[";
         for (int i = 0; i < pred.size(); ++i) {
-            std::cout << pred[i];
+            if (i==0 | i==2){
+                std::cout << index->getStringOfNodeId(pred[i]);
+            }else{
+                std::cout << index->getStringOfRelId(pred[i]);
+            }
             if (i != pred.size() - 1) // not the last item
                 std::cout << ", ";
         }
@@ -70,11 +82,11 @@ int main(){
     }  
     std::cout<<"found:"<<counter<<"\n";
 
-    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
-    RuleStorage rules(index);
-    rules.readAnyTimeFormat(rulePath, true); 
-    std::vector<std::unique_ptr<Rule>>& allRules = rules.getRules();
-    int ctr = 0;
+    // **** read and materialize rules ***
+    // std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
+    // rules.readAnyTimeFormat(rulePath, true); 
+    // std::vector<std::unique_ptr<Rule>>& allRules = rules.getRules();
+    // int ctr = 0;
 
     // for (auto& srule: allRules){
     //     srule->materialize(data);
@@ -83,14 +95,14 @@ int main(){
     // }
 
 
-    #pragma omp parallel
-    {
-    #pragma omp for
-    for (int i = 0; i < allRules.size(); ++i){
-        allRules[i]->materialize(data);
-        std::cout<<"materialize rule:"<< i <<"\n";
-    }
-    }
+    // #pragma omp parallel
+    // {
+    // #pragma omp for
+    // for (int i = 0; i < allRules.size(); ++i){
+    //     allRules[i]->materialize(data);
+    //     std::cout<<"materialize rule:"<< i <<"\n";
+    // }
+    // }
 
 
     std::cout<<"bye";

@@ -44,6 +44,14 @@ std::vector<std::vector<int>> Rule::materialize(TripleStorage& triples){
     throw std::runtime_error("Not implemented yet");
 }
 
+std::vector<int>& Rule::getRelations() {
+    return relations;
+}
+
+std::vector<bool>& Rule::getDirections() {
+    return directions;
+}
+
 // ***RuleB implementation*** 
 
 RuleB::RuleB(std::vector<int>& relations, std::vector<bool>& directions) {
@@ -111,7 +119,7 @@ void RuleB::searchCurrGroundings(
             if (currAtomIdx == relations.size()-1){
                 //copies
                 for(int ent: *nextEntities){
-                    // respect object identity constraint
+                    // respect object identity constraint, stop if violated
                     if (substitutions.find(ent)==substitutions.end()){
                         closingEntities.insert(ent);
                     }
@@ -121,6 +129,7 @@ void RuleB::searchCurrGroundings(
                     if (substitutions.find(ent)==substitutions.end()){
                         substitutions.insert(ent);
                         searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities);
+                        substitutions.erase(ent);
                     }
                 }
             }
@@ -171,7 +180,7 @@ std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
         NodeToNodes& NtoN = it->second;
         if (NtoN.count(constants[1])>0){
             Nodes closingEntities;
-            //TODO OI for both the constants seems to make sense
+            // we enforce OI for both the constants, this is consistent with B rules
             std::set<int> substitutions = {constants[0], constants[1]};
             searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities);
             for (const int& cEnt:  closingEntities){
@@ -216,11 +225,10 @@ void RuleC::searchCurrGroundings(
                     if (substitutions.find(ent)==substitutions.end()){
                         substitutions.insert(ent);
                         searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities);
+                        substitutions.erase(ent);
                     }
                 }
             }
         }
     } 
 }
-
-
