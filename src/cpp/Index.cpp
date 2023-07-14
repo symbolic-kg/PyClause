@@ -24,10 +24,10 @@ int Index::getRelSize() {
 	return relToId.size();
 }
 
-int* Index::getIdOfNodestring(std::string& node) {
+int Index::getIdOfNodestring(std::string& node) {
 	auto it = nodeToId.find(node);
 	if (it != nodeToId.end()) {
-		return &(it->second);
+		return it->second;
 	}
 	else {
 		//if(Properties::get().PREDICT_UNKNOWN){
@@ -38,10 +38,10 @@ int* Index::getIdOfNodestring(std::string& node) {
 	}
 }
 
-std::string* Index::getStringOfNodeId(int& id) {
+std::string Index::getStringOfNodeId(int& id) {
 	auto it = idToNode.find(id);
 	if (it != idToNode.end()) {
-		return &(it->second);
+		return it->second;
 	}
 	else {
 		std::cout << "Error: Id " << id << " not found in idToNode set";
@@ -49,20 +49,20 @@ std::string* Index::getStringOfNodeId(int& id) {
 	}
 }
 
-int* Index::getIdOfRelationstring(std::string& relation) {
+int Index::getIdOfRelationstring(std::string& relation) {
 	auto it = relToId.find(relation);
 	if (it != relToId.end()) {
-		return &(it->second);
+		return it->second;
 	}
 	else {
 		throw std::runtime_error(("Error: Relation " + relation + " not found in Trainingset"));
 	}
 }
 
-std::string* Index::getStringOfRelId(int& id) {
+std::string Index::getStringOfRelId(int& id) {
 	auto it = idToRel.find(id);
 	if (it != idToRel.end()) {
-		return &(it->second);
+		return it->second;
 	}
 	else {
 		std::cout << "Error: Id " << id << " not found in idToRel set";

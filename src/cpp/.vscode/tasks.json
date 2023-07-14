@@ -9,7 +9,8 @@
                 "-g",
                 "${workspaceFolder}/*.cpp",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "-fopenmp"
             ],
             "options": {
                 "cwd": "${fileDirname}"

@@ -40,6 +40,9 @@ int Rule::getTargetRel(){
    return targetRel;
 
 }
+std::vector<std::vector<int>> Rule::materialize(TripleStorage& triples){
+    throw std::runtime_error("Not implemented yet");
+}
 
 // ***RuleB implementation*** 
 

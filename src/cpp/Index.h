@@ -13,10 +13,10 @@ public:
 	void addRelation(std::string& relstring);
 	int getNodeSize();
 	int getRelSize();
-	int* getIdOfNodestring(std::string& node);
-	std::string* getStringOfNodeId(int& id);
-	int* getIdOfRelationstring(std::string& relation);
-	std::string* getStringOfRelId(int& id);
+	int getIdOfNodestring(std::string& node);
+	std::string getStringOfNodeId(int& id);
+	int getIdOfRelationstring(std::string& relation);
+	std::string getStringOfRelId(int& id);
 	void rehash();
 
 private:

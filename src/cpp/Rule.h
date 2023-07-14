@@ -25,6 +25,7 @@ public:
 	long long getBodyHash();
 	void computeBodyHash();
 	int getTargetRel();
+	virtual std::vector<std::vector<int>> materialize(TripleStorage& triples);
 	
 
 protected:
@@ -38,6 +39,12 @@ protected:
 	double confidence;
 	double applied_confidence;
 	long long bodyhash;
+	// possibly sampled confidence metrics
+	int sampledPredicted;
+	int sampledCpredicted;
+	int sampledConf;
+	
+
 	std::string rulestring;
 	int targetRel;
 private:

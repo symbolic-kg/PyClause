@@ -2,6 +2,9 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <omp.h>
+
+
 #include "myClass.h"
 #include "Index.h"
 #include "TripleStorage.h"
@@ -37,13 +40,13 @@ int main(){
     // real C-rule
     std::string rel1Str = "_instance_hypernym";
     std::string rel2Str = "_instance_hypernym";
-    int rel1 = *(index->getIdOfRelationstring(rel1Str));
-    int rel2 = *(index->getIdOfRelationstring(rel2Str));
+    int rel1 = index->getIdOfRelationstring(rel1Str);
+    int rel2 = index->getIdOfRelationstring(rel2Str);
 
     std::string c1str = "08638442";
     std::string c2str = "08524735";
-    int c1 = *(index->getIdOfNodestring(c1str));
-    int c2 = *(index->getIdOfNodestring(c2str));
+    int c1 = index->getIdOfNodestring(c1str);
+    int c2 = index->getIdOfNodestring(c2str);
     std::vector<int> relations = {rel1, rel2};
     std::vector<bool> directions = {true};
     bool leftC = false;
@@ -67,10 +70,29 @@ int main(){
     }  
     std::cout<<"found:"<<counter<<"\n";
 
-    // std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/rules-10";
-    // RuleStorage rules(index);
-    // rules.read(rulePath);
-    
+    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
+    RuleStorage rules(index);
+    rules.readAnyTimeFormat(rulePath, true); 
+    std::vector<std::unique_ptr<Rule>>& allRules = rules.getRules();
+    int ctr = 0;
+
+    // for (auto& srule: allRules){
+    //     srule->materialize(data);
+    //     std::cout<<"materialized rule:"<<ctr<<"\n";
+    //     ctr+=1;
+    // }
+
+
+    #pragma omp parallel
+    {
+    #pragma omp for
+    for (int i = 0; i < allRules.size(); ++i){
+        allRules[i]->materialize(data);
+        std::cout<<"materialize rule:"<< i <<"\n";
+    }
+    }
+
+
     std::cout<<"bye";
 
    

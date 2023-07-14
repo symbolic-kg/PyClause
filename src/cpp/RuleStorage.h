@@ -10,7 +10,10 @@ class RuleStorage
 
 public:
     RuleStorage(std::shared_ptr<Index> index);
-    void read(std::string path);
+    //if sampled the first 3 values in a ruleset refer to sampled values
+    void readAnyTimeFormat(std::string path, bool sampled); 
+    std::unique_ptr<Rule> parseAnytimeRule(std::string rule);
+    std::vector<std::unique_ptr<Rule>>& getRules();
 
 private:
     std::vector<std::unique_ptr<Rule>> rules;

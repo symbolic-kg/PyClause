@@ -63,9 +63,9 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 	index->addNode(tail);
 	index->addRelation(relation);
 
-	int headNodeId = *(index->getIdOfNodestring(head));
-	int relId = *(index->getIdOfRelationstring(relation));
-	int tailNodeId = *(index->getIdOfNodestring(tail));
+	int headNodeId = index->getIdOfNodestring(head);
+	int relId = index->getIdOfRelationstring(relation);
+	int tailNodeId = index->getIdOfNodestring(tail);
 
 	relHeadToTails[relId][headNodeId].insert(tailNodeId);
 	relTailToHeads[relId][tailNodeId].insert(headNodeId);
