@@ -2,8 +2,10 @@
 #include "Index.h"
 #include "Globals.h"
 #include "Rule.h"
+#include "Types.h"
 
 #include <fstream>
+#include <string>
 
 
 RuleStorage::RuleStorage(std::shared_ptr<Index> index){
@@ -39,79 +41,194 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
     }
 };
 
-// this function is adapted from https://github.com/OpenBioLink/SAFRAN/blob/master/src/RuleReader.cpp#L43
 std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
-    std::stringstream stream(rule);
 
-    std::string currentChars;
-    std::getline(stream, currentChars, '(');
-    int relID = index->getIdOfRelationstring(currentChars);
+    if(rule.find(equalityToken) != std::string::npos) {
+    std::cout << "Found me_myself_i, skipping." << std::endl;
+    return nullptr;
+    }
 
-    std::string left;
-    std::string right;
-    std::getline(stream, left, ',');
-    std::getline(stream, right, ')');
+    std::vector<std::string> headBody = util::splitString(rule, ruleSeparator);
+    std::string headAtomStr = headBody[0];
+    
+    // no body
+    if (headBody.size()==1){
+        std::cout<<"that should be a zero rule, skipping yoo.";
+        return nullptr;
+    }
+    std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], atomSeparator);
+    size_t length = bodyAtomsStr.size();
 
-    // the head variables of the anytime format
+    // parse head
+    strAtom headAtom;
+    parseAtom(headAtomStr, headAtom);
+    // set head relation
+    int relID = index->getIdOfRelationstring(headAtom[0]);
+    std::vector<int> relations = {relID};
+    std::vector<bool> directions; 
+    bool leftC;
+    std::array<int, 2> constants;
+
+    // parse body
+    std::vector<strAtom> bodyAtoms;
+    for (int i=0; i<length; i++){
+        strAtom b_i;
+        parseAtom(bodyAtomsStr[i], b_i);
+        bodyAtoms.push_back(b_i);
+    }
+
     char firstVar = anyTimeVars[0];
     char lastVar  = anyTimeVars.back();
 
-    std::string body;
-    // move left to the implication symbol <=
-    // could be any symbol as long it is enclosed within " "
-    std::getline(stream, body, ' ');
-    std::getline(stream, body, ' ');
-
-    std::vector<int> relations = {relID};
-    std::vector<bool> directions; 
-
     std::string ruleType;
-
-    //B-rule
-    if (left[0]==firstVar && right[0]==lastVar){
-        ruleType="RuleB";
-        std::string literal;
-        int ctr = 0;
-        while (!stream.eof()){
-            std::getline(stream, literal, '(');
-            relations.push_back(index->getIdOfRelationstring(literal));
-            std::getline(stream, left, ',');
-            std::getline(stream, right, ')');
-            if (left[0]==anyTimeVars[ctr] && right[0] == anyTimeVars[ctr+1]){
+    // *** BRule ***
+    if (headAtom[1][0]==firstVar && headAtom[2][0]==lastVar){
+        ruleType = "RuleB";
+        for (int i=0; i<length; i++){
+            relations.push_back(index->getIdOfRelationstring(bodyAtoms[i][0]));
+            char first, second;
+            first = anyTimeVars[i];
+            second = (i == length - 1) ? anyTimeVars.back() : anyTimeVars[i + 1];
+            if (bodyAtoms[i][1][0]==first && bodyAtoms[i][2][0]==second){
                 directions.push_back(true);
-            } else if (left[0]==anyTimeVars[ctr+1] && right[0] == anyTimeVars[ctr]) {
-               directions.push_back(false); 
-            } else if(left[0]==anyTimeVars.back() && right[0]==anyTimeVars[ctr]){
+            } else if (bodyAtoms[i][1][0]==second && bodyAtoms[i][2][0]==first) {
                 directions.push_back(false);
-            } else if (left[0]==anyTimeVars[ctr] && right[0]==anyTimeVars.back()){
-                directions.push_back(true);
             } else {
-                throw std::runtime_error("Encountered a rule in parsing that I dont understand: " + rule);
+                throw std::runtime_error("Encountered a Brule that I dont understand in parsing.");
             }
-            std::getline(stream, literal, ',');
-            std::getline(stream, literal, ' ');
-            ctr+=1;
         }
-        std::cout<<"Parsed Brule \n";
+    }else{
+     // *** U_c, U_d rule ***
+        if (length>2){
+            std::cout<<"Cannot parse U_c, U_d rule with length larger than 2, skipping.";
+            return nullptr;
+        }
+
+        bool bodyHasConst = false;
+        symAtom checkHeadAtom;
+        for (strAtom& atom: bodyAtoms){
+            parseSymAtom(atom, checkHeadAtom);
+        if (checkHeadAtom.containsConstant){
+            bodyHasConst = true;
+            }
+        }
+        if (!bodyHasConst){
+            ruleType = "RuleD";
+            std::cout<<"Found U_d rule, skipping.";
+            return nullptr;
+        }else{
+            ruleType = "RuleC";
+        }
+
+        parseSymAtom(headAtom, checkHeadAtom);
+        if (!checkHeadAtom.containsConstant){
+            throw std::runtime_error("Expected a head constant but didnt get one in parsing.");
+        }
+        // assign head constant
+        constants[0] = checkHeadAtom.constant;
+        leftC = checkHeadAtom.leftC;
+
         
-    } else if (left[0]==firstVar && right[0] != lastVar){
-        // leftC=false
-        //std::cout<<"ignored U_c rule\n";
-    } else if (left[0]!=firstVar && right[0]==lastVar){
-        //leftC = true
-        //std::cout<<"Ignored U_c rule\n";
+        symAtom checkBodyAtom;
+        if (length==1){
+            relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+            parseSymAtom(bodyAtoms[0], checkBodyAtom);
+            constants[1] = checkBodyAtom.constant;
+            if (leftC==checkBodyAtom.leftC){
+                directions.push_back(true);
+            }else{
+                directions.push_back(false);
+            }
 
-    } else{
-        throw std::runtime_error("Tried to parse a rule with ParseAnytimeFormat that does not match the format\n.");
-    }   
-    std::unique_ptr<RuleB> ruleInst = nullptr;
-    if (ruleType=="RuleB"){
-        ruleInst = std::make_unique<RuleB>(relations, directions);
+        // we need to do this manually for leftC AnyTime Format is (length=2)
+        // P530(Q142,Y) <= P530(A,Y), P495(Q368674,A)
+        // whereas our representation; which  leads to rel and dir is
+        // P530(Q142,Y) <= P495(Q368674,A), P530(A,Y)
+        } else if (length==2 && leftC){
+            relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
+            relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+            // start with the second atom which is our first atom
+            parseSymAtom(bodyAtoms[1], checkBodyAtom);
+            constants[1] = checkBodyAtom.constant;
+            if (checkBodyAtom.leftC == leftC){
+                directions.push_back(true);
+            }else{
+                directions.push_back(false);
+            }
+            //second var of first atom
+             if (bodyAtoms[0][2][0]==lastVar){
+                directions.push_back(true);
+            }else{
+                directions.push_back(false);
+            }   
+
+        // we need to do this manually for leftC=false AnyTime Format is (length=2)
+        // P3373(X,Q13129708) <= P3373(A,X), P3373(A,Q4530046)
+        // which is in line with our format
+        }else if (length==2 && !leftC){
+            relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+            relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
+            //first var of body atom (char)
+            if (bodyAtoms[0][1][0]==firstVar){
+                directions.push_back(true);
+            }else{
+                directions.push_back(false);
+            }
+            parseSymAtom(bodyAtoms[1], checkBodyAtom);
+            constants[1] = checkBodyAtom.constant;
+            if (checkBodyAtom.leftC == leftC){
+                directions.push_back(true);
+            }else{
+                directions.push_back(false);
+            }
+
+
+        }
     } 
-    return ruleInst;
 
+    if (ruleType=="RuleB"){
+        return std::make_unique<RuleB>(relations, directions);
+    } else if (ruleType=="RuleC"){
+        return std::make_unique<RuleC>(relations, directions, leftC, constants);
+    }
 }
 
- std::vector<std::unique_ptr<Rule>>& RuleStorage::getRules(){
+
+
+std::vector<std::unique_ptr<Rule>>& RuleStorage::getRules(){
     return rules;
  }
+
+void RuleStorage::parseAtom(const std::string& input, strAtom& atom) {
+     std::stringstream stream(input);
+     // assign relation
+    if (!std::getline(stream, atom[0], '(')) {
+        throw std::runtime_error("Error in parseAtom unexpected format:" + input);
+    }
+    // assign head
+    if (!std::getline(stream, atom[1], ',')) {
+        throw std::runtime_error("Error in parseAtom unexpected format:" + input);
+    }
+    //assign tail
+    if (!std::getline(stream, atom[2], ')')) {
+        throw std::runtime_error("Error in parseAtom unexpected format:" + input);
+    }
+}
+
+void RuleStorage::parseSymAtom(strAtom& inputAtom, symAtom& symAt){
+    symAt.containsConstant = false;
+    if (anyTimeVars.find(inputAtom[1]) == std::string::npos){
+        symAt.containsConstant = true;
+        symAt.constant = index->getIdOfNodestring(inputAtom[1]);
+        symAt.leftC = true;
+    }
+    if (anyTimeVars.find(inputAtom[2]) == std::string::npos){
+        if (symAt.containsConstant){
+            throw std::runtime_error("Cannot have a constant in both slots of an atom.");
+        }
+        symAt.containsConstant = true;
+        symAt.constant = index->getIdOfNodestring(inputAtom[2]);
+        symAt.leftC = false;
+    }
+}
+

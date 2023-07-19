@@ -14,6 +14,16 @@ typedef std::set<int> Nodes;
 typedef std::unordered_map<int, Nodes> NodeToNodes;
 typedef std::unordered_map<int, NodeToNodes> RelNodeToNodes;
 
+// [relation, head, tail]
+typedef std::array<std::string,3> strAtom;
+
+struct symAtom {
+    bool containsConstant;
+    bool leftC; // assuming direction is represented as a string
+    int constant;  // assuming constant is represented as a string
+};
+
+
 //typedef std::unordered_map<int, std::vector<Rule*>> RelToRules;
 
 #endif //TYPES_H

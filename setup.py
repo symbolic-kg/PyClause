@@ -59,7 +59,7 @@ class BuildExt(build_ext):
 ext_modules = [
   Extension(
     'python_example',
-    ['bindings.cpp'] + glob("src/cpp/*.cpp"),
+    ['bindings.cpp'] + glob("src/cpp/*.cpp"), #util.hpp
     include_dirs=[
       pybind11.get_include(False),
       pybind11.get_include(True ),
@@ -68,7 +68,7 @@ ext_modules = [
   ),
   Extension(
     'rulebackend',
-    ['bindings.cpp'] + glob("src/cpp/*.cpp"),
+    ['bindings.cpp'] + glob("src/cpp/*.cpp"), #util.hpp
     include_dirs=[
       pybind11.get_include(False),
       pybind11.get_include(True ),

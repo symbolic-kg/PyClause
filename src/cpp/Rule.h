@@ -25,8 +25,10 @@ public:
 	long long getBodyHash();
 	void computeBodyHash();
 	int getTargetRel();
+	// se documentation in child classes
 	std::vector<int>& getRelations();
     std::vector<bool>& getDirections();
+	// fully materialize rule
 	virtual std::vector<std::vector<int>> materialize(TripleStorage& triples);
 
 	
@@ -66,15 +68,15 @@ public:
 	std::vector<std::vector<int>> materialize(TripleStorage& triples);
 
 private:
-	// relations and direction uniquely identifies a rule
+	// this->relations and this->directions uniquely identifies a rule
 	// e.g. relations=[r1, r2, r3]
 	//       directions=[True, False]
 	// is the rule r1(X,Y)<-r2(X,A),r3(Y,A)
 	//array with relation ids first element is head relation
-	std::vector<int> relations;
+	//std::vector<int> relations;
 	// ordering of the implicit body variables
 	// e.g., True means (X,A) False means (A,X)
-	std::vector<bool> directions;
+	// std::vector<bool> directions;
 
 	// currAtom: idx of current atom  wrt this.relations (starts with first body atom has second idx=1)
 	// currEntity: the current entity x for which groundings substitutions for Y 
@@ -97,15 +99,17 @@ public:
 	//TODO check RuleB todo
 	std::vector<std::vector<int>> materialize(TripleStorage& triples);
 private:
-	// relations, directions, leftC, constants, uniquely identify a C rule
+	// this->relations, this->directions, this->leftC, this->constants, uniquely identify a C (U_c) rule
 	// e.g. relations = [r1, r2, r3]
 	//      directions = [false, true]
 	//      leftC = false
 	//       constants = [c,d]
 	// r1(X,c)<--r2(A,X),r3(A,d)
 	// note that when a var is grounded it can be grounded to different entities
-	std::vector<int> relations;
-	std::vector<bool> directions;
+	// for leftC = true the first body atom contains the constant relations,directions stays the same
+	// r1(c,Y)<--r2(A,c),r3(A,Y)
+	//std::vector<int> relations;
+	//std::vector<bool> directions;
 	// left body is grounded (X is grounded means it's a "Y-rule")
 	// if false Y is grounded 
 	bool leftC;

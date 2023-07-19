@@ -1,4 +1,3 @@
-// inspired and adapted from https://github.com/OpenBioLink/SAFRAN/blob/master/include/Util.hpp
 #ifndef UTIL_H
 #define UTIL_H
 
@@ -31,6 +30,21 @@ namespace util{
 		}
 		return cont;
 	}
+
+	inline std::vector<std::string> splitString(const std::string& str, const std::string& delim) {
+    std::vector<std::string> cont;
+    size_t start = 0, end = 0;
+
+    while((end = str.find(delim, start)) != std::string::npos) {
+        cont.push_back(str.substr(start, end - start));
+        start = end + delim.length();
+    }
+	std::string last = str.substr(start);
+	if (!last.empty()){
+		cont.push_back(last);
+	}
+    return cont;
+}
 
 	template<typename ... Args>
 	inline std::string string_format(const std::string& format, Args ... args)
