@@ -14,7 +14,20 @@
 class Rule 
 {
 public:
-	Rule(){};
+	Rule() : 
+        ID(0),
+        length(0), 
+        predicted(0),
+        cpredicted(0),
+        confidence(0.0),
+        applied_confidence(0.0),
+        bodyhash(0),
+        sampledPredicted(0),
+        sampledCpredicted(0),
+		sampledConf(0),
+		targetRel(0),
+		rulestring("")
+	{};
 	void setID(int ID);
 	void print();
 	//Getter
@@ -30,9 +43,6 @@ public:
     std::vector<bool>& getDirections();
 	// fully materialize rule
 	virtual std::vector<std::vector<int>> materialize(TripleStorage& triples);
-
-	
-
 protected:
 	int ID;
 	//body length
@@ -122,15 +132,9 @@ private:
 	std::vector<bool> _directions;
 
 	void searchCurrGroundings(
-		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples, Nodes& closingEntities
+		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+		Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs
 	);
-
-
-
-
-
-
-
 };
 
 

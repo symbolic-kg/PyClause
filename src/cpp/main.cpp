@@ -32,14 +32,14 @@ void tests(){
     // ruleC.release(); // Release old pointer
     // std::unique_ptr<RuleC> ruleCC(ruleCPtr); // Create new unique_ptr
     size = (ruleC->materialize(data)).size();
-    if (!size==276){
+    if (size!=276){
         throw std::runtime_error("Test 1 for C-rule failed.");
     }
     //Test num predictions
-    // 4	2	0.5	_derivationally_related_form(00748155,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(00748155,A)
-    ruleC = rules.parseAnytimeRule("_derivationally_related_form(00748155,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(00748155,A)");
+    // 13	2	0.15384615384615385	_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)
+    ruleC = rules.parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
     size = (ruleC->materialize(data)).size();
-    if (!size==4){
+    if (size!=13){
         throw std::runtime_error("Test 2 for C-rule failed.");
     }
 
@@ -59,7 +59,7 @@ void tests(){
     // 59	11	0.1864406779661017	_member_meronym(12998349,Y) <= _hypernym(Y,11590783)
     ruleC = rules.parseAnytimeRule("_member_meronym(12998349,Y) <= _hypernym(Y,11590783)");
     size = (ruleC->materialize(data)).size();
-    if (!size==59){
+    if (size!=59){
         throw std::runtime_error("Test 5 for C-rule failed.");
     }
 
@@ -67,7 +67,7 @@ void tests(){
     //162	2	0.012345679012345678	_hypernym(X,11669921) <= _member_meronym(11911591,X)
     ruleC = rules.parseAnytimeRule("_hypernym(X,11669921) <= _member_meronym(11911591,X)");
     size = (ruleC->materialize(data)).size();
-    if (!size==162){
+    if (size!=162){
         throw std::runtime_error("Test 6 for C-rule failed.");
     }
 

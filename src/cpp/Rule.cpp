@@ -151,15 +151,12 @@ RuleC::RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& l
     this->leftC = leftC;	
     this->constants = constants;
     this->targetRel = relations.front();
-    if (leftC){
-        this->_relations = relations;
-        this-> _directions = directions;
-    }else{
-        this->_relations = relations;
-        std::reverse(_relations.begin()+1, _relations.end());
-        this->_directions = directions;
-        this->_directions.flip();
-    }   
+
+    // used for rules where leftC=false
+    this->_relations = relations;
+    std::reverse(_relations.begin()+1, _relations.end());
+    this->_directions = directions;
+    this->_directions.flip();   
 }
 
 
@@ -168,21 +165,24 @@ RuleC::RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& l
 std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
 
     std::vector<std::vector<int>> predictions;
-
+    // if left head variable is grounded we start with with the first body atom it contains the second constant
+    // if right is grounded we start with last body atom which then contains the second constant
+    std::vector<int>& rels = leftC ? relations : _relations;
+    std::vector<bool>& dirs = leftC ? directions: _directions;
     RelNodeToNodes* relNtoN = nullptr;
-    if (_directions[0]){
+    if (dirs[0]){
         relNtoN =  &triples.getRelHeadToTails();   
     }else{
         relNtoN =  &triples.getRelTailToHeads();
     }
-    auto it = relNtoN->find(_relations[1]);
+    auto it = relNtoN->find(rels[1]);
     if (!(it==relNtoN->end())){
         NodeToNodes& NtoN = it->second;
         if (NtoN.count(constants[1])>0){
             Nodes closingEntities;
             // we enforce OI for both the constants, this is consistent with B rules
             std::set<int> substitutions = {constants[0], constants[1]};
-            searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities);
+            searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities, rels, dirs);
             for (const int& cEnt:  closingEntities){
                 if (leftC){
                     std::vector<int> pred = {constants[0], targetRel, cEnt};
@@ -196,23 +196,24 @@ std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
         }
     }
 }
-// same implementation as in RuleB except that internal _relations and _directions is used such that both grounding
+// same implementation as in RuleB except that rels dirs  is used depending on leftC
 // directions can be handled
 void RuleC::searchCurrGroundings(
-			int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples, Nodes& closingEntities
+			int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+            Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs
 		)
 {
     Nodes* nextEntities = nullptr;
-    int currRel = _relations[currAtomIdx];
-    RelNodeToNodes& relNtoN = _directions[currAtomIdx-1] ? triples.getRelHeadToTails() : triples.getRelTailToHeads();
-    auto it = relNtoN.find(_relations[currAtomIdx]);
+    int currRel = rels[currAtomIdx];
+    RelNodeToNodes& relNtoN = dirs[currAtomIdx-1] ? triples.getRelHeadToTails() : triples.getRelTailToHeads();
+    auto it = relNtoN.find(rels[currAtomIdx]);
     if (!(it==relNtoN.end())){
         NodeToNodes& NtoN = it->second;
         auto entIt = NtoN.find(currEntity);
         if (!(entIt==NtoN.end())){
             nextEntities = &(entIt->second);
 
-            if (currAtomIdx == _relations.size()-1){
+            if (currAtomIdx == rels.size()-1){
                 //copies
                 for(int ent: *nextEntities){
                     // respect object identity constraint
@@ -224,7 +225,7 @@ void RuleC::searchCurrGroundings(
                 for(int ent: *nextEntities){
                     if (substitutions.find(ent)==substitutions.end()){
                         substitutions.insert(ent);
-                        searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities);
+                        searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities, rels, dirs);
                         substitutions.erase(ent);
                     }
                 }
