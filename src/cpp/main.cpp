@@ -35,6 +35,15 @@ void tests(){
     if (size!=276){
         throw std::runtime_error("Test 1 for C-rule failed.");
     }
+
+
+    //test me 97	3	0.030927835051546393	_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)
+    ruleC = rules.parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
+    size = (ruleC->materialize(data)).size();
+    if (size!=97){
+        throw std::runtime_error("Test 1.1 for C-rule failed.");
+    }
+
     //Test num predictions
     // 13	2	0.15384615384615385	_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)
     ruleC = rules.parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
@@ -70,6 +79,17 @@ void tests(){
     if (size!=162){
         throw std::runtime_error("Test 6 for C-rule failed.");
     }
+
+
+    // Test RuleB predictTailQuery
+    ruleB = rules.parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
+    NodeToPredRules preds;
+    std::string node = "08791167";
+    ruleB->predictTailQuery((index->getIdOfNodestring(node)),data, preds);
+    if (preds.size()!=5){
+        throw std::runtime_error("Test 7 for B-rule predictTailQuery failed");
+    }
+
 
     std::cout<<"All tests passed."<<std::endl;
 }
@@ -141,6 +161,15 @@ int main(){
     int counter = 0;
     for (auto pred: ruleB->materialize(data)) {
         counter +=1;
+        RelNodeToNodes& relHtoT = data.getRelHeadToTails();
+        auto it = relHtoT.find(pred[1]);
+        NodeToNodes& HtoT = it->second;
+        auto _it = HtoT.find(pred[0]);
+        if (_it != HtoT.end()){
+            if ((_it->second).count(pred[2])>0){
+                std::cout<<"Exists in train: ";
+            }
+        }
         std::cout << "[";
         for (int i = 0; i < pred.size(); ++i) {
             if (i==0 | i==2){
@@ -155,30 +184,56 @@ int main(){
     }  
     std::cout<<"found:"<<counter<<"\n";
 
+    NodeToPredRules preds;
+    std::string node = "08791167";
+    ruleB->predictTailQuery((index->getIdOfNodestring(node)), data, preds);
+    std::cout<<"hi"<<preds.size()<<std::endl;
+
+    node = "08921850";
+    preds.clear();
+    ruleB->predictHeadQuery((index->getIdOfNodestring(node)), data, preds);
+    std::cout<<"hi"<<preds.size()<<std::endl;
+
+
+    
     //**** read and materialize rules ***
     std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
     rules.readAnyTimeFormat(rulePath, true); 
     std::vector<std::unique_ptr<Rule>>& allRules = rules.getRules();
-    // int ctr = 0;
-
-    // // for (auto& srule: allRules){
-    // //     srule->materialize(data);
-    // //     std::cout<<"materialized rule:"<<ctr<<"\n";
-    // //     ctr+=1;
-    // // }
+   
+    // // // int ctr = 0;
+    // // // for (auto& srule: allRules){
+    // // //     srule->materialize(data);
+    // // //     std::cout<<"materialized rule:"<<ctr<<"\n";
+    // // //     ctr+=1;
+    // // // }
 
 
     #pragma omp parallel
     {
     #pragma omp for
     for (int i = 0; i < allRules.size(); ++i){
-        allRules[i]->materialize(data);
+        std::vector<std::vector<int>> preds = allRules[i]->materialize(data);
+        for (auto pred: preds){
+            RelNodeToNodes& relHtoT = data.getRelHeadToTails();
+            auto it = relHtoT.find(pred[1]);
+            NodeToNodes& HtoT = it->second;
+            auto _it = HtoT.find(pred[0]);
+            if (_it != HtoT.end()){
+                if ((_it->second).count(pred[2])>0){
+                    // you can set the rule confidences like this
+                    // pred exists in train
+                    int a = 3;
+                }
+            }
+        }
+
         std::cout<<"materialize rule:"<< i <<"\n";
     }
     }
 
 
-    std::cout<<"bye";
+    // std::cout<<"bye";
 
    
     return 0;

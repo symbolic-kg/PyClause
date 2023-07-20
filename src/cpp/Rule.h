@@ -15,7 +15,7 @@ class Rule
 {
 public:
 	Rule() : 
-        ID(0),
+        ID(-1),
         length(0), 
         predicted(0),
         cpredicted(0),
@@ -43,6 +43,10 @@ public:
     std::vector<bool>& getDirections();
 	// fully materialize rule
 	virtual std::vector<std::vector<int>> materialize(TripleStorage& triples);
+	// make prediction for partly grounded triples r(s,?) and r(?,o)
+	// we directly store the results in a query based result structure NodeToPredRults
+	virtual void predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults);
+	virtual void predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults);
 protected:
 	int ID;
 	//body length
@@ -76,6 +80,9 @@ public:
 	//TODO the function should not return a created vector
 	// beter would be to provide a pointer/ref to the data structure where the predictions lie in
 	std::vector<std::vector<int>> materialize(TripleStorage& triples);
+	// we directly store the results in a query based result structure NodeToPredRults
+	void predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults);
+	void predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults);
 
 private:
 	// this->relations and this->directions uniquely identifies a rule
@@ -95,8 +102,14 @@ private:
 	// they must be assigned to another variables (object identity)
 	// closingEntities: the end entities that are assigned to the closing variable
 	// i.e., that are assigned to Y in h(X,Y)<-b1(X,A),b2(A,Y)
+
+	//used for predicting tails
+	std::vector<int> _relations;
+	std::vector<bool> _directions;
+	
 	void searchCurrGroundings(
-		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples, Nodes& closingEntities
+		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+		Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs 
 	);
 };
 

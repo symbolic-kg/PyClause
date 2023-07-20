@@ -17,11 +17,14 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
 	std::string line;
 	std::ifstream file(path);
 	if (file.is_open()) {
+        int IDs = 0;
 		while (!util::safeGetline(file, line).eof()){
 			std::vector<std::string> splitline = util::split(line, '\t');
             std::string ruleString = splitline[3];
             std::unique_ptr<Rule> rule = parseAnytimeRule(ruleString);
             if (rule){
+                rule->setID(currID);
+                currID+=1;
                 rules.push_back(std::move(rule));
                 std::cout<<"added rule\n";
             }else{

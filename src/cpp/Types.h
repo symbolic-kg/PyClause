@@ -23,6 +23,8 @@ struct symAtom {
     int constant;  // assuming constant is represented as a string
 };
 
+typedef std::unordered_map<int, std::vector<int>> NodeToPredRules;
+
 
 //typedef std::unordered_map<int, std::vector<Rule*>> RelToRules;
 

@@ -52,6 +52,13 @@ std::vector<bool>& Rule::getDirections() {
     return directions;
 }
 
+void Rule::predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
+    throw std::runtime_error("Not implemented yet.");
+}
+void Rule::predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults){
+    throw std::runtime_error("Not implemented yet.");
+}
+
 // ***RuleB implementation*** 
 
 RuleB::RuleB(std::vector<int>& relations, std::vector<bool>& directions) {
@@ -64,6 +71,13 @@ RuleB::RuleB(std::vector<int>& relations, std::vector<bool>& directions) {
 	this->relations = relations;
     this->directions = directions;	
     this->targetRel = relations.front();   
+
+     // used for predicting heads
+    this->_relations = relations;
+    std::reverse(_relations.begin()+1, _relations.end());
+    this->_directions = directions;
+    std::reverse(_directions.begin(), _directions.end());
+    _directions.flip();   
 }
 
 // TODO: dont return, just add predictions to a passed data structure
@@ -90,7 +104,7 @@ std::vector<std::vector<int>> RuleB::materialize(TripleStorage& triples){
                 const int& e = pair.first;
                 Nodes closingEntities;
                 std::set<int> substitutions = {e};
-                searchCurrGroundings(1, e, substitutions, triples, closingEntities);
+                searchCurrGroundings(1, e, substitutions, triples, closingEntities, relations, directions);
                 for (const int& cEnt:  closingEntities){
                     std::vector<int> pred = {e, targetRel, cEnt};
                     predictions.push_back(pred);
@@ -101,22 +115,68 @@ std::vector<std::vector<int>> RuleB::materialize(TripleStorage& triples){
 
 }
 
+void RuleB::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
+    RelNodeToNodes* relNtoN = nullptr;
+    if (directions[0]){
+        relNtoN =  &triples.getRelHeadToTails();   
+    }else{
+        relNtoN =  &triples.getRelTailToHeads();
+    }
+    auto it = relNtoN->find(relations[1]);
+    if (it!=relNtoN->end()){
+        NodeToNodes& NtoN = it->second;
+        if (NtoN.count(head)>0){
+            Nodes closingEntities;
+            std::set<int> substitutions = {head};
+            searchCurrGroundings(1, head, substitutions, triples, closingEntities, relations, directions);
+            for (const int& cEnt: closingEntities){
+                tailResults[cEnt].push_back(ID);
+            }
+
+        }
+    }
+}
+void RuleB::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults){
+    RelNodeToNodes* relNtoN = nullptr;
+    if (_directions[0]){
+        relNtoN =  &triples.getRelHeadToTails();   
+    }else{
+        relNtoN =  &triples.getRelTailToHeads();
+    }
+    auto it = relNtoN->find(_relations[1]);
+    if (it!=relNtoN->end()){
+        NodeToNodes& NtoN = it->second;
+        if (NtoN.count(tail)>0){
+            Nodes closingEntities;
+            std::set<int> substitutions = {tail};
+            searchCurrGroundings(1, tail, substitutions, triples, closingEntities, _relations, _directions);
+            for (const int& cEnt: closingEntities){
+                headResults[cEnt].push_back(ID);
+            }
+
+        }
+    }
+}
+
+
+
 // recursive DFS from a startpoint currEntity, one substitution of the first body atom
 void RuleB::searchCurrGroundings(
-			int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples, Nodes& closingEntities
+			int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+            Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs
 		)
 {
     Nodes* nextEntities = nullptr;
-    int currRel = relations[currAtomIdx];
-    RelNodeToNodes& relNtoN = directions[currAtomIdx-1] ? triples.getRelHeadToTails() : triples.getRelTailToHeads();
-    auto it = relNtoN.find(relations[currAtomIdx]);
+    int currRel = rels[currAtomIdx];
+    RelNodeToNodes& relNtoN = dirs[currAtomIdx-1] ? triples.getRelHeadToTails() : triples.getRelTailToHeads();
+    auto it = relNtoN.find(rels[currAtomIdx]);
     if (!(it==relNtoN.end())){
         NodeToNodes& NtoN = it->second;
         auto entIt = NtoN.find(currEntity);
         if (!(entIt==NtoN.end())){
             nextEntities = &(entIt->second);
 
-            if (currAtomIdx == relations.size()-1){
+            if (currAtomIdx == rels.size()-1){
                 //copies
                 for(int ent: *nextEntities){
                     // respect object identity constraint, stop if violated
@@ -128,7 +188,7 @@ void RuleB::searchCurrGroundings(
                 for(int ent: *nextEntities){
                     if (substitutions.find(ent)==substitutions.end()){
                         substitutions.insert(ent);
-                        searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities);
+                        searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities, rels, dirs);
                         substitutions.erase(ent);
                     }
                 }
@@ -152,11 +212,12 @@ RuleC::RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& l
     this->constants = constants;
     this->targetRel = relations.front();
 
-    // used for rules where leftC=false
+    // used for rules where leftC=false and predicting heads
     this->_relations = relations;
     std::reverse(_relations.begin()+1, _relations.end());
     this->_directions = directions;
-    this->_directions.flip();   
+    std::reverse(_directions.begin(), _directions.end());
+    _directions.flip();   
 }
 
 
