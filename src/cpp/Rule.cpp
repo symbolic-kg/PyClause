@@ -52,10 +52,10 @@ std::vector<bool>& Rule::getDirections() {
     return directions;
 }
 
-void Rule::predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
+bool Rule::predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
     throw std::runtime_error("Not implemented yet.");
 }
-void Rule::predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults){
+bool Rule::predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults){
     throw std::runtime_error("Not implemented yet.");
 }
 
@@ -115,7 +115,7 @@ std::vector<std::vector<int>> RuleB::materialize(TripleStorage& triples){
 
 }
 
-void RuleB::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
+bool RuleB::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
     RelNodeToNodes* relNtoN = nullptr;
     if (directions[0]){
         relNtoN =  &triples.getRelHeadToTails();   
@@ -132,11 +132,13 @@ void RuleB::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& 
             for (const int& cEnt: closingEntities){
                 tailResults[cEnt].push_back(ID);
             }
-
+            return !closingEntities.empty();
         }
     }
+    return false;
 }
-void RuleB::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults){
+
+bool RuleB::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults){
     RelNodeToNodes* relNtoN = nullptr;
     if (_directions[0]){
         relNtoN =  &triples.getRelHeadToTails();   
@@ -153,9 +155,10 @@ void RuleB::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& 
             for (const int& cEnt: closingEntities){
                 headResults[cEnt].push_back(ID);
             }
-
+            return !closingEntities.empty();
         }
     }
+    return false;
 }
 
 
@@ -178,7 +181,7 @@ void RuleB::searchCurrGroundings(
 
             if (currAtomIdx == rels.size()-1){
                 //copies
-                for(int ent: *nextEntities){
+                for(const int ent: *nextEntities){
                     // respect object identity constraint, stop if violated
                     if (substitutions.find(ent)==substitutions.end()){
                         closingEntities.insert(ent);
@@ -246,17 +249,94 @@ std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
             searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities, rels, dirs);
             for (const int& cEnt:  closingEntities){
                 if (leftC){
-                    std::vector<int> pred = {constants[0], targetRel, cEnt};
+                    predictions.push_back({constants[0], targetRel, cEnt});
                 }else{
-                    std::vector<int> pred = {cEnt, targetRel, constants[0]};
+                    predictions.push_back({cEnt, targetRel, constants[0]});
                 }
-                std::vector<int> pred = {constants[0], targetRel, cEnt};
-                predictions.push_back(pred);
             }
             return predictions;
         }
     }
 }
+
+bool RuleC::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
+    // can only predict my constant in the grounded direction
+    if (leftC && head!=constants[0]){
+        return false;
+    }
+
+    std::vector<int>& rels = leftC ? relations : _relations;
+    std::vector<bool>& dirs = leftC ? directions: _directions;
+    RelNodeToNodes* relNtoN = nullptr;
+    if (dirs[0]){
+        relNtoN =  &triples.getRelHeadToTails();   
+    }else{
+        relNtoN =  &triples.getRelTailToHeads();
+    }
+    auto it = relNtoN->find(rels[1]);
+    if (it!=relNtoN->end()){
+        NodeToNodes& NtoN = it->second;
+        if (NtoN.count(constants[1])>0){
+            Nodes closingEntities;
+            std::set<int> substitutions = {constants[0], constants[1]};
+            searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities, rels, dirs);
+            bool madePred = false;
+            for (const int& cEnt: closingEntities){
+                // the rule is grounded at the tail so it can only predict this grounding
+                // and the closing entity must be the head grounding in this case
+                if (!leftC && cEnt == head){
+                    tailResults[constants[0]].push_back(ID);
+                    return true;
+                }else if(leftC){
+                    tailResults[cEnt].push_back(ID);
+                    madePred = true;
+                }
+            }
+            return madePred;
+        }
+    }
+    return false;
+}
+
+bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults){
+    // can only predict my constant in the grounded direction
+    if (!leftC && tail!=constants[0]){
+        return false;
+    }
+
+    std::vector<int>& rels = leftC ? relations : _relations;
+    std::vector<bool>& dirs = leftC ? directions: _directions;
+    RelNodeToNodes* relNtoN = nullptr;
+    if (dirs[0]){
+        relNtoN =  &triples.getRelHeadToTails();   
+    }else{
+        relNtoN =  &triples.getRelTailToHeads();
+    }
+    auto it = relNtoN->find(rels[1]);
+    if (it!=relNtoN->end()){
+        NodeToNodes& NtoN = it->second;
+        if (NtoN.count(constants[1])>0){
+            Nodes closingEntities;
+            std::set<int> substitutions = {constants[0], constants[1]};
+            searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities, rels, dirs);
+            bool madePred = false;
+            for (const int& cEnt: closingEntities){
+                // the rule is grounded at the head so it can only predict this grounding
+                // and the closing entity must be the tail grounding in this case
+                if (leftC && cEnt == tail){
+                    headResults[constants[0]].push_back(ID);
+                    return true;
+                }else if(!leftC){
+                    headResults[cEnt].push_back(ID);
+                    madePred = true;
+                }
+            }
+            return madePred;
+        }
+    }
+    return false;
+}
+
 // same implementation as in RuleB except that rels dirs  is used depending on leftC
 // directions can be handled
 void RuleC::searchCurrGroundings(
@@ -276,14 +356,14 @@ void RuleC::searchCurrGroundings(
 
             if (currAtomIdx == rels.size()-1){
                 //copies
-                for(int ent: *nextEntities){
+                for(const int& ent: *nextEntities){
                     // respect object identity constraint
                     if (substitutions.find(ent)==substitutions.end()){
                         closingEntities.insert(ent);
                     }
                 }
             }else{
-                for(int ent: *nextEntities){
+                for(const int& ent: *nextEntities){
                     if (substitutions.find(ent)==substitutions.end()){
                         substitutions.insert(ent);
                         searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities, rels, dirs);

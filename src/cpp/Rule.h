@@ -45,8 +45,8 @@ public:
 	virtual std::vector<std::vector<int>> materialize(TripleStorage& triples);
 	// make prediction for partly grounded triples r(s,?) and r(?,o)
 	// we directly store the results in a query based result structure NodeToPredRults
-	virtual void predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults);
-	virtual void predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults);
+	virtual bool predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults);
+	virtual bool predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults);
 protected:
 	int ID;
 	//body length
@@ -81,8 +81,8 @@ public:
 	// beter would be to provide a pointer/ref to the data structure where the predictions lie in
 	std::vector<std::vector<int>> materialize(TripleStorage& triples);
 	// we directly store the results in a query based result structure NodeToPredRults
-	void predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults);
-	void predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults);
+	bool predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults);
+	bool predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults);
 
 private:
 	// this->relations and this->directions uniquely identifies a rule
@@ -121,6 +121,8 @@ public:
 	RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, std::array<int, 2>& constants);
 	//TODO check RuleB todo
 	std::vector<std::vector<int>> materialize(TripleStorage& triples);
+	bool predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults);
+	bool predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults);
 private:
 	// this->relations, this->directions, this->leftC, this->constants, uniquely identify a C (U_c) rule
 	// e.g. relations = [r1, r2, r3]

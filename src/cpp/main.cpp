@@ -90,6 +90,68 @@ void tests(){
         throw std::runtime_error("Test 7 for B-rule predictTailQuery failed");
     }
 
+    node = "08921850";
+    preds.clear();
+    ruleB->predictHeadQuery((index->getIdOfNodestring(node)), data, preds);
+    std::cout<<"hi"<<preds.size()<<std::endl;
+    if (preds.size()!=3){
+        throw std::runtime_error("Test 8 for B-rule predictHeadQuery failed");
+    }
+    // Test RuleC predictHead/Tail query
+    // tail grounding of head query fits to tail grounding of rule, predict something
+    std::string node_c = "06355894"; 
+    ruleC = rules.parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
+    NodeToPredRules preds_c;
+    ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
+    if(preds_c.size()!=97){
+        throw std::runtime_error("Test 9 for C-rule predictHeadQuery failed");
+    }
+
+    // tail is different to tail constant of the rule, predict nothing
+    node_c = "06898352";
+    preds_c.clear(); 
+    ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
+    if (!preds_c.empty()){
+        throw std::runtime_error("Test 10 for C-rule predictHeadQuery failed");
+
+    }
+
+    // can only make one prediction for tail queries, the tail constant of the rule
+    node_c = "01835276";
+    std::string correctNode = "06355894";
+    preds_c.clear();
+    ruleC->predictTailQuery(index->getIdOfNodestring(node_c), data, preds_c);
+    if (preds_c.size()!=1 || preds_c.find(index->getIdOfNodestring(correctNode))==preds_c.end()){
+        throw std::runtime_error("Test 11 for C-rule predictTailQuery failed");
+    }
+
+    //test leftC C rule head/tail predictions
+    ruleC = rules.parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
+    node_c = "07007945";
+    correctNode = "00548326";
+    preds_c.clear();
+    ruleC->predictTailQuery(index->getIdOfNodestring(node_c), data, preds_c);
+    if (preds_c.size()!=13){
+        throw std::runtime_error("Test 12 for C-rule failed");
+    }
+
+    //head of tail query is different from head of rule, predict nothing
+    node_c = "00548326";
+    preds_c.clear();
+    ruleC->predictTailQuery(index->getIdOfNodestring(node_c), data, preds_c);
+    if (!preds_c.empty()){
+        throw std::runtime_error("Test 13 for C-rule predictHeadQuery failed");
+    }
+
+    // predict exactly your grounded head
+    node_c = "00548326";
+    correctNode = "07007945";
+    preds_c.clear();
+    ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
+    if (preds_c.size()!=1 || preds_c.find(index->getIdOfNodestring(correctNode))==preds_c.end()){
+        throw std::runtime_error("Test 14 for C-rule predictTailQuery failed");
+    }
+
 
     std::cout<<"All tests passed."<<std::endl;
 }
@@ -151,15 +213,14 @@ int main(){
     rules.parseAtom(input, atom);
 
 
-    std::cout<<"im here";
-    //rules.parseAnytimeRule("_has_part(X,08638442) <= _has_part(A,X), _has_part(A,B), _has_part(B,08638442)");
-    // std::unique_ptr<Rule> ruleC = rules.parseAnytimeRule("_has_part(X,08638442) <= _has_part(A,X), _has_part(A,B), _has_part(B,08638442)");
-    // std::vector<bool> dirsC = ruleC->getDirections();
-    // std::vector<int> relsC = ruleC->getRelations();
+    std::string node_c = "06898352"; 
+    std::unique_ptr<Rule>ruleC = rules.parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
+    NodeToPredRules preds_c;
+    ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
 
      // print predictions for rule
     int counter = 0;
-    for (auto pred: ruleB->materialize(data)) {
+    for (auto pred: ruleC->materialize(data)) {
         counter +=1;
         RelNodeToNodes& relHtoT = data.getRelHeadToTails();
         auto it = relHtoT.find(pred[1]);
