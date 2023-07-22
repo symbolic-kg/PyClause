@@ -3,11 +3,11 @@
 #include <memory>
 #include <omp.h>
 
-#include "myClass.h"
-#include "Index.h"
-#include "TripleStorage.h"
-#include "Rule.h"
-#include "RuleStorage.h"
+#include "core/myClass.h"
+#include "core/Index.h"
+#include "core/TripleStorage.h"
+#include "core/Rule.h"
+#include "core/RuleStorage.h"
 
 void tests(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
