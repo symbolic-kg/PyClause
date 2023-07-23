@@ -19,12 +19,9 @@ public:
         length(0), 
         predicted(0),
         cpredicted(0),
-        confidence(0.0),
-        applied_confidence(0.0),
         bodyhash(0),
         sampledPredicted(0),
         sampledCpredicted(0),
-		sampledConf(0),
 		targetRel(0),
 		rulestring("")
 	{};
@@ -32,8 +29,8 @@ public:
 	void print();
 	//Getter
 	int getID();
-	double getAppliedConfidence(int nUnseen);
-	double getConfidence();
+	double getConfidence(int nUnseen, bool exact=false);
+	void setStats(int cpredicted, int predicted, bool exact=false);
 	std::string getRuleString();
 	long long getBodyHash();
 	void computeBodyHash();
@@ -55,13 +52,10 @@ protected:
 	int predicted;
 	// correctly predicted
 	int cpredicted;
-	double confidence;
-	double applied_confidence;
 	long long bodyhash;
 	// possibly sampled confidence metrics
 	int sampledPredicted;
 	int sampledCpredicted;
-	int sampledConf;
 	// see child classes
 	std::vector<int> relations;
 	std::vector<bool> directions;
@@ -81,8 +75,9 @@ public:
 	// beter would be to provide a pointer/ref to the data structure where the predictions lie in
 	std::vector<std::vector<int>> materialize(TripleStorage& triples);
 	// we directly store the results in a query based result structure NodeToPredRults
-	bool predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults);
-	bool predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults);
+	//head query: tail given predict heads; vice versa for head query
+	bool predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& tailResults);
+	bool predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& headResults);
 
 private:
 	// this->relations and this->directions uniquely identifies a rule

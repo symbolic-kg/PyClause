@@ -8,8 +8,6 @@
 #include <vector>
 #include <set>
 
-//#include "Rule.h"
-
 typedef std::unordered_set<int> Nodes;
 typedef std::unordered_map<int, Nodes> NodeToNodes;
 typedef std::unordered_map<int, NodeToNodes> RelNodeToNodes;

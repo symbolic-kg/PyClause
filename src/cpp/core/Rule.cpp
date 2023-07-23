@@ -17,12 +17,23 @@ int Rule::getID(){
     return ID;
 }
 
-double Rule::getAppliedConfidence(int nUnseen){
-    return (double) cpredicted/((double) predicted + (double)nUnseen); 
+double Rule::getConfidence(int nUnseen, bool exact){
+    if (exact){
+        return (double) cpredicted/((double) predicted + (double)nUnseen); 
+    }else{
+        return (double) sampledCpredicted/((double) sampledPredicted + (double)nUnseen); 
+    }
+    
 }
 
-double Rule::getConfidence(){
-    return (double) cpredicted/(double) predicted; 
+void Rule::setStats(int _predicted, int _cpredicted, bool exact){
+    if (exact){
+        cpredicted = _cpredicted;
+        predicted = _predicted;
+    }else{
+        sampledCpredicted = _cpredicted;
+        sampledPredicted = _predicted;
+    }
 }
 
 std::string Rule::getRuleString(){
@@ -52,10 +63,10 @@ std::vector<bool>& Rule::getDirections() {
     return directions;
 }
 
-bool Rule::predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
+bool Rule::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& tailResults){
     throw std::runtime_error("Not implemented yet.");
 }
-bool Rule::predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults){
+bool Rule::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& headResults){
     throw std::runtime_error("Not implemented yet.");
 }
 
@@ -258,7 +269,8 @@ std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
         }
     }
 }
-
+// contrary to B rules we let the DFS run starting from the grounded constants of the rules
+// and not from the grounded entity in the query
 bool RuleC::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
     // can only predict my constant in the grounded direction
     if (leftC && head!=constants[0]){

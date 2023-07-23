@@ -19,12 +19,18 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
 	if (file.is_open()) {
         int IDs = 0;
 		while (!util::safeGetline(file, line).eof()){
+            // expects a line: predicted\t cpredicted\trulestring
 			std::vector<std::string> splitline = util::split(line, '\t');
             std::string ruleString = splitline[3];
             std::unique_ptr<Rule> rule = parseAnytimeRule(ruleString);
             if (rule){
                 rule->setID(currID);
+                rule->setStats(
+                    std::stoi(splitline[0]), std::stoi(splitline[1]), _cfg_exactConf
+                );
                 currID+=1;
+                relToRules[rule->getTargetRel()].insert(&(*rule)); //equivalent to insert(rule.get())
+                // rule is nullptr after this
                 rules.push_back(std::move(rule));
                 std::cout<<"added rule\n";
             }else{
