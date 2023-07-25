@@ -202,6 +202,10 @@ std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
     }
 }
 
+std::set<Rule*, compareRule>&  RuleStorage::getRelRules(int relation){
+    return relToRules[relation];
+}
+
 
 
 std::vector<std::unique_ptr<Rule>>& RuleStorage::getRules(){

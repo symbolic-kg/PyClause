@@ -21,7 +21,9 @@ struct symAtom {
     int constant;  // assuming constant is represented as a string
 };
 
-typedef std::unordered_map<int, std::vector<int>> NodeToPredRules;
+class Rule;
+// it needs to be ensured that rules are added in sorted order
+typedef std::unordered_map<int, std::vector<Rule*>> NodeToPredRules;
 
 
 //typedef std::unordered_map<int, std::vector<Rule*>> RelToRules;

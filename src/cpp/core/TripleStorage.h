@@ -20,6 +20,9 @@ public:
 	void read(std::string filepath);
 	void add(std::string head, std::string relation, std::string tail);
 
+	Nodes* getTforHR(int head, int relation);
+	Nodes* getHforTR(int tail, int relation);
+
 protected:
 
 private:

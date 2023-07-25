@@ -63,10 +63,10 @@ std::vector<bool>& Rule::getDirections() {
     return directions;
 }
 
-bool Rule::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& tailResults){
+bool Rule::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults,  ManySet filterSet){
     throw std::runtime_error("Not implemented yet.");
 }
-bool Rule::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& headResults){
+bool Rule::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults,  ManySet filterSet){
     throw std::runtime_error("Not implemented yet.");
 }
 
@@ -126,7 +126,7 @@ std::vector<std::vector<int>> RuleB::materialize(TripleStorage& triples){
 
 }
 
-bool RuleB::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
+bool RuleB::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet){
     RelNodeToNodes* relNtoN = nullptr;
     if (directions[0]){
         relNtoN =  &triples.getRelHeadToTails();   
@@ -140,8 +140,11 @@ bool RuleB::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& 
             Nodes closingEntities;
             std::set<int> substitutions = {head};
             searchCurrGroundings(1, head, substitutions, triples, closingEntities, relations, directions);
-            for (const int& cEnt: closingEntities){
-                tailResults[cEnt].push_back(ID);
+            for (const int& cEnt: closingEntities){ 
+                if (!filterSet.contains(cEnt)){
+                    tailResults[cEnt].push_back(this);
+                }
+                
             }
             return !closingEntities.empty();
         }
@@ -149,7 +152,7 @@ bool RuleB::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& 
     return false;
 }
 
-bool RuleB::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults){
+bool RuleB::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults,  ManySet filterSet){
     RelNodeToNodes* relNtoN = nullptr;
     if (_directions[0]){
         relNtoN =  &triples.getRelHeadToTails();   
@@ -164,7 +167,10 @@ bool RuleB::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& 
             std::set<int> substitutions = {tail};
             searchCurrGroundings(1, tail, substitutions, triples, closingEntities, _relations, _directions);
             for (const int& cEnt: closingEntities){
-                headResults[cEnt].push_back(ID);
+                if (!filterSet.contains(cEnt)){
+                    headResults[cEnt].push_back(this);
+                }
+                
             }
             return !closingEntities.empty();
         }
@@ -271,7 +277,7 @@ std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
 }
 // contrary to B rules we let the DFS run starting from the grounded constants of the rules
 // and not from the grounded entity in the query
-bool RuleC::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults){
+bool RuleC::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet){
     // can only predict my constant in the grounded direction
     if (leftC && head!=constants[0]){
         return false;
@@ -296,11 +302,11 @@ bool RuleC::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& 
             for (const int& cEnt: closingEntities){
                 // the rule is grounded at the tail so it can only predict this grounding
                 // and the closing entity must be the head grounding in this case
-                if (!leftC && cEnt == head){
-                    tailResults[constants[0]].push_back(ID);
+                if (!leftC && cEnt == head && !filterSet.contains(cEnt)){
+                    tailResults[constants[0]].push_back(this);
                     return true;
-                }else if(leftC){
-                    tailResults[cEnt].push_back(ID);
+                }else if(leftC && !filterSet.contains(cEnt)){
+                    tailResults[cEnt].push_back(this);
                     madePred = true;
                 }
             }
@@ -310,7 +316,7 @@ bool RuleC::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& 
     return false;
 }
 
-bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults){
+bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults,  ManySet filterSet){
     // can only predict my constant in the grounded direction
     if (!leftC && tail!=constants[0]){
         return false;
@@ -335,11 +341,11 @@ bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& 
             for (const int& cEnt: closingEntities){
                 // the rule is grounded at the head so it can only predict this grounding
                 // and the closing entity must be the tail grounding in this case
-                if (leftC && cEnt == tail){
-                    headResults[constants[0]].push_back(ID);
+                if (leftC && cEnt == tail && !filterSet.contains(cEnt)){
+                    headResults[constants[0]].push_back(this);
                     return true;
-                }else if(!leftC){
-                    headResults[cEnt].push_back(ID);
+                }else if(!leftC && !filterSet.contains(cEnt)){
+                    headResults[cEnt].push_back(this);
                     madePred = true;
                 }
             }

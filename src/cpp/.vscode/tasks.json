@@ -9,6 +9,7 @@
                 "-g",
                 "${workspaceFolder}/*.cpp",
                 "${workspaceFolder}/core/*.cpp",
+                "${workspaceFolder}/features/*.cpp",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-fopenmp"

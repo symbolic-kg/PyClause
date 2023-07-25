@@ -73,3 +73,25 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 	relCounter[headNodeId].insert(tailNodeId);
 	relCounter[tailNodeId].insert(headNodeId);
 }
+
+Nodes* TripleStorage::getTforHR(int head, int relation){
+	auto it_rel = relHeadToTails.find(relation);
+	if (it_rel!=relHeadToTails.end()){
+		auto it_head = (it_rel->second).find(head);
+		if (it_head!=(it_rel->second).end()){
+			return &(it_head->second);
+		}
+	}
+	return nullptr;
+}
+Nodes* TripleStorage::getHforTR(int tail, int relation){
+	auto it_rel = relTailToHeads.find(relation);
+	if (it_rel!=relTailToHeads.end()){
+		auto it_head = (it_rel->second).find(tail);
+		if (it_head!=(it_rel->second).end()){
+			return &(it_head->second);
+		}
+	}
+	return nullptr;
+}
+

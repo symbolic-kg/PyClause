@@ -10,3 +10,8 @@ std::string atomSeparator = ", ";
 
 bool _cfg_exactConf = false;
 int _cfg_nUnseen = 5;
+
+//preselection of candidates based on max
+int _cfg_rnk_numPreselect=100;
+//num candidates to output in ranking
+int _cfg_rnk_topk=100;

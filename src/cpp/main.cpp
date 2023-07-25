@@ -8,6 +8,7 @@
 #include "core/TripleStorage.h"
 #include "core/Rule.h"
 #include "core/RuleStorage.h"
+#include "features/Ranking.h"
 
 void tests(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
@@ -173,6 +174,22 @@ int main(){
     std::cout<<"data loaded \n";
     std::cout<<"bye \n";
 
+    //test
+    std::string testPath = "/home/patrick/Desktop/kge/data/wnrr/test.txt";
+    TripleStorage test(index);
+    test.read(testPath);
+
+    //valid 
+    std::string validPath = "/home/patrick/Desktop/kge/data/wnrr/valid.txt";
+    TripleStorage valid(index);
+    valid.read(validPath);
+
+
+
+
+
+
+
     // rule example
     //std::vector<int> relations = {1,6,4};
     //std::vector<bool> directions = {true,true};
@@ -258,9 +275,16 @@ int main(){
 
     
     //**** read and materialize rules ***
-    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
+    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/safran-rules-1000";
     rules.readAnyTimeFormat(rulePath, true); 
     std::vector<std::unique_ptr<Rule>>& allRules = rules.getRules();
+
+    // ranking example
+
+    RankingHandler ranker;
+    ranker.calculateQueryResults(data, test, rules, valid);
+
+
    
     // // // int ctr = 0;
     // // // for (auto& srule: allRules){
