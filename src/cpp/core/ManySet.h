@@ -21,6 +21,15 @@ class ManySet {
             }
             return false;
         }
+        void clear(){
+            sets.clear();
+        }
+        int size(){
+            int mySize = 0;
+            for(auto& set : sets) {
+                mySize+= set->size();
+            }
+        }
 };
 
 #endif //MULTISET_H

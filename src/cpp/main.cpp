@@ -8,7 +8,7 @@
 #include "core/TripleStorage.h"
 #include "core/Rule.h"
 #include "core/RuleStorage.h"
-#include "features/Ranking.h"
+#include "features/Application.h"
 
 void tests(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
@@ -197,25 +197,25 @@ int main(){
     //RuleB rule(relations, directions);
     //std::cout<<rule.getTargetRel()<<"\n";
 
-    Rule empty;
-    std::cout<<empty.getTargetRel()<<"\n";
+    // Rule empty;
+    // std::cout<<empty.getTargetRel()<<"\n";
 
-    // real C-rule
-    std::string rel1Str = "_instance_hypernym";
-    std::string rel2Str = "_instance_hypernym";
-    int rel1 = index->getIdOfRelationstring(rel1Str);
-    int rel2 = index->getIdOfRelationstring(rel2Str);
+    // // real C-rule
+    // std::string rel1Str = "_instance_hypernym";
+    // std::string rel2Str = "_instance_hypernym";
+    // int rel1 = index->getIdOfRelationstring(rel1Str);
+    // int rel2 = index->getIdOfRelationstring(rel2Str);
 
-    std::string c1str = "08638442";
-    std::string c2str = "08524735";
-    int c1 = index->getIdOfNodestring(c1str);
-    int c2 = index->getIdOfNodestring(c2str);
-    std::vector<int> relations = {rel1, rel2};
-    std::vector<bool> directions = {true};
-    bool leftC = false;
-    std::array<int,2> constants = {c1, c2};
+    // std::string c1str = "08638442";
+    // std::string c2str = "08524735";
+    // int c1 = index->getIdOfNodestring(c1str);
+    // int c2 = index->getIdOfNodestring(c2str);
+    // std::vector<int> relations = {rel1, rel2};
+    // std::vector<bool> directions = {true};
+    // bool leftC = false;
+    // std::array<int,2> constants = {c1, c2};
 
-    RuleC rule(relations, directions, leftC, constants);
+    // RuleC rule(relations, directions, leftC, constants);
 
 
     //25 predictions? :"_has_part(X,Y) <= _has_part(A,X), _member_meronym(A,B), _derivationally_related_form(B,C), _derivationally_related_form(C,D), _has_part(D,Y)"
@@ -223,54 +223,54 @@ int main(){
 
     //83 30 rule correct preds from christian _has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)
     RuleStorage rules(index);
-    std::unique_ptr<Rule> ruleB = rules.parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
+    // std::unique_ptr<Rule> ruleB = rules.parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
     
-    strAtom atom;
-    std::string input = "rel1(X,Y)";
-    rules.parseAtom(input, atom);
+    // strAtom atom;
+    // std::string input = "rel1(X,Y)";
+    // rules.parseAtom(input, atom);
 
 
-    std::string node_c = "06898352"; 
-    std::unique_ptr<Rule>ruleC = rules.parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
-    NodeToPredRules preds_c;
-    ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
+    // std::string node_c = "06898352"; 
+    // std::unique_ptr<Rule>ruleC = rules.parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
+    // NodeToPredRules preds_c;
+    // ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
 
-     // print predictions for rule
-    int counter = 0;
-    for (auto pred: ruleC->materialize(data)) {
-        counter +=1;
-        RelNodeToNodes& relHtoT = data.getRelHeadToTails();
-        auto it = relHtoT.find(pred[1]);
-        NodeToNodes& HtoT = it->second;
-        auto _it = HtoT.find(pred[0]);
-        if (_it != HtoT.end()){
-            if ((_it->second).count(pred[2])>0){
-                std::cout<<"Exists in train: ";
-            }
-        }
-        std::cout << "[";
-        for (int i = 0; i < pred.size(); ++i) {
-            if (i==0 | i==2){
-                std::cout << index->getStringOfNodeId(pred[i]);
-            }else{
-                std::cout << index->getStringOfRelId(pred[i]);
-            }
-            if (i != pred.size() - 1) // not the last item
-                std::cout << ", ";
-        }
-        std::cout << "]\n";
-    }  
-    std::cout<<"found:"<<counter<<"\n";
+    //  // print predictions for rule
+    // int counter = 0;
+    // for (auto pred: ruleC->materialize(data)) {
+    //     counter +=1;
+    //     RelNodeToNodes& relHtoT = data.getRelHeadToTails();
+    //     auto it = relHtoT.find(pred[1]);
+    //     NodeToNodes& HtoT = it->second;
+    //     auto _it = HtoT.find(pred[0]);
+    //     if (_it != HtoT.end()){
+    //         if ((_it->second).count(pred[2])>0){
+    //             std::cout<<"Exists in train: ";
+    //         }
+    //     }
+    //     std::cout << "[";
+    //     for (int i = 0; i < pred.size(); ++i) {
+    //         if (i==0 | i==2){
+    //             std::cout << index->getStringOfNodeId(pred[i]);
+    //         }else{
+    //             std::cout << index->getStringOfRelId(pred[i]);
+    //         }
+    //         if (i != pred.size() - 1) // not the last item
+    //             std::cout << ", ";
+    //     }
+    //     std::cout << "]\n";
+    // }  
+    // std::cout<<"found:"<<counter<<"\n";
 
-    NodeToPredRules preds;
-    std::string node = "08791167";
-    ruleB->predictTailQuery((index->getIdOfNodestring(node)), data, preds);
-    std::cout<<"hi"<<preds.size()<<std::endl;
+    // NodeToPredRules preds;
+    // std::string node = "08791167";
+    // ruleB->predictTailQuery((index->getIdOfNodestring(node)), data, preds);
+    // std::cout<<"hi"<<preds.size()<<std::endl;
 
-    node = "08921850";
-    preds.clear();
-    ruleB->predictHeadQuery((index->getIdOfNodestring(node)), data, preds);
-    std::cout<<"hi"<<preds.size()<<std::endl;
+    // node = "08921850";
+    // preds.clear();
+    // ruleB->predictHeadQuery((index->getIdOfNodestring(node)), data, preds);
+    // std::cout<<"hi"<<preds.size()<<std::endl;
 
 
     
@@ -281,8 +281,8 @@ int main(){
 
     // ranking example
 
-    RankingHandler ranker;
-    ranker.calculateQueryResults(data, test, rules, valid);
+    ApplicationHandler ranker(test);
+    ranker.calculateQueryResults(data, rules, valid);
 
 
    
