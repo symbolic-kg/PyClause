@@ -22,6 +22,7 @@ public:
 
 	Nodes* getTforHR(int head, int relation);
 	Nodes* getHforTR(int tail, int relation);
+	Index* getIndex();
 
 protected:
 

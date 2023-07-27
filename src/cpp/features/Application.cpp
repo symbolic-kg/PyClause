@@ -2,6 +2,8 @@
 #include <omp.h>
 #include <memory>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
 
 #include "Application.h"
 #include "../core/TripleStorage.h"
@@ -11,19 +13,19 @@
 #include "../core/Globals.h"
 
 
-
-
-
-
-// todo split in head and tail results s.t. that user can calculate one direction
-void ApplicationHandler::calculateTQueryResults(TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter){
+void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, std::string dir){
    // tail query: predict tail given head
-    RelNodeToNodes& tailQueries = target.getRelHeadToTails();
-    std::cout<<"start tail queries"<<std::endl;
+    RelNodeToNodes& data =  (dir=="tail") ? target.getRelHeadToTails() : target.getRelTailToHeads();
     // relations
-    for (const auto& relTQueries : tailQueries) {
-        int relation = relTQueries.first;
-        const NodeToNodes& headToTail = relTQueries.second;
+    for (const auto& relQueries : data) {
+        int relation = relQueries.first;
+
+        if (_cfg_verbose){
+            std::cout<<"Applying rules on relation "<<relation<<" for "<<dir<<" queries..."<<std::endl;
+        }
+
+        // source to correct target entities
+        const NodeToNodes& srcToCand = relQueries.second;
         
         // collect keys for parallelization
         // trading of space overhead for runtime (note that the maximal space overhead here is O(num_entities))
@@ -34,7 +36,7 @@ void ApplicationHandler::calculateTQueryResults(TripleStorage& train, RuleStorag
         // lastly: simply parallelize for relations instead of queries
         // but note that some relations can make up 30% of the data
         std::vector<int> keys;
-        for (const auto& item : headToTail) {
+        for (const auto& item : srcToCand) {
             keys.push_back(item.first);
         }
 
@@ -45,118 +47,142 @@ void ApplicationHandler::calculateTQueryResults(TripleStorage& train, RuleStorag
             ManySet filter;
             #pragma omp for nowait
             for (int i = 0; i < keys.size(); ++i) {
-                auto headPairs = headToTail.find(keys[i]);
-                // this gives us a query: relation(head,?)
+                auto entityToCands = srcToCand.find(keys[i]);
+                // this gives us a query, e.g. tail direction: relation(source,?)
                 // we apply only once per query
-                // headPairs->second is a set with all the correct tails from train
-                int head = headPairs->first;
+                // entityToCands->second is a set with all the correct answers from target
+                int source = entityToCands->first;
                 // filtering for train and additionalFilter
                 if (_cfg_rnk_filterWtrain){
-                    filter.addSet(&headPairs->second);
+                    filter.addSet(&entityToCands->second);
                 }
-                // always filtered with additionalFilter
+                // always filter with additionalFilter (can be empty)
                 Nodes* naddFilter = nullptr;
-                naddFilter = addFilter.getTforHR(head, relation);
+                naddFilter = addFilter.getTforHR(source, relation);
                 if (naddFilter){
                     filter.addSet(naddFilter);
                 }
                 for (Rule* rule : rules.getRelRules(relation)){
-                    rule->predictTailQuery(head, train, candRules, filter);
+                    if (dir=="tail"){
+                         rule->predictTailQuery(source, train, candRules, filter);
+                    }
+                    else if (dir=="head"){
+                        rule->predictHeadQuery(source, train, candRules, filter);
+                    }
+                    else{
+                        throw std::runtime_error("Need to specify direction='head' or 'tail' when calculating query results.");
+                    }
                     if (candRules.size() > _cfg_rnk_numPreselect){
                     break;
                     }
                 }
 
                 #pragma omp critical
-                {
-                    tailQueryResults[relation][head].candToRules = candRules;
+                {   
+                    if (dir=="tail"){
+                        tailQueryResults[relation][source].candToRules = candRules;
+                    }else{
+                        headQueryResults[relation][source].candToRules = candRules;
+                    }
                 }
                 candRules.clear();
                 filter.clear();
             }
         }        
         }
-    std::cout<<"end tail"<<std::endl;
-
-    std::cout<<"start head queries"<<std::endl;
-    RelNodeToNodes& headQueries = target.getRelTailToHeads();
-    // all relations
-    for (const auto& relHQueries: headQueries){
-        int relation = relHQueries.first;
-        const NodeToNodes& tailToHead = relHQueries.second;
-        
-        // collect keys for parallelization
-        std::vector<int> keys;
-        for (const auto& item : tailToHead) {
-            keys.push_back(item.first);
-        }
-
-        #pragma omp parallel
-        {
-            NodeToPredRules candRules;
-            ManySet filter;
-            #pragma omp for nowait
-            for (int i = 0; i < keys.size(); ++i) {
-                auto tailPairs = tailToHead.find(keys[i]);
-                int tail = tailPairs->first;
-                if (_cfg_rnk_filterWtrain){
-                    filter.addSet(&tailPairs->second);
-                }
-                
-                Nodes* naddFilter = nullptr;
-                naddFilter = addFilter.getHforTR(tail, relation);
-                if (naddFilter){
-                    filter.addSet(naddFilter);
-                }
-                for (Rule* rule: rules.getRelRules(relation)){
-                    rule->predictHeadQuery(tail, train, candRules, filter);
-                    if (candRules.size() > _cfg_rnk_numPreselect){
-                    break;
-                    }
-                }
-                
-                #pragma omp critical
-                {
-                    headQueryResults[relation][tail].candToRules = candRules;
-                }
-                candRules.clear();
-                filter.clear();
-            }
-        }
-    }
-
-    std::cout<<"end head"<<std::endl;
-
-    aggregateQueryResults();
-    std::cout<<"aggregated.";
 }
 
-void ApplicationHandler::aggregateQueryResults(){
-    //tail queries
-    for (auto& relQuery: tailQueryResults){
-            int relation = relQuery.first;
-            std::unordered_map<int, QueryResults>& headToTail = relQuery.second;
-            for (auto& query: headToTail){
+void ApplicationHandler::aggregateQueryResults(std::string direction){
+    auto& queryResults = (direction=="tail") ? tailQueryResults : headQueryResults;
+    for (auto& queries: queryResults){
+            int relation = queries.first;
+            std::unordered_map<int, QueryResults>& srcToCand = queries.second;
+            for (auto& query: srcToCand){
                 int source = query.first;
-                QueryResults& results = query.second;
-                scoreMaxPlus(results.candToRules, results.aggrCand);
+                QueryResults& results = query.second; 
+                if (_cfg_rnk_aggrFunc=="maxplus"){
+                    scoreMaxPlus(results.candToRules, results.aggrCand);
+                }else{
+                    throw std::runtime_error("Only implemented aggregation function is 'maxplus' ");
+                }
+                
             }
     }
-    //head queries
-    for (auto& relQuery: headQueryResults){
-            int relation = relQuery.first;
-            std::unordered_map<int, QueryResults>& tailToHead = relQuery.second;
-            for (auto& query: tailToHead){
-                int source = query.first;
-                QueryResults& results = query.second;
-                scoreMaxPlus(results.candToRules, results.aggrCand);
+}
+
+void ApplicationHandler::makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter){
+    calculateQueryResults(target, train, rules, addFilter, "tail");
+    calculateQueryResults(target, train, rules, addFilter, "head");
+    aggregateQueryResults("tail");
+    aggregateQueryResults("head");
+} 
+
+void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepath){
+    Index* index = target.getIndex();
+    RelNodeToNodes& data = target.getRelTailToHeads();
+    std::ofstream file(filepath);
+
+    for (auto& relQueries: data){
+        int relation = relQueries.first;
+        for (auto& srcTocands: relQueries.second){
+            int tail = srcTocands.first;
+            // true heads
+            Nodes& trueHeads = srcTocands.second;
+            // we use this direction to iterate over all triples
+            // head relation tail is one triple of the target set
+            for (int head: trueHeads){
+                if (file.is_open()){
+                    file<<index->getStringOfNodeId(head)<<" "<<index->getStringOfRelId(relation)<<" "<<index->getStringOfNodeId(tail)<<std::endl;
+                    file<<"Heads: ";
+                    // write head ranking
+                    QueryResults& results = headQueryResults[relation][tail];
+                    for (int i=0; i<results.aggrCand.size(); i++){
+                        auto pair = results.aggrCand[i];
+                        int predHead = pair.first;
+                        double score = pair.second;
+                        // filter with target
+                        // current predicted head is excluded if its the true answer to some other query
+                        if (_cfg_rnk_filterWTarget && !(predHead==head)){
+                            if (!(trueHeads.find(predHead)==trueHeads.end())){
+                                continue;
+                            }
+                        }
+                        if (i!=results.aggrCand.size()-1){
+                             file<<index->getStringOfNodeId(predHead)<<"\t"<<score<<"\t";
+                        }
+                        else{
+                            file<<index->getStringOfNodeId(predHead)<<"\t"<<score;
+                        }
+                       
+                    }
+                    // write tail ranking
+                    file<<"\nTails: ";
+                    //true tails for filtering
+                    Nodes& trueTails = target.getRelHeadToTails()[relation][head];
+                    results = tailQueryResults[relation][head];
+                    for (int i=0; i<results.aggrCand.size(); i++){
+                        auto pair = results.aggrCand[i];
+                        int predTail = pair.first;
+                        double score = pair.second;
+                        if (_cfg_rnk_filterWTarget && !(predTail==tail)){
+                            if (!(trueTails.find(predTail)==trueTails.end())){
+                                continue;
+                            }
+                        }
+                        if (i!=results.aggrCand.size()-1){
+                            file<<index->getStringOfNodeId(predTail)<<"\t"<<score<<"\t";
+                        }else{
+                            file<<index->getStringOfNodeId(predTail)<<"\t"<<score;
+                        }
+                    }
+                    file<<"\n";
+                }
             }
+        }
     }
 }
 
 void ApplicationHandler::scoreMaxPlus(
-
-
     const NodeToPredRules& candToRules, std::vector<std::pair<int, double>>& aggrCand
      ){
     

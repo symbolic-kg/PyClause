@@ -95,3 +95,7 @@ Nodes* TripleStorage::getHforTR(int tail, int relation){
 	return nullptr;
 }
 
+Index* TripleStorage::getIndex(){
+	return index.get();
+}
+

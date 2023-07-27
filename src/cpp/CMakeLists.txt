@@ -16,7 +16,7 @@ include(CPack)
 
 add_library(
     rules_backend SHARED core/myClass.cpp core/Index.cpp core/Rule.cpp core/TripleStorage.cpp
-    core/Util.hpp core/RuleStorage.cpp core/Globals.cpp features/Ranking.cpp
+    core/Util.hpp core/RuleStorage.cpp core/Globals.cpp features/Application.cpp
 )
 
 add_executable(main main.cpp)

@@ -168,19 +168,19 @@ int main(){
     // data loading
     
     std::shared_ptr<Index> index = std::make_shared<Index>();
-    std::string dataPath = "/home/patrick/Desktop/kge/data/wnrr/train.txt";
+    std::string dataPath = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
     TripleStorage data(index);
     data.read(dataPath);
     std::cout<<"data loaded \n";
     std::cout<<"bye \n";
 
     //test
-    std::string testPath = "/home/patrick/Desktop/kge/data/wnrr/test.txt";
+    std::string testPath = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt";
     TripleStorage test(index);
     test.read(testPath);
 
     //valid 
-    std::string validPath = "/home/patrick/Desktop/kge/data/wnrr/valid.txt";
+    std::string validPath = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt";
     TripleStorage valid(index);
     valid.read(validPath);
 
@@ -275,14 +275,17 @@ int main(){
 
     
     //**** read and materialize rules ***
-    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/safran-rules-1000";
+    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/small-rules";
     rules.readAnyTimeFormat(rulePath, true); 
     std::vector<std::unique_ptr<Rule>>& allRules = rules.getRules();
 
     // ranking example
 
-    ApplicationHandler ranker(test);
-    ranker.calculateQueryResults(data, rules, valid);
+    ApplicationHandler ranker;
+    ranker.makeRanking(test, data, rules, valid);
+    std::string rankFile = "/home/patrick/Desktop/PyClause/data/wnrr/firstRanking.txt";
+    ranker.writeRanking(test, rankFile);
+    return 0;
 
 
    

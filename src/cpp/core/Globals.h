@@ -12,6 +12,11 @@ extern std::string atomSeparator;
 extern int _cfg_nUnseen;
 extern bool _cfg_exactConf;
 
+
+extern bool _cfg_verbose;
+
+
+
 // ranking parameters
 
 // preselection of candidates based on max
@@ -23,7 +28,10 @@ extern int _cfg_rnk_numPreselect;
 extern int _cfg_rnk_topk;
 
 extern bool _cfg_rnk_filterWtrain;
-extern bool _cfg_rnk_filterWTest;
+// target is the dataset on which ranking is calculated (test)
+extern bool _cfg_rnk_filterWTarget;
+
+extern std::string _cfg_rnk_aggrFunc;
 
 
 #endif
