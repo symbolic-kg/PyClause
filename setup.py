@@ -49,31 +49,34 @@ class BuildExt(build_ext):
     if ct == 'unix':
       opts.append('-DVERSION_INFO="%s"' % self.distribution.get_version())
       opts.append(cpp_flag(self.compiler))
+      opts.append('-fopenmp') # assumes openmp is supported
     elif ct == 'msvc':
       opts.append('/DVERSION_INFO=\\"%s\\"' % self.distribution.get_version())
+      opts.append("-fopenmp")
     for ext in self.extensions:
       ext.extra_compile_args = opts
+      ext.extra_link_args = ['-fopenmp'] # assumes openmp is supported
     build_ext.build_extensions(self)
 
-
 ext_modules = [
+  # Extension(
+  #   'python_example',
+  #   ['bindings.cpp'] + glob("src/cpp/core/*.cpp"), #util.hpp
+  #   include_dirs=[
+  #     pybind11.get_include(False),
+  #     pybind11.get_include(True ),
+  #   ],
+  #   language='c++'
+  # ),
+
   Extension(
-    'python_example',
-    ['bindings.cpp'] + glob("src/cpp/*.cpp"), #util.hpp
+    'pyclause',
+    ['bindings.cpp'] + glob("src/cpp/core/*.cpp") + glob("src/cpp/features/*.cpp") + glob("src/cpp/*.cpp"),
     include_dirs=[
       pybind11.get_include(False),
       pybind11.get_include(True ),
     ],
-    language='c++'
-  ),
-  Extension(
-    'rulebackend',
-    ['bindings.cpp'] + glob("src/cpp/*.cpp"), #util.hpp
-    include_dirs=[
-      pybind11.get_include(False),
-      pybind11.get_include(True ),
-    ],
-    language='c++'
+    language='c++',
   ),
 ]
 

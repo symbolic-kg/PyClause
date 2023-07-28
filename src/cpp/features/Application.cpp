@@ -39,7 +39,6 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
         for (const auto& item : srcToCand) {
             keys.push_back(item.first);
         }
-
         // parallize rule application for each query in target
         #pragma omp parallel
         {
@@ -54,11 +53,16 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 int source = entityToCands->first;
                 // filtering for train and additionalFilter
                 if (_cfg_rnk_filterWtrain){
-                    filter.addSet(&entityToCands->second);
+                    Nodes* trainFilter = nullptr;
+                    trainFilter = (dir=="head") ? train.getHforTR(source, relation) : train.getTforHR(source, relation);
+                    if (trainFilter){
+                        filter.addSet(trainFilter);
+                    }   
+                    
                 }
                 // always filter with additionalFilter (can be empty)
                 Nodes* naddFilter = nullptr;
-                naddFilter = addFilter.getTforHR(source, relation);
+                naddFilter = (dir=="head") ? addFilter.getHforTR(source, relation) : addFilter.getTforHR(source, relation);
                 if (naddFilter){
                     filter.addSet(naddFilter);
                 }
@@ -147,13 +151,10 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
                                 continue;
                             }
                         }
-                        if (i!=results.aggrCand.size()-1){
-                             file<<index->getStringOfNodeId(predHead)<<"\t"<<score<<"\t";
+                        file<<index->getStringOfNodeId(predHead)<<"\t"<<score<<"\t";
+                        if (i==_cfg_rnk_topk-1){
+                            break;
                         }
-                        else{
-                            file<<index->getStringOfNodeId(predHead)<<"\t"<<score;
-                        }
-                       
                     }
                     // write tail ranking
                     file<<"\nTails: ";
@@ -169,10 +170,9 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
                                 continue;
                             }
                         }
-                        if (i!=results.aggrCand.size()-1){
-                            file<<index->getStringOfNodeId(predTail)<<"\t"<<score<<"\t";
-                        }else{
-                            file<<index->getStringOfNodeId(predTail)<<"\t"<<score;
+                        file<<index->getStringOfNodeId(predTail)<<"\t"<<score<<"\t";
+                        if (i==_cfg_rnk_topk-1){
+                            break;
                         }
                     }
                     file<<"\n";

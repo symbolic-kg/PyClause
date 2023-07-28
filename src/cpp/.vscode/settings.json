@@ -52,6 +52,7 @@
         "ratio": "cpp",
         "bitset": "cpp",
         "map": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "condition_variable": "cpp"
     }
 }

@@ -146,6 +146,7 @@ bool RuleB::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& 
                 }
                 
             }
+            //TODO if everything was filtered this returns true, which feels wrong
             return !closingEntities.empty();
         }
     }
@@ -172,6 +173,7 @@ bool RuleB::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& 
                 }
                 
             }
+            //TODO if everything was filtered this returns true, which feels wrong
             return !closingEntities.empty();
         }
     }

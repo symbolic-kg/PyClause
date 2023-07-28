@@ -1,7 +1,6 @@
 #include <pybind11/pybind11.h>
-#include "src/cpp/myClass.h"
-#include "src/cpp/TripleStorage.h"
-#include "src/cpp/Index.h"
+#include "src/cpp/Api.h"
+#include "src/cpp/core/myClass.h"
 #include <string>
 
 #define STRINGIFY(x) #x
@@ -19,20 +18,24 @@ int add(int i, int j) {
 namespace py = pybind11;
 
 
-// ***Rules backend bindings***
-PYBIND11_MODULE(rulebackend, m) {
-    py::class_<TripleStorage>(m, "TripleStorage") // TODO is actually not needed and cannot invoked as index is not used 
-        .def(py::init<Index*>())
-        .def("read", &TripleStorage::read)
-    ;
-    #ifdef VERSION_INFO
-    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-#else
-    m.attr("__version__") = "dev";
-#endif
-}
+// // ***example bindings***
+// PYBIND11_MODULE(rulebackend, m) {
+//     py::class_<TripleStorage>(m, "TripleStorage") // TODO is actually not needed and cannot invoked as index is not used 
+//         .def(py::init<Index*>())
+//         .def("read", &TripleStorage::read)
+//     ;
+//     #ifdef VERSION_INFO
+//     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+// #else
+//     m.attr("__version__") = "dev";
+// #endif
+// }
 
-PYBIND11_MODULE(python_example, m) {
+
+//***PyClause backend bindings*****
+PYBIND11_MODULE(pyclause, m) {
+
+    //**+ example bindings
     m.doc() = R"pbdoc(
         Pybind11 example plugin
         -----------------------
@@ -65,11 +68,18 @@ PYBIND11_MODULE(python_example, m) {
         .def("sumRange", &myClass::addRange) //name does not matter
     ;
 
-#ifdef VERSION_INFO
+    // rule handler
+    py::class_<RuleHandler>(m, "RuleHandler") 
+        .def(py::init<>())
+        .def("calculateRanking", &RuleHandler::calculateRanking)
+    ;
+    #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else
     m.attr("__version__") = "dev";
 #endif
+
+
 }
 
 

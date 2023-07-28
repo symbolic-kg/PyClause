@@ -15,9 +15,12 @@ class ManySet {
         
         bool contains(int input) {
             for(auto& set : sets) {
-                if(set->find(input) != set->end()) {
+                if (set){
+                    if(set->find(input) != set->end()) {
                     return true;
+                    }
                 }
+                
             }
             return false;
         }
@@ -29,7 +32,9 @@ class ManySet {
             for(auto& set : sets) {
                 mySize+= set->size();
             }
+            return mySize;
         }
+       
 };
 
 #endif //MULTISET_H

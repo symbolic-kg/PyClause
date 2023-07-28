@@ -17,13 +17,6 @@ TripleStorage::TripleStorage(std::shared_ptr<Index> index) {
 	//csr = new CSR<int, int>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
 }
 
-//CSR<int, int>* TripleStorage::getCSR() {
-//	return csr;
-//}
-
-std::unordered_map<int, std::unordered_set<int>>& TripleStorage::getRelCounter() {
-	return relCounter;
-}
 
 RelNodeToNodes& TripleStorage::getRelHeadToTails() {
 	return relHeadToTails;
@@ -70,8 +63,6 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 	relHeadToTails[relId][headNodeId].insert(tailNodeId);
 	relTailToHeads[relId][tailNodeId].insert(headNodeId);
 	
-	relCounter[headNodeId].insert(tailNodeId);
-	relCounter[tailNodeId].insert(headNodeId);
 }
 
 Nodes* TripleStorage::getTforHR(int head, int relation){

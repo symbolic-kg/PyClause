@@ -1,7 +1,7 @@
-import python_example
 import timeit
 import numpy as np
-import rulebackend
+import pyclause
+
 
 def add(a,b):
     return a+b
@@ -20,9 +20,9 @@ n1 = 10000000000
 n2 = 200000000000
 
 print(timeit.timeit(lambda: add(n1,n2)))
-print(timeit.timeit(lambda: python_example.add(1,2)))
-print(python_example.add(2,3))
-obj = python_example.myClass("peter")
+print(timeit.timeit(lambda: pyclause.add(1,2)))
+print(pyclause.add(2,3))
+obj = pyclause.myClass("peter")
 obj.addOne()
 print(obj.getNumber())
 
@@ -31,16 +31,12 @@ print(obj.sumRange(1,1000))
 
 start = 1
 end = 100
+print("Python:")
 print(timeit.timeit(lambda: sumRange(start,end), number=100))
+print("c++:")
 print(timeit.timeit(lambda: obj.sumRange(start,end),number=100))
+print("Numpy:")
 print(timeit.timeit(lambda: np.sum(np.arange(start,end)),number=100))
-
-data = rulebackend.TripleStorage({"a":2})
-
-handler = handlerObject("peter")
-triples = handler.trainset
-## handler HOLDS DATASET
-prediction = handler.materialize_rule(rule_i) 
 
 
 

@@ -166,7 +166,6 @@ int main(){
     std::cout<<ob.addRange(start,end)<<"\n";
 
     // data loading
-    
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::string dataPath = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
     TripleStorage data(index);
@@ -275,7 +274,7 @@ int main(){
 
     
     //**** read and materialize rules ***
-    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/small-rules";
+    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
     rules.readAnyTimeFormat(rulePath, true); 
     std::vector<std::unique_ptr<Rule>>& allRules = rules.getRules();
 

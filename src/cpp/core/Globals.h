@@ -18,7 +18,6 @@ extern bool _cfg_verbose;
 
 
 // ranking parameters
-
 // preselection of candidates based on max
 // for noisy-or this will result in slightly incorrect rankings when set low
 // for max-plus ranking is correct
@@ -27,11 +26,25 @@ extern int _cfg_rnk_numPreselect;
 // must not be higher than _cfg_rnk_numPreselect;
 extern int _cfg_rnk_topk;
 
+// filtering with train set (default=True)
 extern bool _cfg_rnk_filterWtrain;
-// target is the dataset on which ranking is calculated (test)
+// target is the dataset on which ranking is calculated (e.g. test set, default=True)
 extern bool _cfg_rnk_filterWTarget;
 
+// aggregation function values: {"maxplus"}
 extern std::string _cfg_rnk_aggrFunc;
+
+
+//runing configurations
+extern std::string _cfg_pathTrain;
+extern std::string _cfg_pathFilter;
+extern std::string _cfg_pathTarget;
+
+extern std::string _cfg_pathRankFile;
+
+extern std::string _cfg_pathRules;
+
+
 
 
 #endif

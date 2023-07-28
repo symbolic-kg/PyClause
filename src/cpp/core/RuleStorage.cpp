@@ -34,7 +34,7 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
                 rules.push_back(std::move(rule));
                 std::cout<<"added rule\n";
             }else{
-                std::cout<<"yeah was null\n";
+                //std::cout<<"yeah was null\n";
             }
             
 
@@ -62,7 +62,7 @@ std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
     
     // no body
     if (headBody.size()==1){
-        std::cout<<"that should be a zero rule, skipping yoo.";
+        //std::cout<<"that should be a zero rule, skipping yoo.";
         return nullptr;
     }
     std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], atomSeparator);
@@ -123,7 +123,7 @@ std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
         }
         if (!bodyHasConst){
             ruleType = "RuleD";
-            std::cout<<"Found U_d rule, skipping.";
+            std::cout<<"Found U_d rule, skipping."<<std::endl;
             return nullptr;
         }else{
             ruleType = "RuleC";

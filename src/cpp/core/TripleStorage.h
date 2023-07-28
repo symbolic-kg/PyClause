@@ -13,8 +13,6 @@ class TripleStorage
 public:
 	TripleStorage(std::shared_ptr<Index> index);
 
-	//CSR<int, int>* getCSR();
-	std::unordered_map<int, std::unordered_set<int>>& getRelCounter();
 	RelNodeToNodes& getRelHeadToTails();
 	RelNodeToNodes& getRelTailToHeads();
 	void read(std::string filepath);
@@ -28,8 +26,6 @@ protected:
 
 private:
 	std::shared_ptr<Index> index;
-	//CSR<int, int>* csr;
-	std::unordered_map<int, std::unordered_set<int>> relCounter;
 	RelNodeToNodes relHeadToTails;
 	RelNodeToNodes relTailToHeads;
 };
