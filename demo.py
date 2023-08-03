@@ -1,6 +1,6 @@
 import timeit
 import numpy as np
-import pyclause
+import rules_c
 
 
 def add(a,b):
@@ -20,9 +20,9 @@ n1 = 10000000000
 n2 = 200000000000
 
 print(timeit.timeit(lambda: add(n1,n2)))
-print(timeit.timeit(lambda: pyclause.add(1,2)))
-print(pyclause.add(2,3))
-obj = pyclause.myClass("peter")
+print(timeit.timeit(lambda: rules_c.add(1,2)))
+print(rules_c.add(2,3))
+obj = rules_c.myClass("peter")
 obj.addOne()
 print(obj.getNumber())
 

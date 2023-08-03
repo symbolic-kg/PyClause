@@ -140,14 +140,15 @@ bool RuleB::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& 
             Nodes closingEntities;
             std::set<int> substitutions = {head};
             searchCurrGroundings(1, head, substitutions, triples, closingEntities, relations, directions);
+            bool madePred = false;
             for (const int& cEnt: closingEntities){ 
                 if (!filterSet.contains(cEnt)){
                     tailResults[cEnt].push_back(this);
+                    madePred = true;
                 }
                 
             }
-            //TODO if everything was filtered this returns true, which feels wrong
-            return !closingEntities.empty();
+            return madePred;
         }
     }
     return false;
@@ -167,14 +168,15 @@ bool RuleB::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& 
             Nodes closingEntities;
             std::set<int> substitutions = {tail};
             searchCurrGroundings(1, tail, substitutions, triples, closingEntities, _relations, _directions);
+            bool madePred = false;
             for (const int& cEnt: closingEntities){
                 if (!filterSet.contains(cEnt)){
                     headResults[cEnt].push_back(this);
+                    madePred = true;
                 }
                 
             }
-            //TODO if everything was filtered this returns true, which feels wrong
-            return !closingEntities.empty();
+            return madePred;
         }
     }
     return false;
@@ -245,6 +247,8 @@ RuleC::RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& l
 
 // TODO: dont return, just add predictions to a passed data structure
 // or not return a copy
+//DFS search where the starting point is the grounded body atom
+// in the rule representation here this is the last body atom if leftC=false and first body atom if leftC=true
 std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
 
     std::vector<std::vector<int>> predictions;
@@ -277,8 +281,8 @@ std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
         }
     }
 }
-// contrary to B rules we let the DFS run starting from the grounded constants of the rules
-// and not from the grounded entity in the query
+// contrary to B rules we let the DFS run starting from the grounded constants of the rules body
+// and not from the grounded entity in the query 
 bool RuleC::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet){
     // can only predict my constant in the grounded direction
     if (leftC && head!=constants[0]){
@@ -357,7 +361,7 @@ bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& 
     return false;
 }
 
-// same implementation as in RuleB except that rels dirs  is used depending on leftC
+// same implementation as in RuleB except that rels dirs is used depending on leftC s.t.
 // directions can be handled
 void RuleC::searchCurrGroundings(
 			int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
@@ -393,4 +397,52 @@ void RuleC::searchCurrGroundings(
             }
         }
     } 
+}
+
+
+// ***RuleZ implementation*** 
+
+RuleZ::RuleZ(int& relation, bool& leftC, int& constant) {
+    this->relation=relation;
+    this->leftC = leftC;
+    this->constant = constant;
+}
+
+
+bool RuleZ::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet){
+    if (leftC && !filterSet.contains(constant)){
+        headResults[constant].push_back(this);
+        return true;
+    }
+    return false;
+}
+
+bool RuleZ::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet){
+     if (!leftC && !filterSet.contains(constant)){
+        tailResults[constant].push_back(this);
+        return true;
+    }
+    return false;
+}
+
+std::vector<std::vector<int>> RuleZ::materialize(TripleStorage& triples){
+    std::vector<std::vector<int>> predictions;
+    // predict c when h(c,X)<-- given all h(--, a) in train and vice versa
+    RelNodeToNodes& relNtoN = leftC ? triples.getRelTailToHeads() : triples.getRelHeadToTails();
+    auto it = relNtoN.find(relation);
+    if (it!=relNtoN.end()){
+        NodeToNodes& NtoN = it->second;
+        for (auto const& pair: NtoN){
+            // source node 
+            const int& e = pair.first;
+            std::vector<int> pred;
+            if (leftC){
+                pred = {constant, relation, e};
+            }else{
+                pred = {e, relation, constant};
+            }
+        }
+
+    }
+    return predictions;
 }

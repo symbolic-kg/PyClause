@@ -53,12 +53,4 @@ bool _cfg_rnk_filterWtrain=true;
 bool _cfg_rnk_filterWTarget=true;
 std::string _cfg_rnk_aggrFunc = "maxplus";
 
-// running configurations
-std::string _cfg_pathTrain = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
-std::string _cfg_pathFilter = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt";
-std::string _cfg_pathTarget = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt";
-
-std::string _cfg_pathRankFile = "/home/patrick/Desktop/PyClause/data/wnrr/firstRankingChristian.txt";
-std::string _cfg_pathRules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
-
 

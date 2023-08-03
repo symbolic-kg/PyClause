@@ -16,10 +16,11 @@ class ApplicationHandler
 {
 public:
     ApplicationHandler(){};
-    // apply all rules for all queries existig in this->target
+    // apply all rules for all queries existig in target
     // addFilter can be valid set e.g. , used for additional filtering
     // stores results (cand->Vector<rule*>) in, e.g., this->headQueryResult[rel][source_entity].candToRules
     // direction=head or direction=tail
+    // from config filtering with train and addFilter is handable, filtering with target needs to be on triple level
     void calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, std::string direction);
     // aggregate query results based on _cfg_ defined aggregation function
     // writes to, e.g., this->headQueryResults[rel][source_entitiy].aggrCand
@@ -29,6 +30,11 @@ public:
     // writes to e.g. this->headQueryResults[rel][head].aggrCand
     void makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter);
     void writeRanking(TripleStorage& target, std::string path);
+
+    std::unordered_map<int,std::unordered_map<int, QueryResults>>& getHeadQueryResults();
+    std::unordered_map<int,std::unordered_map<int, QueryResults>>& getTailQueryResults();
+
+
 
 
 private:

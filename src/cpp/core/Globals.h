@@ -35,15 +35,6 @@ extern bool _cfg_rnk_filterWTarget;
 extern std::string _cfg_rnk_aggrFunc;
 
 
-//runing configurations
-extern std::string _cfg_pathTrain;
-extern std::string _cfg_pathFilter;
-extern std::string _cfg_pathTarget;
-
-extern std::string _cfg_pathRankFile;
-
-extern std::string _cfg_pathRules;
-
 
 
 

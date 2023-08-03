@@ -12,8 +12,13 @@
 
 class RuleHandler{
 public:
-    void calculateRanking();
-     RuleHandler(){};
+    void calculateRanking(
+        std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write
+        );
+    RuleHandler(){};
+    std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> getRanking(std::string headOrTail);
+private:
+    ApplicationHandler ranker;
 };
 
 #endif

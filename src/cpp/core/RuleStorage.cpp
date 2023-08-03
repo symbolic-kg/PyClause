@@ -12,6 +12,7 @@ RuleStorage::RuleStorage(std::shared_ptr<Index> index){
     this->index = index;
 }
 
+// TODO creates undefined behavior and process gets stuck when file does not exist, check first
 void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
     int currID = 0;
 	std::string line;
@@ -57,13 +58,23 @@ std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
     return nullptr;
     }
 
+    std::string ruleType;
+
     std::vector<std::string> headBody = util::splitString(rule, ruleSeparator);
     std::string headAtomStr = headBody[0];
     
     // no body
     if (headBody.size()==1){
-        //std::cout<<"that should be a zero rule, skipping yoo.";
-        return nullptr;
+        ruleType = "RuleZ";
+        // parse head
+        strAtom headAtom;
+        parseAtom(headAtomStr, headAtom);
+        // set head relation
+        int relID = index->getIdOfRelationstring(headAtom[0]);
+        std::vector<int> relations = {relID};
+        symAtom sym;
+        parseSymAtom(headAtom, sym);
+        return std::make_unique<RuleZ>(relID, sym.leftC, sym.constant);
     }
     std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], atomSeparator);
     size_t length = bodyAtomsStr.size();
@@ -89,7 +100,7 @@ std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
     char firstVar = anyTimeVars[0];
     char lastVar  = anyTimeVars.back();
 
-    std::string ruleType;
+    
     // *** BRule ***
     if (headAtom[1][0]==firstVar && headAtom[2][0]==lastVar){
         ruleType = "RuleB";

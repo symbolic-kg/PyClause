@@ -118,15 +118,15 @@ private:
 };
 
 
-// RuleC rules with 2 constants
+// RuleC rules with 2 constants (U_c rule)
 class RuleC: public Rule
 {
 public:
 	RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, std::array<int, 2>& constants);
 	//TODO check RuleB todo
 	std::vector<std::vector<int>> materialize(TripleStorage& triples);
-	bool predictHeadQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet=ManySet());
-	bool predictTailQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet=ManySet());
+	bool predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet=ManySet());
+	bool predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet=ManySet());
 private:
 	// this->relations, this->directions, this->leftC, this->constants, uniquely identify a C (U_c) rule
 	// e.g. relations = [r1, r2, r3]
@@ -155,6 +155,27 @@ private:
 		Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs
 	);
 };
+
+
+// zero rule, no body and one constant in head
+// r1(X,c) <--{}  or r1(c,Y)<--{}
+// note that the inference semantic of this rule is s.t. it it can only predict its constant
+// like a conditional probability 
+// e.g. r1(X,c) <-- can only predict c given r1(a,?) 
+class RuleZ: public Rule
+{
+public:
+	RuleZ(int& relation, bool& leftC, int& constant);
+	//TODO check RuleB todo
+	std::vector<std::vector<int>> materialize(TripleStorage& triples);
+	bool predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet=ManySet());
+	bool predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet=ManySet());
+private:
+	bool leftC;
+	int constant;
+	int relation;
+};
+
 
 
 #endif // RULE_H

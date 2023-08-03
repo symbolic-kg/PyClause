@@ -66,6 +66,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 if (naddFilter){
                     filter.addSet(naddFilter);
                 }
+                // perform rule application
                 for (Rule* rule : rules.getRelRules(relation)){
                     if (dir=="tail"){
                          rule->predictTailQuery(source, train, candRules, filter);
@@ -121,6 +122,7 @@ void ApplicationHandler::makeRanking(TripleStorage& target, TripleStorage& train
     aggregateQueryResults("head");
 } 
 
+// query results must have been calculated before and aggregated
 void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepath){
     Index* index = target.getIndex();
     RelNodeToNodes& data = target.getRelTailToHeads();
@@ -228,3 +230,14 @@ void ApplicationHandler::scoreMaxPlus(
      }
 }
 
+
+std::unordered_map<int,std::unordered_map<int, QueryResults>>& ApplicationHandler::getHeadQueryResults(){
+    return headQueryResults;
+}
+
+
+std::unordered_map<int,std::unordered_map<int, QueryResults>>&  ApplicationHandler::getTailQueryResults(){
+    return tailQueryResults;
+}
+
+ 

@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include "src/cpp/Api.h"
 #include "src/cpp/core/myClass.h"
 #include <string>
@@ -33,7 +34,7 @@ namespace py = pybind11;
 
 
 //***PyClause backend bindings*****
-PYBIND11_MODULE(pyclause, m) {
+PYBIND11_MODULE(rules_c, m) {
 
     //**+ example bindings
     m.doc() = R"pbdoc(
@@ -72,6 +73,7 @@ PYBIND11_MODULE(pyclause, m) {
     py::class_<RuleHandler>(m, "RuleHandler") 
         .def(py::init<>())
         .def("calculateRanking", &RuleHandler::calculateRanking)
+        .def("getRanking", &RuleHandler::getRanking)
     ;
     #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

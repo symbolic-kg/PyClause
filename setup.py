@@ -70,7 +70,7 @@ ext_modules = [
   # ),
 
   Extension(
-    'pyclause',
+    'rules_c', # needs to match module name in cpp bindings
     ['bindings.cpp'] + glob("src/cpp/core/*.cpp") + glob("src/cpp/features/*.cpp") + glob("src/cpp/*.cpp"),
     include_dirs=[
       pybind11.get_include(False),
