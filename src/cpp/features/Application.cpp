@@ -85,9 +85,9 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 #pragma omp critical
                 {   
                     if (dir=="tail"){
-                        tailQueryResults[relation][source].candToRules = candRules;
+                        tailQcandsRules[relation][source] = candRules;
                     }else{
-                        headQueryResults[relation][source].candToRules = candRules;
+                        headQcandsRules[relation][source] = candRules;
                     }
                 }
                 candRules.clear();
@@ -98,15 +98,15 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
 }
 
 void ApplicationHandler::aggregateQueryResults(std::string direction){
-    auto& queryResults = (direction=="tail") ? tailQueryResults : headQueryResults;
+    auto& queryResults = (direction=="tail") ? tailQcandsRules : headQcandsRules;
+    auto& writeResults = (direction=="tail") ? tailQcandsConfs : headQcandsConfs;
     for (auto& queries: queryResults){
             int relation = queries.first;
-            std::unordered_map<int, QueryResults>& srcToCand = queries.second;
+            std::unordered_map<int, NodeToPredRules>& srcToCand = queries.second;
             for (auto& query: srcToCand){
-                int source = query.first;
-                QueryResults& results = query.second; 
+                int source = query.first; 
                 if (_cfg_rnk_aggrFunc=="maxplus"){
-                    scoreMaxPlus(results.candToRules, results.aggrCand);
+                    scoreMaxPlus(query.second, writeResults[relation][source]);
                 }else{
                     throw std::runtime_error("Only implemented aggregation function is 'maxplus' ");
                 }
@@ -141,9 +141,9 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
                     file<<index->getStringOfNodeId(head)<<" "<<index->getStringOfRelId(relation)<<" "<<index->getStringOfNodeId(tail)<<std::endl;
                     file<<"Heads: ";
                     // write head ranking
-                    QueryResults& results = headQueryResults[relation][tail];
-                    for (int i=0; i<results.aggrCand.size(); i++){
-                        auto pair = results.aggrCand[i];
+                    CandidateConfs& results = headQcandsConfs[relation][tail];
+                    for (int i=0; i<results.size(); i++){
+                        auto pair = results[i];
                         int predHead = pair.first;
                         double score = pair.second;
                         // filter with target
@@ -162,9 +162,9 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
                     file<<"\nTails: ";
                     //true tails for filtering
                     Nodes& trueTails = target.getRelHeadToTails()[relation][head];
-                    results = tailQueryResults[relation][head];
-                    for (int i=0; i<results.aggrCand.size(); i++){
-                        auto pair = results.aggrCand[i];
+                    results = tailQcandsConfs[relation][head];
+                    for (int i=0; i<results.size(); i++){
+                        auto pair = results[i];
                         int predTail = pair.first;
                         double score = pair.second;
                         if (_cfg_rnk_filterWTarget && !(predTail==tail)){
@@ -230,14 +230,18 @@ void ApplicationHandler::scoreMaxPlus(
      }
 }
 
-
-std::unordered_map<int,std::unordered_map<int, QueryResults>>& ApplicationHandler::getHeadQueryResults(){
-    return headQueryResults;
-}
-
-
-std::unordered_map<int,std::unordered_map<int, QueryResults>>&  ApplicationHandler::getTailQueryResults(){
-    return tailQueryResults;
-}
-
  
+
+std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>& ApplicationHandler::getHeadQcandsRules(){
+    return headQcandsRules;
+}
+std::unordered_map<int,std::unordered_map<int, CandidateConfs>>&  ApplicationHandler::getHeadQcandsConfs(){
+    return headQcandsConfs;
+}
+
+std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>&  ApplicationHandler::getTailQcandsRules(){
+    return tailQcandsRules;
+}
+std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& ApplicationHandler::getTailQcandsConfs(){
+    return tailQcandsConfs;
+}

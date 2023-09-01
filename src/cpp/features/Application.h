@@ -7,10 +7,7 @@
 #include "../core/RuleStorage.h"
 #include "../core/Types.h"
 
-struct QueryResults {
-    NodeToPredRules candToRules;
-    std::vector<std::pair<int, double>> aggrCand;
-};
+
 
 class ApplicationHandler
 {
@@ -31,15 +28,30 @@ public:
     void makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter);
     void writeRanking(TripleStorage& target, std::string path);
 
-    std::unordered_map<int,std::unordered_map<int, QueryResults>>& getHeadQueryResults();
-    std::unordered_map<int,std::unordered_map<int, QueryResults>>& getTailQueryResults();
+    std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>& getHeadQcandsRules();
+    std::unordered_map<int,std::unordered_map<int, CandidateConfs>>&  getHeadQcandsConfs();
+
+    std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>&  getTailQcandsRules();
+    std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& getTailQcandsConfs();
 
 
 
 
 private:
-    std::unordered_map<int,std::unordered_map<int, QueryResults>> headQueryResults;
-    std::unordered_map<int,std::unordered_map<int, QueryResults>> tailQueryResults;
+    std::unordered_map<int,std::unordered_map<int, NodeToPredRules>> headQcandsRules;
+    std::unordered_map<int,std::unordered_map<int, CandidateConfs>> headQcandsConfs;
+
+    std::unordered_map<int,std::unordered_map<int, NodeToPredRules>> tailQcandsRules;
+    std::unordered_map<int,std::unordered_map<int, CandidateConfs>> tailQcandsConfs;
+
+    // alternative version, prevents storing map twice but data access needs copying
+
+    //struct QueryResults {
+    //NodeToPredRules candToRules;
+    //std::vector<std::pair<int, double>> aggrCand;
+    //};
+    //std::unordered_map<int,std::unordered_map<int, QueryResults>> headQueryResults;
+    //std::unordered_map<int,std::unordered_map<int, QueryResults>> tailQueryResults;
 };
 
 

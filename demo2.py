@@ -5,13 +5,13 @@ import rules_c
 
 start = time.time()
 
-train = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt"
-filter = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt"
-target = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt"
+train = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt"
+filter = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt"
+target = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt"
 
 
-rules = "/home/patrick/Desktop/PyClause/data/fb15k-237/safran-rules-1000"
-ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/firstRankingChristian.txt"
+rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
+ranking_file = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile.txt"
 
 ranker = rules_c.RuleHandler()
 ranker.calculateRanking(target, train, filter, rules, ranking_file)

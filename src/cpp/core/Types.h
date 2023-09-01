@@ -25,6 +25,8 @@ class Rule;
 // it needs to be ensured that rules are added in sorted order
 typedef std::unordered_map<int, std::vector<Rule*>> NodeToPredRules;
 
+typedef std::vector<std::pair<int, double>> CandidateConfs;
+
 
 //typedef std::unordered_map<int, std::vector<Rule*>> RelToRules;
 
