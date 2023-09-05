@@ -1,5 +1,6 @@
 # Using https://github.com/github/gitignore/blob/master/Python.gitignore
 
+local/*
 tmp/
 data/
 
