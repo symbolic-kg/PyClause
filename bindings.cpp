@@ -3,7 +3,6 @@
 #include "src/cpp/Api.h"
 #include "src/cpp/core/myClass.h"
 #include <string>
-#include <array>
 
 // *Example* 
 int add(int i, int j) {

@@ -8,11 +8,13 @@
 #include <unordered_map>
 #include <optional>
 #include "stdio.h"
+#include <array>
 
 
 #include "Types.h"
 #include "TripleStorage.h"
 #include "ManySet.h"
+
 
 
 
