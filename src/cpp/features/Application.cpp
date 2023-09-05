@@ -52,7 +52,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 // entityToCands->second is a set with all the correct answers from target
                 int source = entityToCands->first;
                 // filtering for train and additionalFilter
-                if (_cfg_rnk_filterWtrain){
+                if (rank_filterWtrain){
                     Nodes* trainFilter = nullptr;
                     trainFilter = (dir=="head") ? train.getHforTR(source, relation) : train.getTforHR(source, relation);
                     if (trainFilter){
@@ -77,7 +77,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                     else{
                         throw std::runtime_error("Need to specify direction='head' or 'tail' when calculating query results.");
                     }
-                    if (candRules.size() > _cfg_rnk_numPreselect){
+                    if (candRules.size() > rank_numPreselect){
                     break;
                     }
                 }
@@ -105,10 +105,10 @@ void ApplicationHandler::aggregateQueryResults(std::string direction){
             std::unordered_map<int, NodeToPredRules>& srcToCand = queries.second;
             for (auto& query: srcToCand){
                 int source = query.first; 
-                if (_cfg_rnk_aggrFunc=="maxplus"){
+                if (rank_aggrFunc=="maxplus"){
                     scoreMaxPlus(query.second, writeResults[relation][source]);
                 }else{
-                    throw std::runtime_error("Only implemented aggregation function is 'maxplus' ");
+                    throw std::runtime_error("Aggregation function is not recognized in calcualte ranking.");
                 }
                 
             }
@@ -148,13 +148,13 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
                         double score = pair.second;
                         // filter with target
                         // current predicted head is excluded if its the true answer to some other query
-                        if (_cfg_rnk_filterWTarget && !(predHead==head)){
+                        if (rank_filterWtarget && !(predHead==head)){
                             if (!(trueHeads.find(predHead)==trueHeads.end())){
                                 continue;
                             }
                         }
                         file<<index->getStringOfNodeId(predHead)<<"\t"<<score<<"\t";
-                        if (i==_cfg_rnk_topk-1){
+                        if (i==rank_topk-1){
                             break;
                         }
                     }
@@ -167,13 +167,13 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
                         auto pair = results[i];
                         int predTail = pair.first;
                         double score = pair.second;
-                        if (_cfg_rnk_filterWTarget && !(predTail==tail)){
+                        if (rank_filterWtarget && !(predTail==tail)){
                             if (!(trueTails.find(predTail)==trueTails.end())){
                                 continue;
                             }
                         }
                         file<<index->getStringOfNodeId(predTail)<<"\t"<<score<<"\t";
-                        if (i==_cfg_rnk_topk-1){
+                        if (i==rank_topk-1){
                             break;
                         }
                     }
@@ -231,6 +231,23 @@ void ApplicationHandler::scoreMaxPlus(
 }
 
  
+void ApplicationHandler::setNumPreselect(int num){
+    rank_numPreselect=num;
+}
+
+void ApplicationHandler::setTopK(int topk){
+    rank_topk=topk;
+}
+void ApplicationHandler::setFilterWTrain(bool ind){
+    rank_filterWtrain=ind;
+}
+
+void ApplicationHandler::setFilterWtarget(bool ind){
+    rank_filterWtarget = ind;
+}
+void ApplicationHandler::setAggregationFunc(std::string func){
+    rank_aggrFunc = func;
+}
 
 std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>& ApplicationHandler::getHeadQcandsRules(){
     return headQcandsRules;

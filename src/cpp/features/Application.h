@@ -34,6 +34,11 @@ public:
     std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>&  getTailQcandsRules();
     std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& getTailQcandsConfs();
 
+    void setNumPreselect(int num);
+    void setTopK(int topk);
+    void setFilterWTrain(bool ind);
+    void setFilterWtarget(bool ind);
+    void setAggregationFunc(std::string func);
 
 
 
@@ -52,6 +57,25 @@ private:
     //};
     //std::unordered_map<int,std::unordered_map<int, QueryResults>> headQueryResults;
     //std::unordered_map<int,std::unordered_map<int, QueryResults>> tailQueryResults;
+
+    // ***ranking parameters***
+    // preselection of candidates based on rules with the highest confidences
+    // for noisy-or this will result in slightly incorrect rankings when set low
+    // for max-plus ranking is correct
+    int rank_numPreselect=100;
+    // num candidates to output in ranking
+    // must not be higher than _cfg_rnk_numPreselect;
+    int rank_topk=100;
+    // filter with train
+    bool rank_filterWtrain=true;
+    // filter with the target set (mostly the "test" set)
+    // note, fitering with additional set e.g. valid is performend by giving filter set as param in ranking functions
+    bool rank_filterWtarget=true;
+    // aggregation function in {"maxplus"}
+    std::string rank_aggrFunc="maxplus";
+
+
+
 };
 
 

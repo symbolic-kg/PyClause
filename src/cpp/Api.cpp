@@ -1,8 +1,13 @@
 #include "Api.h"
 
 void RuleHandler::calculateRanking(
-        std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write
-        ){
+        std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write,
+        std::map<std::string,std::string> options
+    ){
+
+   for(const auto &pair : options){
+    std::cout << pair.first << ":" << pair.second << std::endl;
+    }
     // data loading
     std::shared_ptr<Index> index = std::make_shared<Index>();
     TripleStorage data(index);

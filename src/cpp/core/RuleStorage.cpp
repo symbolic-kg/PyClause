@@ -53,14 +53,14 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
 
 std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
 
-    if(rule.find(equalityToken) != std::string::npos) {
+    if(rule.find(_cfg_prs_equalityToken) != std::string::npos) {
     std::cout << "Found me_myself_i, skipping." << std::endl;
     return nullptr;
     }
 
     std::string ruleType;
 
-    std::vector<std::string> headBody = util::splitString(rule, ruleSeparator);
+    std::vector<std::string> headBody = util::splitString(rule, _cfg_prs_ruleSeparator);
     std::string headAtomStr = headBody[0];
     
     // no body
@@ -76,7 +76,7 @@ std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
         parseSymAtom(headAtom, sym);
         return std::make_unique<RuleZ>(relID, sym.leftC, sym.constant);
     }
-    std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], atomSeparator);
+    std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], _cfg_prs_atomSeparator);
     size_t length = bodyAtomsStr.size();
 
     // parse head
@@ -97,8 +97,8 @@ std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
         bodyAtoms.push_back(b_i);
     }
 
-    char firstVar = anyTimeVars[0];
-    char lastVar  = anyTimeVars.back();
+    char firstVar = _cfg_prs_anyTimeVars[0];
+    char lastVar  = _cfg_prs_anyTimeVars.back();
 
     
     // *** BRule ***
@@ -107,8 +107,8 @@ std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
         for (int i=0; i<length; i++){
             relations.push_back(index->getIdOfRelationstring(bodyAtoms[i][0]));
             char first, second;
-            first = anyTimeVars[i];
-            second = (i == length - 1) ? anyTimeVars.back() : anyTimeVars[i + 1];
+            first = _cfg_prs_anyTimeVars[i];
+            second = (i == length - 1) ? _cfg_prs_anyTimeVars.back() : _cfg_prs_anyTimeVars[i + 1];
             if (bodyAtoms[i][1][0]==first && bodyAtoms[i][2][0]==second){
                 directions.push_back(true);
             } else if (bodyAtoms[i][1][0]==second && bodyAtoms[i][2][0]==first) {
@@ -160,14 +160,14 @@ std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
                 directions.push_back(false);
             }
 
-        // we need to do this manually for leftC AnyTime Format is (length=2)
+        // we need to do this manually for leftC=true AnyTime Format is (length=2)
         // P530(Q142,Y) <= P530(A,Y), P495(Q368674,A)
         // whereas our representation; which  leads to rel and dir is
         // P530(Q142,Y) <= P495(Q368674,A), P530(A,Y)
         } else if (length==2 && leftC){
             relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
             relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-            // start with the second atom which is our first atom
+            // start with the second atom which is the first atom in our representation
             parseSymAtom(bodyAtoms[1], checkBodyAtom);
             constants[1] = checkBodyAtom.constant;
             if (checkBodyAtom.leftC == leftC){
@@ -241,12 +241,12 @@ void RuleStorage::parseAtom(const std::string& input, strAtom& atom) {
 
 void RuleStorage::parseSymAtom(strAtom& inputAtom, symAtom& symAt){
     symAt.containsConstant = false;
-    if (anyTimeVars.find(inputAtom[1]) == std::string::npos){
+    if (_cfg_prs_anyTimeVars.find(inputAtom[1]) == std::string::npos){
         symAt.containsConstant = true;
         symAt.constant = index->getIdOfNodestring(inputAtom[1]);
         symAt.leftC = true;
     }
-    if (anyTimeVars.find(inputAtom[2]) == std::string::npos){
+    if (_cfg_prs_anyTimeVars.find(inputAtom[2]) == std::string::npos){
         if (symAt.containsConstant){
             throw std::runtime_error("Cannot have a constant in both slots of an atom.");
         }

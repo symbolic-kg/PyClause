@@ -40,9 +40,6 @@ class BuildExt(build_ext):
     'unix': [],
   }
 
-  if sys.platform == 'darwin':
-    c_opts['unix'] += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
-
   def build_extensions(self):
     ct = self.compiler.compiler_type
     opts = self.c_opts.get(ct, [])
@@ -52,7 +49,7 @@ class BuildExt(build_ext):
       opts.append('-fopenmp') # assumes openmp is supported
     elif ct == 'msvc':
       opts.append('/DVERSION_INFO=\\"%s\\"' % self.distribution.get_version())
-      opts.append("-fopenmp")
+      opts.append("/openmp")
     for ext in self.extensions:
       ext.extra_compile_args = opts
       ext.extra_link_args = ['-fopenmp'] # assumes openmp is supported

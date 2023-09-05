@@ -3,15 +3,9 @@
 #include "src/cpp/Api.h"
 #include "src/cpp/core/myClass.h"
 #include <string>
+#include <array>
 
-#define STRINGIFY(x) #x
-#define MACRO_STRINGIFY(x) STRINGIFY(x)
-
-
-
-
-
-// ***Pybind Examples**** 
+// *Example* 
 int add(int i, int j) {
     return i + j;
 }
@@ -19,24 +13,10 @@ int add(int i, int j) {
 namespace py = pybind11;
 
 
-// // ***example bindings***
-// PYBIND11_MODULE(rulebackend, m) {
-//     py::class_<TripleStorage>(m, "TripleStorage") // TODO is actually not needed and cannot invoked as index is not used 
-//         .def(py::init<Index*>())
-//         .def("read", &TripleStorage::read)
-//     ;
-//     #ifdef VERSION_INFO
-//     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-// #else
-//     m.attr("__version__") = "dev";
-// #endif
-// }
-
-
-//***PyClause backend bindings*****
+//***PyClause backend bindings + examples *****
 PYBIND11_MODULE(rules_c, m) {
 
-    //**+ example bindings
+    //** example bindings **
     m.doc() = R"pbdoc(
         Pybind11 example plugin
         -----------------------
@@ -69,19 +49,12 @@ PYBIND11_MODULE(rules_c, m) {
         .def("sumRange", &myClass::addRange) //name does not matter
     ;
 
-    // rule handler
+    // **backend bindings**
     py::class_<RuleHandler>(m, "RuleHandler") 
         .def(py::init<>())
         .def("calculateRanking", &RuleHandler::calculateRanking)
         .def("getRanking", &RuleHandler::getRanking)
     ;
-    #ifdef VERSION_INFO
-    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-#else
-    m.attr("__version__") = "dev";
-#endif
-
-
 }
 
 
