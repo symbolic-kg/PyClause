@@ -20,7 +20,7 @@ n1 = 10000000000
 n2 = 200000000000
 
 print(timeit.timeit(lambda: add(n1,n2)))
-print(timeit.timeit(lambda: rules_c.add(1,2)))
+print(timeit.timeit(lambda: c_clause.add(1,2)))
 print(c_clause.add(2,3))
 obj = c_clause.myClass("peter")
 obj.addOne()

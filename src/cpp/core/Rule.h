@@ -39,6 +39,7 @@ public:
 	int getID();
 	double getConfidence(int nUnseen, bool exact=false);
 	void setStats(int cpredicted, int predicted, bool exact=false);
+	std::array<int,2> getStats(bool exact=false);
 	std::string getRuleString();
 	long long getBodyHash();
 	void computeBodyHash();

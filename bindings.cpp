@@ -54,6 +54,17 @@ PYBIND11_MODULE(c_clause, m) {
         .def("calculateRanking", &RankingHandler::calculateRanking)
         .def("getRanking", &RankingHandler::getRanking)
     ;
+
+    py::class_<RuleHandler>(m, "RuleHandler") 
+        .def(py::init<std::string>())
+        .def
+        (
+            "calcStats", &RuleHandler::calcStats, 
+            R"pbdoc(Given a string rule returns two integers. 
+            The first denotes the (exact) number of  predictions, the second the (exact) number of true predictions.
+            )pbdoc" 
+        )
+    ;
 }
 
 

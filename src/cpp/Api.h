@@ -27,9 +27,9 @@ private:
 };
 
 
-class StatsHandler{
+class RuleHandler{
 public:
-    StatsHandler(std::string dataPath);
+    RuleHandler(std::string dataPath);
     std::array<int,2> calcStats(std::string ruleStr);
 private:
     std::shared_ptr<Index> index = std::make_shared<Index>();

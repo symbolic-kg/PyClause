@@ -62,7 +62,7 @@ std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>
 
 // ***StatsCalculator***
 
-StatsHandler::StatsHandler(std::string dataPath){
+RuleHandler::RuleHandler(std::string dataPath){
     data = std::make_unique<TripleStorage>(index);
     data->read(dataPath);
     storage = std::make_unique<RuleStorage>(index);
@@ -70,6 +70,12 @@ StatsHandler::StatsHandler(std::string dataPath){
 
 }
 
-std::array<int,2> StatsHandler::calcStats(std::string ruleStr){
+std::array<int,2> RuleHandler::calcStats(std::string ruleStr){
     std::unique_ptr<Rule> rule = storage->parseAnytimeRule(ruleStr);
+    // reset the exact stats, actually not needed as rule was just created
+    rule->setStats(0, 0, true);
+    rule->setTrackInMaterialize(true);
+    //you could collect the data here
+    rule->materialize(*data);
+    return rule->getStats(true);   
 }

@@ -36,6 +36,14 @@ void Rule::setStats(int _predicted, int _cpredicted, bool exact){
     }
 }
 
+std::array<int,2> Rule::getStats(bool exact){
+    if (exact){
+        return {predicted, cpredicted};
+    }else{
+        return {sampledPredicted, sampledCpredicted};
+    }
+}
+
 void Rule::setTrackInMaterialize(bool val){
     trackInMaterialize = val;
 }
