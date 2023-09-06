@@ -36,6 +36,10 @@ void Rule::setStats(int _predicted, int _cpredicted, bool exact){
     }
 }
 
+void Rule::setTrackInMaterialize(bool val){
+    trackInMaterialize = val;
+}
+
 std::string Rule::getRuleString(){
     throw std::runtime_error("Not implemented yet");
 }
@@ -51,7 +55,7 @@ int Rule::getTargetRel(){
    return targetRel;
 
 }
-std::vector<std::vector<int>> Rule::materialize(TripleStorage& triples){
+std::set<Triple> Rule::materialize(TripleStorage& triples){
     throw std::runtime_error("Not implemented yet");
 }
 
@@ -69,6 +73,7 @@ bool Rule::predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& h
 bool Rule::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults,  ManySet filterSet){
     throw std::runtime_error("Not implemented yet.");
 }
+
 
 // ***RuleB implementation*** 
 
@@ -91,11 +96,10 @@ RuleB::RuleB(std::vector<int>& relations, std::vector<bool>& directions) {
     _directions.flip();   
 }
 
-// TODO: dont return, just add predictions to a passed data structure
-// or not return a copy
-std::vector<std::vector<int>> RuleB::materialize(TripleStorage& triples){
 
-    std::vector<std::vector<int>> predictions;
+std::set<Triple> RuleB::materialize(TripleStorage& triples){
+
+    std::set<Triple> predictions;
 
     RelNodeToNodes* relNtoN = nullptr;
      // first body atom is (v1,v2)
@@ -117,8 +121,15 @@ std::vector<std::vector<int>> RuleB::materialize(TripleStorage& triples){
                 std::set<int> substitutions = {e};
                 searchCurrGroundings(1, e, substitutions, triples, closingEntities, relations, directions);
                 for (const int& cEnt:  closingEntities){
-                    std::vector<int> pred = {e, targetRel, cEnt};
-                    predictions.push_back(pred);
+                    Triple triple = {e, targetRel, cEnt};
+                    auto isNew = predictions.insert(triple);
+                    // add to count if this triple is predicted for the first time
+                    if (trackInMaterialize && isNew.second){
+                        predicted+=1;
+                        if (triples.contains(triple[0], triple[1], triple[2])){
+                            cpredicted += 1;
+                        }
+                    }
                 }
             }
     }
@@ -249,9 +260,9 @@ RuleC::RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& l
 // or not return a copy
 //DFS search where the starting point is the grounded body atom
 // in the rule representation here this is the last body atom if leftC=false and first body atom if leftC=true
-std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
+std::set<Triple> RuleC::materialize(TripleStorage& triples){
 
-    std::vector<std::vector<int>> predictions;
+    std::set<Triple> predictions;
     // if left head variable is grounded we start with with the first body atom it contains the second constant
     // if right is grounded we start with last body atom which then contains the second constant
     std::vector<int>& rels = leftC ? relations : _relations;
@@ -271,10 +282,22 @@ std::vector<std::vector<int>> RuleC::materialize(TripleStorage& triples){
             std::set<int> substitutions = {constants[0], constants[1]};
             searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities, rels, dirs);
             for (const int& cEnt:  closingEntities){
+                std::pair<std::set<Triple>::iterator, bool> isNew;
+                Triple triple;
                 if (leftC){
-                    predictions.push_back({constants[0], targetRel, cEnt});
+                    triple = {constants[0], targetRel, cEnt};
+                    isNew = predictions.insert(triple);
                 }else{
-                    predictions.push_back({cEnt, targetRel, constants[0]});
+                    triple = {cEnt, targetRel, constants[0]};
+                    isNew = predictions.insert(triple);
+                }
+                // if triple is predicted for the first time track stats
+                if (trackInMaterialize && isNew.second){
+                    predicted += 1;
+                    if (triples.contains(triple[0], triple[1], triple[2])){
+                        cpredicted += 1;
+                    }
+
                 }
             }
             return predictions;
@@ -425,24 +448,33 @@ bool RuleZ::predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& 
     return false;
 }
 
-std::vector<std::vector<int>> RuleZ::materialize(TripleStorage& triples){
-    std::vector<std::vector<int>> predictions;
+std::set<Triple> RuleZ::materialize(TripleStorage& triples){
+    std::set<Triple> predictions;
     // predict c when h(c,X)<-- given all h(--, a) in train and vice versa
     RelNodeToNodes& relNtoN = leftC ? triples.getRelTailToHeads() : triples.getRelHeadToTails();
     auto it = relNtoN.find(relation);
     if (it!=relNtoN.end()){
         NodeToNodes& NtoN = it->second;
         for (auto const& pair: NtoN){
+            std::pair<std::set<Triple>::iterator, bool> isNew;
+            Triple triple;
             // source node 
             const int& e = pair.first;
-            std::vector<int> pred;
             if (leftC){
-                pred = {constant, relation, e};
+                triple = {constant, relation, e};
+                isNew = predictions.insert(triple);
             }else{
-                pred = {e, relation, constant};
+                triple = {e, relation, constant};
+                isNew = predictions.insert(triple);
+            }
+            if (trackInMaterialize && isNew.second){
+                predicted += 1;
+                if (triples.contains(triple[0], triple[1], triple[2])){
+                    cpredicted += 1;
+                }
             }
         }
-
     }
     return predictions;
 }
+

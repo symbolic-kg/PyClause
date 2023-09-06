@@ -1,5 +1,7 @@
 #include "Api.h"
 
+
+// *** Ranking handler ***
 void RuleHandler::calculateRanking(
         std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write,
         std::map<std::string,std::string> options
@@ -56,4 +58,18 @@ std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>
     }else{
         throw std::runtime_error("Please specify 'head' or 'tail' as last argument of getRanking");
     }
+}
+
+// ***StatsCalculator***
+
+StatsHandler::StatsHandler(std::string dataPath){
+    data = std::make_unique<TripleStorage>(index);
+    data->read(dataPath);
+    storage = std::make_unique<RuleStorage>(index);
+
+
+}
+
+std::array<int,2> StatsHandler::calcStats(std::string ruleStr){
+    std::unique_ptr<Rule> rule = storage->parseAnytimeRule(ruleStr);
 }

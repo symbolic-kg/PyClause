@@ -8,6 +8,10 @@
 #include "core/RuleStorage.h"
 #include "core/Globals.h"
 #include "features/Application.h"
+#include "core/Index.h"
+
+#include <array>
+#include <string>
 
 
 class RuleHandler{
@@ -20,6 +24,17 @@ public:
     std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> getRanking(std::string headOrTail);
 private:
     ApplicationHandler ranker;
+};
+
+
+class StatsHandler{
+public:
+    StatsHandler(std::string dataPath);
+    std::array<int,2> calcStats(std::string ruleStr);
+private:
+    std::shared_ptr<Index> index = std::make_shared<Index>();
+    std::unique_ptr<TripleStorage> data;
+    std::unique_ptr<RuleStorage> storage;
 };
 
 #endif

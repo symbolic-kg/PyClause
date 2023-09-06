@@ -17,6 +17,8 @@ public:
 	RelNodeToNodes& getRelTailToHeads();
 	void read(std::string filepath);
 	void add(std::string head, std::string relation, std::string tail);
+	// return true if the triple exists in the data, otherwise false
+	bool contains(int head, int relation, int tail);
 
 	Nodes* getTforHR(int head, int relation);
 	Nodes* getHforTR(int tail, int relation);

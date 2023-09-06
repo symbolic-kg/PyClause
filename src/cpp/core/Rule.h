@@ -9,6 +9,7 @@
 #include <optional>
 #include "stdio.h"
 #include <array>
+#include <set>
 
 
 #include "Types.h"
@@ -46,7 +47,7 @@ public:
 	std::vector<int>& getRelations();
     std::vector<bool>& getDirections();
 	// fully materialize rule
-	virtual std::vector<std::vector<int>> materialize(TripleStorage& triples);
+	virtual std::set<Triple> materialize(TripleStorage& triples);
 	// make prediction for partly grounded triples r(s,?) and r(?,o)
 	// we directly store the results in a query based result structure NodeToPredRults
 	virtual bool predictHeadQuery(
@@ -55,6 +56,8 @@ public:
 	virtual bool predictTailQuery(
 		int tail, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet=ManySet()
 	);
+	void setTrackInMaterialize(bool val);
+	
 protected:
 	int ID;
 	//body length
@@ -67,10 +70,15 @@ protected:
 	// possibly sampled confidence metrics
 	int sampledPredicted;
 	int sampledCpredicted;
+	// track exact num(correct)predicted when running materialize
+	bool trackInMaterialize;
+
+	std::string rulestring;
+	// internal rule representation
 	// see child classes
 	std::vector<int> relations;
 	std::vector<bool> directions;
-	std::string rulestring;
+	
 	int targetRel;
 private:
 
@@ -82,9 +90,8 @@ class RuleB: public Rule
 {
 public:
 	RuleB(std::vector<int>& relations, std::vector<bool>& directions);
-	//TODO the function should not return a created vector
-	// beter would be to provide a pointer/ref to the data structure where the predictions lie in
-	std::vector<std::vector<int>> materialize(TripleStorage& triples);
+	//TODO return semantics
+	std::set<Triple> materialize(TripleStorage& triples);
 	// we directly store the results in a query based result structure NodeToPredRults
 	//head query: tail given predict heads; vice versa for head query
 	bool predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet=ManySet());
@@ -125,8 +132,8 @@ class RuleC: public Rule
 {
 public:
 	RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, std::array<int, 2>& constants);
-	//TODO check RuleB todo
-	std::vector<std::vector<int>> materialize(TripleStorage& triples);
+	//TODO return semantics
+	std::set<Triple> materialize(TripleStorage& triples);
 	bool predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet=ManySet());
 	bool predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet=ManySet());
 private:
@@ -168,8 +175,8 @@ class RuleZ: public Rule
 {
 public:
 	RuleZ(int& relation, bool& leftC, int& constant);
-	//TODO check RuleB todo
-	std::vector<std::vector<int>> materialize(TripleStorage& triples);
+	//TODO return semantics
+	std::set<Triple> materialize(TripleStorage& triples);
 	bool predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet=ManySet());
 	bool predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet=ManySet());
 private:

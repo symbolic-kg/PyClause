@@ -90,3 +90,17 @@ Index* TripleStorage::getIndex(){
 	return index.get();
 }
 
+bool TripleStorage::contains(int head, int relation, int tail){
+	auto it = relHeadToTails.find(relation);
+	if (it!=relHeadToTails.end()){
+		NodeToNodes& HtoT = it->second;
+		auto _it = HtoT.find(head);
+		if (_it != HtoT.end()){
+        	if((_it->second).count(tail)>0){
+                 return true;
+        	}
+	 	}
+	}
+	return false;
+}
+

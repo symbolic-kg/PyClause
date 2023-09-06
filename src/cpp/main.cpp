@@ -184,11 +184,6 @@ int main(){
     valid.read(validPath);
 
 
-
-
-
-
-
     // rule example
     //std::vector<int> relations = {1,6,4};
     //std::vector<bool> directions = {true,true};
@@ -300,7 +295,7 @@ int main(){
     {
     #pragma omp for
     for (int i = 0; i < allRules.size(); ++i){
-        std::vector<std::vector<int>> preds = allRules[i]->materialize(data);
+        std::set<Triple> preds = allRules[i]->materialize(data);
         for (auto pred: preds){
             RelNodeToNodes& relHtoT = data.getRelHeadToTails();
             auto it = relHtoT.find(pred[1]);
