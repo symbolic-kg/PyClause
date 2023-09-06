@@ -49,10 +49,10 @@ PYBIND11_MODULE(rules_c, m) {
     ;
 
     // **backend bindings**
-    py::class_<RuleHandler>(m, "RuleHandler") 
+    py::class_<RankingHandler>(m, "RuleHandler") 
         .def(py::init<>())
-        .def("calculateRanking", &RuleHandler::calculateRanking)
-        .def("getRanking", &RuleHandler::getRanking)
+        .def("calculateRanking", &RankingHandler::calculateRanking)
+        .def("getRanking", &RankingHandler::getRanking)
     ;
 }
 

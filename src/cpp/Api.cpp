@@ -2,7 +2,7 @@
 
 
 // *** Ranking handler ***
-void RuleHandler::calculateRanking(
+void RankingHandler::calculateRanking(
         std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write,
         std::map<std::string,std::string> options
     ){
@@ -35,7 +35,7 @@ void RuleHandler::calculateRanking(
     }
 }
 
-std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> RuleHandler::getRanking(std::string headOrTail){
+std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> RankingHandler::getRanking(std::string headOrTail){
     // std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> newData; 
     // auto& results = (headOrTail=="head") ? ranker.getHeadQcandsConfs() : ranker.getTailQcandsConfs();
     // for (auto& queries: results){

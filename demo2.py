@@ -13,7 +13,7 @@ target = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt"
 rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
 ranking_file = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile.txt"
 
-ranker = rules_c.RuleHandler()
+ranker = rules_c.RankingHandler()
 options = {"option1":"value1", "option2":"value2"}
 ranker.calculateRanking(target, train, filter, rules, ranking_file, options)
 

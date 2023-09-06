@@ -14,9 +14,9 @@
 #include <string>
 
 
-class RuleHandler{
+class RankingHandler{
 public:
-    RuleHandler(){};
+    RankingHandler(){};
     void calculateRanking(
         std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write,
         std::map<std::string,std::string> options
