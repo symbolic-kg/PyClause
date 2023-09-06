@@ -13,7 +13,7 @@ namespace py = pybind11;
 
 
 //***PyClause backend bindings + examples *****
-PYBIND11_MODULE(rules_c, m) {
+PYBIND11_MODULE(c_clause, m) {
 
     //** example bindings **
     m.doc() = R"pbdoc(
@@ -49,7 +49,7 @@ PYBIND11_MODULE(rules_c, m) {
     ;
 
     // **backend bindings**
-    py::class_<RankingHandler>(m, "RuleHandler") 
+    py::class_<RankingHandler>(m, "RankingHandler") 
         .def(py::init<>())
         .def("calculateRanking", &RankingHandler::calculateRanking)
         .def("getRanking", &RankingHandler::getRanking)
