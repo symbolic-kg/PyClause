@@ -60,9 +60,8 @@ private:
 
     // ***ranking parameters***
     // preselection of candidates based on rules with the highest confidences
-    // for noisy-or this will result in slightly incorrect rankings when set low
-    // for max-plus ranking is correct
-    int rank_numPreselect=100;
+    // starting with the rule with higehest conf as soon as numPreselect cands are found we stop
+    int rank_numPreselect=1000000;
     // num candidates to output in ranking
     // must not be higher than _cfg_rnk_numPreselect;
     int rank_topk=100;

@@ -7,9 +7,8 @@ void RankingHandler::calculateRanking(
         std::map<std::string,std::string> options
     ){
 
-   for(const auto &pair : options){
-    std::cout << pair.first << ":" << pair.second << std::endl;
-    }
+    setRankingOptions(options);
+
     // data loading
     std::shared_ptr<Index> index = std::make_shared<Index>();
     TripleStorage data(index);
@@ -36,21 +35,6 @@ void RankingHandler::calculateRanking(
 }
 
 std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> RankingHandler::getRanking(std::string headOrTail){
-    // std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> newData; 
-    // auto& results = (headOrTail=="head") ? ranker.getHeadQcandsConfs() : ranker.getTailQcandsConfs();
-    // for (auto& queries: results){
-    //     int relation = queries.first;
-    //     auto& query = queries.second;
-    //     for (auto& cands:query){
-    //         int source = cands.first;
-    //         newData[relation][source] = cands.second;
-    //     }
-    // }
-
-    // return newData;
-
-
-
     if (headOrTail=="head"){
         return ranker.getHeadQcandsConfs();
     }else if (headOrTail=="tail"){
@@ -59,6 +43,58 @@ std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>
         throw std::runtime_error("Please specify 'head' or 'tail' as last argument of getRanking");
     }
 }
+
+void RankingHandler::setRankingOptions(std::map<std::string, std::string> options){
+
+    // register options for ranker
+
+    std::string opt_str = "topk";
+    auto opt = options.find(opt_str);
+    if (opt!=options.end()){
+        if (_cfg_verbose){
+            std::cout<<"Setting option "<<opt_str<<std::endl;
+        }
+        ranker.setTopK(std::stoi(opt->second));
+    }
+
+    opt_str =  "num_preselect";
+    opt = options.find(opt_str);
+    if (opt!=options.end()){
+        if (_cfg_verbose){
+            std::cout<<"Setting option "<<opt_str<<std::endl;
+        }
+        ranker.setNumPreselect(std::stoi(opt->second));
+    }
+
+    opt_str = "aggregation_function";
+    opt = options.find(opt_str);
+    if (opt!=options.end()){
+        if (_cfg_verbose){
+            std::cout<<"Setting option "<<opt_str<<std::endl;
+        }
+        ranker.setAggregationFunc(opt->second);
+    }
+
+    opt_str = "filter_w_train";
+    opt = options.find(opt_str);
+    if (opt!=options.end()){
+        if (_cfg_verbose){
+            std::cout<<"Setting option "<<opt_str<<std::endl;
+        }
+        ranker.setFilterWTrain(util::stringToBool(opt->second));
+    }
+
+    opt_str = "filter_w_target";
+    opt = options.find(opt_str);
+    if (opt!=options.end()){
+        if (_cfg_verbose){
+            std::cout<<"Setting option "<<opt_str<<std::endl;
+        }
+        ranker.setFilterWtarget(util::stringToBool(opt->second));
+    }
+}
+
+
 
 // ***StatsCalculator***
 

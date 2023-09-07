@@ -9,6 +9,7 @@
 #include "core/Globals.h"
 #include "features/Application.h"
 #include "core/Index.h"
+#include "core/Util.hpp"
 
 #include <array>
 #include <string>
@@ -19,11 +20,13 @@ public:
     RankingHandler(){};
     void calculateRanking(
         std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write,
-        std::map<std::string,std::string> options
+        std::map<std::string,std::string> options = std::map<std::string, std::string>()
     );
     std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> getRanking(std::string headOrTail);
 private:
     ApplicationHandler ranker;
+    // setable options in frontend for ranking are registered here
+    void setRankingOptions(std::map<std::string,std::string> options);
 };
 
 

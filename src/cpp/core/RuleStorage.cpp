@@ -227,15 +227,15 @@ void RuleStorage::parseAtom(const std::string& input, strAtom& atom) {
      std::stringstream stream(input);
      // assign relation
     if (!std::getline(stream, atom[0], '(')) {
-        throw std::runtime_error("Error in parseAtom unexpected format:" + input);
+        throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
     }
     // assign head
     if (!std::getline(stream, atom[1], ',')) {
-        throw std::runtime_error("Error in parseAtom unexpected format:" + input);
+        throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
     }
     //assign tail
     if (!std::getline(stream, atom[2], ')')) {
-        throw std::runtime_error("Error in parseAtom unexpected format:" + input);
+        throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
     }
 }
 

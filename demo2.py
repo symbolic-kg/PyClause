@@ -3,7 +3,6 @@ import c_clause
 
 
 
-start = time.time()
 
 train = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt"
 filter = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt"
@@ -24,17 +23,21 @@ print(handler.calcStats("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), 
 testHandler = c_clause.RuleHandler(target)
 print(testHandler.calcStats("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)"))
 
-exit()
-
-
-
+print(handler.calcStats("_hypernym(X,06355894) <= "))
 
 
 #### Calculate a ranking and serialize / use in python
+start = time.time()
+ranking_options = {
+    "aggregation_function": "maxplus",
+    "num_preselect": "100000",
+    "topk": "100",
+    "filter_w_train": "true",
+    "filter_w_target": "true",
+}
 
 ranker = c_clause.RankingHandler()
-options = {"option1":"value1", "option2":"value2"}
-ranker.calculateRanking(target, train, filter, rules, ranking_file, options)
+ranker.calculateRanking(target, train, filter, rules, ranking_file, ranking_options)
 
 
 rankingtime = time.time()

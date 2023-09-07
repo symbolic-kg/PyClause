@@ -18,6 +18,7 @@
 #include <random>
 #include <iostream>
 #include <time.h>
+#include <algorithm>
 
 namespace util{
 	inline std::vector<std::string> split(const std::string& str, char delim = ' ') {
@@ -44,7 +45,7 @@ namespace util{
 		cont.push_back(last);
 	}
     return cont;
-}
+	}
 
 	template<typename ... Args>
 	inline std::string string_format(const std::string& format, Args ... args)
@@ -220,6 +221,25 @@ namespace util{
 		strftime(buf, sizeof(buf), "%Y-%m-%d-%H-%M-%S.db", &tstruct);
 		return buf;
 	}
-}
 
+	inline bool stringToBool(std::string str) 
+	{
+		std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+		
+		if(str == "true" || str == "1") 
+		{
+			return true;
+		}
+		else if(str == "false" || str == "0") 
+		{
+			return false;
+		}
+		else
+		{
+			throw std::invalid_argument("Tried to parse a string into a bool but did not understand the string");
+		}
+	}
+}
 #endif // UTIL_H
+
+
