@@ -1,4 +1,5 @@
 #include "Api.h"
+#include "functional"
 
 
 // *** Ranking handler ***
@@ -48,49 +49,27 @@ void RankingHandler::setRankingOptions(std::map<std::string, std::string> option
 
     // register options for ranker
 
-    std::string opt_str = "topk";
-    auto opt = options.find(opt_str);
-    if (opt!=options.end()){
-        if (_cfg_verbose){
-            std::cout<<"Setting option "<<opt_str<<std::endl;
-        }
-        ranker.setTopK(std::stoi(opt->second));
-    }
+     struct OptionHandler {
+        std::string name;
+        std::function<void(std::string)> setter;
+    };
 
-    opt_str =  "num_preselect";
-    opt = options.find(opt_str);
-    if (opt!=options.end()){
-        if (_cfg_verbose){
-            std::cout<<"Setting option "<<opt_str<<std::endl;
-        }
-        ranker.setNumPreselect(std::stoi(opt->second));
-    }
+    std::vector<OptionHandler> handlers = {
+        {"topk", [this](std::string val) { ranker.setTopK(std::stoi(val)); }},
+        {"num_preselect", [this](std::string val) { ranker.setNumPreselect(std::stoi(val)); }},
+        {"aggregation_function", [this](std::string val) { ranker.setAggregationFunc(val); }},
+        {"filter_w_train", [this](std::string val) { ranker.setFilterWTrain(util::stringToBool(val)); }},
+        {"filter_w_target", [this](std::string val) { ranker.setFilterWtarget(util::stringToBool(val)); }},
+    };
 
-    opt_str = "aggregation_function";
-    opt = options.find(opt_str);
-    if (opt!=options.end()){
-        if (_cfg_verbose){
-            std::cout<<"Setting option "<<opt_str<<std::endl;
+    for (auto& handler : handlers) {
+        auto opt = options.find(handler.name);
+        if (opt != options.end()) {
+            if (_cfg_verbose){
+                std::cout<< "Setting option "<<handler.name<<"to: "<<opt->second<<std::endl;
+            }
+            handler.setter(opt->second);
         }
-        ranker.setAggregationFunc(opt->second);
-    }
-
-    opt_str = "filter_w_train";
-    opt = options.find(opt_str);
-    if (opt!=options.end()){
-        if (_cfg_verbose){
-            std::cout<<"Setting option "<<opt_str<<std::endl;
-        }
-        ranker.setFilterWTrain(util::stringToBool(opt->second));
-    }
-
-    opt_str = "filter_w_target";
-    opt = options.find(opt_str);
-    if (opt!=options.end()){
-        if (_cfg_verbose){
-            std::cout<<"Setting option "<<opt_str<<std::endl;
-        }
-        ranker.setFilterWtarget(util::stringToBool(opt->second));
     }
 }
 
