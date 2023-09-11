@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <functional>
 
 #include "Application.h"
 #include "../core/TripleStorage.h"
@@ -13,15 +14,24 @@
 #include "../core/Globals.h"
 
 
-void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, std::string dir){
-   // tail query: predict tail given head
-    RelNodeToNodes& data =  (dir=="tail") ? target.getRelHeadToTails() : target.getRelTailToHeads();
+void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, bool dirIsTail){
+    // define rule prediction function depending on direction
+    std::function<void(Rule*, int&, TripleStorage&, NodeToPredRules&, ManySet&)> predictHeadOrTail;
+    if (dirIsTail)
+        predictHeadOrTail = [](Rule* rule, int& source, TripleStorage& train, NodeToPredRules& candRules, ManySet& filter)
+        { rule->predictTailQuery(source, train, candRules, filter); };
+    else
+        predictHeadOrTail = [](Rule* rule, int& source, TripleStorage& train, NodeToPredRules& candRules, ManySet& filter)
+        { rule->predictHeadQuery(source, train, candRules, filter); };
+
+    // tail query: predict tail given head; vice versa for head query
+    RelNodeToNodes& data =  (dirIsTail) ? target.getRelHeadToTails() : target.getRelTailToHeads();
     // relations
     for (const auto& relQueries : data) {
         int relation = relQueries.first;
 
         if (_cfg_verbose){
-            std::cout<<"Applying rules on relation "<<relation<<" for "<<dir<<" queries..."<<std::endl;
+            std::cout<<"Applying rules on relation "<<relation<<" for "<<dirIsTail<<" queries (1 is tail)..."<<std::endl;
         }
 
         // source to correct target entities
@@ -54,7 +64,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 // filtering for train and additionalFilter
                 if (rank_filterWtrain){
                     Nodes* trainFilter = nullptr;
-                    trainFilter = (dir=="head") ? train.getHforTR(source, relation) : train.getTforHR(source, relation);
+                    trainFilter = (!dirIsTail) ? train.getHforTR(source, relation) : train.getTforHR(source, relation);
                     if (trainFilter){
                         filter.addSet(trainFilter);
                     }   
@@ -62,29 +72,21 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 }
                 // always filter with additionalFilter (can be empty)
                 Nodes* naddFilter = nullptr;
-                naddFilter = (dir=="head") ? addFilter.getHforTR(source, relation) : addFilter.getTforHR(source, relation);
+                naddFilter = (!dirIsTail) ? addFilter.getHforTR(source, relation) : addFilter.getTforHR(source, relation);
                 if (naddFilter){
                     filter.addSet(naddFilter);
                 }
                 // perform rule application
                 for (Rule* rule : rules.getRelRules(relation)){
-                    if (dir=="tail"){
-                         rule->predictTailQuery(source, train, candRules, filter);
-                    }
-                    else if (dir=="head"){
-                        rule->predictHeadQuery(source, train, candRules, filter);
-                    }
-                    else{
-                        throw std::runtime_error("Need to specify direction='head' or 'tail' when calculating query results.");
-                    }
-                    if (candRules.size() > rank_numPreselect){
-                    break;
-                    }
+                    predictHeadOrTail(rule, source, train, candRules, filter);
+                    //if (candRules.size() > rank_numPreselect){
+                    //break;
+                    //}
                 }
 
                 #pragma omp critical
                 {   
-                    if (dir=="tail"){
+                    if (dirIsTail){
                         tailQcandsRules[relation][source] = candRules;
                     }else{
                         headQcandsRules[relation][source] = candRules;
@@ -116,8 +118,8 @@ void ApplicationHandler::aggregateQueryResults(std::string direction){
 }
 
 void ApplicationHandler::makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter){
-    calculateQueryResults(target, train, rules, addFilter, "tail");
-    calculateQueryResults(target, train, rules, addFilter, "head");
+    calculateQueryResults(target, train, rules, addFilter, true);
+    calculateQueryResults(target, train, rules, addFilter, false);
     aggregateQueryResults("tail");
     aggregateQueryResults("head");
 } 

@@ -18,7 +18,7 @@ public:
     // stores results (cand->Vector<rule*>) in, e.g., this->headQueryResult[rel][source_entity].candToRules
     // direction=head or direction=tail
     // from config filtering with train and addFilter is handable, filtering with target needs to be on triple level
-    void calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, std::string direction);
+    void calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, bool dirIsTail);
     // aggregate query results based on _cfg_ defined aggregation function
     // writes to, e.g., this->headQueryResults[rel][source_entitiy].aggrCand
     void aggregateQueryResults(std::string direction);

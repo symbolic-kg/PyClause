@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <omp.h>
+#include <chrono>
 
 #include "core/myClass.h"
 #include "core/Index.h"
@@ -157,8 +158,55 @@ void tests(){
     std::cout<<"All tests passed."<<std::endl;
 }
 
+
+void timeRanking(){
+
+    auto start = std::chrono::high_resolution_clock::now();
+    std::shared_ptr<Index> index = std::make_shared<Index>();
+    std::string trainPath = "/home/patrick/Desktop/kge/data/wnrr/train.txt";
+    std::string filterPath = "/home/patrick/Desktop/kge/data/wnrr/valid.txt";
+    std::string targetPath = "/home/patrick/Desktop/kge/data/wnrr/test.txt";
+    // data loading
+    TripleStorage train(index);
+    train.read(trainPath);
+    //test
+    TripleStorage target(index);
+    target.read(targetPath);
+    //valid 
+    TripleStorage filter(index);
+    filter.read(filterPath);
+    std::cout<<"data loaded. \n";
+
+
+    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
+    RuleStorage rules(index);
+    rules.readAnyTimeFormat(rulePath, true); 
+
+    ApplicationHandler ranker;
+
+    ranker.makeRanking(target, train, rules, filter);
+
+    std::string rankingFile = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile.txt";
+
+    ranker.writeRanking(target, rankingFile);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+    std::cout << "Overall Execution time: " << duration.count() << " seconds." << std::endl;
+
+
+
+}
+
+
 int main(){
     tests();
+    timeRanking();
+
+    exit(0);
+
+
+
+
     std::cout << "Hello, yesoo from rule_backend! \n";
     myClass ob("peter"); 
     long start = 1;
