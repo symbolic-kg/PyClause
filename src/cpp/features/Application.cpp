@@ -79,9 +79,9 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 // perform rule application
                 for (Rule* rule : rules.getRelRules(relation)){
                     predictHeadOrTail(rule, source, train, candRules, filter);
-                    //if (candRules.size() > rank_numPreselect){
-                    //break;
-                    //}
+                    if (candRules.size() > rank_numPreselect){
+                    break;
+                    }
                 }
 
                 #pragma omp critical
