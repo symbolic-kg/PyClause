@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <functional>
+#include <chrono>
 
 #include "Application.h"
 #include "../core/TripleStorage.h"
@@ -50,11 +51,11 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
             keys.push_back(item.first);
         }
         // parallize rule application for each query in target
-        #pragma omp parallel
+        #pragma omp parallel //num_threads(4)
         {
             NodeToPredRules candRules;
             ManySet filter;
-            #pragma omp for nowait
+            #pragma omp for
             for (int i = 0; i < keys.size(); ++i) {
                 auto entityToCands = srcToCand.find(keys[i]);
                 // this gives us a query, e.g. tail direction: relation(source,?)
@@ -118,11 +119,22 @@ void ApplicationHandler::aggregateQueryResults(std::string direction){
 }
 
 void ApplicationHandler::makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter){
+
+    auto start = std::chrono::high_resolution_clock::now();
     calculateQueryResults(target, train, rules, addFilter, true);
     calculateQueryResults(target, train, rules, addFilter, false);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration_query_results = std::chrono::duration<double>(stop - start);
     aggregateQueryResults("tail");
     aggregateQueryResults("head");
-} 
+    auto stop2 = std::chrono::high_resolution_clock::now();
+    auto duration_aggregation = std::chrono::duration<double>(stop2 - stop);
+    std::cout << "Query results took: " << duration_query_results.count() << " seconds." << std::endl;
+    std::cout << "Aggregation  took: " << duration_aggregation.count() << " seconds." << std::endl;
+
+
+
+}
 
 // query results must have been calculated before and aggregated
 void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepath){

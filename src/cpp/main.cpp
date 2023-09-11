@@ -183,14 +183,13 @@ void timeRanking(){
     rules.readAnyTimeFormat(rulePath, true); 
 
     ApplicationHandler ranker;
-
     ranker.makeRanking(target, train, rules, filter);
 
     std::string rankingFile = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile.txt";
 
     ranker.writeRanking(target, rankingFile);
     auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+    auto duration = std::chrono::duration<double>(stop - start);
     std::cout << "Overall Execution time: " << duration.count() << " seconds." << std::endl;
 
 
