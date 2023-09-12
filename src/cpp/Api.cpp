@@ -66,7 +66,7 @@ void RankingHandler::setRankingOptions(std::map<std::string, std::string> option
         auto opt = options.find(handler.name);
         if (opt != options.end()) {
             if (_cfg_verbose){
-                std::cout<< "Setting option "<<handler.name<<"to: "<<opt->second<<std::endl;
+                std::cout<< "Setting option "<<handler.name<<" to: "<<opt->second<<std::endl;
             }
             handler.setter(opt->second);
         }

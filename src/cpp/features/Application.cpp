@@ -26,17 +26,6 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
         predictHeadOrTail = &Rule::predictHeadQuery;
     }
     
-
-
-
-    //std::function<void(Rule*, int&, TripleStorage&, NodeToPredRules&, ManySet&)> predictHeadOrTail;
-    //if (dirIsTail)
-    //    predictHeadOrTail = [](Rule* rule, int& source, TripleStorage& train, NodeToPredRules& candRules, ManySet& filter)
-    //    { rule->predictTailQuery(source, train, candRules, filter); };
-    //else
-    //    predictHeadOrTail = [](Rule* rule, int& source, TripleStorage& train, NodeToPredRules& candRules, ManySet& filter)
-    //    { rule->predictHeadQuery(source, train, candRules, filter); };
-
     // tail query: predict tail given head; vice versa for head query
     RelNodeToNodes& data =  (dirIsTail) ? target.getRelHeadToTails() : target.getRelTailToHeads();
     // relations
@@ -62,6 +51,9 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
         for (const auto& item : srcToCand) {
             keys.push_back(item.first);
         }
+
+        auto& relRules = rules.getRelRules(relation);
+
         // parallize rule application for each query in target
         #pragma omp parallel //num_threads(4)
         {
@@ -90,7 +82,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                     filter.addSet(naddFilter);
                 }
                 // perform rule application
-                for (Rule* rule : rules.getRelRules(relation)){
+                for (Rule* rule : relRules){
                     (rule->*predictHeadOrTail)(source, train, candRules, filter);
                     if (candRules.size() > rank_numPreselect){
                     break;
