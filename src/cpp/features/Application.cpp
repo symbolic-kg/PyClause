@@ -17,13 +17,25 @@
 
 void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, bool dirIsTail){
     // define rule prediction function depending on direction
-    std::function<void(Rule*, int&, TripleStorage&, NodeToPredRules&, ManySet&)> predictHeadOrTail;
-    if (dirIsTail)
-        predictHeadOrTail = [](Rule* rule, int& source, TripleStorage& train, NodeToPredRules& candRules, ManySet& filter)
-        { rule->predictTailQuery(source, train, candRules, filter); };
-    else
-        predictHeadOrTail = [](Rule* rule, int& source, TripleStorage& train, NodeToPredRules& candRules, ManySet& filter)
-        { rule->predictHeadQuery(source, train, candRules, filter); };
+    typedef bool (Rule::*RulePredFunc)(int, TripleStorage&, NodeToPredRules&, ManySet);
+    RulePredFunc predictHeadOrTail;
+
+    if(dirIsTail){
+        predictHeadOrTail = &Rule::predictTailQuery;
+    }else{
+        predictHeadOrTail = &Rule::predictHeadQuery;
+    }
+    
+
+
+
+    //std::function<void(Rule*, int&, TripleStorage&, NodeToPredRules&, ManySet&)> predictHeadOrTail;
+    //if (dirIsTail)
+    //    predictHeadOrTail = [](Rule* rule, int& source, TripleStorage& train, NodeToPredRules& candRules, ManySet& filter)
+    //    { rule->predictTailQuery(source, train, candRules, filter); };
+    //else
+    //    predictHeadOrTail = [](Rule* rule, int& source, TripleStorage& train, NodeToPredRules& candRules, ManySet& filter)
+    //    { rule->predictHeadQuery(source, train, candRules, filter); };
 
     // tail query: predict tail given head; vice versa for head query
     RelNodeToNodes& data =  (dirIsTail) ? target.getRelHeadToTails() : target.getRelTailToHeads();
@@ -79,7 +91,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 }
                 // perform rule application
                 for (Rule* rule : rules.getRelRules(relation)){
-                    predictHeadOrTail(rule, source, train, candRules, filter);
+                    (rule->*predictHeadOrTail)(source, train, candRules, filter);
                     if (candRules.size() > rank_numPreselect){
                     break;
                     }
@@ -87,17 +99,31 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
 
                 #pragma omp critical
                 {   
-                    if (dirIsTail){
-                        tailQcandsRules[relation][source] = candRules;
-                    }else{
-                        headQcandsRules[relation][source] = candRules;
+                    if (saveCandidateRules){
+                        std::cout<<"not here";
+                        if (dirIsTail){
+                            tailQcandsRules[relation][source] = candRules;
+                        }else{
+                            headQcandsRules[relation][source] = candRules;
+                        }
                     }
+                   
+                   if (performAggregation){
+                        auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
+                        if (rank_aggrFunc=="maxplus"){
+                            scoreMaxPlus(candRules, writeResults[relation][source]);
+                        }
+                        else{
+                            throw std::runtime_error("Aggregation function is not recognized in calcualte ranking.");
+                        }
+                   }
                 }
+                
                 candRules.clear();
                 filter.clear();
             }
         }        
-        }
+    }
 }
 
 void ApplicationHandler::aggregateQueryResults(std::string direction){
@@ -118,22 +144,10 @@ void ApplicationHandler::aggregateQueryResults(std::string direction){
     }
 }
 
+// note this does not yet filter with target as ranking is performed query based
 void ApplicationHandler::makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter){
-
-    auto start = std::chrono::high_resolution_clock::now();
     calculateQueryResults(target, train, rules, addFilter, true);
     calculateQueryResults(target, train, rules, addFilter, false);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration_query_results = std::chrono::duration<double>(stop - start);
-    aggregateQueryResults("tail");
-    aggregateQueryResults("head");
-    auto stop2 = std::chrono::high_resolution_clock::now();
-    auto duration_aggregation = std::chrono::duration<double>(stop2 - stop);
-    std::cout << "Query results took: " << duration_query_results.count() << " seconds." << std::endl;
-    std::cout << "Aggregation  took: " << duration_aggregation.count() << " seconds." << std::endl;
-
-
-
 }
 
 // query results must have been calculated before and aggregated
@@ -261,6 +275,13 @@ void ApplicationHandler::setFilterWtarget(bool ind){
 }
 void ApplicationHandler::setAggregationFunc(std::string func){
     rank_aggrFunc = func;
+}
+
+void ApplicationHandler::setSaveCandidateRules(bool ind){
+    saveCandidateRules = ind;
+}
+void  ApplicationHandler::setPerformAggregation(bool ind){
+    performAggregation = ind;
 }
 
 std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>& ApplicationHandler::getHeadQcandsRules(){

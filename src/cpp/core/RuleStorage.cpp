@@ -33,7 +33,6 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
                 relToRules[rule->getTargetRel()].insert(&(*rule)); //equivalent to insert(rule.get())
                 // rule is nullptr after this
                 rules.push_back(std::move(rule));
-                std::cout<<"added rule\n";
             }else{
                 //std::cout<<"yeah was null\n";
             }
@@ -54,7 +53,7 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
 std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
 
     if(rule.find(_cfg_prs_equalityToken) != std::string::npos) {
-    std::cout << "Found me_myself_i, skipping." << std::endl;
+    //std::cout << "Found me_myself_i, skipping." << std::endl;
     return nullptr;
     }
 
@@ -134,7 +133,7 @@ std::unique_ptr<Rule> RuleStorage::parseAnytimeRule(std::string rule) {
         }
         if (!bodyHasConst){
             ruleType = "RuleD";
-            std::cout<<"Found U_d rule, skipping."<<std::endl;
+            //std::cout<<"Found U_d rule, skipping."<<std::endl;
             return nullptr;
         }else{
             ruleType = "RuleC";

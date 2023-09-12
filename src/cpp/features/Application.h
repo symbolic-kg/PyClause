@@ -39,6 +39,8 @@ public:
     void setFilterWTrain(bool ind);
     void setFilterWtarget(bool ind);
     void setAggregationFunc(std::string func);
+    void setSaveCandidateRules(bool ind);
+    void setPerformAggregation(bool ind);
 
 
 
@@ -58,7 +60,8 @@ private:
     //std::unordered_map<int,std::unordered_map<int, QueryResults>> headQueryResults;
     //std::unordered_map<int,std::unordered_map<int, QueryResults>> tailQueryResults;
 
-    // ***ranking parameters***
+    // ***ranking options***
+
     // preselection of candidates based on rules with the highest confidences
     // starting with the rule with higehest conf as soon as numPreselect cands are found we stop
     int rank_numPreselect=1000000;
@@ -72,6 +75,12 @@ private:
     bool rank_filterWtarget=true;
     // aggregation function in {"maxplus"}
     std::string rank_aggrFunc="maxplus";
+
+    // track for each candidate the predicting rules (saved in e.g. headQcandsRules )
+    bool saveCandidateRules=false;
+    // perform aggregation and store in (headQcandsConfs)
+    bool performAggregation=true;
+
 
 
 
