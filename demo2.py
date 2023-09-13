@@ -4,18 +4,18 @@ import c_clause
 
 
 
-train = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt"
-filter = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt"
-target = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt"
-rules = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600"
-ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/rankingFile.txt"
+# train = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt"
+# filter = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt"
+# target = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt"
+# rules = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600"
+# ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/rankingFile.txt"
 
 
-# train = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt"
-# filter = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt"
-# target = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt"
-#rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
-#ranking_file = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile.txt"
+train = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt"
+filter = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt"
+target = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt"
+rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
+ranking_file = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile.txt"
 
 
 
@@ -39,7 +39,7 @@ ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/rankingFile.txt"
 start = time.time()
 ranking_options = {
     "aggregation_function": "maxplus",
-    "num_preselect": "10000000",
+    "num_preselect": "100",
     "topk": "100",
     "filter_w_train": "true",
     "filter_w_target": "true",

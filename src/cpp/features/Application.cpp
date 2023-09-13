@@ -17,7 +17,7 @@
 
 void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, bool dirIsTail){
     // define rule prediction function depending on direction
-    typedef bool (Rule::*RulePredFunc)(int, TripleStorage&, NodeToPredRules&, ManySet);
+    typedef bool (Rule::*RulePredFunc)(int, TripleStorage&, QueryResults&, ManySet);
     RulePredFunc predictHeadOrTail;
 
     if(dirIsTail){
@@ -57,7 +57,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
         // parallize rule application for each query in target
         #pragma omp parallel //num_threads(4)
         {
-            NodeToPredRules candRules;
+            QueryResults qResults(rank_topk);
             ManySet filter;
             #pragma omp for
             for (int i = 0; i < keys.size(); ++i) {
@@ -83,27 +83,28 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 }
                 // perform rule application
                 for (Rule* rule : relRules){
-                    (rule->*predictHeadOrTail)(source, train, candRules, filter);
-                    if (candRules.size() > rank_numPreselect){
+                    (rule->*predictHeadOrTail)(source, train, qResults, filter);
+                    if (qResults.size() > rank_numPreselect){
                     break;
                     }
                 }
+                //std::cout<<counter<<std::endl;
 
                 #pragma omp critical
                 {   
                     if (saveCandidateRules){
-                        std::cout<<"not here";
+                        // TODO when needed could prevent copy here by using shared pointer
                         if (dirIsTail){
-                            tailQcandsRules[relation][source] = candRules;
+                            tailQcandsRules[relation][source] = qResults.getCandRules();
                         }else{
-                            headQcandsRules[relation][source] = candRules;
+                            headQcandsRules[relation][source] = qResults.getCandRules();
                         }
                     }
                    
                    if (performAggregation){
                         auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
                         if (rank_aggrFunc=="maxplus"){
-                            scoreMaxPlus(candRules, writeResults[relation][source]);
+                            scoreMaxPlus(qResults.getCandRules(), writeResults[relation][source]);
                         }
                         else{
                             throw std::runtime_error("Aggregation function is not recognized in calcualte ranking.");
@@ -111,7 +112,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                    }
                 }
                 
-                candRules.clear();
+                qResults.clear();
                 filter.clear();
             }
         }        

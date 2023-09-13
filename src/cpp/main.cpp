@@ -10,6 +10,7 @@
 #include "core/Rule.h"
 #include "core/RuleStorage.h"
 #include "features/Application.h"
+#include "core/QueryResults.h"
 
 void tests(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
@@ -85,7 +86,7 @@ void tests(){
 
     // Test RuleB predictTailQuery
     ruleB = rules.parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
-    NodeToPredRules preds;
+    QueryResults preds(-1);
     std::string node = "08791167";
     ruleB->predictTailQuery((index->getIdOfNodestring(node)),data, preds);
     if (preds.size()!=5){
@@ -103,7 +104,7 @@ void tests(){
     // tail grounding of head query fits to tail grounding of rule, predict something
     std::string node_c = "06355894"; 
     ruleC = rules.parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
-    NodeToPredRules preds_c;
+    QueryResults preds_c(-1);
     ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
     if(preds_c.size()!=97){
         throw std::runtime_error("Test 9 for C-rule predictHeadQuery failed");
@@ -123,7 +124,7 @@ void tests(){
     std::string correctNode = "06355894";
     preds_c.clear();
     ruleC->predictTailQuery(index->getIdOfNodestring(node_c), data, preds_c);
-    if (preds_c.size()!=1 || preds_c.find(index->getIdOfNodestring(correctNode))==preds_c.end()){
+    if (preds_c.size()!=1 || !preds_c.contains(index->getIdOfNodestring(correctNode))){
         throw std::runtime_error("Test 11 for C-rule predictTailQuery failed");
     }
 
@@ -150,7 +151,7 @@ void tests(){
     correctNode = "07007945";
     preds_c.clear();
     ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
-    if (preds_c.size()!=1 || preds_c.find(index->getIdOfNodestring(correctNode))==preds_c.end()){
+    if (preds_c.size()!=1 || !preds_c.contains(index->getIdOfNodestring(correctNode))){
         throw std::runtime_error("Test 14 for C-rule predictTailQuery failed");
     }
 
@@ -183,6 +184,10 @@ void timeRanking(){
     rules.readAnyTimeFormat(rulePath, true); 
 
     ApplicationHandler ranker;
+
+    ranker.setTopK(100);
+    ranker.setNumPreselect(100);
+
     ranker.makeRanking(target, train, rules, filter);
 
     std::string rankingFile = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile.txt";

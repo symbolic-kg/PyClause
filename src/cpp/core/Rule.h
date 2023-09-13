@@ -15,6 +15,7 @@
 #include "Types.h"
 #include "TripleStorage.h"
 #include "ManySet.h"
+#include "QueryResults.h"
 
 
 
@@ -52,10 +53,10 @@ public:
 	// make prediction for partly grounded triples r(s,?) and r(?,o)
 	// we directly store the results in a query based result structure NodeToPredRults
 	virtual bool predictHeadQuery(
-		int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet=ManySet()
+		int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet()
 		);
 	virtual bool predictTailQuery(
-		int tail, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet=ManySet()
+		int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet()
 	);
 	void setTrackInMaterialize(bool val);
 	
@@ -95,8 +96,8 @@ public:
 	std::set<Triple> materialize(TripleStorage& triples);
 	// we directly store the results in a query based result structure NodeToPredRults
 	//head query: tail given predict heads; vice versa for head query
-	bool predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet=ManySet());
-	bool predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet=ManySet());
+	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 
 private:
 	// this->relations and this->directions uniquely identifies a rule
@@ -135,8 +136,8 @@ public:
 	RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, std::array<int, 2>& constants);
 	//TODO return semantics
 	std::set<Triple> materialize(TripleStorage& triples);
-	bool predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet=ManySet());
-	bool predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet=ManySet());
+	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
+	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 private:
 	// this->relations, this->directions, this->leftC, this->constants, uniquely identify a C (U_c) rule
 	// e.g. relations = [r1, r2, r3]
@@ -178,8 +179,8 @@ public:
 	RuleZ(int& relation, bool& leftC, int& constant);
 	//TODO return semantics
 	std::set<Triple> materialize(TripleStorage& triples);
-	bool predictTailQuery(int head, TripleStorage& triples, NodeToPredRules& tailResults, ManySet filterSet=ManySet());
-	bool predictHeadQuery(int tail, TripleStorage& triples, NodeToPredRules& headResults, ManySet filterSet=ManySet());
+	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 private:
 	bool leftC;
 	int constant;
