@@ -8,6 +8,7 @@
 #include <vector>
 #include <set>
 #include <array>
+#include <string>
 
 typedef std::unordered_set<int> Nodes;
 typedef std::unordered_map<int, Nodes> NodeToNodes;
