@@ -84,7 +84,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 // perform rule application
                 for (Rule* rule : relRules){
                     (rule->*predictHeadOrTail)(source, train, qResults, filter);
-                    if (qResults.size() > rank_numPreselect){
+                    if (qResults.size() >= rank_numPreselect){
                     break;
                     }
                 }
