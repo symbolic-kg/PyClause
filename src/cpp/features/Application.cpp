@@ -84,11 +84,15 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 // perform rule application
                 for (Rule* rule : relRules){
                     (rule->*predictHeadOrTail)(source, train, qResults, filter);
-                    if (qResults.size() >= rank_numPreselect){
-                    break;
-                    }
+                    int lastSize = 0;
+                    int currSize = qResults.size();
+                    // if (currSize>=lastSize+rank_topk){
+                    //     if (qResults.checkDiscrimination()){
+                    //         break;
+                    //     }
+                    //     lastSize=currSize;
+                    // }
                 }
-                //std::cout<<counter<<std::endl;
 
                 #pragma omp critical
                 {   

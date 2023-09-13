@@ -186,7 +186,6 @@ void timeRanking(){
     ApplicationHandler ranker;
 
     ranker.setTopK(100);
-    ranker.setNumPreselect(100);
 
     ranker.makeRanking(target, train, rules, filter);
 

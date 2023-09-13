@@ -6,9 +6,10 @@
 #include <vector>
 
 
-
+class Rule;
 
 //temporary result handling for one query
+// note that this structure assumes throughout that candiates are added in order of the highest rule confidences
 class QueryResults{
 public:
     QueryResults(int addTopK);
@@ -21,6 +22,8 @@ public:
     void clear();
     std::vector<Rule*>& getRulesForCand(int cand);
     NodeToPredRules& getCandRules();
+    // checks if at least discAtLeast top candidates can be fully disciminated
+    bool checkDiscrimination();
     
 
 
@@ -30,6 +33,14 @@ private:
 
     // maximal number of candidates to add
     int addTopK;
+
+    // the num of top candidates which at least have to be fully disciminated
+    int discAtLeast = 10;
+    // we track at least discAtLeast rules for checking discimination number
+    // (we track more than discAtLeast if e.g. the first rule predicts more than discAtLeast)
+    int trackTo=0;
+
+    Rule* firstRule = nullptr;
 
    
 
