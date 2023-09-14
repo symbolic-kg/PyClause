@@ -43,7 +43,7 @@ ranking_options = {
     "topk": "100",
     "filter_w_train": "true",
     "filter_w_target": "true",
-    "disc_at_least":"10" ## -1 for off 
+    "disc_at_least":"100" ## -1 for off 
 }
 
 ranker = c_clause.RankingHandler()

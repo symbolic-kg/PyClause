@@ -4,7 +4,11 @@
 
 QueryResults::QueryResults(int addTopK, int discAtLeast){
     this->addTopK = addTopK;
-    this->discAtLeast = discAtLeast;
+    // discriminating 2 means only one check
+    this->discAtLeast = discAtLeast-1;
+    if (this->discAtLeast==0){
+        std::runtime_error("Check option 'disc_at_least'");
+    }
 }
 
 
