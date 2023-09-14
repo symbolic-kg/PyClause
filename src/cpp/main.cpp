@@ -86,7 +86,7 @@ void tests(){
 
     // Test RuleB predictTailQuery
     ruleB = rules.parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
-    QueryResults preds(-1);
+    QueryResults preds;
     std::string node = "08791167";
     ruleB->predictTailQuery((index->getIdOfNodestring(node)),data, preds);
     if (preds.size()!=5){
@@ -104,7 +104,7 @@ void tests(){
     // tail grounding of head query fits to tail grounding of rule, predict something
     std::string node_c = "06355894"; 
     ruleC = rules.parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
-    QueryResults preds_c(-1);
+    QueryResults preds_c;
     ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
     if(preds_c.size()!=97){
         throw std::runtime_error("Test 9 for C-rule predictHeadQuery failed");
@@ -186,10 +186,11 @@ void timeRanking(){
     ApplicationHandler ranker;
 
     ranker.setTopK(100);
+    ranker.setDiscAtLeast(10);
 
     ranker.makeRanking(target, train, rules, filter);
 
-    std::string rankingFile = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile.txt";
+    std::string rankingFile = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile10.txt";
 
     ranker.writeRanking(target, rankingFile);
     auto stop = std::chrono::high_resolution_clock::now();

@@ -41,6 +41,7 @@ public:
     void setAggregationFunc(std::string func);
     void setSaveCandidateRules(bool ind);
     void setPerformAggregation(bool ind);
+    void setDiscAtLeast(int num);
 
 
 
@@ -65,9 +66,7 @@ private:
     // preselection of candidates based on rules with the highest confidences
     // starting with the rule with higehest conf as soon as numPreselect cands are found we stop
     int rank_numPreselect=1000000;
-    // num candidates to output in ranking
-    // must not be higher than _cfg_rnk_numPreselect;
-    int rank_topk=100;
+   
     // filter with train
     bool rank_filterWtrain=true;
     // filter with the target set (mostly the "test" set)
@@ -80,6 +79,14 @@ private:
     bool saveCandidateRules=false;
     // perform aggregation and store in (headQcandsConfs)
     bool performAggregation=true;
+
+    // num candidates to output in ranking
+    // must not be higher than _cfg_rnk_numPreselect;
+    int rank_topk=100;
+
+    // number of candidates to at least fully discriminate in a ranking; if this criterion is reached and topk then
+    // application is stopped for the current query; atleast: if the first rule predicts more, then all of these have to be discriminated
+    int rank_discAtLeast=10;
 
 
 

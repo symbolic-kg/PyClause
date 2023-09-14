@@ -55,9 +55,9 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
         auto& relRules = rules.getRelRules(relation);
 
         // parallize rule application for each query in target
-        #pragma omp parallel //num_threads(4)
+        #pragma omp parallel //num_threads(1)
         {
-            QueryResults qResults(rank_topk);
+            QueryResults qResults(rank_topk, rank_discAtLeast);
             ManySet filter;
             #pragma omp for
             for (int i = 0; i < keys.size(); ++i) {
@@ -82,18 +82,21 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                     filter.addSet(naddFilter);
                 }
                 // perform rule application
+                int ctr = 0;
+                int currSize = 0;
                 for (Rule* rule : relRules){
+                    ctr += 1;
                     (rule->*predictHeadOrTail)(source, train, qResults, filter);
-                    int lastSize = 0;
-                    int currSize = qResults.size();
+                    currSize = qResults.size();
                     if (currSize>=rank_numPreselect){
                         break;
                     }
-                    if (currSize>=lastSize+rank_topk){
+                    // TODO possibly optimize
+                    // checking for discrimination after every rule had no noticeable overhead
+                    if (rank_discAtLeast>0 && currSize>=rank_topk){
                         if (qResults.checkDiscrimination()){
                             break;
                         }
-                        lastSize=currSize;
                     }
                 }
 
@@ -282,6 +285,10 @@ void ApplicationHandler::setSaveCandidateRules(bool ind){
 }
 void  ApplicationHandler::setPerformAggregation(bool ind){
     performAggregation = ind;
+}
+
+void ApplicationHandler::setDiscAtLeast(int num){
+    rank_discAtLeast = num;
 }
 
 std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>& ApplicationHandler::getHeadQcandsRules(){

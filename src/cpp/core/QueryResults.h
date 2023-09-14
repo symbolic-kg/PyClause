@@ -14,7 +14,8 @@ class Rule;
 // note that this structure assumes throughout that candiates are added in order of the highest rule confidences
 class QueryResults{
 public:
-    QueryResults(int addTopK);
+    QueryResults(int addTopK, int discAtLeast);
+    QueryResults(){};
     //updates if key exists, adds if it doesnt
     void insertRule(int cand, Rule* rule);
     int size();
@@ -33,14 +34,18 @@ private:
     NodeToPredRules candRules;
     std::vector<int> candidateOrder;
 
-    // maximal number of candidates to add
-    int addTopK;
+    //**options**
+    // maximal number of candidates to add modifies data storing
+    int addTopK=-1;
+    // the num of top candidates which at least have to be fully disciminated 
+    // does not change data storing only affects this->discriminate()
+    int discAtLeast=10;
 
-    // the num of top candidates which at least have to be fully disciminated
-    int discAtLeast = 10;
+    //**internal**
     // we track at least discAtLeast rules for checking discimination number
     // (we track more than discAtLeast if e.g. the first rule predicts more than discAtLeast)
     int trackTo=0;
+    int numDiscriminated=0;
 
     Rule* firstRule = nullptr;
 

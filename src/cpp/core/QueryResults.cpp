@@ -2,30 +2,34 @@
 #include <iostream>
 
 
-QueryResults::QueryResults(int addTopK){
+QueryResults::QueryResults(int addTopK, int discAtLeast){
     this->addTopK = addTopK;
+    this->discAtLeast = discAtLeast;
 }
 
 
 void QueryResults::insertRule(int cand, Rule* rule){
-    if (addTopK > 0 && candidateOrder.size()>= addTopK){
-        return;
-    }
-
+    // topk is reached dont add new candidates
+    bool onlyUpdate = (addTopK > 0 && candidateOrder.size()>= addTopK);
     auto it = candRules.find(cand);
+    bool newCand = (it==candRules.end());
     // new candidate
-    if (it==candRules.end()){
+    if (newCand && !onlyUpdate ){
         candidateOrder.push_back(cand);
-        //discrimination tracking
-        if (!firstRule){
+        // discrimination tracking
+        if (!firstRule && discAtLeast>0){
             firstRule = rule;
         }
+        // discriminates always all candidates of the first rule
+        // assumes insertion order regarding rules
         if (firstRule==rule || trackTo<discAtLeast){
             trackTo+=1;
         }
     }
     // update or insert
-    candRules[cand].push_back(rule);
+    if (!onlyUpdate || !newCand){
+        candRules[cand].push_back(rule);
+    }
 }
 
 void QueryResults::clear(){
@@ -33,6 +37,7 @@ void QueryResults::clear(){
     candidateOrder.clear();
     firstRule = nullptr;
     trackTo = 0;
+    numDiscriminated = 0;
 }
 
 std::vector<Rule*>& QueryResults::getRulesForCand(int cand){
@@ -63,8 +68,9 @@ bool QueryResults::checkDiscrimination(){
     if (trackTo<discAtLeast){
         return false;
     }
-    int numDiscriminated = 0;
-    for (int i=1; i<trackTo; i++){
+    // check the non-discriminated pairs if they are discrimonated meanwhile
+    // note: two rules that are discriminated once stay discriminated (assuming rule ordering)
+    for (int i=numDiscriminated+1; i<trackTo; i++){
         if (numDiscriminated>=discAtLeast){
             return true;
         }
@@ -72,27 +78,13 @@ bool QueryResults::checkDiscrimination(){
         int currentCand = candidateOrder[i];
         std::vector<Rule*>& rulesLast = candRules[lastCand];
         std::vector<Rule*>& rulesCurrent = candRules[currentCand];
-
-        // different amount of rules, can be discriminated
-        if (rulesLast.size()!=rulesCurrent.size()){
+        
+        if //rulesets are equal
+        (rulesLast.size() == rulesCurrent.size() && std::equal(rulesCurrent.begin(), rulesCurrent.end(), rulesLast.begin(), rulesLast.end()))
+        {
+            return false;
+        }else{
             numDiscriminated += 1;
-            continue;
-        // are all rules the same
-        } else {
-            bool isSame = true;
-            for (int j=0; j<rulesCurrent.size(); j++){
-                // equality between pointers
-                if (rulesLast!=rulesCurrent){
-                    numDiscriminated +=1;
-                    isSame = false;
-                    break;
-                }
-            }
-            if (isSame){
-                return false;
-            }
         }
     }
-
-
 }

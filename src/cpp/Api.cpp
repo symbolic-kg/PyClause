@@ -1,5 +1,5 @@
 #include "Api.h"
-#include "functional"
+#include <functional>
 
 
 // *** Ranking handler ***
@@ -9,6 +9,7 @@ void RankingHandler::calculateRanking(
     ){
 
     setRankingOptions(options);
+    std::cout<<"Load data... \n";
 
     // data loading
     std::shared_ptr<Index> index = std::make_shared<Index>();
@@ -23,7 +24,8 @@ void RankingHandler::calculateRanking(
     TripleStorage valid(index);
     valid.read(filterPath);
 
-    std::cout<<"data loaded. \n";
+    std::cout<<"Data loaded. \n";
+    std::cout<<"Loading rules.... \n";
 
 
     RuleStorage rules(index);
@@ -60,6 +62,7 @@ void RankingHandler::setRankingOptions(std::map<std::string, std::string> option
         {"aggregation_function", [this](std::string val) { ranker.setAggregationFunc(val); }},
         {"filter_w_train", [this](std::string val) { ranker.setFilterWTrain(util::stringToBool(val)); }},
         {"filter_w_target", [this](std::string val) { ranker.setFilterWtarget(util::stringToBool(val)); }},
+        {"disc_at_least", [this](std::string val) { ranker.setDiscAtLeast(std::stoi(val)); }}
     };
 
     for (auto& handler : handlers) {
