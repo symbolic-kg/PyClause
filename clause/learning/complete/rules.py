@@ -1,13 +1,11 @@
 import config
 import sys
-from triples import id2to
+from triples import id2to,to2id
 import time
 
 from random import sample
 
 from multiprocessing import Array
-
-
 
 
 
@@ -257,7 +255,7 @@ class RuleB(Rule):
     A binary rule of the form h(X,Y) <= b1(X,A), b2(A,B), b3(B,Y). This rule can have between one and five body atoms.
     """
 
-    var_symbols = (("X","Y"), ("X","A", "Y"), ("X","A","B","Y"), ("X","A","B","C","Y"), ("X","A","B","C","D","Y"))
+    var_symbols = (("X","Y"), ("X","A","Y"), ("X","A","B","Y"), ("X","A","B","C","Y"), ("X","A","B","C","D","Y"))
 
     branches_at_zero     = config.rules["b"]["branches_per_level"][0][0]
     branches_at_zero_rev = config.rules["b"]["branches_per_level"][1][0]
@@ -267,9 +265,14 @@ class RuleB(Rule):
 
     def __init__(self, rels, dirs):
         super().__init__()
-        self.target = rels[0]
-        self.rels = tuple(rels[1:])
-        self.dirs = tuple(dirs)    
+        if isinstance(rels[0], int):
+            self.target = rels[0]
+            self.rels = tuple(rels[1:])
+            self.dirs = tuple(dirs)
+        else:
+            self.target = to2id[rels[0]]
+            self.rels = tuple(map(lambda x : to2id[x], rels[1:]))
+            self.dirs = tuple(dirs)
 
     
     def __str__(self):
@@ -315,6 +318,7 @@ class RuleB(Rule):
         prediction_data[data_index + 2] = self.cpred
         data_index = self.maybe_transfer_prediction_data(prediction_data, data_index, lock)
         return data_index, True
+
 
 
     def scoreOLD(self, pid, triples, lock, prediction_data, data_index):
@@ -452,6 +456,39 @@ class RuleB(Rule):
             #            if len(y_values) > 0: return
             #            count += 1
 
+    def get_all_groundings(self, triples):
+            x_values = triples.r2_sub[self.rels[0]] if self.dirs[0] else triples.r2_obj[self.rels[0]]
+            groundings = []
+            for x in x_values:
+                values = set()
+                values.add(x)
+                y_values = set()
+                self.search_grounding_all(triples, 0, x, values, y_values)
+                for y in y_values:
+                    groundings.append((x,y))
+            return groundings
+
+
+    def search_grounding_all(self, triples, index, value, values, y_values):
+        """Searches for all groundings for all groundings (no sampling) in forward direction."""
+        next_values = []
+        rel = self.rels[index]
+        if self.dirs[index]:
+            if value in triples.sub_rel_2_obj and rel in triples.sub_rel_2_obj[value]:
+                next_values = triples.sub_rel_2_obj[value][rel]
+        else:
+            if value in triples.obj_rel_2_sub and rel in triples.obj_rel_2_sub[value]:
+                next_values = triples.obj_rel_2_sub[value][rel]
+        if index+1 == len(self.rels):  
+            for nv in next_values:
+                if nv not in values:
+                    y_values.add(nv)
+        else:
+            for nv in next_values:
+                if nv not in values:
+                    self.search_grounding_all(triples, index+1, nv, (*values, nv), y_values)
+
+
     def search_grounding_rev(self, triples, index, value, values, x_values):
         next_values = []
         rel = self.rels[index]
@@ -545,3 +582,52 @@ class RuleSet:
         if not(output_format == "AnyBURL"):
             print(">>> could not write rules to disc, outputformat not available")
         f.close()
+
+
+class RuleReader:
+
+    def __init__(self):
+        pass
+   
+    def read_file(self, filepath):
+        file = open(filepath, 'r')
+        lines = file.readlines()
+        rules = []
+        count = 0
+        for line in lines:
+            count += 1
+            rule = self.read_line(line.strip())
+            if not(rule == None):
+                rules.append(rule)
+        file.close()
+        return rules
+
+            
+
+    def read_line(self, line):
+        token = line.split("\t")
+        if len(token) != 4: return None
+        pred = int(token[0])
+        cpred = int(token[1])
+        conf = float(token[2])
+        hb = token[3].split(" <= ")
+        if len(hb) != 2: return None
+        if "(X,Y)" in hb[0]:
+            rels = []
+            rels.append(hb[0].split("(")[0])
+            atoms = hb[1].split(", ")
+            dirs = []
+            vars = RuleB.var_symbols[len(atoms)-1]
+            counter = 0
+            for atom in atoms:
+                atoken = atom.split("(")
+                rels.append(atoken[0])
+                dirs.append(atoken[1].startswith(vars[counter]))
+                counter += 1
+            rule = RuleB(rels, dirs)
+            rule.cpred = cpred
+            rule.pred = pred
+            return rule
+        else:
+            return None
+
