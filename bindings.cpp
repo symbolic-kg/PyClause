@@ -60,9 +60,21 @@ PYBIND11_MODULE(c_clause, m) {
         .def
         (
             "calcStats", &RuleHandler::calcStats, 
-            R"pbdoc(Given a string rule returns two integers. 
-            The first denotes the (exact) number of  predictions, the second the (exact) number of true predictions.
+            R"pbdoc(
+                Given a string rule returns two integers. 
+                The first denotes the (exact) number of  predictions, the second the (exact) number of true predictions.
             )pbdoc" 
+        )
+        .def(
+            "calcRulesPredictions", &RuleHandler::calcRulesPredictions,
+            R"pbdoc(
+                Given a string rule calculates all stats and predictions of rules. 
+                args: string:rulestring; bool returnPredictions: if true return predictions; bool returnStats: if true returns exact stats.
+                returns: tuple where tuple[0] are the predictions , tuple[1][0] are number of exact predictions tuple[1][1] number of true predictions.
+
+            )pbdoc" 
+        
+        
         )
     ;
 }

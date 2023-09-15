@@ -10,6 +10,7 @@
 #include "features/Application.h"
 #include "core/Index.h"
 #include "core/Util.hpp"
+#include "core/Types.h"
 
 #include <array>
 #include <string>
@@ -34,6 +35,7 @@ class RuleHandler{
 public:
     RuleHandler(std::string dataPath);
     std::array<int,2> calcStats(std::string ruleStr);
+    std::pair<std::vector<std::vector<std::array<std::string, 3>>>, std::vector<std::array<int,2>>> calcRulesPredictions(std::vector<std::string> stringRules,  bool retPredictions, bool retStats);
 private:
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::unique_ptr<TripleStorage> data;

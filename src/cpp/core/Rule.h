@@ -32,7 +32,8 @@ public:
         sampledPredicted(0),
         sampledCpredicted(0),
 		targetRel(0),
-		rulestring("")
+		rulestring(""),
+		trackInMaterialize(false)
 	{};
 	void setID(int ID);
 	void print();
