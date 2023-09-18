@@ -102,10 +102,10 @@ std::array<int,2> RuleHandler::calcStats(std::string ruleStr){
     return rule->getStats(true);   
 }
 
-std::pair<std::vector<std::vector<std::array<std::string, 3>>>, std::vector<std::array<int,2>>> RuleHandler::calcRulesPredictions(std::vector<std::string> stringRules, bool retPredictions, bool retStats){
+std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std::array<int,2>>> RuleHandler::calcRulesPredictions(std::vector<std::string> stringRules, bool retPredictions, bool retStats){
     //TODO: remove timing
     auto start = std::chrono::high_resolution_clock::now();
-    std::vector<std::vector<std::array<std::string,3>>> preds;
+    std::vector<std::vector<std::array<std::string,2>>> preds;
     std::vector<std::array<int,2>> stats;
 
 
@@ -125,10 +125,10 @@ std::pair<std::vector<std::vector<std::array<std::string, 3>>>, std::vector<std:
                     }
                     std::string head = index->getStringOfNodeId(triple[0]);
                     std::string tail = index->getStringOfNodeId(triple[2]);
-                    std::string relation = index->getStringOfRelId(triple[1]);
                     #pragma omp critical
                     {
-                        preds[i].push_back({head, relation ,tail});
+                        // we now relation from the rule
+                        preds[i].push_back({head ,tail});
                     }
             }
 

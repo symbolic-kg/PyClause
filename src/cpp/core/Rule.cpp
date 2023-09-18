@@ -460,6 +460,7 @@ std::set<Triple> RuleZ::materialize(TripleStorage& triples){
     std::set<Triple> predictions;
     // predict c when h(c,X)<-- given all h(--, a) in train and vice versa
     RelNodeToNodes& relNtoN = leftC ? triples.getRelTailToHeads() : triples.getRelHeadToTails();
+    //TODO optimize
     auto it = relNtoN.find(relation);
     if (it!=relNtoN.end()){
         NodeToNodes& NtoN = it->second;

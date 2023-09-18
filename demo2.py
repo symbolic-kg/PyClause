@@ -11,11 +11,12 @@ import c_clause
 # ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/rankingFile.txt"
 
 
-train = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt"
-filter = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt"
-target = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt"
-rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
-ranking_file = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile.txt"
+train = "./data/wnrr/train.txt"
+filter = "./data/wnrr/valid.txt"
+target = "./data/wnrr/test.txt"
+
+rules = "./data/wnrr/anyburl-rules-c5-3600"
+ranking_file = "./local/rankingFile.txt"
 
 
 
@@ -52,7 +53,7 @@ preds = handler.calcRulesPredictions(rules_list, True, True)
 end = time.time()
 print(f"All time (+serialization) was {end-start} seconds")
 
-exit()
+
 
 
 #### Calculate a ranking and serialize / use in python
@@ -63,7 +64,7 @@ ranking_options = {
     "topk": "100",
     "filter_w_train": "true",
     "filter_w_target": "true",
-    "disc_at_least":"100" ## -1 for off 
+    "disc_at_least":"10" ## -1 for off 
 }
 
 ranker = c_clause.RankingHandler()

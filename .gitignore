@@ -2,8 +2,11 @@
 
 conda.recipe
 local/*
+!local/info.txt
 tmp/
-data/
+data/*
+!data/wnrr
+!data/wnrr/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
