@@ -19,9 +19,9 @@ int Rule::getID(){
 
 double Rule::getConfidence(int nUnseen, bool exact){
     if (exact){
-        return (double) cpredicted/((double) predicted + (double)nUnseen); 
+        return confWeight * ((double) cpredicted/((double) predicted + (double)nUnseen)); 
     }else{
-        return (double) sampledCpredicted/((double) sampledPredicted + (double)nUnseen); 
+        return confWeight *((double) sampledCpredicted/((double) sampledPredicted + (double)nUnseen)); 
     }
     
 }
@@ -80,6 +80,10 @@ bool Rule::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& head
 }
 bool Rule::predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults,  ManySet filterSet){
     throw std::runtime_error("Not implemented yet.");
+}
+
+void Rule::setConfWeight(double weight){
+    confWeight = weight;
 }
 
 

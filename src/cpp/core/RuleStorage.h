@@ -27,6 +27,12 @@ public:
     std::vector<std::unique_ptr<Rule>>& getRules();
     std::set<Rule*, compareRule>& getRelRules(int relation);
 
+    // add a rule to the storage
+    // this should be the only one who adds rules to the storage
+    // takes care of individual rule options/ ignoring certain rule types etc..
+    // also assigns the rule id's
+    void addRule(std::unique_ptr<Rule*> rule);
+
 
 
     void parseAtom(const std::string& input, strAtom& atom);

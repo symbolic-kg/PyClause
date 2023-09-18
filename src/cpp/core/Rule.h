@@ -33,7 +33,8 @@ public:
         sampledCpredicted(0),
 		targetRel(0),
 		rulestring(""),
-		trackInMaterialize(false)
+		trackInMaterialize(false),
+		confWeight(1.0)
 	{};
 	void setID(int ID);
 	void print();
@@ -60,6 +61,7 @@ public:
 		int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet()
 	);
 	void setTrackInMaterialize(bool val);
+	void setConfWeight(double weight);
 	
 protected:
 	int ID;
@@ -73,6 +75,9 @@ protected:
 	// possibly sampled confidence metrics
 	int sampledPredicted;
 	int sampledCpredicted;
+	// weight confidence with this value; is 1 per default but used for ruleZ
+	double confWeight;
+
 	// track exact num(correct)predicted when running materialize
 	bool trackInMaterialize;
 
@@ -182,6 +187,7 @@ public:
 	std::set<Triple> materialize(TripleStorage& triples);
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
+	double getConfidence(int nUnseen, bool exact);
 private:
 	bool leftC;
 	int constant;

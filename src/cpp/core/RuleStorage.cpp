@@ -12,6 +12,11 @@ RuleStorage::RuleStorage(std::shared_ptr<Index> index){
     this->index = index;
 }
 
+void RuleStorage::addRule(std::unique_ptr<Rule*> rule){
+  
+
+}
+
 // TODO creates undefined behavior and process gets stuck when file does not exist, check first
 void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
     int currID = 0;
