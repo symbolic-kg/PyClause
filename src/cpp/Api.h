@@ -6,6 +6,7 @@
 #include "core/TripleStorage.h"
 #include "core/Rule.h"
 #include "core/RuleStorage.h"
+#include "core/RuleFactory.h"
 #include "core/Globals.h"
 #include "features/Application.h"
 #include "core/Index.h"
@@ -39,7 +40,7 @@ public:
 private:
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::unique_ptr<TripleStorage> data;
-    std::unique_ptr<RuleStorage> storage;
+    std::unique_ptr<RuleFactory> ruleFactory;
 };
 
 #endif

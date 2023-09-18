@@ -31,7 +31,8 @@ void RankingHandler::calculateRanking(
     std::cout<<"Loading rules.... \n";
 
 
-    RuleStorage rules(index);
+    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
+    RuleStorage rules(index, ruleFactory);
     rules.readAnyTimeFormat(rulesPath, true);
     ranker.makeRanking(test, data, rules, valid);
 
@@ -87,13 +88,13 @@ void RankingHandler::setRankingOptions(std::map<std::string, std::string> option
 RuleHandler::RuleHandler(std::string dataPath){
     data = std::make_unique<TripleStorage>(index);
     data->read(dataPath);
-    storage = std::make_unique<RuleStorage>(index);
+    ruleFactory = std::make_unique<RuleFactory>(index);
 
 
 }
 
 std::array<int,2> RuleHandler::calcStats(std::string ruleStr){
-    std::unique_ptr<Rule> rule = storage->parseAnytimeRule(ruleStr);
+    std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(ruleStr);
     // reset the exact stats, actually not needed as rule was just created
     rule->setStats(0, 0, true);
     rule->setTrackInMaterialize(true);
@@ -117,7 +118,7 @@ std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std:
     {
         #pragma omp for
         for (int i=0; i<stringRules.size(); i++){
-            std::unique_ptr<Rule> rule = storage->parseAnytimeRule(stringRules[i]);
+            std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(stringRules[i]);
             rule->setTrackInMaterialize(retStats);
             for (auto triple : rule->materialize(*data)){
                     if (!retPredictions){

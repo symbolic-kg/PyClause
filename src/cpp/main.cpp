@@ -11,15 +11,16 @@
 #include "core/RuleStorage.h"
 #include "features/Application.h"
 #include "core/QueryResults.h"
+#include "core/RuleFactory.h"
 
 void tests(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
+    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
     std::string dataPath = "/home/patrick/Desktop/kge/data/wnrr/train.txt";
     TripleStorage data(index);
     data.read(dataPath);
-
-    RuleStorage rules(index);
-    std::unique_ptr<Rule> ruleB = rules.parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
+    RuleStorage rules(index, ruleFactory);
+    std::unique_ptr<Rule> ruleB = ruleFactory->parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
     size_t size = (ruleB->materialize(data)).size();
     if (!size==83){
         throw std::runtime_error("Test 1 for B-rule failed.");
@@ -28,7 +29,7 @@ void tests(){
     
     // Test num predictions
     //276	3	0.010869565217391304	_hypernym(X,00732746) <= _synset_domain_topic_of(X,A), _derivationally_related_form(A,10225219)
-    std::unique_ptr<Rule> ruleC = rules.parseAnytimeRule("_hypernym(X,00732746) <= _synset_domain_topic_of(X,A), _derivationally_related_form(A,10225219)");
+    std::unique_ptr<Rule> ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,00732746) <= _synset_domain_topic_of(X,A), _derivationally_related_form(A,10225219)");
     
     // code for casting to RuleC class
     // RuleC* ruleCPtr = dynamic_cast<RuleC*>(ruleC.get());
@@ -41,7 +42,7 @@ void tests(){
 
 
     //test me 97	3	0.030927835051546393	_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)
-    ruleC = rules.parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
+    ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
     size = (ruleC->materialize(data)).size();
     if (size!=97){
         throw std::runtime_error("Test 1.1 for C-rule failed.");
@@ -49,27 +50,27 @@ void tests(){
 
     //Test num predictions
     // 13	2	0.15384615384615385	_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)
-    ruleC = rules.parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
+    ruleC = ruleFactory->parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
     size = (ruleC->materialize(data)).size();
     if (size!=13){
         throw std::runtime_error("Test 2 for C-rule failed.");
     }
 
     // flip direction of both atoms
-    ruleC = rules.parseAnytimeRule("_hypernym(X,00732746) <= _synset_domain_topic_of(A,X), _derivationally_related_form(10225219,A)");
+    ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,00732746) <= _synset_domain_topic_of(A,X), _derivationally_related_form(10225219,A)");
     if (ruleC->getDirections()[0] || ruleC->getDirections()[1]){
         throw std::runtime_error("Test 3 for C-rule failed");
     }
 
     // flip direction of both atoms
-    ruleC = rules.parseAnytimeRule("_derivationally_related_form(00748155,Y) <= _derivationally_related_form(Y,A), _derivationally_related_form(A,00748155)");
+    ruleC = ruleFactory->parseAnytimeRule("_derivationally_related_form(00748155,Y) <= _derivationally_related_form(Y,A), _derivationally_related_form(A,00748155)");
     if (ruleC->getDirections()[0] || ruleC->getDirections()[1]){
         throw std::runtime_error("Test 4 for C-rule failed");
     }
 
     //Test num predictions
     // 59	11	0.1864406779661017	_member_meronym(12998349,Y) <= _hypernym(Y,11590783)
-    ruleC = rules.parseAnytimeRule("_member_meronym(12998349,Y) <= _hypernym(Y,11590783)");
+    ruleC = ruleFactory->parseAnytimeRule("_member_meronym(12998349,Y) <= _hypernym(Y,11590783)");
     size = (ruleC->materialize(data)).size();
     if (size!=59){
         throw std::runtime_error("Test 5 for C-rule failed.");
@@ -77,7 +78,7 @@ void tests(){
 
     //Test num predictions
     //162	2	0.012345679012345678	_hypernym(X,11669921) <= _member_meronym(11911591,X)
-    ruleC = rules.parseAnytimeRule("_hypernym(X,11669921) <= _member_meronym(11911591,X)");
+    ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,11669921) <= _member_meronym(11911591,X)");
     size = (ruleC->materialize(data)).size();
     if (size!=162){
         throw std::runtime_error("Test 6 for C-rule failed.");
@@ -85,7 +86,7 @@ void tests(){
 
 
     // Test RuleB predictTailQuery
-    ruleB = rules.parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
+    ruleB = ruleFactory->parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
     QueryResults preds;
     std::string node = "08791167";
     ruleB->predictTailQuery((index->getIdOfNodestring(node)),data, preds);
@@ -103,7 +104,7 @@ void tests(){
     // Test RuleC predictHead/Tail query
     // tail grounding of head query fits to tail grounding of rule, predict something
     std::string node_c = "06355894"; 
-    ruleC = rules.parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
+    ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
     QueryResults preds_c;
     ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
     if(preds_c.size()!=97){
@@ -129,7 +130,7 @@ void tests(){
     }
 
     //test leftC C rule head/tail predictions
-    ruleC = rules.parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
+    ruleC = ruleFactory->parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
     node_c = "07007945";
     correctNode = "00548326";
     preds_c.clear();
@@ -164,6 +165,7 @@ void timeRanking(){
 
     auto start = std::chrono::high_resolution_clock::now();
     std::shared_ptr<Index> index = std::make_shared<Index>();
+    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
     std::string trainPath = "/home/patrick/Desktop/kge/data/wnrr/train.txt";
     std::string filterPath = "/home/patrick/Desktop/kge/data/wnrr/valid.txt";
     std::string targetPath = "/home/patrick/Desktop/kge/data/wnrr/test.txt";
@@ -180,7 +182,7 @@ void timeRanking(){
 
 
     std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
-    RuleStorage rules(index);
+    RuleStorage rules(index, ruleFactory);
     rules.readAnyTimeFormat(rulePath, true); 
 
     ApplicationHandler ranker;
@@ -268,16 +270,17 @@ int main(){
     // parse a real B rule and materialize
 
     //83 30 rule correct preds from christian _has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)
-    RuleStorage rules(index);
-    // std::unique_ptr<Rule> ruleB = rules.parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
+    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
+    RuleStorage rules(index, ruleFactory);
+    // std::unique_ptr<Rule> ruleB = ruleFactory->parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
     
     // strAtom atom;
     // std::string input = "rel1(X,Y)";
-    // rules.parseAtom(input, atom);
+    // ruleFactory->parseAtom(input, atom);
 
 
     // std::string node_c = "06898352"; 
-    // std::unique_ptr<Rule>ruleC = rules.parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
+    // std::unique_ptr<Rule>ruleC = ruleFactory->parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
     // NodeToPredRules preds_c;
     // ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
 

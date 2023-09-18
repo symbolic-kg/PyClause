@@ -4,6 +4,7 @@
 #include "Rule.h"
 #include "Globals.h"
 #include "Types.h"
+#include "RuleFactory.h"
 
 #include <vector>
 
@@ -19,24 +20,14 @@ class RuleStorage
 {
 
 public:
-    RuleStorage(std::shared_ptr<Index> index);
+    RuleStorage(std::shared_ptr<Index> index, std::shared_ptr<RuleFactory> ruleFactory);
     // expects a file with lines val\tval\t\val\trulestring
     //if sampled the first 3 values in a ruleset refer to sampled values
     void readAnyTimeFormat(std::string path, bool sampled); 
-    std::unique_ptr<Rule> parseAnytimeRule(std::string rule);
     std::vector<std::unique_ptr<Rule>>& getRules();
     std::set<Rule*, compareRule>& getRelRules(int relation);
 
-    // add a rule to the storage
-    // this should be the only one who adds rules to the storage
-    // takes care of individual rule options/ ignoring certain rule types etc..
-    // also assigns the rule id's
     void addRule(std::unique_ptr<Rule*> rule);
-
-
-
-    void parseAtom(const std::string& input, strAtom& atom);
-    void parseSymAtom(strAtom& inputAtom, symAtom& symA);
 
 private:
     // rules owns the rule objects
@@ -47,6 +38,8 @@ private:
     std::vector<std::unique_ptr<Rule>> rules;
     std::unordered_map<int, std::set<Rule*,compareRule>> relToRules;
     std::shared_ptr<Index> index;
+    // TODO you dont really need a shared pointer here; but at least options should be global 
+    std::shared_ptr<RuleFactory> ruleFactory;
     
 
 };
