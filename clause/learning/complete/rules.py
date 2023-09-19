@@ -23,6 +23,9 @@ class Rule:
         
     def get_confidence(self):
         return self.cpred / self.pred
+    
+    def getSerialization(self):
+        return str(self.pred) + "\t" + str(self.cpred) + "\t" + self.get_confidence() + "\t" + str(self)
 
 class RuleXXuc(Rule):
     """
