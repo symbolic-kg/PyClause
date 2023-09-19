@@ -192,7 +192,7 @@ void timeRanking(){
 
     ranker.makeRanking(target, train, rules, filter);
 
-    std::string rankingFile = "/home/patrick/Desktop/PyClause/data/wnrr/rankingFile10.txt";
+    std::string rankingFile = "/home/patrick/Desktop/PyClause/local/rankingFile10.txt";
 
     ranker.writeRanking(target, rankingFile);
     auto stop = std::chrono::high_resolution_clock::now();

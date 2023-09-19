@@ -21,17 +21,16 @@ public:
     void parseAtom(const std::string& input, strAtom& atom);
     void parseSymAtom(strAtom& inputAtom, symAtom& symA);
 
+   
+    void setCreateRuleB(bool ind);
+    void setCreateRuleC(bool ind);
+    void setCreateRuleZ(bool ind);
+
 private:
     std::shared_ptr<Index> index;
-    void setRuleOptions(Rule& rule);
-
-
-    // **individual rule options**
-    double ruleZweight = 1.0;
-    double ruleBweight = 1.0;
-
-
-
+    bool createRuleZ = true;
+    bool createRuleB = true;
+    bool createRuleC = true;
 };
 
 

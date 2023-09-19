@@ -188,6 +188,7 @@ public:
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 	double getConfidence(int nUnseen, bool exact);
+	static double zConfWeight;
 private:
 	bool leftC;
 	int constant;

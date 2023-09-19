@@ -58,17 +58,23 @@ print(f"All time (+serialization) was {end-start} seconds")
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()
-ranking_options = {
+options = {
+    # ranking options
     "aggregation_function": "maxplus",
     "num_preselect": "10000000",
     "topk": "100",
     "filter_w_train": "true",
     "filter_w_target": "true",
-    "disc_at_least":"10" ## -1 for off 
+    "disc_at_least":"10", ## -1 for off
+    # rule options 
+     "rule_zero_weight":"0.01",
+     "use_zero_rules": "True",
+     "use_u_c_rules": "False",
+     "use_b_rules": "False",
 }
 
 ranker = c_clause.RankingHandler()
-ranker.calculateRanking(target, train, filter, rules, ranking_file, ranking_options)
+ranker.calculateRanking(target, train, filter, rules, ranking_file, options)
 
 
 rankingtime = time.time()

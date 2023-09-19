@@ -3,6 +3,7 @@
 #include <functional>
 #include <array>
 #include <chrono>
+#include <string>
 
 
 // *** Ranking handler ***
@@ -10,12 +11,15 @@ void RankingHandler::calculateRanking(
         std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write,
         std::map<std::string,std::string> options
     ){
-
+    
+    std::shared_ptr<Index> index = std::make_shared<Index>();    
+    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
     setRankingOptions(options);
+    setRuleOptions(options, *ruleFactory);
     std::cout<<"Load data... \n";
 
     // data loading
-    std::shared_ptr<Index> index = std::make_shared<Index>();
+   
     TripleStorage data(index);
     data.read(trainPath);
    
@@ -31,7 +35,7 @@ void RankingHandler::calculateRanking(
     std::cout<<"Loading rules.... \n";
 
 
-    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
+    
     RuleStorage rules(index, ruleFactory);
     rules.readAnyTimeFormat(rulesPath, true);
     ranker.makeRanking(test, data, rules, valid);
@@ -68,6 +72,33 @@ void RankingHandler::setRankingOptions(std::map<std::string, std::string> option
         {"filter_w_train", [this](std::string val) { ranker.setFilterWTrain(util::stringToBool(val)); }},
         {"filter_w_target", [this](std::string val) { ranker.setFilterWtarget(util::stringToBool(val)); }},
         {"disc_at_least", [this](std::string val) { ranker.setDiscAtLeast(std::stoi(val)); }}
+    };
+
+    for (auto& handler : handlers) {
+        auto opt = options.find(handler.name);
+        if (opt != options.end()) {
+            if (_cfg_verbose){
+                std::cout<< "Setting option "<<handler.name<<" to: "<<opt->second<<std::endl;
+            }
+            handler.setter(opt->second);
+        }
+    }
+}
+
+void RankingHandler::setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory){
+    
+
+    // individual rule options
+     struct OptionHandler {
+        std::string name;
+        std::function<void(std::string)> setter;
+    };
+
+    std::vector<OptionHandler> handlers = {
+        {"rule_zero_weight", [this](std::string val) { RuleZ::zConfWeight = std::stod(val); }},
+        {"use_zero_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleZ(util::stringToBool(val));}},
+        {"use_u_c_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleC(util::stringToBool(val));}},
+        {"use_b_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleB(util::stringToBool(val));}}
     };
 
     for (auto& handler : handlers) {
@@ -120,6 +151,9 @@ std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std:
         for (int i=0; i<stringRules.size(); i++){
             std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(stringRules[i]);
             rule->setTrackInMaterialize(retStats);
+            if (!rule){
+                throw std::runtime_error("Error in parsing rule:" + stringRules[i]);
+            }
             for (auto triple : rule->materialize(*data)){
                     if (!retPredictions){
                         break; // stats are calculated with invoking materialize

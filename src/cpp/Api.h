@@ -29,6 +29,8 @@ private:
     ApplicationHandler ranker;
     // setable options in frontend for ranking are registered here
     void setRankingOptions(std::map<std::string,std::string> options);
+    // setable options for individual rule classes (assigned to RuleFactory)
+    void setRuleOptions(std::map<std::string,std::string> options, RuleFactory& ruleFact);
 };
 
 

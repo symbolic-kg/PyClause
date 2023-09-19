@@ -1,4 +1,6 @@
 
+#include <string>
+
 #include "RuleFactory.h"
 #include "Globals.h"
 #include "Types.h"
@@ -11,9 +13,7 @@ RuleFactory::RuleFactory(std::shared_ptr<Index> index){
 }
 
 
-void RuleFactory::setRuleOptions(Rule& rule){
-    
-}
+
 
 std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
 
@@ -38,7 +38,13 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
         std::vector<int> relations = {relID};
         symAtom sym;
         parseSymAtom(headAtom, sym);
-        return std::make_unique<RuleZ>(relID, sym.leftC, sym.constant);
+        if (createRuleZ){
+            return std::make_unique<RuleZ>(relID, sym.leftC, sym.constant); //cals std::move implicitly
+        }
+        else{
+            return nullptr;
+        }
+        
     }
     std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], _cfg_prs_atomSeparator);
     size_t length = bodyAtomsStr.size();
@@ -170,10 +176,12 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
         }
     } 
 
-    if (ruleType=="RuleB"){
+    if (ruleType=="RuleB" && createRuleB){
         return std::make_unique<RuleB>(relations, directions);
-    } else if (ruleType=="RuleC"){
+    } else if (ruleType=="RuleC" && createRuleC){
         return std::make_unique<RuleC>(relations, directions, leftC, constants);
+    } else {
+        return nullptr;
     }
 }
 
@@ -211,3 +219,16 @@ void RuleFactory::parseSymAtom(strAtom& inputAtom, symAtom& symAt){
         symAt.leftC = false;
     }
 }
+
+void RuleFactory::setCreateRuleB(bool ind){
+    createRuleB = ind;
+}
+
+void RuleFactory::setCreateRuleC(bool ind){
+    createRuleC = ind;
+}
+
+void RuleFactory::setCreateRuleZ(bool ind){
+    createRuleZ = ind;
+}
+
