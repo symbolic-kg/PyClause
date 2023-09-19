@@ -69,8 +69,8 @@ options = {
     # rule options 
      "rule_zero_weight":"0.01",
      "use_zero_rules": "True",
-     "use_u_c_rules": "False",
-     "use_b_rules": "False",
+     "use_u_c_rules": "True",
+     "use_b_rules": "True",
 }
 
 ranker = c_clause.RankingHandler()
