@@ -89,6 +89,9 @@ void Rule::setConfWeight(double weight){
 
 // ***RuleB implementation*** 
 
+int RuleB::branchingFaktor=-1;
+int RuleB::discriminationBound=-1;
+
 RuleB::RuleB(std::vector<int>& relations, std::vector<bool>& directions) {
     if(relations.size() != (directions.size() + 1)) {
         throw std::invalid_argument("'Directions' size should be one less than 'relations' size in construction of RuleB");
@@ -222,7 +225,6 @@ void RuleB::searchCurrGroundings(
         auto entIt = NtoN.find(currEntity);
         if (!(entIt==NtoN.end())){
             nextEntities = &(entIt->second);
-
             if (currAtomIdx == rels.size()-1){
                 //copies
                 for(const int ent: *nextEntities){
@@ -232,6 +234,10 @@ void RuleB::searchCurrGroundings(
                     }
                 }
             }else{
+                // skip if branching factor is used and if exceeded
+                if (RuleB::branchingFaktor>0 && nextEntities->size()>RuleB::branchingFaktor){
+                    return;
+                }
                 for(int ent: *nextEntities){
                     if (substitutions.find(ent)==substitutions.end()){
                         substitutions.insert(ent);

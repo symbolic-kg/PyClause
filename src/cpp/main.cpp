@@ -166,9 +166,11 @@ void timeRanking(){
     auto start = std::chrono::high_resolution_clock::now();
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
-    std::string trainPath = "/home/patrick/Desktop/kge/data/wnrr/train.txt";
-    std::string filterPath = "/home/patrick/Desktop/kge/data/wnrr/valid.txt";
-    std::string targetPath = "/home/patrick/Desktop/kge/data/wnrr/test.txt";
+    ruleFactory->setCreateRuleB(false);
+    ruleFactory->setCreateRuleZ(false);
+    std::string trainPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/train.txt";
+    std::string filterPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/valid.txt";
+    std::string targetPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/test-debug.txt";
     // data loading
     TripleStorage train(index);
     train.read(trainPath);
@@ -192,7 +194,7 @@ void timeRanking(){
 
     ranker.makeRanking(target, train, rules, filter);
 
-    std::string rankingFile = "/home/patrick/Desktop/PyClause/local/rankingFile10.txt";
+    std::string rankingFile = "/home/patrick/Desktop/PyClause/local/debug/rankingFile10.txt";
 
     ranker.writeRanking(target, rankingFile);
     auto stop = std::chrono::high_resolution_clock::now();
@@ -205,9 +207,8 @@ void timeRanking(){
 
 
 int main(){
-    tests();
     timeRanking();
-
+    tests();
     exit(0);
 
 

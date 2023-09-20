@@ -67,10 +67,11 @@ options = {
     "filter_w_target": "true",
     "disc_at_least":"10", ## -1 for off
     # rule options 
-     "rule_zero_weight":"0.01",
-     "use_zero_rules": "True",
-     "use_u_c_rules": "True",
-     "use_b_rules": "True",
+    "rule_zero_weight":"0.01",
+    "rule_b_max_branching_factor": "-1",
+    "use_zero_rules": "False",
+    "use_u_c_rules": "True",
+    "use_b_rules": "False",
 }
 
 ranker = c_clause.RankingHandler()

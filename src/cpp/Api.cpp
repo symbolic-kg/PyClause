@@ -88,7 +88,7 @@ void RankingHandler::setRankingOptions(std::map<std::string, std::string> option
 void RankingHandler::setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory){
     
 
-    // individual rule options
+    // rule options:  individual rule options and options of which rules to use
      struct OptionHandler {
         std::string name;
         std::function<void(std::string)> setter;
@@ -96,6 +96,7 @@ void RankingHandler::setRuleOptions(std::map<std::string, std::string> options, 
 
     std::vector<OptionHandler> handlers = {
         {"rule_zero_weight", [this](std::string val) { RuleZ::zConfWeight = std::stod(val); }},
+        {"rule_b_max_branching_factor", [this](std::string val) { RuleB::branchingFaktor = std::stoi(val); }},
         {"use_zero_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleZ(util::stringToBool(val));}},
         {"use_u_c_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleC(util::stringToBool(val));}},
         {"use_b_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleB(util::stringToBool(val));}}

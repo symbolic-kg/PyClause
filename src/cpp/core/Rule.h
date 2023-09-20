@@ -105,6 +105,16 @@ public:
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 
+	// options used for enabling running on very large datasets
+	// if the rule predicts more this amount of new entities, skip the rule (it's expensive and it does not help
+	// in discriminating predictions
+	static int discriminationBound;
+	// if a nodes in the DFS opens more then specified value branches, go to the next node
+	static int branchingFaktor;
+
+
+
+
 private:
 	// this->relations and this->directions uniquely identifies a rule
 	// e.g. relations=[r1, r2, r3]
@@ -188,6 +198,7 @@ public:
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 	double getConfidence(int nUnseen, bool exact);
+	// zero rules downweighting
 	static double zConfWeight;
 private:
 	bool leftC;
