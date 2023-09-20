@@ -11,7 +11,14 @@
 
 struct compareRule {
     bool operator () (Rule* lhs, Rule* rhs) const {
-        return lhs->getConfidence(_cfg_nUnseen, _cfg_exactConf) > rhs->getConfidence(_cfg_nUnseen, _cfg_exactConf);
+        double lconf =  lhs->getConfidence(_cfg_nUnseen, _cfg_exactConf);
+        double rconf = rhs->getConfidence(_cfg_nUnseen, _cfg_exactConf);
+        if (lconf != rconf){
+            return lconf>rconf;
+        }
+        else{
+            return true;
+        }
     }
 };
 
