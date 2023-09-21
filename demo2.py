@@ -65,12 +65,12 @@ options = {
     "topk": "100",
     "filter_w_train": "true",
     "filter_w_target": "true",
-    "disc_at_least":"10", ## -1 for off
+    "disc_at_least":"100", ## -1 for off
     # rule options 
     "rule_zero_weight":"0.01",
     "rule_b_max_branching_factor": "-1",
-    "use_zero_rules": "False",
-    "use_u_c_rules": "False",
+    "use_zero_rules": "True",
+    "use_u_c_rules": "True",
     "use_b_rules": "True",
 }
 

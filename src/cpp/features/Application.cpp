@@ -172,9 +172,9 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
                     file<<index->getStringOfNodeId(head)<<" "<<index->getStringOfRelId(relation)<<" "<<index->getStringOfNodeId(tail)<<std::endl;
                     file<<"Heads: ";
                     // write head ranking
-                    CandidateConfs& results = headQcandsConfs[relation][tail];
-                    for (int i=0; i<results.size(); i++){
-                        auto pair = results[i];
+                    CandidateConfs& resultsHead = headQcandsConfs[relation][tail];
+                    for (int i=0; i<resultsHead.size(); i++){
+                        auto pair = resultsHead[i];
                         int predHead = pair.first;
                         double score = pair.second;
                         // filter with target
@@ -193,9 +193,9 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
                     file<<"\nTails: ";
                     //true tails for filtering
                     Nodes& trueTails = target.getRelHeadToTails()[relation][head];
-                    results = tailQcandsConfs[relation][head];
-                    for (int i=0; i<results.size(); i++){
-                        auto pair = results[i];
+                    CandidateConfs& resultsTail = tailQcandsConfs[relation][head];
+                    for (int i=0; i<resultsTail.size(); i++){
+                        auto pair = resultsTail[i];
                         int predTail = pair.first;
                         double score = pair.second;
                         if (rank_filterWtarget && !(predTail==tail)){

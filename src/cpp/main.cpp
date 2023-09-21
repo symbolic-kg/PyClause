@@ -170,7 +170,7 @@ void timeRanking(){
     ruleFactory->setCreateRuleZ(false);
     std::string trainPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/train.txt";
     std::string filterPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/valid.txt";
-    std::string targetPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/test.txt";
+    std::string targetPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/test-debug.txt";
     // data loading
     TripleStorage train(index);
     train.read(trainPath);
