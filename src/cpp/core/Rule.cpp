@@ -349,7 +349,7 @@ bool RuleC::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
             for (const int& cEnt: closingEntities){
                 // the rule is grounded at the tail so it can only predict this grounding
                 // and the closing entity must be the head grounding in this case
-                if (!leftC && cEnt == head && !filterSet.contains(cEnt)){
+                if (!leftC && cEnt == head && !filterSet.contains(constants[0])){
                     tailResults.insertRule(constants[0], this);
                     return true;
                 }else if(leftC && !filterSet.contains(cEnt)){
@@ -388,7 +388,7 @@ bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& hea
             for (const int& cEnt: closingEntities){
                 // the rule is grounded at the head so it can only predict this grounding
                 // and the closing entity must be the tail grounding in this case
-                if (leftC && cEnt == tail && !filterSet.contains(cEnt)){
+                if (leftC && cEnt == tail && !filterSet.contains(constants[0])){
                     headResults.insertRule(constants[0], this);
                     return true;
                 }else if(!leftC && !filterSet.contains(cEnt)){
