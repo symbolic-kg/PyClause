@@ -447,6 +447,7 @@ double RuleZ::zConfWeight = 1.0;
 
 RuleZ::RuleZ(int& relation, bool& leftC, int& constant) {
     this->relation=relation;
+    this->targetRel=relation;
     this->leftC = leftC;
     this->constant = constant;
     confWeight = RuleZ::zConfWeight;
