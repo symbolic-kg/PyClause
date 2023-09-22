@@ -13,8 +13,9 @@ QueryResults::QueryResults(int addTopK, int discAtLeast){
 
 
 void QueryResults::insertRule(int cand, Rule* rule){
-    // topk is reached dont add new candidates
-    bool onlyUpdate = (addTopK > 0 && candidateOrder.size()>= addTopK);
+    // topk is reached dont add new candidates but always add everything from the first rule
+    // to not cut off results randomly at the beginning
+    bool onlyUpdate = (addTopK > 0 && candidateOrder.size()>= addTopK && rule != firstRule);
     auto it = candRules.find(cand);
     bool newCand = (it==candRules.end());
     // new candidate

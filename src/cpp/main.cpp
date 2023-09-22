@@ -166,8 +166,9 @@ void timeRanking(){
     auto start = std::chrono::high_resolution_clock::now();
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
-    ruleFactory->setCreateRuleB(false);
+    ruleFactory->setCreateRuleB(true);
     ruleFactory->setCreateRuleZ(false);
+    ruleFactory->setCreateRuleC(false);
     std::string trainPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/train.txt";
     std::string filterPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/valid.txt";
     std::string targetPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/test-debug.txt";
@@ -189,8 +190,11 @@ void timeRanking(){
 
     ApplicationHandler ranker;
 
-    ranker.setTopK(100);
-    ranker.setDiscAtLeast(10);
+    ranker.setTopK(3);
+    ranker.setDiscAtLeast(3);
+
+    std::string mystr = "12485811";
+    std::cout<<index->getIdOfNodestring(mystr)<<std::endl;
 
     ranker.makeRanking(target, train, rules, filter);
 
