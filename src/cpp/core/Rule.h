@@ -62,6 +62,7 @@ public:
 	);
 	void setTrackInMaterialize(bool val);
 	void setConfWeight(double weight);
+	void setRuleString(std::string str);
 	
 protected:
 	int ID;

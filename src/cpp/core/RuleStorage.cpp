@@ -36,6 +36,7 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
                 rule->setStats(
                     std::stoi(splitline[0]), std::stoi(splitline[1]), _cfg_exactConf
                 );
+                rule->setRuleString(ruleString);
                 currID+=1;
                 relToRules[rule->getTargetRel()].insert(&(*rule)); //equivalent to insert(rule.get())
                 // rule is nullptr after this
@@ -54,6 +55,7 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
             //     std::cout<<el<<"\n";
             // }
         }
+        std::cout<<"Loaded "<<currID<<" rules."<<std::endl;
     }
 };
 

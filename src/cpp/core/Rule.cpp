@@ -17,6 +17,10 @@ int Rule::getID(){
     return ID;
 }
 
+void Rule::setRuleString(std::string str){
+    this->rulestring = str;
+}
+
 double Rule::getConfidence(int nUnseen, bool exact){
     if (exact){
         return confWeight * ((double) cpredicted/((double) predicted + (double)nUnseen)); 
