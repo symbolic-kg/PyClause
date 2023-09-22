@@ -190,11 +190,9 @@ void timeRanking(){
 
     ApplicationHandler ranker;
 
-    ranker.setTopK(3);
-    ranker.setDiscAtLeast(3);
+    ranker.setTopK(100);
+    ranker.setDiscAtLeast(100);
 
-    std::string mystr = "12485811";
-    std::cout<<index->getIdOfNodestring(mystr)<<std::endl;
 
     ranker.makeRanking(target, train, rules, filter);
 

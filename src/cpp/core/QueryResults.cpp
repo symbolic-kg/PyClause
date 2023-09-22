@@ -15,7 +15,9 @@ QueryResults::QueryResults(int addTopK, int discAtLeast){
 void QueryResults::insertRule(int cand, Rule* rule){
     // topk is reached dont add new candidates but always add everything from the first rule
     // to not cut off results randomly at the beginning
-    bool onlyUpdate = (addTopK > 0 && candidateOrder.size()>= addTopK && rule != firstRule);
+    // also add all candidates from the current rule to not randomly cut off rule predictions
+    bool onlyUpdate = (addTopK > 0 && candidateOrder.size()>= addTopK && rule != firstRule && currentRule!=rule);
+    currentRule = rule;
     auto it = candRules.find(cand);
     bool newCand = (it==candRules.end());
     // new candidate
@@ -41,6 +43,7 @@ void QueryResults::clear(){
     candRules.clear();
     candidateOrder.clear();
     firstRule = nullptr;
+    currentRule=nullptr;
     trackTo = 0;
     numDiscriminated = 0;
 }

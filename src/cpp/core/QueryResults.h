@@ -48,6 +48,7 @@ private:
     int numDiscriminated=0;
 
     Rule* firstRule = nullptr;
+    Rule* currentRule = nullptr;
 
    
 
