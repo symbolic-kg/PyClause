@@ -335,7 +335,7 @@ bool RuleC::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
         return false;
     }
 
-    if (directions.size()==1 && !leftC){
+    if (directions.size()==1){
         return predictL1TailQuery(head, triples, tailResults, filterSet);
     }
 
@@ -392,6 +392,23 @@ bool RuleC::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& t
                     }
                 }
             }
+    }else{
+         // h(c,Y) <-- b1(d,Y) or h(c,Y) <-- b1(Y,d) , predict all Y=y that ground the body
+         RelNodeToNodes& relNtoN = directions[0] ? triples.getRelHeadToTails() :  triples.getRelTailToHeads(); 
+         auto it = relNtoN.find(relations[1]);
+        if (it!=relNtoN.end()){
+            NodeToNodes& constToY = it->second;
+            auto itconstToY = constToY.find(constants[1]);
+            if (itconstToY != constToY.end()){
+                for (auto ent: itconstToY->second){
+                    if (!filterSet.contains(ent)){
+                        tailResults.insertRule(ent, this);
+                    }
+
+                }
+                return true;
+            }
+        }
     }
     return false;
 
@@ -417,6 +434,23 @@ bool RuleC::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
                     }
                 }
             }
+    }else{
+        // h(X,c) <-- b1(d,X) or h(c,X) <-- b1(X,d) we want to predict all x=X that ground the body
+        // tail==constants[0] is already checked
+        RelNodeToNodes& relNtoN = directions[0] ? triples.getRelTailToHeads() :  triples.getRelHeadToTails();
+        auto it = relNtoN.find(relations[1]);
+        if (it!=relNtoN.end()){
+            NodeToNodes& constToX = it->second;
+            auto itconstToX = constToX.find(constants[1]);
+            if (itconstToX != constToX.end()){
+                for (auto ent: itconstToX->second){
+                    if (!filterSet.contains(ent)){
+                        headResults.insertRule(ent, this);
+                    }
+                }
+                return true;
+            }
+        } 
     }
     return false;
 
@@ -430,7 +464,7 @@ bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& hea
         return false;
     }
 
-    if (directions.size()==1 && leftC){
+    if (directions.size()==1){
         return predictL1HeadQuery(tail, triples, headResults, filterSet);
     }
 

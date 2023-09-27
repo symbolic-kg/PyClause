@@ -174,9 +174,6 @@ void tests(){
     ruleC->predictTailQuery(index->getIdOfNodestring(node_c), data, preds_c);
     if (preds_c.size()!=1){
          throw std::runtime_error("Test 16 for C-rule length 1 predictTailQuery failed");
-
-    }else{
-        std::cout<<"it really worked";
     }
     
 
