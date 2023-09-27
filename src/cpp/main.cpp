@@ -157,6 +157,30 @@ void tests(){
     }
 
 
+    preds_c.clear();
+    ruleC = ruleFactory->parseAnytimeRule("_member_meronym(02549533,Y) <= _hypernym(Y,01429349)");
+    node_c = "02640093";
+    ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
+    if (preds_c.size()!=1){
+         throw std::runtime_error("Test 15 for C-rule length 1 predictHeadQuery failed");
+
+    }
+
+
+
+    preds_c.clear();
+    ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,01189282) <= _synset_domain_topic_of(X,08441203)");
+    node_c = "01068012";
+    ruleC->predictTailQuery(index->getIdOfNodestring(node_c), data, preds_c);
+    if (preds_c.size()!=1){
+         throw std::runtime_error("Test 16 for C-rule length 1 predictTailQuery failed");
+
+    }else{
+        std::cout<<"it really worked";
+    }
+    
+
+
     std::cout<<"All tests passed."<<std::endl;
 }
 
@@ -166,12 +190,12 @@ void timeRanking(){
     auto start = std::chrono::high_resolution_clock::now();
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
-    ruleFactory->setCreateRuleB(true);
+    ruleFactory->setCreateRuleB(false);
     ruleFactory->setCreateRuleZ(false);
-    ruleFactory->setCreateRuleC(false);
+    ruleFactory->setCreateRuleC(true);
     std::string trainPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/train.txt";
     std::string filterPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/valid.txt";
-    std::string targetPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/test-debug.txt";
+    std::string targetPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/test.txt";
     // data loading
     TripleStorage train(index);
     train.read(trainPath);
@@ -209,8 +233,8 @@ void timeRanking(){
 
 
 int main(){
-    timeRanking();
     tests();
+    timeRanking();
     exit(0);
 
 

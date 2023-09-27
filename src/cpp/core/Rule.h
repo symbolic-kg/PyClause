@@ -154,7 +154,11 @@ public:
 	//TODO return semantics
 	std::set<Triple> materialize(TripleStorage& triples);
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
+	bool predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
+
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+	bool predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+	
 private:
 	// this->relations, this->directions, this->leftC, this->constants, uniquely identify a C (U_c) rule
 	// e.g. relations = [r1, r2, r3]

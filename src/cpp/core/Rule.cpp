@@ -227,7 +227,7 @@ void RuleB::searchCurrGroundings(
     if (!(it==relNtoN.end())){
         NodeToNodes& NtoN = it->second;
         auto entIt = NtoN.find(currEntity);
-        if (!(entIt==NtoN.end())){
+        if (entIt!=NtoN.end()){
             nextEntities = &(entIt->second);
             if (currAtomIdx == rels.size()-1){
                 //copies
@@ -296,7 +296,7 @@ std::set<Triple> RuleC::materialize(TripleStorage& triples){
         relNtoN =  &triples.getRelTailToHeads();
     }
     auto it = relNtoN->find(rels[1]);
-    if (!(it==relNtoN->end())){
+    if (it!=relNtoN->end()){
         NodeToNodes& NtoN = it->second;
         if (NtoN.count(constants[1])>0){
             Nodes closingEntities;
@@ -326,12 +326,17 @@ std::set<Triple> RuleC::materialize(TripleStorage& triples){
         }
     }
 }
+
 // contrary to B rules we let the DFS run starting from the grounded constants of the rules body
 // and not from the grounded entity in the query 
 bool RuleC::predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){
     // can only predict my constant in the grounded direction
     if (leftC && head!=constants[0]){
         return false;
+    }
+
+    if (directions.size()==1 && !leftC){
+        return predictL1TailQuery(head, triples, tailResults, filterSet);
     }
 
     std::vector<int>& rels = leftC ? relations : _relations;
@@ -367,12 +372,73 @@ bool RuleC::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
     return false;
 }
 
+
+bool RuleC::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){
+    if (!leftC){
+        // h(X,c) <-- b1(d,X) or h(X,c) <-- b1(X,d)
+        // we want to only look up the body for X=head by looking from X=head to d and then predict c
+        RelNodeToNodes& relNtoN = directions[0] ? triples.getRelHeadToTails() :  triples.getRelTailToHeads(); 
+        auto it = relNtoN.find(relations[1]);
+        if (it!=relNtoN.end()){
+            NodeToNodes& headToConst = it->second;
+            // head appears
+            auto itHeadToConst = headToConst.find(head);
+            if (itHeadToConst!=headToConst.end()){
+                Nodes cands = itHeadToConst->second;
+                //constant appears in head with tail
+                if (cands.find(constants[1])!=cands.end() && !filterSet.contains(constants[0])){
+                    tailResults.insertRule(constants[0], this);
+                    return true;
+                    }
+                }
+            }
+    }
+    return false;
+
+}
+
+
+bool RuleC::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& headResults,  ManySet filterSet){
+    if (leftC){
+        // h(c,Y) <-- b1(d,Y) or h(c,Y) <-- b1(Y,d)
+        // we want to only look up the body for Y=tail by looking from Y=tail to d and then predict c
+        RelNodeToNodes& relNtoN = directions[0] ? triples.getRelTailToHeads() :  triples.getRelHeadToTails() ; 
+        auto it = relNtoN.find(relations[1]);
+        if (it!=relNtoN.end()){
+            NodeToNodes& tailToConst = it->second;
+            // tail appears
+            auto itTailToConst = tailToConst.find(tail);
+            if (itTailToConst!=tailToConst.end()){
+                Nodes cands = itTailToConst->second;
+                //constant appears in head with tail
+                if (cands.find(constants[1])!=cands.end() && !filterSet.contains(constants[0])){
+                    headResults.insertRule(constants[0], this);
+                    return true;
+                    }
+                }
+            }
+    }
+    return false;
+
+}
+
+
+
 bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults,  ManySet filterSet){
     // can only predict my constant in the grounded direction
     if (!leftC && tail!=constants[0]){
         return false;
     }
 
+    if (directions.size()==1 && leftC){
+        return predictL1HeadQuery(tail, triples, headResults, filterSet);
+    }
+
+    // the internal representation for the rules is
+    // h(c,Y) <-- b1(d,A), b2(A,Y)
+    // h(X,c) <-- b1(X,A), b2(A,d)
+    // the DFS always starts from the first body atom so for the second rule (leftC==false)
+    // we turn everything around: b2(A,d),b1(X,A) starting with current_entity=d
     std::vector<int>& rels = leftC ? relations : _relations;
     std::vector<bool>& dirs = leftC ? directions: _directions;
     RelNodeToNodes* relNtoN = nullptr;
@@ -417,10 +483,10 @@ void RuleC::searchCurrGroundings(
     int currRel = rels[currAtomIdx];
     RelNodeToNodes& relNtoN = dirs[currAtomIdx-1] ? triples.getRelHeadToTails() : triples.getRelTailToHeads();
     auto it = relNtoN.find(rels[currAtomIdx]);
-    if (!(it==relNtoN.end())){
+    if ((it!=relNtoN.end())){
         NodeToNodes& NtoN = it->second;
         auto entIt = NtoN.find(currEntity);
-        if (!(entIt==NtoN.end())){
+        if (entIt!=NtoN.end()){
             nextEntities = &(entIt->second);
 
             if (currAtomIdx == rels.size()-1){

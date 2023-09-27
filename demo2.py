@@ -66,7 +66,7 @@ options = {
     "topk": "100",
     "filter_w_train": "true",
     "filter_w_target": "true",
-    "disc_at_least":"100", ## -1 for off, must not be bigger than topk
+    "disc_at_least":"10", ## -1 for off, must not be bigger than topk
     # rule options 
     "rule_zero_weight":"0.01",
     "rule_b_max_branching_factor": "-1",

@@ -56,7 +56,6 @@ def test_uc_b_zero_ranking():
 
     ranker = c_clause.RankingHandler()
     ranker.calculateRanking(test_path, train_path, filter_path, rules_path, ranking_path, options)
-    #['0.4566', '0.5720', '0.4962']
 
 
     # TODO: this wouldnt work on windows probably
