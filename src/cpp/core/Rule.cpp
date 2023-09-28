@@ -374,41 +374,43 @@ bool RuleC::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
 
 
 bool RuleC::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){
-    if (!leftC){
-        // h(X,c) <-- b1(d,X) or h(X,c) <-- b1(X,d)
-        // we want to only look up the body for X=head by looking from X=head to d and then predict c
-        RelNodeToNodes& relNtoN = directions[0] ? triples.getRelHeadToTails() :  triples.getRelTailToHeads(); 
-        auto it = relNtoN.find(relations[1]);
-        if (it!=relNtoN.end()){
-            NodeToNodes& headToConst = it->second;
-            // head appears
-            auto itHeadToConst = headToConst.find(head);
-            if (itHeadToConst!=headToConst.end()){
-                Nodes cands = itHeadToConst->second;
-                //constant appears in head with tail
-                if (cands.find(constants[1])!=cands.end() && !filterSet.contains(constants[0])){
-                    tailResults.insertRule(constants[0], this);
-                    return true;
-                    }
-                }
-            }
-    }else{
-         // h(c,Y) <-- b1(d,Y) or h(c,Y) <-- b1(Y,d) , predict all Y=y that ground the body
-         RelNodeToNodes& relNtoN = directions[0] ? triples.getRelHeadToTails() :  triples.getRelTailToHeads(); 
-         auto it = relNtoN.find(relations[1]);
-        if (it!=relNtoN.end()){
-            NodeToNodes& constToY = it->second;
-            auto itconstToY = constToY.find(constants[1]);
-            if (itconstToY != constToY.end()){
-                for (auto ent: itconstToY->second){
-                    if (!filterSet.contains(ent)){
-                        tailResults.insertRule(ent, this);
-                    }
+    RelationalCSR* csr = triples.getCSR();
 
-                }
+    // h(X,c) <-- b1(d,X) or h(X,c) <-- b1(X,d)
+    // we want to only look up the body for X=head by looking from X=head to d and then predict c
+    if (!leftC){
+
+        if (filterSet.contains(constants[0])){
+            return false;
+        }
+        int* begin;
+        int length;
+        int bodyRel = this->relations[1];
+        directions[0] ? csr->getTforHREfficient(head, bodyRel, begin, length) :  csr->getHforTRFast(head, bodyRel, begin, length);
+        std::cout<<length<<std::endl;
+        for (int i=0; i<length; i++){
+            if (begin[i]==constants[1]){
+                tailResults.insertRule(constants[0], this);
                 return true;
+
             }
         }
+    
+    }else{
+         // h(c,Y) <-- b1(d,Y) or h(c,Y) <-- b1(Y,d) , predict all Y=y that ground the body
+        int* begin;
+        int length;
+        int bodyRel = this->relations[1];
+        directions[0] ? csr->getTforHREfficient(constants[1], bodyRel, begin, length) :  csr->getHforTRFast(constants[1], bodyRel, begin, length);
+        bool predicted = false;
+        for (int i=0; i<length; i++){
+            int cand = begin[i];
+            if (!filterSet.contains(cand)){
+                tailResults.insertRule(cand, this);
+                predicted = true;
+            }
+        }
+        return predicted;
     }
     return false;
 

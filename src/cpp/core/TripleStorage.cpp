@@ -14,7 +14,7 @@ TripleStorage::TripleStorage(std::shared_ptr<Index> index) {
 	relHeadToTails.rehash(relHeadToTails.size());
 	relTailToHeads.rehash(relTailToHeads.size());
 
-	rcsr = std::make_unique<RelationalCSR>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
+	
 
 	//csr = new CSR<int, int>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
 }
@@ -55,6 +55,10 @@ void TripleStorage::read(std::string filepath) {
 		std::cout << "Unable to open file " << filepath << std::endl;
 		exit(-1);
 	}
+
+	rcsr = std::make_unique<RelationalCSR>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
+
+
 }
 
 void TripleStorage::add(std::string head, std::string relation, std::string tail) {

@@ -51,7 +51,7 @@ class RelationalCSR {
         }
 
         void getHforTRFast(int tail, int relation, int*& begin, int& length){
-            getTforHREfficient(tail, relation, begin, length);
+            getTforHREfficient(tail, relation+numRelations, begin, length);
         }
     private:
         int numNodes;

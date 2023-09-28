@@ -173,6 +173,8 @@ void tests(){
     ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,01189282) <= _synset_domain_topic_of(X,08441203)");
     node_c = "01068012";
     ruleC->predictTailQuery(index->getIdOfNodestring(node_c), data, preds_c);
+    std::string target = "01189282";
+    int targetId = index->getIdOfNodestring(target);
     if (preds_c.size()!=1){
          throw std::runtime_error("Test 16 for C-rule length 1 predictTailQuery failed");
     }
