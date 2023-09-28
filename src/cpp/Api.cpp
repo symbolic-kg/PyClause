@@ -20,16 +20,18 @@ void RankingHandler::calculateRanking(
 
     // data loading
    
-    TripleStorage data(index);
-    data.read(trainPath);
-   
     //test
     TripleStorage test(index);
     test.read(targetPath);
 
+
     //valid 
     TripleStorage valid(index);
     valid.read(filterPath);
+
+
+    TripleStorage data(index);
+    data.read(trainPath);
 
     std::cout<<"Data loaded. \n";
     std::cout<<"Loading rules.... \n";

@@ -222,7 +222,7 @@ void timeRanking(){
     std::cout<<"data loaded. \n";
 
 
-    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
+    std::string rulePath = "/home/patrick/Desktop/PyClause/local/debug/rules-Uc";
     RuleStorage rules(index, ruleFactory);
     rules.readAnyTimeFormat(rulePath, true); 
 
