@@ -14,7 +14,14 @@ TripleStorage::TripleStorage(std::shared_ptr<Index> index) {
 	relHeadToTails.rehash(relHeadToTails.size());
 	relTailToHeads.rehash(relTailToHeads.size());
 
+	rcsr = std::make_unique<RelationalCSR>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
+
 	//csr = new CSR<int, int>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
+}
+
+
+RelationalCSR* TripleStorage::getCSR(){
+	return rcsr.get();
 }
 
 

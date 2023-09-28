@@ -7,6 +7,7 @@
 #include "Index.h"
 #include "Types.h"
 #include "Util.hpp"
+#include "RelationalCSR.hpp"
 
 class TripleStorage
 {
@@ -23,6 +24,8 @@ public:
 	Nodes* getTforHR(int head, int relation);
 	Nodes* getHforTR(int tail, int relation);
 	Index* getIndex();
+	std::unique_ptr<RelationalCSR> rcsr;
+	RelationalCSR* getCSR();
 
 protected:
 

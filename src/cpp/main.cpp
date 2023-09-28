@@ -3,6 +3,7 @@
 #include <memory>
 #include <omp.h>
 #include <chrono>
+#include <numeric>
 
 #include "core/myClass.h"
 #include "core/Index.h"
@@ -242,8 +243,92 @@ void timeRanking(){
 
 }
 
+// void checkRuntimes(){
+
+//     int numRelations = 2;
+//     int numNodes = 5;
+
+//     RelNodeToNodes relHeadToTails;
+//     relHeadToTails[0][1].insert(2);
+// 	relHeadToTails[0][1].insert(3);
+//     relHeadToTails[1][1].insert(3);
+// 	relHeadToTails[1][2].insert(1);
+// 	relHeadToTails[1][2].insert(3);
+
+//     // invert htt -> tth
+//     RelNodeToNodes relTailToHeads;
+//     for (auto& itRelHeadToTails: relHeadToTails) {
+//         for (auto& itHeadToTails: itRelHeadToTails.second) {
+//             for (auto& tail : itHeadToTails.second){
+//                 relTailToHeads[itRelHeadToTails.first][tail].insert(itHeadToTails.first);
+//             }
+//         }
+//     }
+//     ///////////////////////////////////////////////////////////
+
+//     RelationalCSR rcsr = RelationalCSR(numRelations, numNodes, relHeadToTails, relTailToHeads);
+
+//     Nodes* nodes = rcsr.getTforHR(2,1);
+//     for (auto itr = nodes->begin(); itr != nodes->end(); itr++)
+//     {
+//         std::cout << *itr << " ";
+//     }
+//     std::cout << "\n";
+
+//     int* begin;
+//     int length;
+//     rcsr.getTforHREfficient(2, 1, begin, length);
+//     for (int i = 0; i < length; i++){
+//         std::cout << begin[i] << " ";
+//     }
+//     std::cout << "\n";
+
+//     ////////////////// runtime tests (test task: sum of nodeids) /////////////////////////////
+
+
+//     int n = 10000000;
+
+//     auto start = std::chrono::high_resolution_clock::now();
+//     int test_v = 0;
+//     for (int i = 0; i < n; i++){
+//         Nodes* nodes = rcsr.getTforHR(2,1);
+//         for (auto itr = nodes->begin(); itr != nodes->end(); itr++){
+//             test_v += *itr;
+//         }
+//     }
+//     auto finish = std::chrono::high_resolution_clock::now();
+// 	auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+//     std::cout << "getTforHR " << milliseconds.count() << " ms\n";
+
+//     start = std::chrono::high_resolution_clock::now();
+//     test_v = 0;
+//     for (int i = 0; i < n; i++){
+//         int* begin;
+//         int length;
+//         rcsr.getTforHREfficient(2, 1, begin, length);
+//         for (int i = 0; i < length; i++){
+//             test_v += begin[i];
+//         }
+//     }
+//     finish = std::chrono::high_resolution_clock::now();
+// 	milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+//     std::cout << "getTforHREfficient " << milliseconds.count() << " ms\n";
+
+//     start = std::chrono::high_resolution_clock::now();
+//     test_v = 0;
+//     for (int i = 0; i < n; i++){
+//         for (auto& it : relHeadToTails[1][2]){
+//             test_v += it;
+//         }
+//     }
+//     finish = std::chrono::high_resolution_clock::now();
+// 	milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+//     std::cout << "mapOfMapOfMap " << milliseconds.count() << " ms\n";
+// }
+
 
 int main(){
+    //checkRuntimes();
     tests();
     timeRanking();
     exit(0);
