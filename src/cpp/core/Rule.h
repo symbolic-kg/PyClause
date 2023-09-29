@@ -212,5 +212,22 @@ private:
 };
 
 
+//U_d rule, internal representation: (grounded variable does not appear in body, the other head variable appears it the expected atom)
+// h(X,d) <-- b1(X,A), b2(A,B), b3(B,C)
+//  leftC=false, relations=[h, b1, b2, b3], directions=[1,1,1]
+// h(d,Y) <-- b1(A,B), b2(B,C), b3(C,Y)
+// leftC=true, relations=[h, b1, b2, b3], directions=[1,1,1]
+// h(d,Y) <-- b1(A,B), b2(C,D), b3(Y,C)
+// leftC=true, relations=[h, b1, b2, b3], directions=[1,0,0]
+class RuleD: public Rule
+{
+public:
+	RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, int constant);
+	static double dConfWeight;
+private:
+	bool leftC;
+	int constant;
+};
+
 
 #endif // RULE_H

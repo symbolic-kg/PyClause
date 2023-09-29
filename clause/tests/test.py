@@ -51,6 +51,7 @@ def test_uc_b_zero_ranking():
     "rule_b_max_branching_factor": "-1",
     "use_zero_rules": "True",
     "use_u_c_rules": "True",
+    "use_u_d_rules": "False",
     "use_b_rules": "True",
     }
 

@@ -175,8 +175,21 @@ void tests(){
     if (preds_c.size()!=1){
          throw std::runtime_error("Test 16 for C-rule length 1 predictTailQuery failed");
     }
-    
 
+
+    // 1833	2 _derivationally_related_form(X,01264336) <= _derivationally_related_form(A,X)
+    std::unique_ptr<Rule> ruleD;
+    preds.clear();
+    ruleD = ruleFactory->parseAnytimeRule("_derivationally_related_form(X,01264336) <= _derivationally_related_form(A,X)");
+
+    
+    
+    //2001	24	0.01199400299850075	_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)
+    ruleD = ruleFactory->parseAnytimeRule("_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)");
+
+
+    // 2001	2	9.995002498750624E-4	_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)
+    ruleD = ruleFactory->parseAnytimeRule("_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)");
 
     std::cout<<"All tests passed."<<std::endl;
 }
@@ -190,6 +203,7 @@ void timeRanking(){
     ruleFactory->setCreateRuleB(false);
     ruleFactory->setCreateRuleZ(false);
     ruleFactory->setCreateRuleC(true);
+    ruleFactory->setCreateRuleD(false);
     std::string trainPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/train.txt";
     std::string filterPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/valid.txt";
     std::string targetPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/test.txt";

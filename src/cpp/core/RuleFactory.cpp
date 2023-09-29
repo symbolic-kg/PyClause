@@ -95,84 +95,124 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
         }
 
         bool bodyHasConst = false;
-        symAtom checkHeadAtom;
+        symAtom checkBodyAtom;
         for (strAtom& atom: bodyAtoms){
-            parseSymAtom(atom, checkHeadAtom);
-        if (checkHeadAtom.containsConstant){
-            bodyHasConst = true;
+            parseSymAtom(atom, checkBodyAtom);
+            if (checkBodyAtom.containsConstant){
+                bodyHasConst = true;
             }
         }
+        // *** RuleD (U_d -rule) ***
         if (!bodyHasConst){
             ruleType = "RuleD";
-            //std::cout<<"Found U_d rule, skipping."<<std::endl;
-            return nullptr;
+            symAtom checkHeadAtom;
+            parseSymAtom(headAtom, checkHeadAtom);
+            if (!checkHeadAtom.containsConstant){
+                throw std::runtime_error("Expected a head constant but didnt get one in parsing.");
+            }
+            // assign head constant
+            constants[0] = checkHeadAtom.constant;
+            leftC = checkHeadAtom.leftC;
+
+            if (length==1){
+                relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+                if (!leftC && firstVar==bodyAtoms[0][1][0]){
+                    directions.push_back(true);
+                }else if(!leftC && firstVar==bodyAtoms[0][2][0]){
+                    directions.push_back(false);
+                } else if (leftC && lastVar == bodyAtoms[0][2][0]){
+                    directions.push_back(true);
+                }else if (leftC && lastVar == bodyAtoms[0][1][0]){
+                    directions.push_back(false);
+                } else {
+                    std::runtime_error("Could not parse D-rule: " + rule);
+                }
+            } else if (length==2){
+                // the anyburl string rule representation deviates from our representation
+                // anyburl (the input here) e.g. : h(c,Y) <-- someRel(A,Y) , otherRel(B,A)
+                // our representation would be: h(c,Y) <-- otherRel(A,B), someRel(B,Y)
+                // so to get the first body atom we need to take the second body atom of the rule
+                relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
+                relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+                //our first body atom; leftC no X appears
+                if (leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[1]){
+                    directions.push_back(true);
+                }else if (leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[2]){
+                    directions.push_back(false);
+                } else if (!leftC && firstVar == bodyAtoms[0][1][0]) {
+                    directions.push_back(true);
+                } else if (!leftC && firstVar == bodyAtoms[0][2][0]) {
+                    directions.push_back(false);
+                }
+                else {
+                    std::runtime_error("Could not parse D-rule: " + rule);
+                }
+            }else{
+                 std::runtime_error("Cannot parse longer AnyBURL U_d rules");
+            }
         }else{
             ruleType = "RuleC";
-        }
-
-        parseSymAtom(headAtom, checkHeadAtom);
-        if (!checkHeadAtom.containsConstant){
-            throw std::runtime_error("Expected a head constant but didnt get one in parsing.");
-        }
-        // assign head constant
-        constants[0] = checkHeadAtom.constant;
-        leftC = checkHeadAtom.leftC;
-
-        
-        symAtom checkBodyAtom;
-        if (length==1){
-            relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-            parseSymAtom(bodyAtoms[0], checkBodyAtom);
-            constants[1] = checkBodyAtom.constant;
-            if (leftC==checkBodyAtom.leftC){
-                directions.push_back(true);
-            }else{
-                directions.push_back(false);
+            symAtom checkHeadAtom;
+            parseSymAtom(headAtom, checkHeadAtom);
+            if (!checkHeadAtom.containsConstant){
+                throw std::runtime_error("Expected a head constant but didnt get one in parsing.");
             }
+            // assign head constant
+            constants[0] = checkHeadAtom.constant;
+            leftC = checkHeadAtom.leftC;
 
-        // we need to do this manually for leftC=true AnyTime Format is (length=2)
-        // P530(Q142,Y) <= P530(A,Y), P495(Q368674,A)
-        // whereas our representation; which  leads to rel and dir is
-        // P530(Q142,Y) <= P495(Q368674,A), P530(A,Y)
-        } else if (length==2 && leftC){
-            relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
-            relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-            // start with the second atom which is the first atom in our representation
-            parseSymAtom(bodyAtoms[1], checkBodyAtom);
-            constants[1] = checkBodyAtom.constant;
-            if (checkBodyAtom.leftC == leftC){
-                directions.push_back(true);
-            }else{
-                directions.push_back(false);
+            if (length==1){
+                relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+                parseSymAtom(bodyAtoms[0], checkBodyAtom);
+                constants[1] = checkBodyAtom.constant;
+                if (leftC==checkBodyAtom.leftC){
+                    directions.push_back(true);
+                }else{
+                    directions.push_back(false);
+                }
+
+            // we need to do this manually for leftC=true AnyTime Format is (length=2)
+            // P530(Q142,Y) <= P530(A,Y), P495(Q368674,A)
+            // whereas our representation; which  leads to rel and dir is
+            // P530(Q142,Y) <= P495(Q368674,A), P530(A,Y)
+            } else if (length==2 && leftC){
+                relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
+                relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+                // start with the second atom which is the first atom in our representation
+                parseSymAtom(bodyAtoms[1], checkBodyAtom);
+                constants[1] = checkBodyAtom.constant;
+                if (checkBodyAtom.leftC == leftC){
+                    directions.push_back(true);
+                }else{
+                    directions.push_back(false);
+                }
+                //second var of first atom
+                if (bodyAtoms[0][2][0]==lastVar){
+                    directions.push_back(true);
+                }else{
+                    directions.push_back(false);
+                }   
+
+            // we need to do this manually for leftC=false AnyTime Format is (length=2)
+            // P3373(X,Q13129708) <= P3373(A,X), P3373(A,Q4530046)
+            // which is in line with our format
+            }else if (length==2 && !leftC){
+                relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+                relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
+                //first var of body atom (char)
+                if (bodyAtoms[0][1][0]==firstVar){
+                    directions.push_back(true);
+                }else{
+                    directions.push_back(false);
+                }
+                parseSymAtom(bodyAtoms[1], checkBodyAtom);
+                constants[1] = checkBodyAtom.constant;
+                if (checkBodyAtom.leftC == leftC){
+                    directions.push_back(true);
+                }else{
+                    directions.push_back(false);
+                }
             }
-            //second var of first atom
-             if (bodyAtoms[0][2][0]==lastVar){
-                directions.push_back(true);
-            }else{
-                directions.push_back(false);
-            }   
-
-        // we need to do this manually for leftC=false AnyTime Format is (length=2)
-        // P3373(X,Q13129708) <= P3373(A,X), P3373(A,Q4530046)
-        // which is in line with our format
-        }else if (length==2 && !leftC){
-            relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-            relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
-            //first var of body atom (char)
-            if (bodyAtoms[0][1][0]==firstVar){
-                directions.push_back(true);
-            }else{
-                directions.push_back(false);
-            }
-            parseSymAtom(bodyAtoms[1], checkBodyAtom);
-            constants[1] = checkBodyAtom.constant;
-            if (checkBodyAtom.leftC == leftC){
-                directions.push_back(true);
-            }else{
-                directions.push_back(false);
-            }
-
-
         }
     } 
 
@@ -180,6 +220,8 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
         return std::make_unique<RuleB>(relations, directions);
     } else if (ruleType=="RuleC" && createRuleC){
         return std::make_unique<RuleC>(relations, directions, leftC, constants);
+    }else if(ruleType=="RuleD" && createRuleD){
+        return std::make_unique<RuleD>(relations, directions, leftC, constants[0]);
     } else {
         return nullptr;
     }
@@ -205,6 +247,8 @@ void RuleFactory::parseAtom(const std::string& input, strAtom& atom) {
 
 void RuleFactory::parseSymAtom(strAtom& inputAtom, symAtom& symAt){
     symAt.containsConstant = false;
+    symAt.constant = -1;
+    symAt.leftC = false;
     if (_cfg_prs_anyTimeVars.find(inputAtom[1]) == std::string::npos){
         symAt.containsConstant = true;
         symAt.constant = index->getIdOfNodestring(inputAtom[1]);
@@ -231,4 +275,9 @@ void RuleFactory::setCreateRuleC(bool ind){
 void RuleFactory::setCreateRuleZ(bool ind){
     createRuleZ = ind;
 }
+
+void RuleFactory::setCreateRuleD(bool ind){
+    createRuleD = ind;
+}
+
 

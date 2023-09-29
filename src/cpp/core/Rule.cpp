@@ -435,7 +435,7 @@ bool RuleC::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
                 }
             }
     }else{
-        // h(X,c) <-- b1(d,X) or h(c,X) <-- b1(X,d) we want to predict all x=X that ground the body
+        // h(X,c) <-- b1(d,X) or h(X,c) <-- b1(X,d) we want to predict all x=X that ground the body
         // tail==constants[0] is already checked
         RelNodeToNodes& relNtoN = directions[0] ? triples.getRelTailToHeads() :  triples.getRelHeadToTails();
         auto it = relNtoN.find(relations[1]);
@@ -604,4 +604,20 @@ std::set<Triple> RuleZ::materialize(TripleStorage& triples){
     }
     return predictions;
 }
+
+
+// ***RuleD implementation*** 
+
+double RuleD::dConfWeight = 1.0;
+
+RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, int constant) {
+    this->relations=relations;
+    this->targetRel=relations[0];
+    this->leftC = leftC;
+    this->constant = constant;
+    confWeight = RuleD::dConfWeight;
+}
+
+
+
 
