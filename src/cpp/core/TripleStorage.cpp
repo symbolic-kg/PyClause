@@ -97,6 +97,16 @@ Nodes* TripleStorage::getHforTR(int tail, int relation){
 	return nullptr;
 }
 
+
+void TripleStorage::getTforHR(int head, int relation, int*& begin, int& length){
+	rcsr->getTforHREfficient(head, relation, begin, length);
+
+}
+void TripleStorage::getHforTR(int tail, int relation, int*& begin, int& length){
+	rcsr->getHforTREfficient(tail, relation, begin, length);
+
+}
+
 Index* TripleStorage::getIndex(){
 	return index.get();
 }

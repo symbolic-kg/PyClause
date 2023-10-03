@@ -386,7 +386,7 @@ bool RuleC::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& t
         int* begin;
         int length;
         int bodyRel = this->relations[1];
-        directions[0] ? csr->getTforHREfficient(head, bodyRel, begin, length) :  csr->getHforTRFast(head, bodyRel, begin, length);
+        directions[0] ? triples.getTforHR(head, bodyRel, begin, length) :  triples.getHforTR(head, bodyRel, begin, length);
         int* end = begin + length;
         if (std::find(begin, end, constants[1]) != end){
              tailResults.insertRule(constants[0], this);
@@ -397,7 +397,7 @@ bool RuleC::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& t
         int* begin;
         int length;
         int bodyRel = this->relations[1];
-        directions[0] ? csr->getTforHREfficient(constants[1], bodyRel, begin, length) :  csr->getHforTRFast(constants[1], bodyRel, begin, length);
+        directions[0] ? triples.getTforHR(constants[1], bodyRel, begin, length) :  triples.getHforTR(constants[1], bodyRel, begin, length);
         bool predicted = false;
         for (int i=0; i<length; i++){
             int cand = begin[i];
@@ -424,7 +424,7 @@ bool RuleC::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
         int* begin;
         int length;
         int bodyRel = this->relations[1];
-        directions[0] ? csr->getHforTRFast(tail, bodyRel, begin, length) :  csr->getTforHREfficient(tail, bodyRel, begin, length);
+        directions[0] ? csr->getHforTREfficient(tail, bodyRel, begin, length) :  csr->getTforHREfficient(tail, bodyRel, begin, length);
         int* end = begin + length;
           if (std::find(begin, end, constants[1]) != end){
              headResults.insertRule(constants[0], this);
@@ -435,7 +435,7 @@ bool RuleC::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
         int* begin;
         int length;
         int bodyRel = this->relations[1];
-        directions[0] ? csr->getHforTRFast(constants[1], bodyRel, begin, length) :  csr->getTforHREfficient(constants[1], bodyRel, begin, length);
+        directions[0] ? csr->getHforTREfficient(constants[1], bodyRel, begin, length) :  csr->getTforHREfficient(constants[1], bodyRel, begin, length);
         bool predicted = false;
         for (int i=0; i<length; i++){
             int cand = begin[i];

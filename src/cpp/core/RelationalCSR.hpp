@@ -50,7 +50,7 @@ class RelationalCSR {
             length = rowPtr[head+1] - rowPtr[head];
         }
 
-        void getHforTRFast(int tail, int relation, int*& begin, int& length){
+        void getHforTREfficient(int tail, int relation, int*& begin, int& length){
             getTforHREfficient(tail, relation+numRelations, begin, length);
         }
     private:

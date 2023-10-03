@@ -23,6 +23,8 @@ public:
 
 	Nodes* getTforHR(int head, int relation);
 	Nodes* getHforTR(int tail, int relation);
+	void getTforHR(int head, int relation, int*& begin, int& length);
+	void getHforTR(int tail, int relation, int*& begin, int& length);
 	Index* getIndex();
 	std::unique_ptr<RelationalCSR> rcsr;
 	RelationalCSR* getCSR();
