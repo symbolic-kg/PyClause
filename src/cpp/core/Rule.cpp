@@ -156,60 +156,34 @@ std::set<Triple> RuleB::materialize(TripleStorage& triples){
 
 }
 
-bool RuleB::predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){
-    RelNodeToNodes* relNtoN = nullptr;
-    if (directions[0]){
-        relNtoN =  &triples.getRelHeadToTails();   
-    }else{
-        relNtoN =  &triples.getRelTailToHeads();
-    }
-    auto it = relNtoN->find(relations[1]);
-    if (it!=relNtoN->end()){
-        NodeToNodes& NtoN = it->second;
-        if (NtoN.count(head)>0){
-            Nodes closingEntities;
-            std::set<int> substitutions = {head};
-            searchCurrGroundings(1, head, substitutions, triples, closingEntities, relations, directions);
-            bool madePred = false;
-            for (const int& cEnt: closingEntities){ 
-                if (!filterSet.contains(cEnt)){
-                    tailResults.insertRule(cEnt, this);
-                    madePred = true;
-                }
-                
-            }
-            return madePred;
+bool RuleB::predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){ 
+    Nodes closingEntities;
+    std::set<int> substitutions = {head};
+    searchCurrGroundings(1, head, substitutions, triples, closingEntities, relations, directions);
+    bool madePred = false;
+    for (const int& cEnt: closingEntities){ 
+        if (!filterSet.contains(cEnt)){
+            tailResults.insertRule(cEnt, this);
+            madePred = true;
         }
     }
-    return false;
+    return madePred;
+                
+           
 }
 
 bool RuleB::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults,  ManySet filterSet){
-    RelNodeToNodes* relNtoN = nullptr;
-    if (_directions[0]){
-        relNtoN =  &triples.getRelHeadToTails();   
-    }else{
-        relNtoN =  &triples.getRelTailToHeads();
-    }
-    auto it = relNtoN->find(_relations[1]);
-    if (it!=relNtoN->end()){
-        NodeToNodes& NtoN = it->second;
-        if (NtoN.count(tail)>0){
-            Nodes closingEntities;
-            std::set<int> substitutions = {tail};
-            searchCurrGroundings(1, tail, substitutions, triples, closingEntities, _relations, _directions);
-            bool madePred = false;
-            for (const int& cEnt: closingEntities){
-                if (!filterSet.contains(cEnt)){
-                    headResults.insertRule(cEnt, this);
-                    madePred = true;
-                }
-                
-            }
-            return madePred;
+    Nodes closingEntities;
+    std::set<int> substitutions = {tail};
+    searchCurrGroundings(1, tail, substitutions, triples, closingEntities, _relations, _directions);
+    bool madePred = false;
+    for (const int& cEnt: closingEntities){
+        if (!filterSet.contains(cEnt)){
+                headResults.insertRule(cEnt, this);
+                madePred = true;
         }
     }
-    return false;
+    return madePred;
 }
 
 
