@@ -222,36 +222,33 @@ void RuleB::searchCurrGroundings(
 {
     Nodes* nextEntities = nullptr;
     int currRel = rels[currAtomIdx];
+    int* begin;
+    int length;
+
     RelNodeToNodes& relNtoN = dirs[currAtomIdx-1] ? triples.getRelHeadToTails() : triples.getRelTailToHeads();
-    auto it = relNtoN.find(rels[currAtomIdx]);
-    if (!(it==relNtoN.end())){
-        NodeToNodes& NtoN = it->second;
-        auto entIt = NtoN.find(currEntity);
-        if (entIt!=NtoN.end()){
-            nextEntities = &(entIt->second);
-            if (currAtomIdx == rels.size()-1){
-                //copies
-                for(const int ent: *nextEntities){
-                    // respect object identity constraint, stop if violated
-                    if (substitutions.find(ent)==substitutions.end()){
-                        closingEntities.insert(ent);
-                    }
-                }
-            }else{
-                // skip if branching factor is used and if exceeded
-                if (RuleB::branchingFaktor>0 && nextEntities->size()>RuleB::branchingFaktor){
-                    return;
-                }
-                for(int ent: *nextEntities){
-                    if (substitutions.find(ent)==substitutions.end()){
-                        substitutions.insert(ent);
-                        searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities, rels, dirs);
-                        substitutions.erase(ent);
-                    }
-                }
+    dirs[currAtomIdx-1] ? triples.getTforHR(currEntity, currRel, begin, length) : triples.getHforTR(currEntity, currRel, begin, length);
+    if (currAtomIdx == rels.size()-1){
+        // next entities
+        for (int i=0; i<length; i++){
+            int ent = begin[i];
+            // respect object identity constraint, stop if violated
+            if (substitutions.find(ent)==substitutions.end()){
+                    closingEntities.insert(ent);
             }
         }
-    } 
+    }else{
+        if (RuleB::branchingFaktor>0 && length>RuleB::branchingFaktor){
+            return;
+        }
+        for (int i=0; i<length; i++){
+            int ent = begin[i];
+            if (substitutions.find(ent)==substitutions.end()){
+                substitutions.insert(ent);
+                searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities, rels, dirs);
+                substitutions.erase(ent);
+            }
+        }
+    }
 }
 
 // ***RuleC implementation*** 

@@ -203,16 +203,14 @@ void timeRanking(){
     auto start = std::chrono::high_resolution_clock::now();
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
-    ruleFactory->setCreateRuleB(false);
+    ruleFactory->setCreateRuleB(true);
     ruleFactory->setCreateRuleZ(false);
-    ruleFactory->setCreateRuleC(true);
+    ruleFactory->setCreateRuleC(false);
     ruleFactory->setCreateRuleD(false);
     std::string trainPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/train.txt";
     std::string filterPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/valid.txt";
     std::string targetPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/test.txt";
-    // data loading
-    TripleStorage train(index);
-    train.read(trainPath);
+   
     //test
     TripleStorage target(index);
     target.read(targetPath);
@@ -221,8 +219,12 @@ void timeRanking(){
     filter.read(filterPath);
     std::cout<<"data loaded. \n";
 
+    //train
+    TripleStorage train(index);
+    train.read(trainPath);
 
-    std::string rulePath = "/home/patrick/Desktop/PyClause/local/debug/rules-Uc";
+
+    std::string rulePath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/anyburl-rules-c5-3600";
     RuleStorage rules(index, ruleFactory);
     rules.readAnyTimeFormat(rulePath, true); 
 
