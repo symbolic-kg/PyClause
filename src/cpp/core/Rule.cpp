@@ -199,7 +199,6 @@ void RuleB::searchCurrGroundings(
     int* begin;
     int length;
 
-    RelNodeToNodes& relNtoN = dirs[currAtomIdx-1] ? triples.getRelHeadToTails() : triples.getRelTailToHeads();
     dirs[currAtomIdx-1] ? triples.getTforHR(currEntity, currRel, begin, length) : triples.getHforTR(currEntity, currRel, begin, length);
     if (currAtomIdx == rels.size()-1){
         // next entities
