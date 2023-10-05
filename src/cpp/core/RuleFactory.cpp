@@ -131,14 +131,16 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
                 // the anyburl string rule representation deviates from our representation
                 // anyburl (the input here) e.g. : h(c,Y) <-- someRel(A,Y) , otherRel(B,A)
                 // our representation would be: h(c,Y) <-- otherRel(A,B), someRel(B,Y)
+                // note (!!) not only the atoms are flipped also A and B are flipped!
                 // so to get the first body atom we need to take the second body atom of the rule
                 relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
                 relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-                //our first body atom; leftC no X appears
-                if (leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[1]){
+                //our first body atom; second atom of anyburl; leftC no X appears
+                if (leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[2]){
                     directions.push_back(true);
-                }else if (leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[2]){
+                }else if (leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[1]){
                     directions.push_back(false);
+                // for not leftC anyburls first atom is also our first atom
                 } else if (!leftC && firstVar == bodyAtoms[0][1][0]) {
                     directions.push_back(true);
                 } else if (!leftC && firstVar == bodyAtoms[0][2][0]) {
@@ -147,8 +149,24 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
                 else {
                     std::runtime_error("Could not parse D-rule: " + rule);
                 }
+
+                //our second body atom
+                if (leftC && bodyAtoms[0][1][0]==_cfg_prs_anyTimeVars[1]){
+                    directions.push_back(true);
+                } else if (leftC && bodyAtoms[0][1][0]==lastVar){
+                    directions.push_back(false);
+                } else if (!leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[1]){
+                    directions.push_back(true);
+                } else if (!leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[2]){
+                    directions.push_back(false);
+                } else {
+                     std::runtime_error("Could not parse D-rule: " + rule);
+                }
+
+
             }else{
-                 std::runtime_error("Cannot parse longer AnyBURL U_d rules");
+                std::runtime_error("Cannot parse longer AnyBURL U_d rules");
+                
             }
         }else{
             ruleType = "RuleC";

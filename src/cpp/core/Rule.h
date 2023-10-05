@@ -224,9 +224,24 @@ class RuleD: public Rule
 public:
 	RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, int constant);
 	static double dConfWeight;
+	static int branchingFactor;
+
+	std::set<Triple> materialize(TripleStorage& triples);
+	//bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
+	//bool predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
+	//bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+	//bool predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+
+
+
 private:
 	bool leftC;
 	int constant;
+
+	void searchCurrGroundings(
+		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+		Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs
+	);
 };
 
 

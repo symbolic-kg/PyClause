@@ -194,7 +194,6 @@ void RuleB::searchCurrGroundings(
             Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs
 		)
 {
-    Nodes* nextEntities = nullptr;
     int currRel = rels[currAtomIdx];
     int* begin;
     int length;
@@ -573,14 +572,111 @@ std::set<Triple> RuleZ::materialize(TripleStorage& triples){
 // ***RuleD implementation*** 
 
 double RuleD::dConfWeight = 1.0;
+int RuleD::branchingFactor = -1;
 
 RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, int constant) {
+
+    if(relations.size() != (directions.size() + 1)) {
+        throw std::invalid_argument("'Directions' size should be one less than 'relations' size in construction of RuleB");
+    }
+    if(relations.size() < 2) {
+        throw std::invalid_argument("Cannot construct a RuleB with no body atom.");
+    }		
+
+
+
+    this->directions = directions;
     this->relations=relations;
     this->targetRel=relations[0];
     this->leftC = leftC;
     this->constant = constant;
     confWeight = RuleD::dConfWeight;
 }
+
+
+std::set<Triple> RuleD::materialize(TripleStorage& triples){
+    std::set<Triple> predictions;
+    RelNodeToNodes* relNtoN = nullptr;
+     // first body atom is (v1,v2)
+    if (directions[0]){
+         relNtoN =  &triples.getRelHeadToTails();
+    // first body atom is (v2,v1)    
+    }else{
+         relNtoN =  &triples.getRelTailToHeads();
+    }
+     // first body relation
+    auto it = relNtoN->find(relations[1]);
+    if (!(it==relNtoN->end())){
+        NodeToNodes& NtoN = it->second;
+         // start branches of the DFS search
+         // every entity e that satisfies b1(e,someY) [or b1(someX, e)]
+         for (auto const& pair: NtoN){
+                const int& e = pair.first;
+                Nodes closingEntities;
+                std::set<int> substitutions = {e, constant};
+
+                if (e==constant){
+                    continue;
+                }
+                searchCurrGroundings(1, e, substitutions, triples, closingEntities, relations, directions);
+                for (const int& cEnt:  closingEntities){
+                    Triple triple;
+                    if (!leftC){
+                        triple = {e, targetRel, constant};
+                    }else{
+                        triple = {constant, targetRel, cEnt};
+                    }
+                    auto isNew = predictions.insert(triple);
+                    // add to count if this triple is predicted for the first time
+                    if (trackInMaterialize && isNew.second){
+                        predicted+=1;
+                        if (triples.contains(triple[0], triple[1], triple[2])){
+                            cpredicted += 1;
+                        }
+                    }
+                }
+            }
+    }
+    return predictions;
+}
+
+
+
+void RuleD::searchCurrGroundings(
+		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+		Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs
+)
+{
+    int currRel = rels[currAtomIdx];
+    int* begin;
+    int length;
+
+    dirs[currAtomIdx-1] ? triples.getTforHR(currEntity, currRel, begin, length) : triples.getHforTR(currEntity, currRel, begin, length);
+    if (currAtomIdx == rels.size()-1){
+        // next entities
+        for (int i=0; i<length; i++){
+            int ent = begin[i];
+            // respect object identity constraint, stop if violated
+            if (substitutions.find(ent)==substitutions.end()){
+                    closingEntities.insert(ent);
+            }
+        }
+    }else{
+        if (RuleD::branchingFactor>0 && length>RuleD::branchingFactor){
+            return;
+        }
+        for (int i=0; i<length; i++){
+            int ent = begin[i];
+            if (substitutions.find(ent)==substitutions.end()){
+                substitutions.insert(ent);
+                searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities, rels, dirs);
+                substitutions.erase(ent);
+            }
+        }
+    }
+}
+
+
 
 
 
