@@ -193,54 +193,15 @@ void tests(){
          throw std::runtime_error("Test 17 for D-rule length 1 materialize failed");
     }
 
-    // 16108 2 _derivationally_related_form(X,01264336) <= _derivationally_related_form(A,X)
+    // 16106 2 _derivationally_related_form(X,01264336) <= _derivationally_related_form(A,X)
+    // note that a very minor bug in AnyBURL23 leads to 16108 for stats[0]
     ruleD = ruleFactory->parseAnytimeRule("_derivationally_related_form(X,01264336) <= _derivationally_related_form(A,X)");
     ruleD->setTrackInMaterialize(true);
     matPreds = ruleD->materialize(data);
     stats = ruleD->getStats(true);
-    std::cout<<stats[0]<<std::endl;
-
-    // the only correct ones
-    //04650201	01264336
-    //06776138	01264336
-
-    // i have 
-    //06776138 _derivationally_related_form 01264336
-    //04650201 _derivationally_related_form 01264336
-    //04649051 _derivationally_related_form 01264336
-
-
-    //count unique tails
-    int ctr = 0;
-    for (int i=0;i<index->getNodeSize(); i++){
-        int* begin;
-        int length;
-        data.getHforTR(i, ruleD->getTargetRel(), begin, length);
-        if (length!=0){
-            ctr += 1;
-        }
+    if (!(stats[0]==16106 & stats[1]==2)){
+         throw std::runtime_error("Test 18 for D-rule length 1 materialize failed");
     }
-    std::cout<<ctr<<std::endl;
-
-
-
-
-    std::cout<<"correct triples"<<std::endl;
-    for (Triple pred: matPreds){
-        int* begin;
-        int length;
-        std::cout<<index->getStringOfNodeId(pred[0])<<"\t"<<index->getStringOfRelId(pred[1])<<"\t"<<index->getStringOfNodeId(pred[2])<<std::endl;
-
-        // if (data.contains(pred[0], pred[1], pred[2])){
-        //      std::cout<<index->getStringOfNodeId(pred[0])<<" "<<index->getStringOfRelId(pred[1])<<" "<<index->getStringOfNodeId(pred[2])<<std::endl;
-        // }     
-        
-    }
-
-
-    // if (!(stats[0]==1833 & stats[1]==2)){
-    //      throw std::runtime_error("Test 18 for D-rule length 1 materialize failed");
-    // }
 
 
 
@@ -249,26 +210,20 @@ void tests(){
     ruleD->setTrackInMaterialize(true);
     matPreds = ruleD->materialize(data);
     stats = ruleD->getStats(true);
-    // if (!(stats[0]==706 & stats[1]==4) ){
-    //      throw std::runtime_error("Test 19 for D-rule length 1 materialize failed");
-    // }
-    std::cout<<stats[0]<<stats[1]<<std::endl;
-
-
-
-
-
-
+    if (!(stats[0]==706 & stats[1]==4) ){
+          throw std::runtime_error("Test 19 for D-rule length 1 materialize failed");
+    }
     
-    
-    //2001	24	0.01199400299850075	_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)
+    //	_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)
+    // should parse to identical: _member_meronym(08176077,Y) <= _has_part(A,B), _has_part(B,Y)
     ruleD = ruleFactory->parseAnytimeRule("_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)");
     ruleD->setTrackInMaterialize(true);
 
     matPreds = ruleD->materialize(data);
     size = matPreds.size();
 
-    // 2001	2	9.995002498750624E-4	_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)
+    // 	_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)
+    // should parse to same representation
     ruleD = ruleFactory->parseAnytimeRule("_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)");
 
 
