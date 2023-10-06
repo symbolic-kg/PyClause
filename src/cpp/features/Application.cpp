@@ -35,7 +35,6 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
         if (_cfg_verbose){
             std::cout<<"Applying rules on relation "<<relation<<" for "<<dirIsTail<<" queries (1 is tail)..."<<std::endl;
         }
-
         // source to correct target entities
         const NodeToNodes& srcToCand = relQueries.second;
         

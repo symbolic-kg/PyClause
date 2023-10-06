@@ -9,6 +9,8 @@ QueryResults::QueryResults(int addTopK, int discAtLeast){
     if (this->discAtLeast==0){
         std::runtime_error("Check option 'disc_at_least'");
     }
+
+    candRules.rehash(addTopK);
 }
 
 

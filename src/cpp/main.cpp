@@ -180,8 +180,6 @@ void tests(){
          throw std::runtime_error("Test 16 for C-rule length 1 predictTailQuery failed");
     }
 
-
-   
     std::unique_ptr<Rule> ruleD;
     preds.clear();
      //309	2	0.006472491909385114	_hypernym(X,05653848) <= _synset_domain_topic_of(A,X)
@@ -193,6 +191,8 @@ void tests(){
          throw std::runtime_error("Test 17 for D-rule length 1 materialize failed");
     }
 
+
+
     // 16106 2 _derivationally_related_form(X,01264336) <= _derivationally_related_form(A,X)
     // note that a very minor bug in AnyBURL23 leads to 16108 for stats[0]
     ruleD = ruleFactory->parseAnytimeRule("_derivationally_related_form(X,01264336) <= _derivationally_related_form(A,X)");
@@ -202,6 +202,14 @@ void tests(){
     if (!(stats[0]==16106 & stats[1]==2)){
          throw std::runtime_error("Test 18 for D-rule length 1 materialize failed");
     }
+    std::string nodeStr = "01264336";
+    preds.clear();
+    ruleD->predictHeadQuery(index->getIdOfNodestring(nodeStr), data, preds);
+    if (!preds.size()==16106){
+        throw std::runtime_error("Test 19 for D-rule length 1 predictHeadQuery failed");
+
+    }
+ 
 
 
 
@@ -211,9 +219,14 @@ void tests(){
     matPreds = ruleD->materialize(data);
     stats = ruleD->getStats(true);
     if (!(stats[0]==706 & stats[1]==4) ){
-          throw std::runtime_error("Test 19 for D-rule length 1 materialize failed");
+          throw std::runtime_error("Test 20 for D-rule length 1 materialize failed");
     }
-    
+    preds.clear();
+    nodeStr = "01716491";
+    ruleD->predictTailQuery(index->getIdOfNodestring(nodeStr), data, preds);
+    if (!preds.size()==706){
+        throw std::runtime_error("Test 20 for D-rule length 1 predictTailQuery failed.");
+    }   
     //	_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)
     // should parse to identical: _member_meronym(08176077,Y) <= _has_part(A,B), _has_part(B,Y)
     ruleD = ruleFactory->parseAnytimeRule("_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)");
@@ -227,6 +240,7 @@ void tests(){
     ruleD = ruleFactory->parseAnytimeRule("_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)");
 
 
+
     
     std::cout<<"All tests passed."<<std::endl;
 }
@@ -237,10 +251,10 @@ void timeRanking(){
     auto start = std::chrono::high_resolution_clock::now();
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
-    ruleFactory->setCreateRuleB(true);
+    ruleFactory->setCreateRuleB(false);
     ruleFactory->setCreateRuleZ(false);
     ruleFactory->setCreateRuleC(false);
-    ruleFactory->setCreateRuleD(false);
+    ruleFactory->setCreateRuleD(true);
     std::string trainPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/train.txt";
     std::string filterPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/valid.txt";
     std::string targetPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/test.txt";

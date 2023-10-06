@@ -35,6 +35,7 @@ public:
     std::set<Rule*, compareRule>& getRelRules(int relation);
 
     void addRule(std::unique_ptr<Rule*> rule);
+    
 
 private:
     // rules owns the rule objects

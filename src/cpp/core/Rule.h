@@ -227,16 +227,18 @@ public:
 	static int branchingFactor;
 
 	std::set<Triple> materialize(TripleStorage& triples);
-	//bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
-	//bool predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
-	//bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
-	//bool predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
+	bool predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
+	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+	bool predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 
 
 
 private:
 	bool leftC;
 	int constant;
+	std::vector<int> _relations;
+	std::vector<bool> _directions;
 
 	void searchCurrGroundings(
 		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,

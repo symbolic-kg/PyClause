@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <chrono>
 
 #include "Rule.h"
 #include "Types.h"
@@ -571,7 +572,7 @@ std::set<Triple> RuleZ::materialize(TripleStorage& triples){
 
 // ***RuleD implementation*** 
 
-double RuleD::dConfWeight = 1.0;
+double RuleD::dConfWeight = 1;
 int RuleD::branchingFactor = -1;
 
 RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, int constant) {
@@ -591,6 +592,14 @@ RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& l
     this->leftC = leftC;
     this->constant = constant;
     confWeight = RuleD::dConfWeight;
+
+
+    // used for rules where leftC=false and predicting heads
+    this->_relations = relations;
+    std::reverse(_relations.begin()+1, _relations.end());
+    this->_directions = directions;
+    std::reverse(_directions.begin(), _directions.end());
+    _directions.flip();   
 }
 
 
@@ -675,6 +684,223 @@ void RuleD::searchCurrGroundings(
         }
     }
 }
+
+
+bool RuleD::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet){
+    // h(X,d) <-- b1(X,A), b2(A,B), b3(B,C)
+    //  leftC=false, relations=[h, b1, b2, b3], directions=[1,1,1]
+    // h(d,Y) <-- b1(A,B), b2(B,C), b3(C,Y)
+    // leftC=true, relations=[h, b1, b2, b3], directions=[1,1,1]
+    // h(d,Y) <-- b1(A,B), b2(C,D), b3(Y,C)
+    // leftC=true, relations=[h, b1, b2, b3], directions=[1,0,0]
+    if (!leftC && tail!=constant){
+        return false;
+    }
+
+    if (leftC && filterSet.contains(constant)){
+        return false;
+    }
+    if (directions.size()==1){
+        return predictL1HeadQuery(tail, triples, headResults, filterSet);
+    }
+    // can only predict constant
+    if (leftC){
+        std::set<int> substitutions = {constant, tail};
+        Nodes closingEntities;
+        searchCurrGroundings(1, tail, substitutions, triples, closingEntities, _relations, _directions);
+        if (closingEntities.size()>0){
+            // filtering is checked above already
+            headResults.insertRule(constant, this);
+            //done, can only predict one thing
+            return true;
+        }
+    }else{
+        RelNodeToNodes* relNtoN = nullptr;
+        if (directions[0]){
+            relNtoN =  &triples.getRelHeadToTails();
+          
+        }else{
+            relNtoN =  &triples.getRelTailToHeads();
+        }
+        // first body relation
+        auto it = relNtoN->find(relations[1]);
+        bool predicted = false;
+        if (!(it==relNtoN->end())){
+            NodeToNodes& NtoN = it->second;
+            for (auto const& pair: NtoN){
+                const int& e = pair.first;
+                Nodes closingEntities;
+                std::set<int> substitutions = {e, constant};
+                if (e==constant){
+                    continue;
+                }
+                searchCurrGroundings(1, e, substitutions, triples, closingEntities, relations, directions);
+                if (closingEntities.size()>0 && !filterSet.contains(e)){
+                    headResults.insertRule(e, this);
+                    predicted = true;
+                }
+            }
+        }
+        return predicted;
+    }
+}
+
+
+bool RuleD::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet){
+
+
+    // h(X,d) <-- b1(X,A)
+    // h(d,Y) <-- b1(A,Y)
+    if (leftC){
+        int bodyRel = relations[1];
+        int* begin;
+        int length;
+        if (constant==tail){
+            return false;
+        }
+        directions[0] ? triples.getHforTR(tail, bodyRel, begin, length) : triples.getTforHR(tail, bodyRel, begin, length);
+        if (length>0){
+            // filtering is checked  already
+            headResults.insertRule(constant, this);
+            return true;
+        } else {
+            return false;
+        }
+    }else {
+        Index* index = triples.getIndex();
+        bool predicted = false;
+        
+        for (int i=0; i<index->getNodeSize(); i++){
+            auto start = std::chrono::high_resolution_clock::now();
+            int bodyRel = relations[1];
+            int* begin;
+            int length;
+            directions[0] ? triples.getTforHR(i, bodyRel, begin, length) : triples.getHforTR(i, bodyRel, begin, length);
+            auto stop_look = std::chrono::high_resolution_clock::now();
+            if (length>0 && !filterSet.contains(i)){
+                 headResults.insertRule(i, this);
+                 predicted = true;
+
+            }
+            
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration<double>(stop - stop_look);
+            // std::cout<<std::endl;
+            // std::cout << "Insert time: " << duration.count() << " seconds." << std::endl;
+            // auto duration_lool = std::chrono::duration<double>(stop_look- start);
+            // std::cout << "Look time: " << duration_lool.count() << " seconds." << std::endl;
+
+
+            // for (int j=0; j<length; j++){
+            //     int e = begin[j];
+            //     if (e!=constant && !filterSet.contains(e)){
+            //         headResults.insertRule(e, this);
+            //         predicted = true;
+            //     }
+            // }
+        }
+        return predicted;
+        auto stop = std::chrono::high_resolution_clock::now();
+       
+    // }
+    //     RelNodeToNodes* relNtoN = nullptr;
+    //     if (directions[0]){
+    //         relNtoN =  &triples.getRelHeadToTails();
+          
+    //     }else{
+    //         relNtoN =  &triples.getRelTailToHeads();
+    //     }
+    //     // first body relation
+    //     auto it = relNtoN->find(relations[1]);
+    //     bool predicted = false;
+    //     if (!(it==relNtoN->end())){
+    //         NodeToNodes& NtoN = it->second;
+    //         for (auto& pair: NtoN){
+    //             const int& e = pair.first;
+    //             if (e!=constant && !filterSet.contains(e)){
+    //                 headResults.insertRule(e, this);
+    //                 predicted = true;
+    //             }
+    //         }
+    //         return predicted;
+    //     }
+    // 
+
+     
+    }
+}  
+
+    
+
+
+
+bool RuleD::predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){
+    // h(X,d) <-- b1(X,A), b2(A,B), b3(B,C)
+    //  leftC=false, relations=[h, b1, b2, b3], directions=[1,1,1]
+    // h(d,Y) <-- b1(A,B), b2(B,C), b3(C,Y)
+    // leftC=true, relations=[h, b1, b2, b3], directions=[1,1,1]
+    // h(d,Y) <-- b1(A,B), b2(C,D), b3(Y,C)
+    // leftC=true, relations=[h, b1, b2, b3], directions=[1,0,0]
+     if (leftC && head!=constant){
+        return false;
+    }
+    if (!leftC && filterSet.contains(constant)){
+        return false;
+    }
+
+     // if (directions.size()==1){
+    //     return predictLTailQuery(head, triples, tailResults, filterSet);
+    // }
+
+    // can only predict constant for the tail
+    if (!leftC){
+        std::set<int> substitutions = {constant, head};
+        Nodes closingEntities;
+        searchCurrGroundings(1, head, substitutions, triples, closingEntities, relations, directions);
+        if (closingEntities.size()>0){
+            // filtering is checked above already
+            tailResults.insertRule(constant, this);
+            //done, can only predict one thing
+            return true;
+        }
+    } else {
+        
+        // we start from the last atom grounded with head
+        RelNodeToNodes* relNtoN = nullptr;
+        if (_directions[0]){
+            relNtoN =  &triples.getRelHeadToTails();
+          
+        }else{
+            relNtoN =  &triples.getRelTailToHeads();
+        }
+        // first body relation
+        auto it = relNtoN->find(relations[1]);
+        bool predicted = false;
+        if (!(it==relNtoN->end())){
+            NodeToNodes& NtoN = it->second;
+            for (auto const& pair: NtoN){
+                const int& e = pair.first;
+                Nodes closingEntities;
+                std::set<int> substitutions = {e, constant};
+                if (e==constant){
+                    continue;
+                }
+                searchCurrGroundings(1, e, substitutions, triples, closingEntities, _relations, _directions);
+                if (closingEntities.size()>0 && !filterSet.contains(e)){
+                    tailResults.insertRule(e, this);
+                    predicted = true;
+                }
+            }
+        }
+        return predicted;
+    }
+}
+
+
+bool RuleD::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){
+    std::cout<<"debug";
+}
+
 
 
 
