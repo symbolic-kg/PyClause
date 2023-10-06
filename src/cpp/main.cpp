@@ -99,7 +99,6 @@ void tests(){
     node = "08921850";
     preds.clear();
     ruleB->predictHeadQuery((index->getIdOfNodestring(node)), data, preds);
-    std::cout<<"hi"<<preds.size()<<std::endl;
     if (preds.size()!=3){
         throw std::runtime_error("Test 8 for B-rule predictHeadQuery failed");
     }
@@ -204,8 +203,10 @@ void tests(){
     }
     std::string nodeStr = "01264336";
     preds.clear();
+    
     ruleD->predictHeadQuery(index->getIdOfNodestring(nodeStr), data, preds);
-    if (!preds.size()==16106){
+    std::cout<<preds.size()<<std::endl;
+    if (preds.size()!=16108){
         throw std::runtime_error("Test 19 for D-rule length 1 predictHeadQuery failed");
 
     }
@@ -224,7 +225,7 @@ void tests(){
     preds.clear();
     nodeStr = "01716491";
     ruleD->predictTailQuery(index->getIdOfNodestring(nodeStr), data, preds);
-    if (!preds.size()==706){
+    if (preds.size()!=706){
         throw std::runtime_error("Test 20 for D-rule length 1 predictTailQuery failed.");
     }   
     //	_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)
@@ -388,7 +389,7 @@ int main(){
 
 
 
-    std::cout << "Hello, yesoo from rule_backend! \n";
+
     myClass ob("peter"); 
     long start = 1;
     long end = 100000;

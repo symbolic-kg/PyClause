@@ -771,20 +771,20 @@ bool RuleD::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
         bool predicted = false;
         
         for (int i=0; i<index->getNodeSize(); i++){
-            auto start = std::chrono::high_resolution_clock::now();
+            //auto start = std::chrono::high_resolution_clock::now();
             int bodyRel = relations[1];
             int* begin;
             int length;
             directions[0] ? triples.getTforHR(i, bodyRel, begin, length) : triples.getHforTR(i, bodyRel, begin, length);
             auto stop_look = std::chrono::high_resolution_clock::now();
-            if (length>0 && !filterSet.contains(i)){
+            if (length>0 && !filterSet.contains(i) && i!=constant){
                  headResults.insertRule(i, this);
                  predicted = true;
 
             }
             
-            auto stop = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration<double>(stop - stop_look);
+            //auto stop = std::chrono::high_resolution_clock::now();
+            //auto duration = std::chrono::duration<double>(stop - stop_look);
             // std::cout<<std::endl;
             // std::cout << "Insert time: " << duration.count() << " seconds." << std::endl;
             // auto duration_lool = std::chrono::duration<double>(stop_look- start);
@@ -800,7 +800,7 @@ bool RuleD::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
             // }
         }
         return predicted;
-        auto stop = std::chrono::high_resolution_clock::now();
+        //auto stop = std::chrono::high_resolution_clock::now();
        
     // }
     //     RelNodeToNodes* relNtoN = nullptr;
