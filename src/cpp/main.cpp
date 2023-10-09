@@ -252,9 +252,9 @@ void timeRanking(){
     auto start = std::chrono::high_resolution_clock::now();
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
-    ruleFactory->setCreateRuleB(false);
-    ruleFactory->setCreateRuleZ(false);
-    ruleFactory->setCreateRuleC(false);
+    ruleFactory->setCreateRuleB(true);
+    ruleFactory->setCreateRuleZ(true);
+    ruleFactory->setCreateRuleC(true);
     ruleFactory->setCreateRuleD(true);
     std::string trainPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/train.txt";
     std::string filterPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/valid.txt";
