@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <chrono>
 
 #include "Rule.h"
 #include "Types.h"
@@ -361,7 +360,6 @@ bool RuleC::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& t
         if (std::find(begin, end, constants[1]) != end){
              tailResults.insertRule(constants[0], this);
         }
-    
     }else{
          // h(c,Y) <-- b1(d,Y) or h(c,Y) <-- b1(Y,d) , predict all Y=y that ground the body
         int* begin;
@@ -747,10 +745,8 @@ bool RuleD::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& hea
 
 
 bool RuleD::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet){
-
-
-    // h(X,d) <-- b1(X,A)
-    // h(d,Y) <-- b1(A,Y)
+    // h(X,c) <-- b1(X,A)
+    // h(c,Y) <-- b1(A,Y)
     if (leftC){
         int bodyRel = relations[1];
         int* begin;
@@ -766,80 +762,32 @@ bool RuleD::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
         } else {
             return false;
         }
-    }else {
+    }else { 
         Index* index = triples.getIndex();
         bool predicted = false;
-        
         for (int i=0; i<index->getNodeSize(); i++){
-            //auto start = std::chrono::high_resolution_clock::now();
+            
             int bodyRel = relations[1];
             int* begin;
             int length;
             directions[0] ? triples.getTforHR(i, bodyRel, begin, length) : triples.getHforTR(i, bodyRel, begin, length);
-            auto stop_look = std::chrono::high_resolution_clock::now();
             if (length>0 && !filterSet.contains(i) && i!=constant){
                  headResults.insertRule(i, this);
                  predicted = true;
-
             }
-            
-            //auto stop = std::chrono::high_resolution_clock::now();
-            //auto duration = std::chrono::duration<double>(stop - stop_look);
-            // std::cout<<std::endl;
-            // std::cout << "Insert time: " << duration.count() << " seconds." << std::endl;
-            // auto duration_lool = std::chrono::duration<double>(stop_look- start);
-            // std::cout << "Look time: " << duration_lool.count() << " seconds." << std::endl;
-
-
-            // for (int j=0; j<length; j++){
-            //     int e = begin[j];
-            //     if (e!=constant && !filterSet.contains(e)){
-            //         headResults.insertRule(e, this);
-            //         predicted = true;
-            //     }
-            // }
         }
         return predicted;
-        //auto stop = std::chrono::high_resolution_clock::now();
-       
-    // }
-    //     RelNodeToNodes* relNtoN = nullptr;
-    //     if (directions[0]){
-    //         relNtoN =  &triples.getRelHeadToTails();
-          
-    //     }else{
-    //         relNtoN =  &triples.getRelTailToHeads();
-    //     }
-    //     // first body relation
-    //     auto it = relNtoN->find(relations[1]);
-    //     bool predicted = false;
-    //     if (!(it==relNtoN->end())){
-    //         NodeToNodes& NtoN = it->second;
-    //         for (auto& pair: NtoN){
-    //             const int& e = pair.first;
-    //             if (e!=constant && !filterSet.contains(e)){
-    //                 headResults.insertRule(e, this);
-    //                 predicted = true;
-    //             }
-    //         }
-    //         return predicted;
-    //     }
-    // 
-
-     
     }
 }  
 
     
 
-
-
 bool RuleD::predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){
-    // h(X,d) <-- b1(X,A), b2(A,B), b3(B,C)
+    // h(X,c) <-- b1(X,A), b2(A,B), b3(B,C)
     //  leftC=false, relations=[h, b1, b2, b3], directions=[1,1,1]
-    // h(d,Y) <-- b1(A,B), b2(B,C), b3(C,Y)
+    // h(c,Y) <-- b1(A,B), b2(B,C), b3(C,Y)
     // leftC=true, relations=[h, b1, b2, b3], directions=[1,1,1]
-    // h(d,Y) <-- b1(A,B), b2(C,D), b3(Y,C)
+    // h(c,Y) <-- b1(A,B), b2(C,D), b3(Y,C)
     // leftC=true, relations=[h, b1, b2, b3], directions=[1,0,0]
      if (leftC && head!=constant){
         return false;
@@ -848,9 +796,9 @@ bool RuleD::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
         return false;
     }
 
-     // if (directions.size()==1){
-    //     return predictLTailQuery(head, triples, tailResults, filterSet);
-    // }
+     if (directions.size()==1){
+        return predictL1TailQuery(head, triples, tailResults, filterSet);
+    }
 
     // can only predict constant for the tail
     if (!leftC){
@@ -898,7 +846,40 @@ bool RuleD::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
 
 
 bool RuleD::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){
-    std::cout<<"debug";
+    // h(X,c) <-- b1(X,A)
+    // h(c,Y) <-- b1(A,Y)
+     if (!leftC){
+        int bodyRel = relations[1];
+        int* begin;
+        int length;
+        //OI
+        if (constant==head){
+            return false;
+        }
+        !directions[0] ? triples.getHforTR(head, bodyRel, begin, length) : triples.getTforHR(head, bodyRel, begin, length);
+        if (length>0){
+            // filtering is checked  already
+            tailResults.insertRule(constant, this);
+            return true;
+        } else {
+            return false;
+        }
+    }else { 
+        Index* index = triples.getIndex();
+        bool predicted = false;
+        for (int i=0; i<index->getNodeSize(); i++){
+            int bodyRel = relations[1];
+            int* begin;
+            int length;
+            !directions[0] ? triples.getTforHR(i, bodyRel, begin, length) : triples.getHforTR(i, bodyRel, begin, length);
+            if (length>0 && !filterSet.contains(i) && i!=constant){
+                 tailResults.insertRule(i, this);
+                 predicted = true;
+            }
+        }
+        return predicted;
+    }
+    
 }
 
 

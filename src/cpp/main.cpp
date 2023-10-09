@@ -205,11 +205,18 @@ void tests(){
     preds.clear();
     
     ruleD->predictHeadQuery(index->getIdOfNodestring(nodeStr), data, preds);
-    std::cout<<preds.size()<<std::endl;
     if (preds.size()!=16108){
         throw std::runtime_error("Test 19 for D-rule length 1 predictHeadQuery failed");
 
     }
+    preds.clear();
+    std::string headStr = "01428853";
+    ruleD->predictTailQuery(index->getIdOfNodestring(headStr), data, preds);
+    if ( !(preds.size()==1 && preds.contains(index->getIdOfNodestring(nodeStr)))){
+        throw std::runtime_error("Test 20 for D-rule length 1 predictTailQuery failed");
+
+    }
+    preds.clear();
  
 
 
@@ -220,16 +227,28 @@ void tests(){
     matPreds = ruleD->materialize(data);
     stats = ruleD->getStats(true);
     if (!(stats[0]==706 & stats[1]==4) ){
-          throw std::runtime_error("Test 20 for D-rule length 1 materialize failed");
+          throw std::runtime_error("Test 21 for D-rule length 1 materialize failed");
     }
+
     preds.clear();
     nodeStr = "01716491";
     ruleD->predictTailQuery(index->getIdOfNodestring(nodeStr), data, preds);
     if (preds.size()!=706){
-        throw std::runtime_error("Test 20 for D-rule length 1 predictTailQuery failed.");
+        throw std::runtime_error("Test 22 for D-rule length 1 predictTailQuery failed.");
     }   
+
+
+    preds.clear();
+    nodeStr = "00452512";
+    std::string headCOnst = "01716491";
+    ruleD->predictHeadQuery(index->getIdOfNodestring(nodeStr), data, preds);
+    if (!(preds.size()==1 && preds.contains(index->getIdOfNodestring(headCOnst)))){
+        throw std::runtime_error("Test 23 for D-rule length 1 predictHeadQuery failed.");
+
+    }
+
     //	_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)
-    // should parse to identical: _member_meronym(08176077,Y) <= _has_part(A,B), _has_part(B,Y)
+    // should parse to: _member_meronym(08176077,Y) <= _has_part(A,B), _has_part(B,Y)     [A,B are flipped]
     ruleD = ruleFactory->parseAnytimeRule("_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)");
     ruleD->setTrackInMaterialize(true);
 
@@ -252,9 +271,9 @@ void timeRanking(){
     auto start = std::chrono::high_resolution_clock::now();
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
-    ruleFactory->setCreateRuleB(true);
-    ruleFactory->setCreateRuleZ(true);
-    ruleFactory->setCreateRuleC(true);
+    ruleFactory->setCreateRuleB(false);
+    ruleFactory->setCreateRuleZ(false);
+    ruleFactory->setCreateRuleC(false);
     ruleFactory->setCreateRuleD(true);
     std::string trainPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/train.txt";
     std::string filterPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/valid.txt";
