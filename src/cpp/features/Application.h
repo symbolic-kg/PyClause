@@ -21,9 +21,9 @@ public:
     void calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, bool dirIsTail);
     // aggregate query results based on _cfg_ defined aggregation function
     // writes to, e.g., this->headQueryResults[rel][source_entitiy].aggrCand
-    void aggregateQueryResults(std::string direction);
+    void aggregateQueryResults(std::string direction, TripleStorage& train);
     //aggregation functions
-    void scoreMaxPlus(const NodeToPredRules& candToRules, std::vector<std::pair<int, double>>& aggregatedCand);
+    void scoreMaxPlus(const NodeToPredRules& candToRules, std::vector<std::pair<int, double>>& aggregatedCand, TripleStorage& train);
     // writes to e.g. this->headQueryResults[rel][head].aggrCand
     void makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter);
     void writeRanking(TripleStorage& target, std::string path);
@@ -42,6 +42,7 @@ public:
     void setSaveCandidateRules(bool ind);
     void setPerformAggregation(bool ind);
     void setDiscAtLeast(int num);
+    void setTieHandling(std::string opt);
 
 
 
@@ -87,6 +88,12 @@ private:
     // number of candidates to at least fully discriminate in a ranking; if this criterion is reached and topk then
     // application is stopped for the current query; atleast: if the first rule predicts more, then all of these have to be discriminated
     int rank_discAtLeast=10;
+
+    // how to handle ties when 2 candidates cannot be further discriminated by rules
+    // in {random, frequency}
+    // random: randomly rank (expect difference results); frequency: rank according to entity frequency (determinstic results)
+    // note that this parameter is independent of any evaluation; it's on the model side
+    std::string rank_tie_handling="frequency";
 
 
 

@@ -113,7 +113,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                    if (performAggregation){
                         auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
                         if (rank_aggrFunc=="maxplus"){
-                            scoreMaxPlus(qResults.getCandRules(), writeResults[relation][source]);
+                            scoreMaxPlus(qResults.getCandRules(), writeResults[relation][source], train);
                         }
                         else{
                             throw std::runtime_error("Aggregation function is not recognized in calcualte ranking.");
@@ -128,7 +128,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
     }
 }
 
-void ApplicationHandler::aggregateQueryResults(std::string direction){
+void ApplicationHandler::aggregateQueryResults(std::string direction, TripleStorage& train){
     auto& queryResults = (direction=="tail") ? tailQcandsRules : headQcandsRules;
     auto& writeResults = (direction=="tail") ? tailQcandsConfs : headQcandsConfs;
     for (auto& queries: queryResults){
@@ -137,7 +137,7 @@ void ApplicationHandler::aggregateQueryResults(std::string direction){
             for (auto& query: srcToCand){
                 int source = query.first; 
                 if (rank_aggrFunc=="maxplus"){
-                    scoreMaxPlus(query.second, writeResults[relation][source]);
+                    scoreMaxPlus(query.second, writeResults[relation][source], train);
                 }else{
                     throw std::runtime_error("Aggregation function is not recognized in calcualte ranking.");
                 }
@@ -148,6 +148,10 @@ void ApplicationHandler::aggregateQueryResults(std::string direction){
 
 // note this does not yet filter with target as ranking is performed query based
 void ApplicationHandler::makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter){
+    if (rank_tie_handling=="frequency"){
+        std::cout<<"Calculate entity frequencies..."<<std::endl;
+        train.calcEntityFreq();
+    }
     calculateQueryResults(target, train, rules, addFilter, true);
     calculateQueryResults(target, train, rules, addFilter, false);
 }
@@ -215,7 +219,7 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
 }
 
 void ApplicationHandler::scoreMaxPlus(
-    const NodeToPredRules& candToRules, std::vector<std::pair<int, double>>& aggrCand
+    const NodeToPredRules& candToRules, std::vector<std::pair<int, double>>& aggrCand, TripleStorage& train
      ){
     
     // for noisy-or we can simply sort according to aggrCand after scoring
@@ -223,7 +227,7 @@ void ApplicationHandler::scoreMaxPlus(
     std::vector<std::pair<int, std::vector<Rule*>>> candsToSort(candToRules.begin(), candToRules.end());
 
     // max+ sorting
-    auto sortLexicographic = [](const std::pair<int, std::vector<Rule*>>& candA, const std::pair<int, std::vector<Rule*>>& candB) { 
+    auto sortLexicographic = [&train, this](const std::pair<int, std::vector<Rule*>>& candA, const std::pair<int, std::vector<Rule*>>& candB) { 
         std::vector<Rule*> rulesA = candA.second;
         std::vector<Rule*> rulesB = candB.second;
 
@@ -243,8 +247,19 @@ void ApplicationHandler::scoreMaxPlus(
         } else if (rulesA.size() > rulesB.size()){
             return true;
         }
-        // exactly the same rules given NodeToPred is unordered_map return random order
-        return false;
+        //exactly the same rules given NodeToPred is unordered_map return random order
+        if (this->rank_tie_handling=="random"){
+            return false;
+        }else if (this->rank_tie_handling=="frequency"){
+            if (train.getFreq(candA.first)!=train.getFreq(candB.first)){
+                return train.getFreq(candA.first) > train.getFreq(candB.first);
+            }else{
+                return candA.first<candB.first;
+            }
+            
+        } else {
+            throw std::runtime_error("Could not understand tie_handling_paramter in scoreMaxPlus.");
+        }
     };
      std::sort(candsToSort.begin(), candsToSort.end(), sortLexicographic);
     
@@ -302,4 +317,8 @@ std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>&  ApplicationHa
 }
 std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& ApplicationHandler::getTailQcandsConfs(){
     return tailQcandsConfs;
+}
+
+void ApplicationHandler::setTieHandling(std::string opt){
+    rank_tie_handling = opt;
 }

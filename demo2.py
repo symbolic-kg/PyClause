@@ -70,10 +70,11 @@ options = {
     # rule options 
     "rule_zero_weight":"0.01",
     "rule_b_max_branching_factor": "-1",
-    "use_zero_rules": "False",
-    "use_u_c_rules": "False",
-    "use_b_rules": "False",
-    "use_u_d_rules": "True",
+    "use_zero_rules": "true",
+    "use_u_c_rules": "true",
+    "use_b_rules": "true",
+    "use_u_d_rules": "true",
+    "tie_handling": "frequency"
 }
 
 ranker = c_clause.RankingHandler()

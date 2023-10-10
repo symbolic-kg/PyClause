@@ -17,7 +17,10 @@ void QueryResults::insertRule(int cand, Rule* rule){
     // to not cut off results randomly at the beginning
     // also add all candidates from the current rule to not randomly cut off rule predictions
     bool onlyUpdate = (addTopK > 0 && candidateOrder.size()>= addTopK && rule != firstRule && currentRule!=rule);
-    currentRule = rule;
+    // as long as we not have topk we track the current rule to not cut candidats off
+    if (addTopK>=candidateOrder.size()){
+         currentRule = rule;
+    }
     auto it = candRules.find(cand);
     bool newCand = (it==candRules.end());
     // new candidate

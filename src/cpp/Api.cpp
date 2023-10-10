@@ -73,7 +73,8 @@ void RankingHandler::setRankingOptions(std::map<std::string, std::string> option
         {"aggregation_function", [this](std::string val) { ranker.setAggregationFunc(val); }},
         {"filter_w_train", [this](std::string val) { ranker.setFilterWTrain(util::stringToBool(val)); }},
         {"filter_w_target", [this](std::string val) { ranker.setFilterWtarget(util::stringToBool(val)); }},
-        {"disc_at_least", [this](std::string val) { ranker.setDiscAtLeast(std::stoi(val)); }}
+        {"disc_at_least", [this](std::string val) { ranker.setDiscAtLeast(std::stoi(val)); }},
+        {"tie_handling", [this](std::string val) { ranker.setTieHandling(val); }}
     };
 
     for (auto& handler : handlers) {

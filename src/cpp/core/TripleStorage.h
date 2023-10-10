@@ -4,6 +4,7 @@
 #define TRIPLESTORAGE_H
 
 #include <memory>
+#include <map>
 #include "Index.h"
 #include "Types.h"
 #include "Util.hpp"
@@ -28,6 +29,8 @@ public:
 	Index* getIndex();
 	std::unique_ptr<RelationalCSR> rcsr;
 	RelationalCSR* getCSR();
+	void calcEntityFreq();
+	int getFreq(int entity);
 
 protected:
 
@@ -35,6 +38,7 @@ private:
 	std::shared_ptr<Index> index;
 	RelNodeToNodes relHeadToTails;
 	RelNodeToNodes relTailToHeads;
+	std::unordered_map<int, int> entityFrequencies;
 };
 
 #endif // TRIPLESTORAGE_H

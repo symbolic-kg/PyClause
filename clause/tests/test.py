@@ -41,6 +41,7 @@ def test_uc_b_zero_ranking():
     options = {
     # ranking options
     "aggregation_function": "maxplus",
+    "tie_handling": "frequency",
     "num_preselect": "10000000",
     "topk": "100",
     "filter_w_train": "true",
@@ -72,9 +73,9 @@ def test_uc_b_zero_ranking():
     hAt10 = str(stdout)[-18:-12]
     hA1 = str(stdout)[-36:-30]
 
-    expectMRR = "0.4961"
-    expecth1 =  "0.4568"
-    expecth10 = "0.5728"
+    expectMRR = "0.4964"
+    expecth1 =  "0.4576"
+    expecth10 = "0.5720"
 
     check_all = all([mrr_result==expectMRR, hA1==expecth1, hAt10==expecth10])
     if (not check_all):

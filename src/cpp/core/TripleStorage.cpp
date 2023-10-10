@@ -125,3 +125,22 @@ bool TripleStorage::contains(int head, int relation, int tail){
 	return false;
 }
 
+void TripleStorage::calcEntityFreq(){
+	for (int r=0; r<index->getRelSize(); r++){
+		for (int i=0; i<index->getNodeSize(); i++){
+			int* beginH;
+			int lengthH;
+			getHforTR(i, r, beginH, lengthH);
+			entityFrequencies[i] += lengthH;
+			int* beginT;
+			int lengthT;
+			getTforHR(i, r, beginT, lengthT);
+			entityFrequencies[i] += lengthT;
+		}
+	}
+}
+
+int TripleStorage::getFreq(int ent){
+	return entityFrequencies[ent];
+}
+
