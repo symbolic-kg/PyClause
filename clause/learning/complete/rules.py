@@ -1,7 +1,9 @@
 import config
 import sys
-from triples import id2to,to2id
+from triples import TripleSet,TripleIndex
 import time
+
+import re
 
 from random import sample
 
@@ -13,19 +15,21 @@ class Rule:
 
     id_counter = 0
 
-    def __init__(self):
+    def __init__(self, ruleset):
         Rule.id_counter += 1
         self.id = Rule.id_counter
+        self.ruleset = ruleset
         self.pred = 0
         self.cpred = 0
         self.hashcode = None
         self.aconfidence = 0.0 # this is the counterpart to the applied confidence
+        self.ruleset.add_rule(self)
         
     def get_confidence(self):
         return self.cpred / self.pred
     
-    def getSerialization(self):
-        return str(self.pred) + "\t" + str(self.cpred) + "\t" + self.get_confidence() + "\t" + str(self)
+    def get_serialization(self):
+        return str(self.pred) + "\t" + str(self.cpred) + "\t" + str(self.get_confidence()) + "\t" + str(self)
 
 class RuleXXuc(Rule):
     """
@@ -33,18 +37,18 @@ class RuleXXuc(Rule):
     rule. Here we implemented it as a rule on its own. However, this rule type still supports the output required to run as AnyBURL
     hack.
     """  
-
-    def __init__(self, target, rel, bc, bc_right):
-        super().__init__()
+    def __init__(self, ruleset, target, rel, bc, bc_right):
+        super().__init__(ruleset)
         self.target = target
         self.rel = rel
         self.bc = bc
         self.bc_right = bc_right
 
     def __str__(self):
+        ii = self.ruleset.index
         rep = ""
-        body_left, body_right  = ("X",id2to[self.bc]) if self.bc_right else (id2to[self.bc],"X")
-        rep += id2to[self.target] + "(X,X) <= " + id2to[self.rel] + "(" + body_left + "," + body_right + ")"
+        body_left, body_right  = ("X",ii.id2to[self.bc]) if self.bc_right else (ii.id2to[self.bc],"X")
+        rep += ii.id2to[self.target] + "(X,X) <= " + ii.id2to[self.rel] + "(" + body_left + "," + body_right + ")"
         return rep
 
     def __eq__(self, other):
@@ -81,16 +85,17 @@ class RuleXXud(Rule):
     hack.
     """  
 
-    def __init__(self, target, rel, dangling_right):
-        super().__init__()
+    def __init__(self, ruleset, target, rel, dangling_right):
+        super().__init__(ruleset)
         self.target = target
         self.rel = rel
         self.dangling_right = dangling_right
 
     def __str__(self):
+        ii = self.ruleset.index
         rep = ""
         body_left, body_right  = ("X","A") if self.dangling_right else ("A","X")
-        rep += id2to[self.target] + "(X,X) <= " + id2to[self.rel] + "(" + body_left + "," + body_right + ")"
+        rep += ii.id2to[self.target] + "(X,X) <= " + ii.id2to[self.rel] + "(" + body_left + "," + body_right + ")"
         return rep
 
     def __eq__(self, other):
@@ -125,16 +130,21 @@ class RuleZ(Rule):
     It is assumed that these rules are used only in a context where it is clear that the entity of the the completion task is an entity that
     is related to something else via the target relation of the z-rule that is applied in this context.
     """
-    def __init__(self, target, hc, hc_right):
-        super().__init__()
-        self.target = target
-        self.hc = hc
+    def __init__(self, ruleset, target, hc, hc_right):
+        super().__init__(ruleset)
+        if isinstance(target, int):
+            self.target = target
+            self.hc = hc
+        else:
+            self.target = Rule.index.to2id[target]
+            self.hc = Rule.index.to2id[hc]
         self.hc_right = hc_right # if true, the rule is an X rule, otherwise it is an Y rule
 
     def __str__(self):
+        ii = self.ruleset.index
         rep = ""
-        (head_left, head_right)  = ("X",id2to[self.hc]) if self.hc_right else (id2to[self.hc],"Y")
-        rep += id2to[self.target] + "(" + head_left + "," + head_right + ") <="
+        (head_left, head_right)  = ("X", ii.id2to[self.hc]) if self.hc_right else (ii.id2to[self.hc],"Y")
+        rep += ii.id2to[self.target] + "(" + head_left + "," + head_right + ") <="
         return rep
 
     def __eq__(self, other):
@@ -160,8 +170,8 @@ class RuleUd(Rule):
     A unary rule with a constant in head and a dangling (free) variabale in the body. The body consists of exactly one atom.
     A rule of this type has the form h(X,a) <= b1(X,A).
     """
-    def __init__(self, target, rel, hc, hc_right, dangling_right):
-        super().__init__()
+    def __init__(self, ruleset, target, rel, hc, hc_right, dangling_right):
+        super().__init__(ruleset)
         self.target = target
         self.rel = rel
         self.hc = hc
@@ -169,11 +179,12 @@ class RuleUd(Rule):
         self.dangling_right = dangling_right
 
     def __str__(self):
+        ii = self.ruleset.index
         rep = ""
-        (head_left, head_right)  = ("X",id2to[self.hc]) if self.hc_right else (id2to[self.hc],"Y")
+        (head_left, head_right)  = ("X",ii.id2to[self.hc]) if self.hc_right else (ii.id2to[self.hc],"Y")
         v = "X" if self.hc_right else "Y"
         body_left, body_right  = (v,"A") if self.dangling_right else ("A",v)
-        rep += id2to[self.target] + "(" + head_left + "," + head_right + ") <= " + id2to[self.rel] + "(" + body_left + "," + body_right + ")"
+        rep += ii.id2to[self.target] + "(" + head_left + "," + head_right + ") <= " + ii.id2to[self.rel] + "(" + body_left + "," + body_right + ")"
         return rep
     
     def __eq__(self, other):
@@ -196,27 +207,34 @@ class RuleUd(Rule):
         # todo, implement if required
         pass
 
-class RuleUc(Rule):
+class RuleUc(Rule): 
     """
     A unary rule with a constant in head and body. The body consists of exactly one atom.
     A rule of this type has the form h(X,a) <= b1(X,b).
     """    
 
-    def __init__(self, target, rel, hc, hc_right, bc, bc_right):
-        super().__init__()
-        self.target = target
-        self.rel = rel
-        self.hc = hc
+    def __init__(self, ruleset, target, rel, hc, hc_right, bc, bc_right):
+        super().__init__(ruleset)
+        if isinstance(target, int):
+            self.target = target
+            self.rel = rel
+            self.hc = hc
+            self.bc = bc
+        else:
+            self.target = self.ruleset.index.to2id[target]
+            self.rel = self.ruleset.index.to2id[rel]
+            self.hc = self.ruleset.index.to2id[hc]
+            self.bc = self.ruleset.index.to2id[bc]
         self.hc_right = hc_right # if true, the rule is an X rule, otherwise it is an Y rule
-        self.bc = bc
         self.bc_right = bc_right
 
     def __str__(self):
+        ii = self.ruleset.index
         rep = ""
-        (head_left, head_right)  = ("X",id2to[self.hc]) if self.hc_right else (id2to[self.hc],"Y")
+        (head_left, head_right)  = ("X",ii.id2to[self.hc]) if self.hc_right else (ii.id2to[self.hc],"Y")
         v = "X" if self.hc_right else "Y"
-        body_left, body_right  = (v,id2to[self.bc]) if self.bc_right else (id2to[self.bc],v)
-        rep += id2to[self.target] + "(" + head_left + "," + head_right + ") <= " + id2to[self.rel] + "(" + body_left + "," + body_right + ")"
+        body_left, body_right  = (v,ii.id2to[self.bc]) if self.bc_right else (ii.id2to[self.bc],v)
+        rep += ii.id2to[self.target] + "(" + head_left + "," + head_right + ") <= " + self.ruleset.index.id2to[self.rel] + "(" + body_left + "," + body_right + ")"
         return rep
 
     def __eq__(self, other):
@@ -258,7 +276,7 @@ class RuleB(Rule):
     A binary rule of the form h(X,Y) <= b1(X,A), b2(A,B), b3(B,Y). This rule can have between one and five body atoms.
     """
 
-    var_symbols = (("X","Y"), ("X","A","Y"), ("X","A","B","Y"), ("X","A","B","C","Y"), ("X","A","B","C","D","Y"))
+    var_symbols = (("X","Y"), ("X","A","Y"), ("X","A","B","Y"), ("X","A","B","C","Y"), ("X","A","B","C","D","Y"), ("X","A","B","C","D","E","Y"), ("X","A","B","C","D","E","F","Y"))
 
     branches_at_zero     = config.rules["b"]["branches_per_level"][0][0]
     branches_at_zero_rev = config.rules["b"]["branches_per_level"][1][0]
@@ -266,21 +284,21 @@ class RuleB(Rule):
     branches_per_level_rev = config.rules["b"]["branches_per_level"][1][1]
 
 
-    def __init__(self, rels, dirs):
-        super().__init__()
+    def __init__(self, ruleset, rels, dirs):
+        super().__init__(ruleset)
         if isinstance(rels[0], int):
             self.target = rels[0]
             self.rels = tuple(rels[1:])
             self.dirs = tuple(dirs)
         else:
-            self.target = to2id[rels[0]]
-            self.rels = tuple(map(lambda x : to2id[x], rels[1:]))
+            self.target = Rule.index.to2id[rels[0]]
+            self.rels = tuple(map(lambda x : Rule.index.to2id[x], rels[1:]))
             self.dirs = tuple(dirs)
 
-    
     def __str__(self):
-        return self.get_rep(id2to)
+        return self.get_rep(self.ruleset.index.id2to)
     
+    # take care
     def get_rep(self, id2to):
         rep = ""
         rep += id2to[self.target] + "(X,Y) <="
@@ -306,8 +324,8 @@ class RuleB(Rule):
                 self.hashcode += self.rels[i] if self.dirs[i] else -self.rels[i]
         return self.hashcode    
 
-    def score(self, pid, triples, lock, prediction_data, data_index, c_clause_handler, id2to):
-        scores = c_clause_handler.calcStats(self.get_rep(id2to))
+    def score(self, triples, lock, prediction_data, data_index, c_clause_handler):
+        scores = c_clause_handler.calcStats(self.get_rep(triples.index.id2to))
         self.cpred = int(scores[1])
         self.pred = int(scores[0])
         if self.pred == 0: return data_index, False
@@ -534,7 +552,8 @@ class RuleSet:
     rules = []
     id2rules = {}
 
-    def __init__(self):
+    def __init__(self, index):
+        self.index = index
         self.rules = []
 
     def add_rule(self, rule):
@@ -580,7 +599,7 @@ class RuleSet:
                     f.write(str(rule.pred) + "\t" + str(rule.cpred) + "\t" + str(confidence) + "\t" +  ruleMeMyselfI + "\n")
                 else:
                     f.write(str(rule.pred) + "\t" + str(rule.cpred) + "\t" + str(confidence) + "\t" + str(rule) + "\n")
-            # print(">>> rules written to " +  path + " using AnyBURL format") 
+            print(">>> " + str(len(self.rules)) + " rules written to " +  path + " using AnyBURL format") 
             
         if not(output_format == "AnyBURL"):
             print(">>> could not write rules to disc, outputformat not available")
@@ -608,14 +627,14 @@ class RuleReader:
             
 
     def read_line(self, line):
+        # print("reading: " + line)
         token = line.split("\t")
         if len(token) != 4: return None
         pred = int(token[0])
         cpred = int(token[1])
         conf = float(token[2])
         hb = token[3].split(" <= ")
-        if len(hb) != 2: return None
-        if "(X,Y)" in hb[0]:
+        if "(X,Y)" in hb[0]: # RuleB
             rels = []
             rels.append(hb[0].split("(")[0])
             atoms = hb[1].split(", ")
@@ -628,9 +647,40 @@ class RuleReader:
                 dirs.append(atoken[1].startswith(vars[counter]))
                 counter += 1
             rule = RuleB(rels, dirs)
-            rule.cpred = cpred
-            rule.pred = pred
+            rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
             return rule
         else:
+            if not(re.search("\(X,X\)", hb[0])) and not(re.search("\(X, X\)", hb[0])) and not(re.search("me_myself_i", hb[0])):
+                htoken = re.split("\(|,|\)",hb[0])
+                target = htoken[0]
+                if len(hb) == 1 or (len(hb) == 2 and len(hb[1]) < 2): # RuleZ
+                    if (htoken[1] == "X"):
+                        rule = RuleZ(target, htoken[2], True)
+                    else:
+                        rule = RuleZ(target, htoken[1], False) 
+                    rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
+                    return rule
+                else: # Uc or Ud rule
+                    btoken = re.split("\(|,|\)",hb[1])
+                    # print(btoken)
+                    if btoken[1] == "A" or btoken[2] == "A": # Ud rule (not yet supported)
+                        return None
+                    else: # Uc rule
+                        if htoken[1] == "X":
+                            if btoken[1] == "X": rule = RuleUc(target, btoken[0], htoken[2], True, btoken[2], True)
+                            else: rule = RuleUc(target, btoken[0], htoken[2], True, btoken[1], False) 
+                        else:
+                            if btoken[1] == "Y": rule = RuleUc(target, btoken[0], htoken[1], False, btoken[2], True)
+                            else: rule = RuleUc(target, btoken[0], htoken[1], False, btoken[1], False) 
+                        rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
+                    return rule
             return None
-
+    
+if __name__ == '__main__':
+    triples = TripleSet("E:/code/eclipse-workspace/AnyBURL/data/wn18rr/train.txt")
+    rr = RuleReader()
+    r1 = rr.read_line("29722	5	1.682255568265931E-4	_derivationally_related_form(02566528,Y) <=")
+    print("Rule that has been read: " +  str(r1))
+    print("")
+    r2 = rr.read_line("2	2	1.0	_instance_hypernym(X,08969798) <= _instance_hypernym(X,08762104) ")
+    print("Rule that has been read: " +  str(r2))

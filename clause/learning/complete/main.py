@@ -1,8 +1,8 @@
 from torm import Torm
-from triples import Triple,TripleSet,PredictionSet,CompletionSet,id2to
-import triples as ttt
+from triples import TripleSet,TripleIndex
+# import triples as ttt
 
-from rules import RuleSet
+from rules import RuleSet,Rule
 import config
 
 import multiprocessing as mp
@@ -19,8 +19,12 @@ if __name__ == '__main__':
         mp.set_start_method('spawn')
 
     rules = RuleSet()
-    triples = TripleSet(config.paths["input"]["train"])
-    task_triples = TripleSet(config.paths["input"]["tasks"])
+    index = TripleIndex()
+
+    triples = TripleSet(config.paths["input"]["train"], index)
+    task_triples = TripleSet(config.paths["input"]["tasks"], index)
+
+    Rule.set_index(index)
 
     targets = triples.rels
     # targets = list(map(lambda x : ttt.to2id[x], ["P37"]))
@@ -35,7 +39,6 @@ if __name__ == '__main__':
         print(">>> constructed " + str(candidates.size()) + " b-rules candidates, materialization started using " + str(num_of_processes) + " processes ...")
        
         start = time.time()
-        
         
         candidate_lists = []
         for i in range(num_of_processes): candidate_lists.append([])
@@ -57,9 +60,9 @@ if __name__ == '__main__':
             procs = []
             for pid in range(num_of_processes):
                 if pid == 0:
-                    proc = mp.Process(target=torm.mine_b_rules, args=(pid, locks[pid], prediction_data[pid], candidate_lists[pid], config.paths["input"]["train"], ttt.id2to, sender))
+                    proc = mp.Process(target=torm.mine_b_rules, args=(pid, locks[pid], prediction_data[pid], candidate_lists[pid], config.paths["input"]["train"], Rule.index, sender))
                 else:
-                    proc = mp.Process(target=torm.mine_b_rules, args=(pid, locks[pid], prediction_data[pid], candidate_lists[pid], config.paths["input"]["train"], ttt.id2to, None))
+                    proc = mp.Process(target=torm.mine_b_rules, args=(pid, locks[pid], prediction_data[pid], candidate_lists[pid], config.paths["input"]["train"], Rule.index, None))
                 procs.append(proc)
                 proc.start()
 
@@ -155,21 +158,4 @@ if __name__ == '__main__':
     rules.write(config.paths["output"]["rules"])
     print(">>> ~~~ rules written to " + config.paths["output"]["rules"])
 
-    # **************************************
 
-    #t1 = time.time()
-    #print(">>> sorting rules that explain the predictions ...")
-    #predictions.sort_explaining_rules()
-    #t2 = time.time()
-    #print(">>> ... sorting finished, it required " + str(t2 -t1) + " seconds")
-
-
-    #completions = CompletionSet(task_triples, predictions)
-    #print(">>> ... created completion set, now collecting")
-    #completions.collect()
-    #print(">>> ... collected, now filtering ...")
-    #completions.filter(triples)
-    #print(">>> ... filtered, now writing ...")
-
-    #completions.write_ranking(config.paths["output"]["ranking"])
-    #print(">>> ... cccc")
