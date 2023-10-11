@@ -27,7 +27,6 @@ def test_uc_b_zero_ranking():
 
     conf_path = join_u(testing_dir, "testing-conf")
 
-    #TODO this might work on Windows as path.join should handle it
     eval_config = [
         f"PATH_TRAINING = {train_path}",
         f"PATH_TEST = {test_path}",
@@ -61,7 +60,6 @@ def test_uc_b_zero_ranking():
     ranker.calculateRanking(test_path, train_path, filter_path, rules_path, ranking_path, options)
 
 
-    # TODO: this wouldnt work on windows probably
     p = Popen(
         f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Eval {conf_path}",
         shell=True,
