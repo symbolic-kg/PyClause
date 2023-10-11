@@ -10,12 +10,13 @@ def test_uc_b_zero_ranking():
     print(get_ab_dir())
 
     base_dir = get_base_dir()
-    train_path = path.join(base_dir, "data/wnrr/train.txt")
-    filter_path = path.join(base_dir, "data/wnrr/valid.txt")
-    test_path = path.join(base_dir, "data/wnrr/test.txt")
-    rules_path = path.join(base_dir, "data/wnrr/anyburl-rules-c5-3600")
+    train_path = path.join(base_dir, path.join("data", "wnrr", "train.txt"))
+    filter_path = path.join(base_dir, path.join("data", "wnrr", "valid.txt"))
 
-    testing_dir = path.join(base_dir, "local/testing")
+    test_path = path.join(base_dir, path.join("data", "wnrr", "test.txt"))
+    rules_path = path.join(base_dir, path.join("data", "wnrr", "anyburl-rules-c5-3600"))
+
+    testing_dir = path.join(base_dir, path.join("local", "testing"))
 
     if not path.isdir(testing_dir):
         os.mkdir(testing_dir)

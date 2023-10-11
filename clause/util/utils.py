@@ -11,4 +11,4 @@ def get_base_dir():
 
 def get_ab_dir():
     base_dir = get_base_dir()
-    return path.abspath(path.join(base_dir, "bin/AnyBURL-23-1.jar"))
+    return path.abspath(path.join(base_dir, path.join("bin", "AnyBURL-23-1.jar")))
