@@ -1,4 +1,4 @@
-from clause.util.utils import get_ab_dir, get_base_dir
+from clause.util.utils import get_ab_dir, get_base_dir, join_u
 import c_clause
 
 import os
@@ -10,22 +10,22 @@ def test_uc_b_zero_ranking():
     print(get_ab_dir())
 
     base_dir = get_base_dir()
-    train_path = path.join(base_dir, path.join("data", "wnrr", "train.txt"))
-    filter_path = path.join(base_dir, path.join("data", "wnrr", "valid.txt"))
+    train_path = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
+    filter_path = join_u(base_dir, join_u("data", "wnrr", "valid.txt"))
 
-    test_path = path.join(base_dir, path.join("data", "wnrr", "test.txt"))
-    rules_path = path.join(base_dir, path.join("data", "wnrr", "anyburl-rules-c5-3600"))
+    test_path = join_u(base_dir, join_u("data", "wnrr", "test.txt"))
+    rules_path = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
 
-    testing_dir = path.join(base_dir, path.join("local", "testing"))
+    testing_dir = join_u(base_dir, join_u("local", "testing"))
 
     if not path.isdir(testing_dir):
         os.mkdir(testing_dir)
 
 
-    ranking_path = path.join(testing_dir, "test-ranking")
+    ranking_path = join_u(testing_dir, "test-ranking")
 
 
-    conf_path = path.join(testing_dir, "testing-conf")
+    conf_path = join_u(testing_dir, "testing-conf")
 
     #TODO this might work on Windows as path.join should handle it
     eval_config = [
@@ -63,7 +63,7 @@ def test_uc_b_zero_ranking():
 
     # TODO: this wouldnt work on windows probably
     p = Popen(
-        [f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Eval {conf_path}"],
+        f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Eval {conf_path}",
         shell=True,
         stdout=PIPE,
         stderr=PIPE
