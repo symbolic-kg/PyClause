@@ -259,7 +259,7 @@ void tests(){
     // should parse to same representation
     ruleD = ruleFactory->parseAnytimeRule("_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)");
 
-
+    
 
     
     std::cout<<"All tests passed."<<std::endl;
@@ -275,9 +275,13 @@ void timeRanking(){
     ruleFactory->setCreateRuleZ(true);
     ruleFactory->setCreateRuleC(true);
     ruleFactory->setCreateRuleD(true);
-    std::string trainPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/train.txt";
-    std::string filterPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/valid.txt";
-    std::string targetPath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/test.txt";
+    ruleFactory->setCreateRuleXXd(true);
+    ruleFactory->setCreateRuleXXc(true);
+    RuleZ::zConfWeight = 0.01;
+    RuleD::dConfWeight = 0.01;
+    std::string trainPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt";
+    std::string filterPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt";
+    std::string targetPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt";
    
     //test
     TripleStorage target(index);
@@ -292,8 +296,21 @@ void timeRanking(){
     train.read(trainPath);
 
 
-    std::string rulePath = "/home/patrick/Desktop/PyClause/local/debug/wnrr/anyburl-rules-c5-3600";
+    //683 258 0.37774524158125916 /location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)
+    std::unique_ptr<Rule> ruleXXd = ruleFactory->parseAnytimeRule("/location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)");
+    std::string node = "/m/09c7w0";
+    QueryResults preds;
+    //ruleXXd->predictHeadQuery(index->getIdOfNodestring(node), train, preds);
+    std::set<Triple> predictions;
+    ruleXXd->setTrackInMaterialize(true);
+    predictions = ruleXXd->materialize(train);
+    //TODO: test
+    
+
+
+    std::string rulePath = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600";
     RuleStorage rules(index, ruleFactory);
+    std::cout<<"here";
     rules.readAnyTimeFormat(rulePath, true); 
 
     ApplicationHandler ranker;
@@ -312,97 +329,18 @@ void timeRanking(){
     std::cout << "Overall Execution time: " << duration.count() << " seconds." << std::endl;
 
 
+   
+
+
 
 }
-
-// void checkRuntimes(){
-
-//     int numRelations = 2;
-//     int numNodes = 5;
-
-//     RelNodeToNodes relHeadToTails;
-//     relHeadToTails[0][1].insert(2);
-// 	relHeadToTails[0][1].insert(3);
-//     relHeadToTails[1][1].insert(3);
-// 	relHeadToTails[1][2].insert(1);
-// 	relHeadToTails[1][2].insert(3);
-
-//     // invert htt -> tth
-//     RelNodeToNodes relTailToHeads;
-//     for (auto& itRelHeadToTails: relHeadToTails) {
-//         for (auto& itHeadToTails: itRelHeadToTails.second) {
-//             for (auto& tail : itHeadToTails.second){
-//                 relTailToHeads[itRelHeadToTails.first][tail].insert(itHeadToTails.first);
-//             }
-//         }
-//     }
-//     ///////////////////////////////////////////////////////////
-
-//     RelationalCSR rcsr = RelationalCSR(numRelations, numNodes, relHeadToTails, relTailToHeads);
-
-//     Nodes* nodes = rcsr.getTforHR(2,1);
-//     for (auto itr = nodes->begin(); itr != nodes->end(); itr++)
-//     {
-//         std::cout << *itr << " ";
-//     }
-//     std::cout << "\n";
-
-//     int* begin;
-//     int length;
-//     rcsr.getTforHREfficient(2, 1, begin, length);
-//     for (int i = 0; i < length; i++){
-//         std::cout << begin[i] << " ";
-//     }
-//     std::cout << "\n";
-
-//     ////////////////// runtime tests (test task: sum of nodeids) /////////////////////////////
-
-
-//     int n = 10000000;
-
-//     auto start = std::chrono::high_resolution_clock::now();
-//     int test_v = 0;
-//     for (int i = 0; i < n; i++){
-//         Nodes* nodes = rcsr.getTforHR(2,1);
-//         for (auto itr = nodes->begin(); itr != nodes->end(); itr++){
-//             test_v += *itr;
-//         }
-//     }
-//     auto finish = std::chrono::high_resolution_clock::now();
-// 	auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
-//     std::cout << "getTforHR " << milliseconds.count() << " ms\n";
-
-//     start = std::chrono::high_resolution_clock::now();
-//     test_v = 0;
-//     for (int i = 0; i < n; i++){
-//         int* begin;
-//         int length;
-//         rcsr.getTforHREfficient(2, 1, begin, length);
-//         for (int i = 0; i < length; i++){
-//             test_v += begin[i];
-//         }
-//     }
-//     finish = std::chrono::high_resolution_clock::now();
-// 	milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
-//     std::cout << "getTforHREfficient " << milliseconds.count() << " ms\n";
-
-//     start = std::chrono::high_resolution_clock::now();
-//     test_v = 0;
-//     for (int i = 0; i < n; i++){
-//         for (auto& it : relHeadToTails[1][2]){
-//             test_v += it;
-//         }
-//     }
-//     finish = std::chrono::high_resolution_clock::now();
-// 	milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
-//     std::cout << "mapOfMapOfMap " << milliseconds.count() << " ms\n";
-// }
 
 
 int main(){
     //checkRuntimes();
-    tests();
     timeRanking();
+    tests();
+   
     exit(0);
 
 

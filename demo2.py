@@ -68,7 +68,6 @@ options = {
     "filter_w_target": "true",
     "disc_at_least":"100", ## -1 for off, must not be bigger than topk
     # rule options 
-   
     "rule_b_max_branching_factor": "-1",
     "use_zero_rules": "true",
     "rule_zero_weight":"0.01",
@@ -76,6 +75,8 @@ options = {
     "use_b_rules": "true",
     "use_u_d_rules": "true",
     "rule_u_d_weight":"0.01",
+    "use_u_xxc_rules": "true",
+    "use_u_xxd_rules": "true",
     "tie_handling": "frequency"
 }
 

@@ -26,6 +26,8 @@ public:
     void setCreateRuleC(bool ind);
     void setCreateRuleZ(bool ind);
     void setCreateRuleD(bool ind);
+    void setCreateRuleXXd(bool ind);
+    void setCreateRuleXXc(bool ind);
 
 private:
     std::shared_ptr<Index> index;
@@ -33,6 +35,8 @@ private:
     bool createRuleB = true;
     bool createRuleC = true;
     bool createRuleD = true;
+    bool createRuleXXd = true;
+    bool createRuleXXc = true;
 };
 
 

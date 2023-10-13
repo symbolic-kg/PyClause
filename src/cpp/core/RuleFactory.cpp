@@ -16,26 +16,102 @@ RuleFactory::RuleFactory(std::shared_ptr<Index> index){
 
 
 std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
-
-    if(rule.find(_cfg_prs_equalityToken) != std::string::npos) {
-    //std::cout << "Found me_myself_i, skipping." << std::endl;
-    return nullptr;
-    }
-
     std::string ruleType;
-
     std::vector<std::string> headBody = util::splitString(rule, _cfg_prs_ruleSeparator);
     std::string headAtomStr = headBody[0];
-    
+    // parse head
+    strAtom headAtom;
+    parseAtom(headAtomStr, headAtom);
+    // set head relation
+    int relID = index->getIdOfRelationstring(headAtom[0]);
+    std::vector<int> relations = {relID};
+    std::vector<bool> directions; 
+    // UXX rule
+    if(rule.find(_cfg_prs_equalityToken) != std::string::npos) {
+        if (headAtomStr.find(_cfg_prs_equalityToken) != std::string::npos ){
+            if (headBody.size()==1){
+                // no body
+                //std::cout<<"UxxZ " + rule<<std::endl;
+                return nullptr;
+            }
+            bool predictHead=true;
+            bool predictTail=true;
+
+            // parse body
+            strAtom bodyAtom;
+            std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], _cfg_prs_atomSeparator);
+            
+            size_t length = bodyAtomsStr.size();
+            if (length>1){
+                throw std::runtime_error("Cannot parse longer Uxx rule: " + rule);
+            } 
+            if (bodyAtomsStr[0].find(_cfg_prs_equalityToken) != std::string::npos){
+                //std::cout<<"me_myself in  head and body, skipping";
+                return nullptr;
+            }
+            parseAtom(bodyAtomsStr[0], bodyAtom);
+            relations.push_back(index->getIdOfRelationstring(bodyAtom[0]));
+            // special parsing from AnyBURL rules
+            // direction and head tail usability is independent of type UXXd and UXXc
+            if (headAtom[1] ==_cfg_prs_equalityToken && headAtom[2][0] ==_cfg_prs_anyTimeVars.back()){
+                // head:  h(me_myself, Y);
+                // we treat the head as h(X,X)  and track that it only predicts head queries
+                predictTail = false;
+                if (bodyAtom[1][0]==_cfg_prs_anyTimeVars.back()){
+                    // body b(Y,A) we treat it as b(X,A) regarding the direction
+                    directions.push_back(true);
+                }else if (bodyAtom[2][0]==_cfg_prs_anyTimeVars.back()){
+                    directions.push_back(false);
+                }else{
+                    throw std::runtime_error("Could not understand this rule: " + rule);
+                }
+            } else if (headAtom[1][0] ==_cfg_prs_anyTimeVars[0] && headAtom[2] ==_cfg_prs_equalityToken){
+                // head:  "h(X, my_myself)";
+                predictHead = false;
+                if (bodyAtom[1][0]==_cfg_prs_anyTimeVars[0]){
+                    directions.push_back(true);
+                }else if (bodyAtom[2][0]==_cfg_prs_anyTimeVars[0]){
+                    directions.push_back(false);
+                }else{
+                    throw std::runtime_error("Could not understand this rule: " + rule);
+                }
+            }else{
+                throw std::runtime_error("Could not understand this rule: " + rule);
+            }
+
+            // check for particular rule type  UXXc: constant is in body; UXXd: no constant
+            symAtom symBodyAtom;
+            parseSymAtom(bodyAtom, symBodyAtom);
+
+            // UXXc rule
+            if (symBodyAtom.containsConstant){
+                if (createRuleXXc){
+                     std::unique_ptr<Rule> ruleXXc = std::make_unique<RuleXXc>(relations, directions, symBodyAtom.constant);
+                    ruleXXc->setPredictHead(predictHead);
+                    ruleXXc->setPredictTail(predictTail);
+                    return std::move(ruleXXc);
+                } else {
+                      return nullptr;
+                }
+            }else{
+                // Uxxd rule
+                if (createRuleXXd){
+                    std::unique_ptr<Rule> ruleXXd = std::make_unique<RuleXXd>(relations, directions);
+                    ruleXXd->setPredictHead(predictHead);
+                    ruleXXd->setPredictTail(predictTail);
+                    return std::move(ruleXXd);
+                }else{
+                    return nullptr;
+                }   
+            }
+        }else{
+            //std::cout<<"myself in body, skipping"<<std::endl;
+            return nullptr;
+        }
+    }
     // no body
     if (headBody.size()==1){
         ruleType = "RuleZ";
-        // parse head
-        strAtom headAtom;
-        parseAtom(headAtomStr, headAtom);
-        // set head relation
-        int relID = index->getIdOfRelationstring(headAtom[0]);
-        std::vector<int> relations = {relID};
         symAtom sym;
         parseSymAtom(headAtom, sym);
         if (createRuleZ){
@@ -49,13 +125,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
     std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], _cfg_prs_atomSeparator);
     size_t length = bodyAtomsStr.size();
 
-    // parse head
-    strAtom headAtom;
-    parseAtom(headAtomStr, headAtom);
-    // set head relation
-    int relID = index->getIdOfRelationstring(headAtom[0]);
-    std::vector<int> relations = {relID};
-    std::vector<bool> directions; 
+  
     bool leftC;
     std::array<int, 2> constants;
 
@@ -296,6 +366,14 @@ void RuleFactory::setCreateRuleZ(bool ind){
 
 void RuleFactory::setCreateRuleD(bool ind){
     createRuleD = ind;
+}
+
+void RuleFactory::setCreateRuleXXd(bool ind){
+    createRuleXXd = ind;
+}
+
+void RuleFactory::setCreateRuleXXc(bool ind){
+    createRuleXXc = ind;
 }
 
 

@@ -86,6 +86,14 @@ bool Rule::predictTailQuery(int head, TripleStorage& triples, QueryResults& tail
     throw std::runtime_error("Not implemented yet.");
 }
 
+
+void Rule::setPredictHead(bool ind){
+   throw std::runtime_error("Not implemented yet.");
+}
+void Rule::setPredictTail(bool ind){
+    throw std::runtime_error("Not implemented yet.");
+}
+
 void Rule::setConfWeight(double weight){
     confWeight = weight;
 }
@@ -569,6 +577,13 @@ std::set<Triple> RuleZ::materialize(TripleStorage& triples){
 
 
 // ***RuleD implementation*** 
+// a rule with a constant and a dangling atom
+// h(X,d) <-- b1(X,A), b2(A,B), b3(B,C)
+//  leftC=false, relations=[h, b1, b2, b3], directions=[1,1,1]
+// h(d,Y) <-- b1(A,B), b2(B,C), b3(C,Y)
+// leftC=true, relations=[h, b1, b2, b3], directions=[1,1,1]
+// h(d,Y) <-- b1(A,B), b2(C,D), b3(Y,C)
+// leftC=true, relations=[h, b1, b2, b3], directions=[1,0,0]
 
 double RuleD::dConfWeight = 1;
 int RuleD::branchingFactor = -1;
@@ -766,7 +781,6 @@ bool RuleD::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
         Index* index = triples.getIndex();
         bool predicted = false;
         for (int i=0; i<index->getNodeSize(); i++){
-            
             int bodyRel = relations[1];
             int* begin;
             int length;
@@ -881,6 +895,184 @@ bool RuleD::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& t
     }
     
 }
+
+// RuleXXd
+
+RuleXXd::RuleXXd(std::vector<int>& relations, std::vector<bool>& directions) {
+    if(relations.size() > 2) {
+        throw std::invalid_argument("'Cannot construct longer UXX_d rules-");
+    }
+    if (directions.size()!=1){
+        throw std::invalid_argument("Something wrong with this UXXd rule.");
+
+    }
+    this->relations=relations; 
+    this->directions=directions;
+    this->targetRel=relations[0];
+
+    // only used and set after a rule is contructed and parsed from AnyBURL rule files
+    this->predictHead = true;
+    this->predictHead = true;
+}
+
+void RuleXXd::setPredictHead(bool ind){
+    this->predictHead = ind;
+}
+void RuleXXd::setPredictTail(bool ind){
+    this->predictTail = ind;
+}
+
+bool RuleXXd::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet){
+    // h(X,X) <-- b(X,A)
+    // h(X,X) <-- b(A,X)
+    if (!predictHead){
+        return false;
+    }
+    int length;
+    int* begin;
+    int bodyRel = this->relations[1];
+    directions[0] ? triples.getTforHR(tail, bodyRel, begin, length) :  triples.getHforTR(tail, bodyRel, begin, length);
+    if (length>0 && !filterSet.contains(tail)){
+        headResults.insertRule(tail, this);
+        return true;
+    }
+    return false;
+}
+
+
+bool RuleXXd::predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){
+    // h(X,X) <-- b(X,A)
+    // h(X,X) <-- b(A,X)
+    if (!predictTail){
+        return false;
+    }
+    int length;
+    int* begin;
+    
+    int bodyRel = this->relations[1];
+    directions[0] ? triples.getTforHR(head, bodyRel, begin, length) :  triples.getHforTR(head, bodyRel, begin, length);
+    if (length>0 && !filterSet.contains(head)){
+        tailResults.insertRule(head, this);
+        return true;
+    }
+    return false;
+}
+
+std::set<Triple> RuleXXd::materialize(TripleStorage& triples){
+    // h(X,X) <-- b(X,A)
+    // h(X,X) <-- b(A,X)
+    std::set<Triple> predictions;
+    Index* index = triples.getIndex();
+    for (int i=0; i<index->getNodeSize(); i++){
+        int bodyRel = relations[1];
+        int* begin;
+        int length;
+        directions[0] ? triples.getTforHR(i, bodyRel, begin, length) : triples.getHforTR(i, bodyRel, begin, length);
+        if (length>0){
+            Triple triple = {i, targetRel, i};
+            auto isNew = predictions.insert(triple);
+            if (trackInMaterialize && isNew.second){
+                predicted+=1;
+                if (triples.contains(triple[0], triple[1], triple[2])){
+                    cpredicted += 1;
+                }
+            }
+        }
+    }
+    return predictions;
+}
+
+
+
+//RuleXXc
+
+RuleXXc::RuleXXc(std::vector<int>& relations, std::vector<bool>& directions, int& constant) {
+    if(relations.size() > 2) {
+        throw std::invalid_argument("'Cannot construct longer UXX_d rules-");
+    }
+    if (directions.size()!=1){
+        throw std::invalid_argument("Something wrong with this UXXd rule.");
+
+    }
+    this->relations=relations; 
+    this->directions=directions;
+    this->targetRel=relations[0];
+    this->constant = constant;
+
+    // only used and set after a rule is contructed and parsed from AnyBURL rule files
+    this->predictHead = true;
+    this->predictHead = true;
+}
+
+
+
+bool RuleXXc::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet){
+    // h(X,X) <-- b(X,d)
+    // h(X,X) <-- b(d,X)
+    if (!predictHead){
+        return false;
+    }
+    int length;
+    int* begin;
+    int bodyRel = this->relations[1];
+    directions[0] ? triples.getTforHR(tail, bodyRel, begin, length) :  triples.getHforTR(tail, bodyRel, begin, length);
+    int* end = begin + length;
+    if (std::find(begin, end, constant)!= end && !filterSet.contains(tail)){
+        headResults.insertRule(tail, this);
+        return true;
+    }
+    return false;
+}
+
+
+bool RuleXXc::predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){
+    // h(X,X) <-- b(X,d)
+    // h(X,X) <-- b(d,X)
+    if (!predictTail){
+        return false;
+    }
+    int length;
+    int* begin;
+    int bodyRel = this->relations[1];
+    directions[0] ? triples.getTforHR(head, bodyRel, begin, length) :  triples.getHforTR(head, bodyRel, begin, length);
+    int* end = begin + length;
+    if (std::find(begin, end, constant)!= end && !filterSet.contains(head)){
+        tailResults.insertRule(head, this);
+        return true;
+    }
+    return false;
+}
+
+
+void RuleXXc::setPredictHead(bool ind){
+    this->predictHead = ind;
+}
+void RuleXXc::setPredictTail(bool ind){
+    this->predictTail = ind;
+}
+
+
+std::set<Triple> RuleXXc::materialize(TripleStorage& triples){
+    // h(X,X) <-- b(X,d)
+    // h(X,X) <-- b(d,X)
+    std::set<Triple> predictions;
+    int bodyRel = relations[1];
+    int* begin;
+    int length;
+    directions[0] ? triples.getHforTR(constant, bodyRel, begin, length) : triples.getTforHR(constant, bodyRel, begin, length);
+    for (int i=0; i<length; i++){
+        Triple triple = {begin[i], targetRel, begin[i]};
+        auto isNew = predictions.insert(triple);
+        if (trackInMaterialize && isNew.second){
+            predicted+=1;
+            if (triples.contains(triple[0], triple[1], triple[2])){
+                cpredicted += 1;
+            }
+        }
+    }
+    return predictions;
+}
+
 
 
 

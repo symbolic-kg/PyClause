@@ -63,6 +63,12 @@ public:
 	void setTrackInMaterialize(bool val);
 	void setConfWeight(double weight);
 	void setRuleString(std::string str);
+
+	// only used for Uxxd Uxxc rules when particularly parsed from Anyburl rule files
+	virtual void setPredictHead(bool ind);
+	virtual void setPredictTail(bool ind);
+	bool predictHead;
+	bool predictTail;
 	
 protected:
 	int ID;
@@ -89,6 +95,8 @@ protected:
 	std::vector<bool> directions;
 	
 	int targetRel;
+
+	
 private:
 
 };
@@ -231,9 +239,6 @@ public:
 	bool predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
-
-
-
 private:
 	bool leftC;
 	int constant;
@@ -245,6 +250,36 @@ private:
 		Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs
 	);
 };
+
+
+class RuleXXd: public Rule
+{
+public:
+	RuleXXd(std::vector<int>& relations, std::vector<bool>& directions);
+	void setPredictHead(bool ind);
+	void setPredictTail(bool ind);
+	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
+	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+	std::set<Triple> materialize(TripleStorage& triples);
+private:
+
+};
+
+
+class RuleXXc: public Rule
+{
+public:
+	RuleXXc(std::vector<int>& relations, std::vector<bool>& directions, int& constant);
+	void setPredictHead(bool ind);
+	void setPredictTail(bool ind);
+	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
+	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+	std::set<Triple> materialize(TripleStorage& triples);
+private:
+	int constant;
+
+};
+
 
 
 #endif // RULE_H
