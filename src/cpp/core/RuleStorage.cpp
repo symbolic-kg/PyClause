@@ -56,6 +56,8 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
             // }
         }
         std::cout<<"Loaded "<<currID<<" rules."<<std::endl;
+    }else{
+         throw std::ios_base::failure("Could not open rule file: " + path + " is the path correct?");
     }
 };
 
