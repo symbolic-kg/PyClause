@@ -251,19 +251,45 @@ void tests(){
     // should parse to: _member_meronym(08176077,Y) <= _has_part(A,B), _has_part(B,Y)     [A,B are flipped]
     ruleD = ruleFactory->parseAnytimeRule("_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)");
     ruleD->setTrackInMaterialize(true);
-
     matPreds = ruleD->materialize(data);
     size = matPreds.size();
-
     // 	_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)
     // should parse to same representation
     ruleD = ruleFactory->parseAnytimeRule("_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)");
 
-    
+
+    // *** FB15k-237 Uxx rules ***
+    std::shared_ptr<Index> index237 = std::make_shared<Index>();
+    std::string dataPath237 = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt";
+    std::shared_ptr<RuleFactory> ruleFactory237 = std::make_shared<RuleFactory>(index237);
+    TripleStorage data237(index237);
+    data237.read(dataPath237);
+
+
+
+    //683 258 0.37774524158125916 /location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)
+    std::unique_ptr<Rule> ruleXXd = ruleFactory237->parseAnytimeRule("/location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)");
+    std::set<Triple> predictions;
+    ruleXXd->setTrackInMaterialize(true);
+    predictions = ruleXXd->materialize(data237); 
+    stats = ruleXXd -> getStats(true);  
+    if (!(stats[0]==683 && stats[1]==258)){
+        throw std::runtime_error("Test 24 for Uxxd rule materialize failed.");
+    } 
+
+    //67	6	 /dataworld/gardening_hint/split_to(me_myself_i,Y) <= /education/educational_institution/students_graduates./education/education/major_field_of_study(Y,/m/01lj9)
+    std::unique_ptr<Rule> ruleXXc = ruleFactory237->parseAnytimeRule("/dataworld/gardening_hint/split_to(me_myself_i,Y) <= /education/educational_institution/students_graduates./education/education/major_field_of_study(Y,/m/01lj9)");
+    std::cout<<"All tests passed."<<std::endl;
+    ruleXXc->setTrackInMaterialize(true);
+    predictions = ruleXXc->materialize(data237);
+    stats = ruleXXc -> getStats(true);  
+    if (!(stats[0]==67 && stats[1]==6)){
+        throw std::runtime_error("Test 25 for Uxxc rule materialize failed.");
+    } 
+
+}
 
     
-    std::cout<<"All tests passed."<<std::endl;
-}
 
 
 void timeRanking(){
@@ -337,9 +363,10 @@ void timeRanking(){
 
 
 int main(){
+    tests();
     //checkRuntimes();
     timeRanking();
-    tests();
+    
    
     exit(0);
 

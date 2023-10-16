@@ -13,8 +13,6 @@ RuleFactory::RuleFactory(std::shared_ptr<Index> index){
 }
 
 
-
-
 std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
     std::string ruleType;
     std::vector<std::string> headBody = util::splitString(rule, _cfg_prs_ruleSeparator);
@@ -30,8 +28,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
     if(rule.find(_cfg_prs_equalityToken) != std::string::npos) {
         if (headAtomStr.find(_cfg_prs_equalityToken) != std::string::npos ){
             if (headBody.size()==1){
-                // no body
-                //std::cout<<"UxxZ " + rule<<std::endl;
+                // no body this would be a UxxZero rule, it is an artefact and we do not process it
                 return nullptr;
             }
             bool predictHead=true;
@@ -46,7 +43,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
                 throw std::runtime_error("Cannot parse longer Uxx rule: " + rule);
             } 
             if (bodyAtomsStr[0].find(_cfg_prs_equalityToken) != std::string::npos){
-                //std::cout<<"me_myself in  head and body, skipping";
+                //me_myself in  head and body we do not process this
                 return nullptr;
             }
             parseAtom(bodyAtomsStr[0], bodyAtom);
@@ -105,7 +102,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
                 }   
             }
         }else{
-            //std::cout<<"myself in body, skipping"<<std::endl;
+            //me_myself in body we do not process this
             return nullptr;
         }
     }

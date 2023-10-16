@@ -55,7 +55,7 @@ int Index::getIdOfRelationstring(std::string& relation) {
 		return it->second;
 	}
 	else {
-		throw std::runtime_error(("Error: Relation " + relation + " not found in Trainingset"));
+		throw std::runtime_error(("Error: Relation " + relation + " not found in index"));
 	}
 }
 
