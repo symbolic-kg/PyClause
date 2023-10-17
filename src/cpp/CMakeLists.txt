@@ -16,7 +16,7 @@ include(CPack)
 
 add_library(
     rules_backend SHARED core/myClass.cpp core/Index.cpp core/Rule.cpp core/TripleStorage.cpp
-    core/Util.hpp core/RuleStorage.cpp core/Globals.cpp features/Application.cpp Api.cpp core/QueryResults.cpp
+    core/Util.hpp core/RuleStorage.cpp core/Globals.cpp features/Application.cpp api/Api.cpp core/QueryResults.cpp
     core/RuleFactory.cpp
 )
 

@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "src/cpp/Api.h"
+#include "src/cpp/api/Api.h"
 #include "src/cpp/core/myClass.h"
 #include <string>
 
@@ -57,14 +57,6 @@ PYBIND11_MODULE(c_clause, m) {
 
     py::class_<RuleHandler>(m, "RuleHandler") 
         .def(py::init<std::string>())
-        .def
-        (
-            "calcStats", &RuleHandler::calcStats, 
-            R"pbdoc(
-                Given a string rule returns two integers. 
-                The first denotes the (exact) number of  predictions, the second the (exact) number of true predictions.
-            )pbdoc" 
-        )
         .def(
             "calcRulesPredictions", &RuleHandler::calcRulesPredictions,
             R"pbdoc(

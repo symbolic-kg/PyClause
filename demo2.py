@@ -28,16 +28,6 @@ ranking_file = "./local/rankingFile.txt"
 #calcStats returns list[num_pred, num_correct_pred]
 
 handler = c_clause.RuleHandler(train)
-print(handler.calcStats("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)"))
-print(handler.calcStats("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)"))
-
-testHandler = c_clause.RuleHandler(target)
-print(testHandler.calcStats("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)"))
-
-print(handler.calcStats("_hypernym(X,06355894) <= "))
-
-
-
 print("Get predictions")
 rules_list = [
     "_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)",

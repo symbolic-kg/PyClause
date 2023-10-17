@@ -68,7 +68,7 @@ ext_modules = [
 
   Extension(
     'c_clause', # needs to match module name in cpp bindings
-    ['bindings.cpp'] + glob("src/cpp/core/*.cpp") + glob("src/cpp/features/*.cpp") + glob("src/cpp/*.cpp"),
+    ['bindings.cpp'] + glob("src/cpp/core/*.cpp") + glob("src/cpp/features/*.cpp") + glob("src/cpp/*.cpp") + glob("src/cpp/api/*.cpp"),
     include_dirs=[
       pybind11.get_include(False),
       pybind11.get_include(True ),

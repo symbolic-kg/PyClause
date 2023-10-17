@@ -6,6 +6,27 @@
 #include <string>
 
 
+//*** BackendHandler ***
+
+BackendHandler::BackendHandler(){
+    index = std::make_shared<Index>();
+    ruleFactory = std::make_shared<RuleFactory>(index);
+    data = std::make_unique<TripleStorage>(index);
+    rules = std::make_unique<RuleStorage>(index, ruleFactory);
+}
+
+void BackendHandler::loadData(std::string path){
+    data->read(path); 
+}
+
+void BackendHandler::loadRules(std::string path){
+    rules->readAnyTimeFormat(path, true);
+
+
+}
+
+
+
 // *** Ranking handler ***
 void RankingHandler::calculateRanking(
         std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write,
@@ -120,8 +141,6 @@ void RankingHandler::setRuleOptions(std::map<std::string, std::string> options, 
     }
 }
 
-
-
 // ***RuleHandler***
 
 RuleHandler::RuleHandler(std::string dataPath){
@@ -132,15 +151,6 @@ RuleHandler::RuleHandler(std::string dataPath){
 
 }
 
-std::array<int,2> RuleHandler::calcStats(std::string ruleStr){
-    std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(ruleStr);
-    // reset the exact stats, actually not needed as rule was just created
-    rule->setStats(0, 0, true);
-    rule->setTrackInMaterialize(true);
-    //you could collect the data here
-    rule->materialize(*data);
-    return rule->getStats(true);   
-}
 
 std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std::array<int,2>>> RuleHandler::calcRulesPredictions(std::vector<std::string> stringRules, bool retPredictions, bool retStats){
     //TODO: remove timing
@@ -151,6 +161,10 @@ std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std:
 
     if (retPredictions){
          preds.resize(stringRules.size());
+    }
+
+    if (retStats){
+        stats.resize(stringRules.size());
     }
 
     #pragma omp parallel
@@ -178,7 +192,7 @@ std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std:
             if (retStats){
                 #pragma omp critical
                 {
-                     stats.push_back(rule->getStats(true));
+                     stats.at(i) = rule->getStats(true);
                 } 
             }
 
