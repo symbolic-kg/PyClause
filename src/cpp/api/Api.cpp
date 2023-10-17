@@ -16,7 +16,11 @@ BackendHandler::BackendHandler(){
 }
 
 void BackendHandler::loadData(std::string path){
+    if (loadedData){
+        throw std::runtime_error("Please load the data only once or use a new handler.");
+    }
     data->read(path); 
+    loadedData = true;
 }
 
 void BackendHandler::loadRules(std::string path){

@@ -1,7 +1,6 @@
 #ifndef API_H
 #define API_H
 
-#include "../core/myClass.h"
 #include "../core/Index.h"
 #include "../core/TripleStorage.h"
 #include "../core/Rule.h"
@@ -24,13 +23,16 @@ public:
     void loadData(std::string path);
     void loadRules(std::string path);
 private:
+protected:
     std::shared_ptr<Index> index;
     // data aka train where rule application is performed
     std::unique_ptr<TripleStorage> data;
-
     std::shared_ptr<RuleFactory> ruleFactory;
-
     std::unique_ptr<RuleStorage> rules;
+
+    // handling
+    bool loadedData = false;
+
     
 
 };

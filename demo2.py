@@ -44,6 +44,11 @@ preds = handler.calcRulesPredictions(rules_list, True, True)
 end = time.time()
 print(f"All time (+serialization) was {end-start} seconds")
 
+handlerNew = c_clause.RulesHandler()
+handlerNew.load_data(train)
+predsNew = handlerNew.stats_and_predictions(rules_list, True, True)
+exit()
+
 
 
 

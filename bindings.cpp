@@ -1,7 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include "src/cpp/api/Api.h"
-#include "src/cpp/core/myClass.h"
+#include "src/cpp/api/RulesHandler.h"
 #include <string>
 
 // *Example* 
@@ -41,19 +41,12 @@ PYBIND11_MODULE(c_clause, m) {
         Some other explanation about the subtract function.
     )pbdoc");
 
-    py::class_<myClass>(m, "myClass")
-        .def(py::init<std::string>())
-        .def("addOne", &myClass::addOne)
-        .def("getNumber", &myClass::getNumber)
-        .def("sumRange", &myClass::addRange) //name does not matter
-    ;
-
     // **backend bindings**
     py::class_<RankingHandler>(m, "RankingHandler") 
         .def(py::init<>())
         .def("calculateRanking", &RankingHandler::calculateRanking)
         .def("getRanking", &RankingHandler::getRanking)
-    ;
+    ; //class end
 
     py::class_<RuleHandler>(m, "RuleHandler") 
         .def(py::init<std::string>())
@@ -68,7 +61,20 @@ PYBIND11_MODULE(c_clause, m) {
         
         
         )
-    ;
+    ; //class end
+    py::class_<RulesHandler>(m, "RulesHandler") 
+        .def(py::init<>())
+        .def(
+            "stats_and_predictions", &RulesHandler::calcRulesPredictions,
+            R"pbdoc(
+                Given a string rule calculates all stats and predictions of rules. 
+                args: string:rulestring; bool returnPredictions: if true return predictions; bool returnStats: if true returns exact stats.
+                returns: tuple where tuple[0] are the predictions , tuple[1][0] are number of exact predictions tuple[1][1] number of true predictions.
+
+            )pbdoc" 
+        )
+        .def("load_data", &RulesHandler::loadData)
+    ; //class end
 }
 
 

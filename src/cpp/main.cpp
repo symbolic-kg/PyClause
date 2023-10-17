@@ -5,7 +5,6 @@
 #include <chrono>
 #include <numeric>
 
-#include "core/myClass.h"
 #include "core/Index.h"
 #include "core/TripleStorage.h"
 #include "core/Rule.h"
@@ -370,14 +369,6 @@ int main(){
    
     exit(0);
 
-
-
-
-
-    myClass ob("peter"); 
-    long start = 1;
-    long end = 100000;
-    std::cout<<ob.addRange(start,end)<<"\n";
 
     // data loading
     std::shared_ptr<Index> index = std::make_shared<Index>();
