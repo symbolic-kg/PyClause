@@ -56,9 +56,12 @@ def test_uc_b_zero_ranking():
     "use_b_rules": "True",
     }
 
-    ranker = c_clause.RankingHandler()
-    ranker.calculateRanking(test_path, train_path, filter_path, rules_path, ranking_path, options)
 
+    ranker = c_clause.RankingHandler(options)
+    ranker.load_datasets(test_path, train_path, filter_path)
+    ranker.load_rules(rules_path)
+    ranker.calc_ranking()
+    ranker.write_ranking(ranking_path)
 
     p = Popen(
         f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Eval {conf_path}",
@@ -139,9 +142,12 @@ def test_237_all_ranking():
     "use_u_xxd_rules": "True",
     }
 
-    ranker = c_clause.RankingHandler()
-    ranker.calculateRanking(test_path, train_path, filter_path, rules_path, ranking_path, options)
 
+    ranker = c_clause.RankingHandler(options)
+    ranker.load_datasets(test_path, train_path, filter_path)
+    ranker.load_rules(rules_path)
+    ranker.calc_ranking()
+    ranker.write_ranking(ranking_path)
 
     p = Popen(
         f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Eval {conf_path}",

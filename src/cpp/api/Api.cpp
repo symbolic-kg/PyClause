@@ -24,96 +24,16 @@ void BackendHandler::loadData(std::string path){
 }
 
 void BackendHandler::loadRules(std::string path){
+    if (!loadedData){
+         throw std::runtime_error("Please load the data first.");
+    }
     rules->readAnyTimeFormat(path, true);
 
 
 }
 
 
-
-// *** Ranking handler ***
-void RankingHandler::calculateRanking(
-        std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write,
-        std::map<std::string,std::string> options
-    ){
-    
-    std::shared_ptr<Index> index = std::make_shared<Index>();    
-    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
-    setRankingOptions(options);
-    setRuleOptions(options, *ruleFactory);
-    std::cout<<"Load data... \n";
-
-    // data loading
-   
-    //test
-    TripleStorage test(index);
-    test.read(targetPath);
-
-
-    //valid 
-    TripleStorage valid(index);
-    valid.read(filterPath);
-
-
-    TripleStorage data(index);
-    data.read(trainPath);
-
-    std::cout<<"Data loaded. \n";
-    std::cout<<"Loading rules.... \n";
-
-
-    
-    RuleStorage rules(index, ruleFactory);
-    rules.readAnyTimeFormat(rulesPath, true);
-    ranker.makeRanking(test, data, rules, valid);
-
-    if (!write.empty()){
-        ranker.writeRanking(test, write);
-    }
-}
-
-std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> RankingHandler::getRanking(std::string headOrTail){
-    if (headOrTail=="head"){
-        return ranker.getHeadQcandsConfs();
-    }else if (headOrTail=="tail"){
-        return ranker.getTailQcandsConfs();
-    }else{
-        throw std::runtime_error("Please specify 'head' or 'tail' as last argument of getRanking");
-    }
-}
-
-void RankingHandler::setRankingOptions(std::map<std::string, std::string> options){
-    
-
-    // register options for ranker
-
-     struct OptionHandler {
-        std::string name;
-        std::function<void(std::string)> setter;
-    };
-
-    std::vector<OptionHandler> handlers = {
-        {"topk", [this](std::string val) { ranker.setTopK(std::stoi(val)); }},
-        {"num_preselect", [this](std::string val) { ranker.setNumPreselect(std::stoi(val)); }},
-        {"aggregation_function", [this](std::string val) { ranker.setAggregationFunc(val); }},
-        {"filter_w_train", [this](std::string val) { ranker.setFilterWTrain(util::stringToBool(val)); }},
-        {"filter_w_target", [this](std::string val) { ranker.setFilterWtarget(util::stringToBool(val)); }},
-        {"disc_at_least", [this](std::string val) { ranker.setDiscAtLeast(std::stoi(val)); }},
-        {"tie_handling", [this](std::string val) { ranker.setTieHandling(val); }}
-    };
-
-    for (auto& handler : handlers) {
-        auto opt = options.find(handler.name);
-        if (opt != options.end()) {
-            if (_cfg_verbose){
-                std::cout<< "Setting option "<<handler.name<<" to: "<<opt->second<<std::endl;
-            }
-            handler.setter(opt->second);
-        }
-    }
-}
-
-void RankingHandler::setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory){
+void BackendHandler::setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory){
     
 
     // rule options:  individual rule options and options of which rules to use
@@ -132,6 +52,37 @@ void RankingHandler::setRuleOptions(std::map<std::string, std::string> options, 
         {"use_u_d_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleD(util::stringToBool(val));}},
         {"use_u_xxc_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXc(util::stringToBool(val));}},
         {"use_u_xxd_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXd(util::stringToBool(val));}}
+    };
+
+    for (auto& handler : handlers) {
+        auto opt = options.find(handler.name);
+        if (opt != options.end()) {
+            if (_cfg_verbose){
+                std::cout<< "Setting option "<<handler.name<<" to: "<<opt->second<<std::endl;
+            }
+            handler.setter(opt->second);
+        }
+    }
+}
+
+void BackendHandler::setRankingOptions(std::map<std::string, std::string> options, ApplicationHandler& ranker){
+    
+
+    // register options for ranker
+
+     struct OptionHandler {
+        std::string name;
+        std::function<void(std::string)> setter;
+    };
+
+    std::vector<OptionHandler> handlers = {
+        {"topk", [&ranker](std::string val) { ranker.setTopK(std::stoi(val)); }},
+        {"num_preselect", [&ranker](std::string val) { ranker.setNumPreselect(std::stoi(val)); }},
+        {"aggregation_function", [&ranker](std::string val) { ranker.setAggregationFunc(val); }},
+        {"filter_w_train", [&ranker](std::string val) { ranker.setFilterWTrain(util::stringToBool(val)); }},
+        {"filter_w_target", [&ranker](std::string val) { ranker.setFilterWtarget(util::stringToBool(val)); }},
+        {"disc_at_least", [&ranker](std::string val) { ranker.setDiscAtLeast(std::stoi(val)); }},
+        {"tie_handling", [&ranker](std::string val) { ranker.setTieHandling(val); }}
     };
 
     for (auto& handler : handlers) {
@@ -188,7 +139,7 @@ std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std:
                     std::string tail = index->getStringOfNodeId(triple[2]);
                     #pragma omp critical
                     {
-                        // we now relation from the rule
+                        // we know relation from the rule
                         preds[i].push_back({head ,tail});
                     }
             }

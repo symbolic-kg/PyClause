@@ -2,6 +2,7 @@
 #include <pybind11/stl.h>
 #include "src/cpp/api/Api.h"
 #include "src/cpp/api/RulesHandler.h"
+#include "src/cpp/api/RankingHandler.h"
 #include <string>
 
 // *Example* 
@@ -43,9 +44,12 @@ PYBIND11_MODULE(c_clause, m) {
 
     // **backend bindings**
     py::class_<RankingHandler>(m, "RankingHandler") 
-        .def(py::init<>())
-        .def("calculateRanking", &RankingHandler::calculateRanking)
-        .def("getRanking", &RankingHandler::getRanking)
+        .def(py::init<std::map<std::string, std::string>>())
+        .def("load_datasets", &RankingHandler::loadDatasets)
+        .def("load_rules", &RankingHandler::loadRules)
+        .def("calc_ranking", &RankingHandler::calculateRanking)
+        .def("get_ranking", &RankingHandler::getRanking)
+        .def("write_ranking", &RankingHandler::writeRanking)
     ; //class end
 
     py::class_<RuleHandler>(m, "RuleHandler") 

@@ -33,25 +33,11 @@ protected:
     // handling
     bool loadedData = false;
 
+    void setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory);
+    void setRankingOptions(std::map<std::string, std::string> options, ApplicationHandler& ranker);
+
     
 
-};
-
-
-class RankingHandler{
-public:
-    RankingHandler(){};
-    void calculateRanking(
-        std::string targetPath, std::string trainPath, std::string filterPath, std::string rulesPath, std::string write,
-        std::map<std::string,std::string> options = std::map<std::string, std::string>()
-    );
-    std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> getRanking(std::string headOrTail);
-private:
-    ApplicationHandler ranker;
-    // setable options in frontend for ranking are registered here
-    void setRankingOptions(std::map<std::string,std::string> options);
-    // setable options for individual rule classes (assigned to RuleFactory)
-    void setRuleOptions(std::map<std::string,std::string> options, RuleFactory& ruleFact);
 };
 
 
