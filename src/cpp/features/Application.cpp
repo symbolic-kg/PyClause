@@ -32,7 +32,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
     for (const auto& relQueries : data) {
         int relation = relQueries.first;
 
-        if (_cfg_verbose){
+        if (verbose){
             std::cout<<"Applying rules on relation "<<relation<<" for "<<dirIsTail<<" queries (1 is tail)..."<<std::endl;
         }
         // source to correct target entities
@@ -113,6 +113,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                    if (performAggregation){
                         auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
                         if (rank_aggrFunc=="maxplus"){
+                            // tail/headQcandsConfs is filled here
                             scoreMaxPlus(qResults.getCandRules(), writeResults[relation][source], train);
                         }
                         else{
@@ -149,7 +150,10 @@ void ApplicationHandler::aggregateQueryResults(std::string direction, TripleStor
 // note this does not yet filter with target as ranking is performed query based
 void ApplicationHandler::makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter){
     if (rank_tie_handling=="frequency"){
-        std::cout<<"Calculate entity frequencies..."<<std::endl;
+        if (verbose){
+            std::cout<<"Calculate entity frequencies..."<<std::endl;
+        }
+        
         train.calcEntityFreq();
     }
     calculateQueryResults(target, train, rules, addFilter, true);
@@ -321,4 +325,8 @@ std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& ApplicationHand
 
 void ApplicationHandler::setTieHandling(std::string opt){
     rank_tie_handling = opt;
+}
+
+void ApplicationHandler::setVerbose(bool ind){
+    verbose = ind;
 }

@@ -3,6 +3,7 @@
 #include "src/cpp/api/Api.h"
 #include "src/cpp/api/RulesHandler.h"
 #include "src/cpp/api/RankingHandler.h"
+#include "src/cpp/api/QAHandler.h"
 #include <string>
 
 // *Example* 
@@ -50,6 +51,14 @@ PYBIND11_MODULE(c_clause, m) {
         .def("calc_ranking", &RankingHandler::calculateRanking)
         .def("get_ranking", &RankingHandler::getRanking)
         .def("write_ranking", &RankingHandler::writeRanking)
+    ; //class end
+
+    py::class_<QAHandler>(m, "QAHandler") 
+        .def(py::init<std::map<std::string, std::string>>())
+        .def("load_datasets", &QAHandler::loadDatasets)
+        .def("load_rules", &QAHandler::loadRules)
+        .def("answer_queries", py::overload_cast<std::vector<std::pair<int, int>>, std::string>(&QAHandler::answerQueries))
+        .def("answer_queries", py::overload_cast<std::vector<std::pair<std::string, std::string>>, std::string>(&QAHandler::answerQueries))
     ; //class end
 
     py::class_<RuleHandler>(m, "RuleHandler") 

@@ -76,6 +76,19 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 	
 }
 
+
+void TripleStorage::addIdx(int head, int relation, int tail) {
+	//error handling
+	index->getStringOfNodeId(head);
+	index->getStringOfNodeId(tail);
+	index->getStringOfRelId(relation);
+
+	relHeadToTails[relation][head].insert(tail);
+	relTailToHeads[relation][tail].insert(head);
+	
+}
+
+
 Nodes* TripleStorage::getTforHR(int head, int relation){
 	auto it_rel = relHeadToTails.find(relation);
 	if (it_rel!=relHeadToTails.end()){

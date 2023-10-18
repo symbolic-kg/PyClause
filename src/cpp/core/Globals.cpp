@@ -13,9 +13,6 @@ std::string _cfg_prs_atomSeparator = ", ";
 bool _cfg_exactConf = false;
 int _cfg_nUnseen = 5;
 
-//general
-bool _cfg_verbose = true;
-
 
 
 

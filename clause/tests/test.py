@@ -142,7 +142,6 @@ def test_237_all_ranking():
     "use_u_xxd_rules": "True",
     }
 
-
     ranker = c_clause.RankingHandler(options)
     ranker.load_datasets(test_path, train_path, filter_path)
     ranker.load_rules(rules_path)

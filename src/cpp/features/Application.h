@@ -43,6 +43,7 @@ public:
     void setPerformAggregation(bool ind);
     void setDiscAtLeast(int num);
     void setTieHandling(std::string opt);
+    void setVerbose(bool ind);
 
 
 
@@ -94,6 +95,10 @@ private:
     // random: randomly rank (expect difference results); frequency: rank according to entity frequency (determinstic results)
     // note that this parameter is independent of any evaluation; it's on the model side
     std::string rank_tie_handling="frequency";
+
+    //***running options***
+    // output current relation and direction during ranking
+    bool verbose = true;
 
 
 

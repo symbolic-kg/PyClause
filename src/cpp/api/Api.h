@@ -32,11 +32,13 @@ protected:
 
     // handling
     bool loadedData = false;
+    bool loadedRules = false;
 
     void setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory);
     void setRankingOptions(std::map<std::string, std::string> options, ApplicationHandler& ranker);
 
-    
+    //general 
+    bool verbose = true;    
 
 };
 

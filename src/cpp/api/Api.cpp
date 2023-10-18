@@ -25,9 +25,10 @@ void BackendHandler::loadData(std::string path){
 
 void BackendHandler::loadRules(std::string path){
     if (!loadedData){
-         throw std::runtime_error("Please load the data first.");
+         throw std::runtime_error("Please load the data first with the the Handlers load data functionality.");
     }
     rules->readAnyTimeFormat(path, true);
+    loadedRules = true;
 
 
 }
@@ -57,7 +58,7 @@ void BackendHandler::setRuleOptions(std::map<std::string, std::string> options, 
     for (auto& handler : handlers) {
         auto opt = options.find(handler.name);
         if (opt != options.end()) {
-            if (_cfg_verbose){
+            if (verbose){
                 std::cout<< "Setting option "<<handler.name<<" to: "<<opt->second<<std::endl;
             }
             handler.setter(opt->second);
@@ -88,7 +89,7 @@ void BackendHandler::setRankingOptions(std::map<std::string, std::string> option
     for (auto& handler : handlers) {
         auto opt = options.find(handler.name);
         if (opt != options.end()) {
-            if (_cfg_verbose){
+            if (verbose){
                 std::cout<< "Setting option "<<handler.name<<" to: "<<opt->second<<std::endl;
             }
             handler.setter(opt->second);
