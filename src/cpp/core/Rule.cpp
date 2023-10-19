@@ -366,7 +366,8 @@ bool RuleC::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& t
         directions[0] ? triples.getTforHR(head, bodyRel, begin, length) :  triples.getHforTR(head, bodyRel, begin, length);
         int* end = begin + length;
         if (std::find(begin, end, constants[1]) != end){
-             tailResults.insertRule(constants[0], this);
+            tailResults.insertRule(constants[0], this);
+            return true;
         }
     }else{
          // h(c,Y) <-- b1(d,Y) or h(c,Y) <-- b1(Y,d) , predict all Y=y that ground the body
@@ -402,8 +403,9 @@ bool RuleC::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
         int bodyRel = this->relations[1];
         directions[0] ? csr->getHforTREfficient(tail, bodyRel, begin, length) :  csr->getTforHREfficient(tail, bodyRel, begin, length);
         int* end = begin + length;
-          if (std::find(begin, end, constants[1]) != end){
-             headResults.insertRule(constants[0], this);
+        if (std::find(begin, end, constants[1]) != end){
+            headResults.insertRule(constants[0], this);
+            return true;
         }
     }else{
         // h(X,c) <-- b1(d,X) or h(X,c) <-- b1(X,d) we want to predict all x=X that ground the body
