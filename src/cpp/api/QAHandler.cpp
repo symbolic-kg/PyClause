@@ -87,6 +87,18 @@ void QAHandler::loadDatasets(std::string dataPath, std::string filterPath){
     int d = 0;
     for (int i=0; i<queries.size(); i++){
         std::pair<std::string,std::string>& query = queries[i];
+        // error handling
+        try {
+             index->getIdOfNodestring(query.first);
+        } catch(const std::exception& e){
+                throw std::runtime_error("Could not find entity in index: " + query.first + ". If you want to make predictions for unseen entities add them to the index before loading the data");
+        }
+        try {
+            index->getIdOfRelationstring(query.second);
+        } catch (const std::exception& e){
+            throw std::runtime_error("Relation " + query.second + " does not exist.");
+        }
+       
         isTailQuery ?  target.add(query.first, query.second, index->getStringOfNodeId(d)) : target.add(index->getStringOfNodeId(d), query.second, query.first);
     }
     ranker.makeRanking(target, *data, *rules, *filter);

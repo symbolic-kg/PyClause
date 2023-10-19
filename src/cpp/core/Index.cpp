@@ -44,7 +44,7 @@ std::string Index::getStringOfNodeId(int& id) {
 		return it->second;
 	}
 	else {
-		std::cout << "Error: Id " << id << " not found in idToNode set";
+		std::cout << "Error: Idx " << id << " not found in idxToNode set";
 		exit(-1);
 	}
 }
@@ -65,7 +65,7 @@ std::string Index::getStringOfRelId(int& id) {
 		return it->second;
 	}
 	else {
-		std::cout << "Error: Id " << id << " not found in idToRel set";
+		std::cout << "Error: Idx " << id << " not found in idxToRel set";
 		exit(-1);
 	}
 }

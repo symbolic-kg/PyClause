@@ -15,7 +15,7 @@
 #include <array>
 #include <string>
 
-
+// all API handler classes inherit from this base class
 class BackendHandler{
 public:
     BackendHandler();

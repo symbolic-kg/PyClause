@@ -76,7 +76,7 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 	
 }
 
-
+// can only add idx'es that already exist
 void TripleStorage::addIdx(int head, int relation, int tail) {
 	//error handling
 	index->getStringOfNodeId(head);
