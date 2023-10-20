@@ -1,5 +1,7 @@
 #include "Index.h"
 
+#include <map>
+
 void Index::addNode(std::string& nodesstring) {
 	if (nodeToId.find(nodesstring) == nodeToId.end()) {
 		nodeToId[nodesstring] = maxNodeID;
@@ -85,4 +87,28 @@ std::unordered_map<std::string, int>& Index::getNodeToIdx(){
 std::unordered_map<std::string, int>& Index::getRelationToIdx(){
 	return relToId;
 
+}
+
+
+// exchange the strings of entitiess with the strings found in the keys of the map
+void Index::subsEntityStrings(std::map<std::string, std::string>& newStrings){
+	for (const auto& pair : newStrings) {
+		if (nodeToId.count(pair.first)) { 
+			int tempID = nodeToId[pair.first];
+			nodeToId.erase(pair.first); 
+			nodeToId[pair.second] = tempID;
+			idToNode[tempID] = pair.second;
+    	}
+	}
+}
+// exchange the strings of relations with the strings found in the keys of the map
+void Index::subsRelationStrings(std::map<std::string, std::string>& newStrings){
+	for (const auto& pair : newStrings) {
+		if (relToId.count(pair.first)) { 
+			int tempID = relToId[pair.first];
+			relToId.erase(pair.first); 
+			relToId[pair.second] = tempID;
+			idToRel[tempID] = pair.second;
+    	}
+	}
 }

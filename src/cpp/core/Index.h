@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <iostream>
 
+#include <map>
+
 class Index {
 
 public:
@@ -20,6 +22,10 @@ public:
 	void rehash();
 	std::unordered_map<std::string, int>& getNodeToIdx();
 	std::unordered_map<std::string, int>& getRelationToIdx();
+	// exchange the strings of entitiess with the strings found in the keys of the map
+	void subsEntityStrings(std::map<std::string, std::string>& newNames);
+	// exchange the strings of relations with the strings found in the keys of the map
+	void subsRelationStrings(std::map<std::string, std::string>& newNames);
 
 
 private:

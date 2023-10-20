@@ -105,6 +105,16 @@ void BackendHandler::setRankingOptions(std::map<std::string, std::string> option
     }
 }
 
+    void BackendHandler::subsEntityStrings(std::map<std::string, std::string>& newNames){
+        index->subsEntityStrings(newNames);
+
+    }
+    void BackendHandler::subsRelationStrings(std::map<std::string, std::string>& newNames){
+        index->subsRelationStrings(newNames);
+    }
+
+
+
 // ***RuleHandler***
 
 RuleHandler::RuleHandler(std::string dataPath){

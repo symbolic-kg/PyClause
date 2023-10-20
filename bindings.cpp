@@ -53,6 +53,8 @@ PYBIND11_MODULE(c_clause, m) {
         .def("write_ranking", &RankingHandler::writeRanking)
         .def("entity_map", &RankingHandler::getNodeToIdx)
         .def("relation_map", &RankingHandler::getRelationToIdx)
+        .def("replace_ent_tokens", &RankingHandler::subsEntityStrings)
+        .def("replace_rel_tokens", &RankingHandler::subsRelationStrings)
     ; //class end
 
     py::class_<QAHandler>(m, "QAHandler") 
@@ -64,6 +66,8 @@ PYBIND11_MODULE(c_clause, m) {
         .def("entity_map", &QAHandler::getNodeToIdx)
         .def("relation_map", &QAHandler::getRelationToIdx)
         .def("set_options", &QAHandler::setOptions)
+        .def("replace_ent_tokens", &QAHandler::subsEntityStrings)
+        .def("replace_rel_tokens", &QAHandler::subsRelationStrings)
     ; //class end
 
     py::class_<RuleHandler>(m, "RuleHandler") 
@@ -94,6 +98,8 @@ PYBIND11_MODULE(c_clause, m) {
         .def("load_data", &RulesHandler::loadData)
         .def("entity_map", &RulesHandler::getNodeToIdx)
         .def("relation_map", &RulesHandler::getRelationToIdx)
+        .def("replace_ent_tokens", &RulesHandler::subsEntityStrings)
+        .def("replace_rel_tokens", &RulesHandler::subsRelationStrings)
     ; //class end
 }
 

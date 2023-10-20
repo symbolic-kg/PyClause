@@ -25,6 +25,10 @@ public:
     std::unordered_map<std::string, int>& getNodeToIdx();
 	std::unordered_map<std::string, int>& getRelationToIdx();
 
+
+    void subsEntityStrings(std::map<std::string, std::string>& newNames);
+    void subsRelationStrings(std::map<std::string, std::string>& newNames);
+
 private:
 protected:
     std::shared_ptr<Index> index;
