@@ -76,3 +76,13 @@ void Index::rehash() {
 	idToNode.rehash(idToNode.size());
 	idToRel.rehash(idToRel.size());
 }
+
+
+std::unordered_map<std::string, int>& Index::getNodeToIdx(){
+	return nodeToId;
+}
+
+std::unordered_map<std::string, int>& Index::getRelationToIdx(){
+	return relToId;
+
+}

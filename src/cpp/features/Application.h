@@ -33,6 +33,7 @@ public:
 
     std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>&  getTailQcandsRules();
     std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& getTailQcandsConfs();
+    void clearAll();
 
     void setNumPreselect(int num);
     void setTopK(int topk);

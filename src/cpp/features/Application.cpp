@@ -279,6 +279,13 @@ void ApplicationHandler::scoreMaxPlus(
      }
 }
 
+
+void ApplicationHandler::clearAll(){
+    headQcandsRules.clear();
+    headQcandsConfs.clear();
+    tailQcandsRules.clear();
+    tailQcandsConfs.clear();
+}
  
 void ApplicationHandler::setNumPreselect(int num){
     rank_numPreselect=num;

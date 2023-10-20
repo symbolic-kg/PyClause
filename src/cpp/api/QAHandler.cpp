@@ -4,8 +4,7 @@
 QAHandler::QAHandler(std::map<std::string, std::string> options): BackendHandler(){
     filter = std::make_unique<TripleStorage>(index);
     // parent constructor is called before
-    setRuleOptions(options, *ruleFactory);
-    setRankingOptions(options, ranker);
+    setOptions(options);
     ranker.setVerbose(false);
 }
 
@@ -23,6 +22,12 @@ void QAHandler::loadDatasets(std::string dataPath, std::string filterPath){
     loadData(dataPath);
 }
 
+void QAHandler::setOptions(std::map<std::string, std::string> options){
+    setRuleOptions(options, *ruleFactory);
+    setRankingOptions(options, ranker);
+}
+
+
 //queries are (sourceEntity, relation)
  std::vector<std::vector<std::pair<int, double>>> QAHandler::answerQueries(std::vector<std::pair<int, int>> queries, std::string headOrTail){
     if (!loadedData){
@@ -33,6 +38,7 @@ void QAHandler::loadDatasets(std::string dataPath, std::string filterPath){
 
     }
     std::vector<std::vector<std::pair<int, double>>> ret(queries.size());
+    ranker.clearAll();
     TripleStorage target(index);
     bool isTailQuery;
     if (headOrTail=="tail"){
@@ -59,6 +65,8 @@ void QAHandler::loadDatasets(std::string dataPath, std::string filterPath){
         ret.at(i) = candConfs[query.second][query.first];
     }
 
+    
+
     return ret;
  }
 
@@ -72,6 +80,7 @@ void QAHandler::loadDatasets(std::string dataPath, std::string filterPath){
         throw std::runtime_error("You must load rules before you can answer questions.");
 
     }
+    ranker.clearAll();
     std::vector<std::vector<std::pair<std::string, double>>> ret(queries.size());
     TripleStorage target(index);
     bool isTailQuery;
@@ -91,7 +100,7 @@ void QAHandler::loadDatasets(std::string dataPath, std::string filterPath){
         try {
              index->getIdOfNodestring(query.first);
         } catch(const std::exception& e){
-                throw std::runtime_error("Could not find entity in index: " + query.first + ". If you want to make predictions for unseen entities add them to the index before loading the data");
+                throw std::runtime_error("Could not find entity in index: " + query.first + ". If you want to make predictions for unseen entities add them to the index before loading the data.");
         }
         try {
             index->getIdOfRelationstring(query.second);
@@ -118,6 +127,8 @@ void QAHandler::loadDatasets(std::string dataPath, std::string filterPath){
         }
         ret.at(i) = stringCandConfs;
     }
+
+   
 
     return ret;
  }

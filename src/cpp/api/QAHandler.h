@@ -12,6 +12,8 @@ public:
     std::vector<std::vector<std::pair<std::string,double>>> answerQueries(std::vector<std::pair<std::string, std::string>> queries, std::string headOrTail);
     std::vector<std::vector<std::pair<int, double>>> answerQueries(std::vector<std::pair<int, int>> queries, std::string headOrTail);
 
+    //reset options
+    void setOptions(std::map<std::string, std::string> options);
 
 
 private:

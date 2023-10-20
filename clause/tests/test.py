@@ -173,10 +173,108 @@ def test_237_all_ranking():
     print(f"Calculated {[hA1, hAt10, mrr_result]}")
 
 
+def test_qa_handler():
+    import c_clause
+    import numpy as np
 
 
+    train = "./data/wnrr/train.txt"
+    filter = "./data/wnrr/valid.txt"
+    target = "./data/wnrr/test.txt"
+
+    rules = "./data/wnrr/anyburl-rules-c5-3600"
 
 
+    options = {
+        # ranking options
+        "aggregation_function": "maxplus",
+        "num_preselect": "10000000",
+        "topk": "100",
+        "filter_w_train": "false",
+        "filter_w_target": "true",
+        "disc_at_least":"100", ## -1 for off, must not be bigger than topk
+        # rule options 
+        "rule_b_max_branching_factor": "-1",
+        "use_zero_rules": "true",
+        "rule_zero_weight":"0.01",
+        "use_u_c_rules": "true",
+        "use_b_rules": "true",
+        "use_u_d_rules": "true",
+        "rule_u_d_weight":"0.01",
+        "use_u_xxc_rules": "true",
+        "use_u_xxd_rules": "true",
+        "tie_handling": "frequency"
+    }
+
+
+    qa_handler = c_clause.QAHandler(options)
+    qa_handler.load_datasets(train, filter)
+    qa_handler.load_rules(rules)
+
+    ent_map = qa_handler.entity_map()
+    rel_map = qa_handler.relation_map()
+
+        
+
+    # tail query example where we know that one true answer is in train 
+    t_q_source = "00037919"
+    t_q_rel = "_derivationally_related_form"
+    t_answer_in_train = "02808440"
+
+
+    t_answers_str = qa_handler.answer_queries([(t_q_source, t_q_rel)], "tail")
+    t_answers_idx = qa_handler.answer_queries([(ent_map[t_q_source], rel_map[t_q_rel])], "tail")
+
+    # == 1 both contain the true answer in train, note that by no means the rules must predict a triple in train
+    # if you filter with train however they must not predict the answer
+    assert(1==sum(np.array(t_answers_idx[0])[:,0] == ent_map[t_answer_in_train]))
+    assert(1==sum(np.array(t_answers_str[0])[:,0] == t_answer_in_train))
+
+    ## after not filtering with train the true answer from train must not be contained
+    options["filter_w_train"] = "true"
+    qa_handler.set_options(options)
+
+    t_answers_str = qa_handler.answer_queries([(t_q_source, t_q_rel)], "tail")
+    t_answers_idx = qa_handler.answer_queries([(ent_map[t_q_source], rel_map[t_q_rel])], "tail")
+
+    assert(0==sum(np.array(t_answers_idx[0])[:,0] == ent_map[t_answer_in_train]))
+    assert(0==sum(np.array(t_answers_str[0])[:,0] == t_answer_in_train))
+
+    # outputs must be exactly identical
+    for i, answer in enumerate(t_answers_str[0]):
+        # answer[0]:str entity
+        # answer[1]: float conf
+        assert(t_answers_idx[0][i][0] == ent_map[answer[0]])
+        assert(t_answers_idx[0][i][1] == answer[1])
+
+        
+
+    qa_handler.set_options({"filter_w_train": "false"})
+    h_q_source = "01051956"
+    h_q_rel = "_also_see"
+    h_q_answer_in_train = "00941990"
+
+
+    # the one true answer from train is in the answers
+    assert(1==sum(np.array(qa_handler.answer_queries([[h_q_source, h_q_rel]], "head")[0])[:,0]==h_q_answer_in_train))
+    assert (1==sum(np.array(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], "head")[0])[:,0]==ent_map[h_q_answer_in_train]))
+
+
+    qa_handler.set_options({"filter_w_train": "true"})
+
+
+    assert(0==sum(np.array(qa_handler.answer_queries([[h_q_source, h_q_rel]], "head")[0])[:,0]==h_q_answer_in_train))
+    assert (0==sum(np.array(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], "head")[0])[:,0]==ent_map[h_q_answer_in_train]))
+
+
+    # repeatedly calculating the answers would be bad in a usage scenario, here just for testing purpose
+    for i, answer in enumerate(qa_handler.answer_queries([[h_q_source, h_q_rel]], "head")[0]):
+        # answer[0]:str entity
+        # answer[1]: float conf
+        assert(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], "head")[0][i][0] == ent_map[answer[0]])
+        assert(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], "head")[0][i][1] == answer[1])
+
+    print("Test for QA Handler idx and string version successful.")
 
     
 

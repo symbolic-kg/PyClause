@@ -18,6 +18,9 @@ public:
 	int getIdOfRelationstring(std::string& relation);
 	std::string getStringOfRelId(int& id);
 	void rehash();
+	std::unordered_map<std::string, int>& getNodeToIdx();
+	std::unordered_map<std::string, int>& getRelationToIdx();
+
 
 private:
 	std::unordered_map<std::string, int> nodeToId;

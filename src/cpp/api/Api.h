@@ -22,6 +22,9 @@ public:
     // extend to overloaded functions: load data from a list of string triples/ list of indice triples
     void loadData(std::string path);
     void loadRules(std::string path);
+    std::unordered_map<std::string, int>& getNodeToIdx();
+	std::unordered_map<std::string, int>& getRelationToIdx();
+
 private:
 protected:
     std::shared_ptr<Index> index;

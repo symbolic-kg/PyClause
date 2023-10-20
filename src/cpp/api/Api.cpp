@@ -34,6 +34,14 @@ void BackendHandler::loadRules(std::string path){
 }
 
 
+std::unordered_map<std::string, int>& BackendHandler::getNodeToIdx(){
+    return index->getNodeToIdx();
+}
+std::unordered_map<std::string, int>& BackendHandler::getRelationToIdx(){
+    return index->getRelationToIdx();
+}
+
+
 void BackendHandler::setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory){
     
 

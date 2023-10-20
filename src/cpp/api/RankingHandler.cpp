@@ -36,6 +36,7 @@ void RankingHandler::loadDatasets(std::string targetPath, std::string trainPath,
 
 
 void RankingHandler::calculateRanking(){
+    ranker.clearAll();
     ranker.makeRanking(*target, *data, *rules, *filter);
 }
 

@@ -51,6 +51,8 @@ PYBIND11_MODULE(c_clause, m) {
         .def("calc_ranking", &RankingHandler::calculateRanking)
         .def("get_ranking", &RankingHandler::getRanking)
         .def("write_ranking", &RankingHandler::writeRanking)
+        .def("entity_map", &RankingHandler::getNodeToIdx)
+        .def("relation_map", &RankingHandler::getRelationToIdx)
     ; //class end
 
     py::class_<QAHandler>(m, "QAHandler") 
@@ -59,6 +61,9 @@ PYBIND11_MODULE(c_clause, m) {
         .def("load_rules", &QAHandler::loadRules)
         .def("answer_queries", py::overload_cast<std::vector<std::pair<int, int>>, std::string>(&QAHandler::answerQueries))
         .def("answer_queries", py::overload_cast<std::vector<std::pair<std::string, std::string>>, std::string>(&QAHandler::answerQueries))
+        .def("entity_map", &QAHandler::getNodeToIdx)
+        .def("relation_map", &QAHandler::getRelationToIdx)
+        .def("set_options", &QAHandler::setOptions)
     ; //class end
 
     py::class_<RuleHandler>(m, "RuleHandler") 
@@ -87,6 +92,8 @@ PYBIND11_MODULE(c_clause, m) {
             )pbdoc" 
         )
         .def("load_data", &RulesHandler::loadData)
+        .def("entity_map", &RulesHandler::getNodeToIdx)
+        .def("relation_map", &RulesHandler::getRelationToIdx)
     ; //class end
 }
 
