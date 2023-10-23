@@ -305,11 +305,6 @@ void tests(){
      if (!(stats[0]==552 && stats[1]==397)){
         throw std::runtime_error("Test 27 for Uxxd rule materialize failed.");
     } 
-
-
-
-
-
 }
 
     

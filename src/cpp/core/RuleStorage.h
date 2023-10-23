@@ -48,6 +48,8 @@ private:
     std::shared_ptr<Index> index;
     // TODO you dont really need a shared pointer here; but at least options should be global 
     std::shared_ptr<RuleFactory> ruleFactory;
+
+    bool verbose = true;
     
 
 };
