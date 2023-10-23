@@ -27,7 +27,7 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool sampled){
         int IDs = 0;
 		while (!util::safeGetline(file, line).eof()){
             if (currID%1000000==0 && verbose){
-                std::cout<<"...read "<<currID<<" rules from file "<<std::endl;
+                std::cout<<"...read "<<currID<<" rules "<<std::endl;
             }
             // expects a line: predicted\t cpredicted\trulestring
 			std::vector<std::string> splitline = util::split(line, '\t');
