@@ -281,10 +281,34 @@ void tests(){
     std::cout<<"All tests passed."<<std::endl;
     ruleXXc->setTrackInMaterialize(true);
     predictions = ruleXXc->materialize(data237);
-    stats = ruleXXc -> getStats(true);  
+    stats = ruleXXc->getStats(true);  
     if (!(stats[0]==67 && stats[1]==6)){
         throw std::runtime_error("Test 25 for Uxxc rule materialize failed.");
     } 
+
+    // new string representation of Uxx rules
+    
+    // 843	258	0.30605	/education/educational_institution/campuses(X,X) <= /location/location/contains(/m/09c7w0,X)
+    ruleXXc = ruleFactory237->parseAnytimeRule("/education/educational_institution/campuses(X,X) <= /location/location/contains(/m/09c7w0,X)");
+    ruleXXc->setTrackInMaterialize(true);
+    predictions = ruleXXc->materialize(data237);
+    stats = ruleXXc->getStats(true);  
+    if (!(stats[0]==843 && stats[1]==258)){
+        throw std::runtime_error("Test 26 for Uxxc rule materialize failed.");
+    } 
+
+    // 552	397	0.71920	/education/educational_institution/campuses(X,X) <= /education/educational_institution/school_type(X,A)
+    ruleXXd = ruleFactory237->parseAnytimeRule("/education/educational_institution/campuses(X,X) <= /education/educational_institution/school_type(X,A)");
+    ruleXXd->setTrackInMaterialize(true);
+    predictions = ruleXXd->materialize(data237);
+    stats = ruleXXd->getStats(true);
+     if (!(stats[0]==552 && stats[1]==397)){
+        throw std::runtime_error("Test 27 for Uxxd rule materialize failed.");
+    } 
+
+
+
+
 
 }
 

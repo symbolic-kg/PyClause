@@ -18,6 +18,8 @@ public:
     RuleFactory(std::shared_ptr<Index> index);
     std::unique_ptr<Rule> parseAnytimeRule(std::string rule);
 
+    std::unique_ptr<Rule>parseUXXrule(std::vector<std::string> headBody);
+
     void parseAtom(const std::string& input, strAtom& atom);
     void parseSymAtom(strAtom& inputAtom, symAtom& symA);
 

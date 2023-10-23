@@ -13,6 +13,61 @@ RuleFactory::RuleFactory(std::shared_ptr<Index> index){
 }
 
 
+
+std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody){
+    // parse head
+    strAtom headAtom;
+    parseAtom(headBody[0], headAtom);
+    // set head relation
+    int relID = index->getIdOfRelationstring(headAtom[0]);
+    std::vector<int> relations = {relID};
+    std::vector<bool> directions; 
+
+
+    // parse body
+    strAtom bodyAtom;
+    std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], _cfg_prs_atomSeparator);
+    parseAtom(bodyAtomsStr[0], bodyAtom);
+   
+            
+    size_t length = bodyAtomsStr.size();
+    if (length>1){
+        throw std::runtime_error("Cannot parse longer Uxx rule: " + headBody[0] + "<=" +  headBody[1]);
+    } 
+    relations.push_back(index->getIdOfRelationstring(bodyAtom[0]));
+
+    if (bodyAtom[1][0]==_cfg_prs_anyTimeVars[0]){
+        directions.push_back(true);
+    }else if (bodyAtom[2][0]==_cfg_prs_anyTimeVars[0]){
+        directions.push_back(false);
+    }else{
+        throw std::runtime_error("Cannot understand this rule: " + headBody[0] + "<=" +  headBody[1]);
+    }
+
+    // check for particular rule type  UXXc: constant is in body; UXXd: no constant
+    symAtom symBodyAtom;
+    parseSymAtom(bodyAtom, symBodyAtom);
+
+    // UXXc rule
+    if (symBodyAtom.containsConstant){
+        if (createRuleXXc){
+            std::unique_ptr<Rule> ruleXXc = std::make_unique<RuleXXc>(relations, directions, symBodyAtom.constant);      
+            return std::move(ruleXXc);
+            } else {
+                return nullptr;
+            }
+    // Uxxd rule
+    }else{
+        if (createRuleXXd){
+            std::unique_ptr<Rule> ruleXXd = std::make_unique<RuleXXd>(relations, directions);
+            return std::move(ruleXXd);
+        }else{
+            return nullptr;
+        }   
+    }
+
+}
+
 std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
     std::string ruleType;
     std::vector<std::string> headBody = util::splitString(rule, _cfg_prs_ruleSeparator);
@@ -24,7 +79,15 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
     int relID = index->getIdOfRelationstring(headAtom[0]);
     std::vector<int> relations = {relID};
     std::vector<bool> directions; 
-    // UXX rule
+
+
+    // Uxx d or c rule h(X,X) <- body
+    if (headAtom[1][0]==_cfg_prs_anyTimeVars[0] && headAtom[2][0] == _cfg_prs_anyTimeVars[0]){
+        return parseUXXrule(headBody);
+    }
+
+
+    // UXX rule in old AnyTime format (the rule contains the equality token me_myself..)
     if(rule.find(_cfg_prs_equalityToken) != std::string::npos) {
         if (headAtomStr.find(_cfg_prs_equalityToken) != std::string::npos ){
             if (headBody.size()==1){
