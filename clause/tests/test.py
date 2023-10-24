@@ -56,12 +56,15 @@ def test_uc_b_zero_ranking():
     "use_b_rules": "True",
     }
 
+    loader = c_clause.DataHandler(options)
+    loader.load_datasets(test_path, train_path, filter_path)
+    loader.load_rules(rules_path)
+
+
 
     ranker = c_clause.RankingHandler(options)
-    ranker.load_datasets(test_path, train_path, filter_path)
-    ranker.load_rules(rules_path)
-    ranker.calc_ranking()
-    ranker.write_ranking(ranking_path)
+    ranker.calc_ranking(loader)
+    ranker.write_ranking(ranking_path, loader)
 
     p = Popen(
         f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Eval {conf_path}",
@@ -142,11 +145,15 @@ def test_237_all_ranking():
     "use_u_xxd_rules": "True",
     }
 
+    loader = c_clause.DataHandler(options)
+    loader.load_datasets(test_path, train_path, filter_path)
+    loader.load_rules(rules_path)
+
+
     ranker = c_clause.RankingHandler(options)
-    ranker.load_datasets(test_path, train_path, filter_path)
-    ranker.load_rules(rules_path)
-    ranker.calc_ranking()
-    ranker.write_ranking(ranking_path)
+    ranker.calc_ranking(loader)
+    ranker.write_ranking(ranking_path, loader)
+
 
     p = Popen(
         f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Eval {conf_path}",
@@ -207,12 +214,15 @@ def test_qa_handler():
     }
 
 
-    qa_handler = c_clause.QAHandler(options)
-    qa_handler.load_datasets(train, filter)
-    qa_handler.load_rules(rules)
+    loader = c_clause.DataHandler(options)
+    loader.load_data(train, filter)
+    loader.load_rules(rules)
 
-    ent_map = qa_handler.entity_map()
-    rel_map = qa_handler.relation_map()
+
+    qa_handler = c_clause.QAHandler(options)
+
+    ent_map = loader.entity_map()
+    rel_map = loader.relation_map()
 
         
 
@@ -222,8 +232,8 @@ def test_qa_handler():
     t_answer_in_train = "02808440"
 
 
-    t_answers_str = qa_handler.answer_queries([(t_q_source, t_q_rel)], "tail")
-    t_answers_idx = qa_handler.answer_queries([(ent_map[t_q_source], rel_map[t_q_rel])], "tail")
+    t_answers_str = qa_handler.answer_queries([(t_q_source, t_q_rel)], loader, "tail")
+    t_answers_idx = qa_handler.answer_queries([(ent_map[t_q_source], rel_map[t_q_rel])], loader, "tail")
 
     # == 1 both contain the true answer in train, note that by no means the rules must predict a triple in train
     # if you filter with train however they must not predict the answer
@@ -234,8 +244,8 @@ def test_qa_handler():
     options["filter_w_train"] = "true"
     qa_handler.set_options(options)
 
-    t_answers_str = qa_handler.answer_queries([(t_q_source, t_q_rel)], "tail")
-    t_answers_idx = qa_handler.answer_queries([(ent_map[t_q_source], rel_map[t_q_rel])], "tail")
+    t_answers_str = qa_handler.answer_queries([(t_q_source, t_q_rel)], loader, "tail")
+    t_answers_idx = qa_handler.answer_queries([(ent_map[t_q_source], rel_map[t_q_rel])], loader, "tail")
 
     assert(0==sum(np.array(t_answers_idx[0])[:,0] == ent_map[t_answer_in_train]))
     assert(0==sum(np.array(t_answers_str[0])[:,0] == t_answer_in_train))
@@ -256,23 +266,23 @@ def test_qa_handler():
 
 
     # the one true answer from train is in the answers
-    assert(1==sum(np.array(qa_handler.answer_queries([[h_q_source, h_q_rel]], "head")[0])[:,0]==h_q_answer_in_train))
-    assert (1==sum(np.array(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], "head")[0])[:,0]==ent_map[h_q_answer_in_train]))
+    assert(1==sum(np.array(qa_handler.answer_queries([[h_q_source, h_q_rel]], loader, "head")[0])[:,0]==h_q_answer_in_train))
+    assert (1==sum(np.array(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], loader, "head")[0])[:,0]==ent_map[h_q_answer_in_train]))
 
 
     qa_handler.set_options({"filter_w_train": "true"})
 
 
-    assert(0==sum(np.array(qa_handler.answer_queries([[h_q_source, h_q_rel]], "head")[0])[:,0]==h_q_answer_in_train))
-    assert (0==sum(np.array(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], "head")[0])[:,0]==ent_map[h_q_answer_in_train]))
+    assert(0==sum(np.array(qa_handler.answer_queries([[h_q_source, h_q_rel]], loader, "head")[0])[:,0]==h_q_answer_in_train))
+    assert (0==sum(np.array(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], loader, "head")[0])[:,0]==ent_map[h_q_answer_in_train]))
 
 
     # repeatedly calculating the answers would be bad in a usage scenario, here just for testing purpose
-    for i, answer in enumerate(qa_handler.answer_queries([[h_q_source, h_q_rel]], "head")[0]):
+    for i, answer in enumerate(qa_handler.answer_queries([[h_q_source, h_q_rel]], loader, "head")[0]):
         # answer[0]:str entity
         # answer[1]: float conf
-        assert(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], "head")[0][i][0] == ent_map[answer[0]])
-        assert(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], "head")[0][i][1] == answer[1])
+        assert(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], loader, "head")[0][i][0] == ent_map[answer[0]])
+        assert(qa_handler.answer_queries([[ent_map[h_q_source], rel_map[h_q_rel]]], loader, "head")[0][i][1] == answer[1])
 
     print("Test for QA Handler idx and string version successful.")
 

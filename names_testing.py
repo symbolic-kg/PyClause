@@ -46,13 +46,16 @@ options = {
     "tie_handling": "frequency"
 }
 
+loader = c_clause.DataHandler(options)
+loader.load_data(train, filter)
+loader.load_rules(rules)
+loader.replace_ent_tokens(entity_names)
+
 
 qa_handler = c_clause.QAHandler(options)
-qa_handler.load_datasets(train, filter)
-qa_handler.load_rules(rules)
-qa_handler.replace_ent_tokens(entity_names)
 
-answers = qa_handler.answer_queries([("italy", "_has_part")], "head")
+
+answers = qa_handler.answer_queries([("italy", "_has_part")], loader, "head")
 answers = answers[0]
 for i in range(len(answers)):
     print(answers[i][0], answers[i][1])

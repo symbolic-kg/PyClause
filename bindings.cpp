@@ -4,6 +4,7 @@
 #include "src/cpp/api/RulesHandler.h"
 #include "src/cpp/api/RankingHandler.h"
 #include "src/cpp/api/QAHandler.h"
+#include "src/cpp/api/DataHandler.h"
 #include <string>
 
 // *Example* 
@@ -46,28 +47,16 @@ PYBIND11_MODULE(c_clause, m) {
     // **backend bindings**
     py::class_<RankingHandler>(m, "RankingHandler") 
         .def(py::init<std::map<std::string, std::string>>())
-        .def("load_datasets", &RankingHandler::loadDatasets)
-        .def("load_rules", &RankingHandler::loadRules)
         .def("calc_ranking", &RankingHandler::calculateRanking)
         .def("get_ranking", &RankingHandler::getRanking)
         .def("write_ranking", &RankingHandler::writeRanking)
-        .def("entity_map", &RankingHandler::getNodeToIdx)
-        .def("relation_map", &RankingHandler::getRelationToIdx)
-        .def("replace_ent_tokens", &RankingHandler::subsEntityStrings)
-        .def("replace_rel_tokens", &RankingHandler::subsRelationStrings)
     ; //class end
 
     py::class_<QAHandler>(m, "QAHandler") 
         .def(py::init<std::map<std::string, std::string>>())
-        .def("load_datasets", &QAHandler::loadDatasets)
-        .def("load_rules", &QAHandler::loadRules)
-        .def("answer_queries", py::overload_cast<std::vector<std::pair<int, int>>, std::string>(&QAHandler::answerQueries))
-        .def("answer_queries", py::overload_cast<std::vector<std::pair<std::string, std::string>>, std::string>(&QAHandler::answerQueries))
-        .def("entity_map", &QAHandler::getNodeToIdx)
-        .def("relation_map", &QAHandler::getRelationToIdx)
+        .def("answer_queries", py::overload_cast<std::vector<std::pair<int, int>>, std::shared_ptr<DataHandler>, std::string>(&QAHandler::answerQueries))
+        .def("answer_queries", py::overload_cast<std::vector<std::pair<std::string, std::string>>, std::shared_ptr<DataHandler>, std::string>(&QAHandler::answerQueries))
         .def("set_options", &QAHandler::setOptions)
-        .def("replace_ent_tokens", &QAHandler::subsEntityStrings)
-        .def("replace_rel_tokens", &QAHandler::subsRelationStrings)
     ; //class end
 
     py::class_<RuleHandler>(m, "RuleHandler") 
@@ -79,10 +68,7 @@ PYBIND11_MODULE(c_clause, m) {
                 args: string:rulestring; bool returnPredictions: if true return predictions; bool returnStats: if true returns exact stats.
                 returns: tuple where tuple[0] are the predictions , tuple[1][0] are number of exact predictions tuple[1][1] number of true predictions.
 
-            )pbdoc" 
-        
-        
-        )
+            )pbdoc" )
     ; //class end
     py::class_<RulesHandler>(m, "RulesHandler") 
         .def(py::init<>())
@@ -95,12 +81,19 @@ PYBIND11_MODULE(c_clause, m) {
 
             )pbdoc" 
         )
-        .def("load_data", &RulesHandler::loadData)
-        .def("entity_map", &RulesHandler::getNodeToIdx)
-        .def("relation_map", &RulesHandler::getRelationToIdx)
-        .def("replace_ent_tokens", &RulesHandler::subsEntityStrings)
-        .def("replace_rel_tokens", &RulesHandler::subsRelationStrings)
     ; //class end
+
+    py::class_<DataHandler,  std::shared_ptr<DataHandler>>(m, "DataHandler") 
+        .def(py::init<std::map<std::string, std::string>>())
+        .def("load_datasets", &DataHandler::loadDatasets)
+        .def("load_rules", &DataHandler::loadRules)
+        .def("load_data", py::overload_cast<std::string>(&DataHandler::loadData))
+        .def("load_data", py::overload_cast<std::string, std::string>(&DataHandler::loadData))
+        .def("entity_map", &DataHandler::getNodeToIdx)
+        .def("relation_map", &DataHandler::getRelationToIdx)
+        .def("replace_ent_tokens", &DataHandler::subsEntityStrings)
+        .def("replace_rel_tokens", &DataHandler::subsRelationStrings)
+    ; // class end
 }
 
 

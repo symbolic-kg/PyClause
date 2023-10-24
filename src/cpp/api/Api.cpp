@@ -8,71 +8,8 @@
 
 //*** BackendHandler ***
 
-BackendHandler::BackendHandler(){
-    index = std::make_shared<Index>();
-    ruleFactory = std::make_shared<RuleFactory>(index);
-    data = std::make_unique<TripleStorage>(index);
-    rules = std::make_unique<RuleStorage>(index, ruleFactory);
-}
+BackendHandler::BackendHandler(){}
 
-void BackendHandler::loadData(std::string path){
-    if (loadedData){
-        throw std::runtime_error("Please load the data only once or use a new handler.");
-    }
-    data->read(path); 
-    loadedData = true;
-}
-
-void BackendHandler::loadRules(std::string path){
-    if (!loadedData){
-         throw std::runtime_error("Please load the data first with the the Handlers load data functionality.");
-    }
-    rules->readAnyTimeFormat(path, true);
-    loadedRules = true;
-
-
-}
-
-
-std::unordered_map<std::string, int>& BackendHandler::getNodeToIdx(){
-    return index->getNodeToIdx();
-}
-std::unordered_map<std::string, int>& BackendHandler::getRelationToIdx(){
-    return index->getRelationToIdx();
-}
-
-
-void BackendHandler::setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory){
-    
-
-    // rule options:  individual rule options and options of which rules to use
-     struct OptionHandler {
-        std::string name;
-        std::function<void(std::string)> setter;
-    };
-
-    std::vector<OptionHandler> handlers = {
-        {"rule_zero_weight", [this](std::string val) { RuleZ::zConfWeight = std::stod(val); }},
-        {"rule_u_d_weight", [this](std::string val) { RuleD::dConfWeight = std::stod(val); }},
-        {"rule_b_max_branching_factor", [this](std::string val) { RuleB::branchingFaktor = std::stoi(val); }},
-        {"use_zero_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleZ(util::stringToBool(val));}},
-        {"use_u_c_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleC(util::stringToBool(val));}},
-        {"use_b_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleB(util::stringToBool(val));}},
-        {"use_u_d_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleD(util::stringToBool(val));}},
-        {"use_u_xxc_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXc(util::stringToBool(val));}},
-        {"use_u_xxd_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXd(util::stringToBool(val));}}
-    };
-
-    for (auto& handler : handlers) {
-        auto opt = options.find(handler.name);
-        if (opt != options.end()) {
-            if (verbose){
-                std::cout<< "Setting option "<<handler.name<<" to: "<<opt->second<<std::endl;
-            }
-            handler.setter(opt->second);
-        }
-    }
-}
 
 void BackendHandler::setRankingOptions(std::map<std::string, std::string> options, ApplicationHandler& ranker){
     
@@ -105,13 +42,6 @@ void BackendHandler::setRankingOptions(std::map<std::string, std::string> option
     }
 }
 
-    void BackendHandler::subsEntityStrings(std::map<std::string, std::string>& newNames){
-        index->subsEntityStrings(newNames);
-
-    }
-    void BackendHandler::subsRelationStrings(std::map<std::string, std::string>& newNames){
-        index->subsRelationStrings(newNames);
-    }
 
 
 

@@ -30,10 +30,14 @@ options = {
     "tie_handling": "frequency"
 }
 
+loader = c_clause.DataHandler(options)
+loader.load_data(train, filter)
+loader.load_rules(rules)
+
+
 
 qa_handler = c_clause.QAHandler(options)
-qa_handler.load_datasets(train, filter)
-qa_handler.load_rules(rules)
+
 
 ## string inputs mode
 ## input queries:
@@ -48,7 +52,7 @@ queries = [("12184337","_hypernym"), ("12184337","_verb_group")]
 ## output: list[list[tuple[string,float]]] 
 ## e.g. output[0] contains a list with the answers for the first query
 ## note that output[i] does not have same length as output[k] as different queries have different amounts of answers
-answers = qa_handler.answer_queries(queries, "tail")
+answers = qa_handler.answer_queries(queries, loader, "tail")
 print(answers)
 
 
@@ -62,7 +66,7 @@ queries = np.array([(4,5), (0,1)])
 
 # answers to first query
 
-answers = qa_handler.answer_queries(queries, "tail")
+answers = qa_handler.answer_queries(queries, loader, "tail")
 answer_set = np.array(answers[0], dtype=object)
 # print idx answers
 print(answer_set[:,0])

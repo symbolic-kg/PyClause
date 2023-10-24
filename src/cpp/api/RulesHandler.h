@@ -13,6 +13,7 @@
 #include "../core/Util.hpp"
 #include "../core/Types.h"
 #include "Api.h"
+#include "DataHandler.h"
 
 #include <string>
 #include <vector>
@@ -22,7 +23,7 @@
 class RulesHandler: public BackendHandler{
 public:
     RulesHandler(): BackendHandler(){};
-    std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std::array<int,2>>> calcRulesPredictions(std::vector<std::string> stringRules, bool retPredictions, bool retStats);
+    std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std::array<int,2>>> calcRulesPredictions(std::vector<std::string> stringRules, std::shared_ptr<DataHandler> dHandler, bool retPredictions, bool retStats);
 
 
 };

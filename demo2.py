@@ -20,6 +20,35 @@ rules = "./data/wnrr/anyburl-rules-c5-3600"
 ranking_file = "./local/rankingFile.txt"
 
 
+options = {
+    # ranking options
+    "aggregation_function": "maxplus",
+    "num_preselect": "10000000",
+    "topk": "100",
+    "filter_w_train": "true",
+    "filter_w_target": "true",
+    "disc_at_least":"100", ## -1 for off, must not be bigger than topk
+    # rule options 
+    "rule_b_max_branching_factor": "-1",
+    "use_zero_rules": "true",
+    "rule_zero_weight":"0.01",
+    "use_u_c_rules": "true",
+    "use_b_rules": "true",
+    "use_u_d_rules": "true",
+    "rule_u_d_weight":"0.01",
+    "use_u_xxc_rules": "true",
+    "use_u_xxd_rules": "true",
+    "tie_handling": "frequency"
+}
+
+
+loader = c_clause.DataHandler(options)
+loader.load_datasets(target, train, filter)
+loader.load_rules(rules)
+
+
+
+
 
 
 
@@ -45,42 +74,20 @@ end = time.time()
 print(f"All time (+serialization) was {end-start} seconds")
 
 handlerNew = c_clause.RulesHandler()
-handlerNew.load_data(train)
-predsNew = handlerNew.stats_and_predictions(rules_list, True, True)
+predsNew = handlerNew.stats_and_predictions(rules_list, loader,  True, True)
 
 
 
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()
-options = {
-    # ranking options
-    "aggregation_function": "maxplus",
-    "num_preselect": "10000000",
-    "topk": "100",
-    "filter_w_train": "true",
-    "filter_w_target": "true",
-    "disc_at_least":"100", ## -1 for off, must not be bigger than topk
-    # rule options 
-    "rule_b_max_branching_factor": "-1",
-    "use_zero_rules": "true",
-    "rule_zero_weight":"0.01",
-    "use_u_c_rules": "true",
-    "use_b_rules": "true",
-    "use_u_d_rules": "true",
-    "rule_u_d_weight":"0.01",
-    "use_u_xxc_rules": "true",
-    "use_u_xxd_rules": "true",
-    "tie_handling": "frequency"
-}
+
 
 
 
 ranker = c_clause.RankingHandler(options)
-ranker.load_datasets(target, train, filter)
-ranker.load_rules(rules)
-ranker.calc_ranking()
-ranker.write_ranking(ranking_file)
+ranker.calc_ranking(loader)
+ranker.write_ranking(ranking_file, loader)
 rankingtime = time.time()
 headRanking = ranker.get_ranking("head")
 tailRanking = ranker.get_ranking("tail")

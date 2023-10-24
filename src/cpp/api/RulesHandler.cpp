@@ -1,11 +1,11 @@
 #include "RulesHandler.h"
 
 
-std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std::array<int,2>>> RulesHandler::calcRulesPredictions(std::vector<std::string> stringRules, bool retPredictions, bool retStats){
+std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std::array<int,2>>> RulesHandler::calcRulesPredictions(std::vector<std::string> stringRules, std::shared_ptr<DataHandler> dHandler, bool retPredictions, bool retStats){
     std::vector<std::vector<std::array<std::string,2>>> preds;
     std::vector<std::array<int,2>> stats;
 
-    if (!loadedData){
+    if (!dHandler->getLoadedData()){
         throw std::runtime_error("Please load data before you calculate rule predictions/stats.");
     }
 
@@ -20,14 +20,19 @@ std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std:
 
     #pragma omp parallel
     {
+
+        RuleFactory& ruleFactory = dHandler->getRuleFactory();
+        TripleStorage& data = dHandler->getData();
+        std::shared_ptr<Index> index = dHandler->getIndex();
+
         #pragma omp for
         for (int i=0; i<stringRules.size(); i++){
-            std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(stringRules[i]);
+            std::unique_ptr<Rule> rule = ruleFactory.parseAnytimeRule(stringRules[i]);
             rule->setTrackInMaterialize(retStats);
             if (!rule){
                 throw std::runtime_error("Error in parsing rule:" + stringRules[i]);
             }
-            for (auto triple : rule->materialize(*data)){
+            for (auto triple : rule->materialize(data)){
                     if (!retPredictions){
                         break; // stats are calculated with invoking materialize
                     }

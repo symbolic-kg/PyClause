@@ -19,29 +19,9 @@
 class BackendHandler{
 public:
     BackendHandler();
-    // extend to overloaded functions: load data from a list of string triples/ list of indice triples
-    void loadData(std::string path);
-    void loadRules(std::string path);
-    std::unordered_map<std::string, int>& getNodeToIdx();
-	std::unordered_map<std::string, int>& getRelationToIdx();
-
-
-    void subsEntityStrings(std::map<std::string, std::string>& newNames);
-    void subsRelationStrings(std::map<std::string, std::string>& newNames);
 
 private:
 protected:
-    std::shared_ptr<Index> index;
-    // data aka train where rule application is performed
-    std::unique_ptr<TripleStorage> data;
-    std::shared_ptr<RuleFactory> ruleFactory;
-    std::unique_ptr<RuleStorage> rules;
-
-    // handling
-    bool loadedData = false;
-    bool loadedRules = false;
-
-    void setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory);
     void setRankingOptions(std::map<std::string, std::string> options, ApplicationHandler& ranker);
 
     //general 

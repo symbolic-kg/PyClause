@@ -2,42 +2,28 @@
 
 
 QAHandler::QAHandler(std::map<std::string, std::string> options): BackendHandler(){
-    filter = std::make_unique<TripleStorage>(index);
     // parent constructor is called before
     setOptions(options);
     ranker.setVerbose(false);
 }
 
-void QAHandler::loadDatasets(std::string dataPath, std::string filterPath){
-     if (loadedData){
-        throw std::runtime_error("Please load the data only once or use a new handler.");
-    }
-
-    std::cout<<"Load data... \n";
-    if (filterPath!=""){
-        filter->read(filterPath);
-    }
-    
-    // sets loadedData to true
-    loadData(dataPath);
-}
 
 void QAHandler::setOptions(std::map<std::string, std::string> options){
-    setRuleOptions(options, *ruleFactory);
     setRankingOptions(options, ranker);
 }
 
 
 //queries are (sourceEntity, relation)
- std::vector<std::vector<std::pair<int, double>>> QAHandler::answerQueries(std::vector<std::pair<int, int>> queries, std::string headOrTail){
-    if (!loadedData){
+ std::vector<std::vector<std::pair<int, double>>> QAHandler::answerQueries(std::vector<std::pair<int, int>> queries, std::shared_ptr<DataHandler> dHandler, std::string headOrTail){
+    if (!dHandler->getLoadedData()){
         throw std::runtime_error("You must load data before you can answer questions.");
     }
-    if (!loadedRules){
+    if (!dHandler->getLoadedRules()){
         throw std::runtime_error("You must load rules before you can answer questions.");
 
     }
     std::vector<std::vector<std::pair<int, double>>> ret(queries.size());
+    std::shared_ptr<Index> index = dHandler->getIndex();
     ranker.clearAll();
     TripleStorage target(index);
     bool isTailQuery;
@@ -54,7 +40,7 @@ void QAHandler::setOptions(std::map<std::string, std::string> options){
         std::pair<int,int>& query = queries[i];
         isTailQuery ?  target.addIdx(query.first, query.second, 0) : target.addIdx(0, query.second, query.first);
     }
-    ranker.makeRanking(target, *data, *rules, *filter);
+    ranker.makeRanking(target, dHandler->getData(), dHandler->getRules(), dHandler->getFilter());
 
     // CandidateConfs is  std::vector<pair<int,double>>
     std::unordered_map<int, std::unordered_map<int, CandidateConfs>>& candConfs = isTailQuery ? ranker.getTailQcandsConfs() : ranker.getHeadQcandsConfs();
@@ -72,16 +58,17 @@ void QAHandler::setOptions(std::map<std::string, std::string> options){
 
 
 //queries are (sourceEntity, relation)
- std::vector<std::vector<std::pair<std::string, double>>> QAHandler::answerQueries(std::vector<std::pair<std::string, std::string>> queries, std::string headOrTail){
-    if (!loadedData){
+ std::vector<std::vector<std::pair<std::string, double>>> QAHandler::answerQueries(std::vector<std::pair<std::string, std::string>> queries, std::shared_ptr<DataHandler> dHandler , std::string headOrTail){
+     if (!dHandler->getLoadedData()){
         throw std::runtime_error("You must load data before you can answer questions.");
     }
-    if (!loadedRules){
+    if (!dHandler->getLoadedRules()){
         throw std::runtime_error("You must load rules before you can answer questions.");
 
     }
     ranker.clearAll();
     std::vector<std::vector<std::pair<std::string, double>>> ret(queries.size());
+    std::shared_ptr<Index> index = dHandler->getIndex();
     TripleStorage target(index);
     bool isTailQuery;
     if (headOrTail=="tail"){
@@ -110,7 +97,7 @@ void QAHandler::setOptions(std::map<std::string, std::string> options){
        
         isTailQuery ?  target.add(query.first, query.second, index->getStringOfNodeId(d)) : target.add(index->getStringOfNodeId(d), query.second, query.first);
     }
-    ranker.makeRanking(target, *data, *rules, *filter);
+    ranker.makeRanking(target, dHandler->getData(), dHandler->getRules(), dHandler->getFilter());
 
     // CandidateConfs is  std::vector<pair<int,double>>
     std::unordered_map<int, std::unordered_map<int, CandidateConfs>>& candConfs = isTailQuery ? ranker.getTailQcandsConfs() : ranker.getHeadQcandsConfs();
