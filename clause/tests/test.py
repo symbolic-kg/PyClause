@@ -54,6 +54,7 @@ def test_uc_b_zero_ranking():
     "use_u_c_rules": "True",
     "use_u_d_rules": "False",
     "use_b_rules": "True",
+    "rule_num_unseen": "5",
     }
 
     loader = c_clause.DataHandler(options)
@@ -143,6 +144,7 @@ def test_237_all_ranking():
     "rule_u_d_weight":"0.01",
     "use_u_xxc_rules": "True",
     "use_u_xxd_rules": "True",
+    "rule_num_unseen":  "5",
     }
 
     loader = c_clause.DataHandler(options)
@@ -210,7 +212,7 @@ def test_qa_handler():
         "rule_u_d_weight":"0.01",
         "use_u_xxc_rules": "true",
         "use_u_xxd_rules": "true",
-        "tie_handling": "frequency"
+        "tie_handling": "frequency",
     }
 
 

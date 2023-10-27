@@ -30,6 +30,18 @@ double Rule::getConfidence(int nUnseen, bool exact){
     
 }
 
+
+double Rule::getConfidence(bool exact){
+    if (exact){
+        return confWeight * ((double) cpredicted/((double) predicted + (double)numUnseen)); 
+    }else{
+        return confWeight *((double) sampledCpredicted/((double) sampledPredicted + (double)numUnseen)); 
+    }
+    
+}
+
+
+
 void Rule::setStats(int _predicted, int _cpredicted, bool exact){
     if (exact){
         cpredicted = _cpredicted;
@@ -98,6 +110,9 @@ void Rule::setConfWeight(double weight){
     confWeight = weight;
 }
 
+void Rule::setNumUnseen(int val){
+    numUnseen = val;
+}
 
 // ***RuleB implementation*** 
 

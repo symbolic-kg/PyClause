@@ -30,15 +30,21 @@ public:
     void setCreateRuleD(bool ind);
     void setCreateRuleXXd(bool ind);
     void setCreateRuleXXc(bool ind);
+    void setNumUnseen(int val);
 
 private:
     std::shared_ptr<Index> index;
+
+    // ***Rule options***
     bool createRuleZ = true;
     bool createRuleB = true;
     bool createRuleC = true;
     bool createRuleD = true;
     bool createRuleXXd = true;
     bool createRuleXXc = true;
+
+    // laplace smoothing for rule confidence
+    int num_unseen = 5;
 };
 
 

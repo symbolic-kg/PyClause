@@ -34,13 +34,15 @@ public:
 		targetRel(0),
 		rulestring(""),
 		trackInMaterialize(false),
-		confWeight(1.0)
+		confWeight(1.0),
+		numUnseen(5)
 	{};
 	void setID(int ID);
 	void print();
 	//Getter
 	int getID();
 	double getConfidence(int nUnseen, bool exact=false);
+	double getConfidence(bool exact=false);
 	void setStats(int cpredicted, int predicted, bool exact=false);
 	std::array<int,2> getStats(bool exact=false);
 	std::string getRuleString();
@@ -63,10 +65,12 @@ public:
 	void setTrackInMaterialize(bool val);
 	void setConfWeight(double weight);
 	void setRuleString(std::string str);
+	void setNumUnseen(int val);
 
 	// only used for Uxxd Uxxc rules when particularly parsed from Anyburl rule files
 	virtual void setPredictHead(bool ind);
 	virtual void setPredictTail(bool ind);
+
 	bool predictHead;
 	bool predictTail;
 	
@@ -84,6 +88,9 @@ protected:
 	int sampledCpredicted;
 	// weight confidence with this value; is 1 per default but used for ruleZ
 	double confWeight;
+
+	// laplace smoothing for confidence prediction
+	int numUnseen;
 
 	// track exact num(correct)predicted when running materialize
 	bool trackInMaterialize;

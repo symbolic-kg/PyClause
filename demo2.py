@@ -38,7 +38,9 @@ options = {
     "rule_u_d_weight":"0.01",
     "use_u_xxc_rules": "true",
     "use_u_xxd_rules": "true",
-    "tie_handling": "frequency"
+    "tie_handling": "frequency",
+    "rule_num_unseen": "5",
+    
 }
 
 

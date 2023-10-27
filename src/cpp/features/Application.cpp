@@ -237,8 +237,8 @@ void ApplicationHandler::scoreMaxPlus(
 
         int minRules = std::min(rulesA.size(), rulesB.size());
         for (int i=0; i<minRules; i++){
-            double confA = rulesA[i]->getConfidence(_cfg_nUnseen);
-            double confB = rulesB[i]->getConfidence(_cfg_nUnseen);
+            double confA = rulesA[i]->getConfidence();
+            double confB = rulesB[i]->getConfidence();
             if (confA > confB){
                 return true;
             } else if (confB > confA){
@@ -273,7 +273,7 @@ void ApplicationHandler::scoreMaxPlus(
         aggrCand.push_back(
             std::make_pair(
                 pair.first,
-                pair.second[0]->getConfidence(_cfg_nUnseen)
+                pair.second[0]->getConfidence()
                 )
             );
      }

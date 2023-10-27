@@ -51,15 +51,17 @@ std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody
     // UXXc rule
     if (symBodyAtom.containsConstant){
         if (createRuleXXc){
-            std::unique_ptr<Rule> ruleXXc = std::make_unique<RuleXXc>(relations, directions, symBodyAtom.constant);      
+            std::unique_ptr<Rule> ruleXXc = std::make_unique<RuleXXc>(relations, directions, symBodyAtom.constant);
+            ruleXXc->setNumUnseen(num_unseen);      
             return std::move(ruleXXc);
-            } else {
-                return nullptr;
-            }
+        } else {
+            return nullptr;
+        }
     // Uxxd rule
     }else{
         if (createRuleXXd){
             std::unique_ptr<Rule> ruleXXd = std::make_unique<RuleXXd>(relations, directions);
+            ruleXXd->setNumUnseen(num_unseen);
             return std::move(ruleXXd);
         }else{
             return nullptr;
@@ -146,9 +148,10 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
             // UXXc rule
             if (symBodyAtom.containsConstant){
                 if (createRuleXXc){
-                     std::unique_ptr<Rule> ruleXXc = std::make_unique<RuleXXc>(relations, directions, symBodyAtom.constant);
+                    std::unique_ptr<Rule> ruleXXc = std::make_unique<RuleXXc>(relations, directions, symBodyAtom.constant);
                     ruleXXc->setPredictHead(predictHead);
                     ruleXXc->setPredictTail(predictTail);
+                    ruleXXc->setNumUnseen(num_unseen);
                     return std::move(ruleXXc);
                 } else {
                       return nullptr;
@@ -159,6 +162,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
                     std::unique_ptr<Rule> ruleXXd = std::make_unique<RuleXXd>(relations, directions);
                     ruleXXd->setPredictHead(predictHead);
                     ruleXXd->setPredictTail(predictTail);
+                    ruleXXd->setNumUnseen(num_unseen);
                     return std::move(ruleXXd);
                 }else{
                     return nullptr;
@@ -175,7 +179,9 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
         symAtom sym;
         parseSymAtom(headAtom, sym);
         if (createRuleZ){
-            return std::make_unique<RuleZ>(relID, sym.leftC, sym.constant); //cals std::move implicitly
+            std::unique_ptr<RuleZ> rulez = std::make_unique<RuleZ>(relID, sym.leftC, sym.constant);
+            rulez->setNumUnseen(num_unseen);
+            return  std::move(rulez);
         }
         else{
             return nullptr;
@@ -365,11 +371,17 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
     } 
 
     if (ruleType=="RuleB" && createRuleB){
-        return std::make_unique<RuleB>(relations, directions);
+        std::unique_ptr<RuleB> ruleb = std::make_unique<RuleB>(relations, directions);
+        ruleb ->setNumUnseen(num_unseen);
+        return std::move(ruleb); 
     } else if (ruleType=="RuleC" && createRuleC){
-        return std::make_unique<RuleC>(relations, directions, leftC, constants);
+        std::unique_ptr<RuleC> rulec = std::make_unique<RuleC>(relations, directions, leftC, constants);
+        rulec->setNumUnseen(num_unseen);
+        return std::move(rulec);
     }else if(ruleType=="RuleD" && createRuleD){
-        return std::make_unique<RuleD>(relations, directions, leftC, constants[0]);
+        std::unique_ptr<RuleD> ruled = std::make_unique<RuleD>(relations, directions, leftC, constants[0]);
+        ruled->setNumUnseen(num_unseen);
+        return std::move(ruled);
     } else {
         return nullptr;
     }
@@ -434,6 +446,10 @@ void RuleFactory::setCreateRuleXXd(bool ind){
 
 void RuleFactory::setCreateRuleXXc(bool ind){
     createRuleXXc = ind;
+}
+
+void RuleFactory::setNumUnseen(int val){
+    num_unseen = val;
 }
 
 
