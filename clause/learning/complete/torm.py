@@ -17,9 +17,13 @@ class Torm():
         self.triples = triples
         self.rules = RuleSet(triples.index)
         self.c_clause_handler = None
+        self.c_clause_loader = None
 
-    def set_c_clause_handler(self, train_path):
-        self.c_clause_handler = c_clause.RuleHandler(train_path)
+    def set_c_clause_handler(self):
+        options = {}
+        self.c_clause_loader = c_clause.DataHandler(options)
+        self.c_clause_loader.load_data(self.triples.path)
+        self.c_clause_handler = c_clause.RulesHandler()
 
     def mine_z_rules(self):
         print(">>> mining z-rules ...")
@@ -31,6 +35,7 @@ class Torm():
                     rule = RuleZ(self.rules, hr, sub, False)
                     rule.pred = preds
                     rule.cpred = num_obj
+                    rule.store()
             for obj in self.triples.r2_obj[hr]:
                 num_sub = len(self.triples.obj_rel_2_sub[obj][hr])
                 preds = len(self.triples.r2_sub[hr])
@@ -38,6 +43,7 @@ class Torm():
                     rule = RuleZ(self.rules, hr, obj, True)
                     rule.pred = preds
                     rule.cpred = num_sub
+                    rule.store()
 
     def mine_ud_rules(self):
         print(">>> mining ud-rules ...")
@@ -57,7 +63,16 @@ class Torm():
 
     def mine_uc_rules(self):
         print(">>> mining uc-rules ...")
+        current_time = time.time()
+        bc_count = 0
+
         for bc in self.triples.sub_rel_2_obj:
+            bc_count += 1
+            next_time = time.time()
+            if (current_time + 5 < next_time):
+                current_time = next_time
+                frac = bc_count / (len(self.triples.sub_rel_2_obj) + len(self.triples.obj_rel_2_sub))
+                print(">>> ...  mined ~" + str(round(frac * 100)) + "%s")
             for br in self.triples.sub_rel_2_obj[bc]:
                 if len(self.triples.sub_rel_2_obj[bc][br]) >= config.rules["uc"]["support"]:
                     preds = len(self.triples.sub_rel_2_obj[bc][br])
@@ -65,6 +80,10 @@ class Torm():
                     self.create_uc_rules_from_stats(statsx, br, bc, preds, True, False)
                     self.create_uc_rules_from_stats(statsy, br, bc, preds, False, False)
         for bc in self.triples.obj_rel_2_sub:
+            if (current_time + 5 < next_time):
+                current_time = next_time
+                frac = bc_count / (len(self.triples.sub_rel_2_obj) + len(self.triples.obj_rel_2_sub))
+                print(">>> ...  mined ~" + str(round(frac * 100)) + "%")
             for br in self.triples.obj_rel_2_sub[bc]:
                 if len(self.triples.obj_rel_2_sub[bc][br]) >= config.rules["uc"]["support"]:
                     preds = len(self.triples.obj_rel_2_sub[bc][br])
@@ -95,17 +114,20 @@ class Torm():
         for hr in stats:
             for hc in stats[hr]:
                 if stats[hr][hc] >= config.rules["uc"]["support"] and stats[hr][hc] / preds >= config.rules["uc"]["confidence"] :
-                    rule = RuleUc(self.rules, hr, br, hc, hc_right, bc, bc_right)
+                    # ef __init__(self, ruleset, target, rels, dirs, hc, hc_right, bc):
+                    rule = RuleUc(self.rules, hr, (br,), (bc_right,), hc, hc_right, bc)
                     rule.pred = preds
                     rule.cpred = stats[hr][hc]
+                    rule.store()
 
     def create_ud_rules_from_stats(self, stats, br, preds, hc_right, dangling_right):
         for hr in stats:
             for hc in stats[hr]:
                 if stats[hr][hc] >= config.rules["ud"]["support"] and stats[hr][hc] / preds >= config.rules["ud"]["confidence"] :
-                    rule = RuleUd(self.rules, hr, br, hc, hc_right, dangling_right)
+                    rule = RuleUd(self.rules, hr, (br,), (dangling_right,), hc, hc_right)
                     rule.pred = preds
                     rule.cpred = stats[hr][hc]
+                    rule.store()
 
 
     def mine_xx_uc_rules(self):
@@ -154,6 +176,7 @@ class Torm():
                 rule = RuleXXuc(rules, hr, br, bc, bc_right)
                 rule.pred = preds
                 rule.cpred = stats[hr]
+                rule.store()
 
     def create_xx_ud_rules_from_stats(self, rules, stats, br, preds, dangling_right):
         for hr in stats:
@@ -162,22 +185,7 @@ class Torm():
                 rule = RuleXXud(rules, hr, br, dangling_right)
                 rule.pred = preds
                 rule.cpred = stats[hr]
-
-    # -ruleid sub1 obj1 subj obj1  
-    def mine_b_rules(self, pid, lock, prediction_data, candidates, train_path, index, sender):
-        self.set_c_clause_handler(train_path)
-        lock.acquire()
-        info_steps = (len(candidates) // 200) + 1
-        counter = 0
-        data_index = 0
-        for candidate in candidates:
-            if pid == 0 and counter % info_steps == 0:
-                sender.send(counter/len(candidates))
-            data_index, success = candidate.score(self.triples, lock, prediction_data, data_index, self.c_clause_handler)
-            counter += 1
-        if data_index < len(prediction_data):
-            prediction_data[data_index] = 0   
-        lock.release()
+                rule.store()
 
     def mine_b_rule_candidates(self, num_of_atoms):
         candidates = RuleSet(self.triples.index)
@@ -192,7 +200,7 @@ class Torm():
                 print(">>> ... still constructing b-rule candidates, " + str(count) + " out of " + str(len(self.targets)) + " relations processed so far ...") 
             for pattern_l in ltf:
                 for pattern in pattern_l:
-                    self.searchX(candidates, (target,), 0, pattern)
+                    self.search(candidates, (target,), 0, pattern)
         return candidates
 
     def directions_combinations(self, num_body_atoms):
@@ -208,6 +216,7 @@ class Torm():
             ln.append((*p, False))
         ltf.append(ln)
 
+    # probably you can delete this method
     def searchX(self, candidates, relations, index, pattern):
         i = 0
         j = 0
@@ -243,26 +252,18 @@ class Torm():
         if index < len(pattern):
             for r_next in r2r:
                 self.search(candidates, (*relations, r_next), index+1, pattern)
-        else:
-            if relations[-1] in r2r:
-                rels_ordered = [relations[0]]
-                rels_ordered.extend(relations[1::2])
-                back_rels = relations[2::2]
-                back_rels.reverse()
-                rels_ordered.extend(back_rels)
-                rule = RuleB(rels_ordered, pattern)
-                if not(rule.trivial()): candidates.add_rule(rule)
 
     def search(self, candidates, relations, index, pattern):
         if index == len(pattern):
             if pattern[-1]:
                 if relations[0] in self.triples.r2r_oo[relations[-1]]:
-                    rule = RuleB(candidates, relations, pattern)
-                    if not(rule.trivial()): candidates.add_rule(rule)
+                    if (len(pattern) != 1 or relations[0] != relations[1]):
+                        rule = RuleB(candidates, relations[0], relations[1:], pattern)
+                        if not(rule.trivial()): rule.store()
             else:
                 if relations[0] in self.triples.r2r_so[relations[-1]]:
-                    rule = RuleB(candidates, relations, pattern)
-                    if not(rule.trivial()):  candidates.add_rule(rule)
+                    rule = RuleB(candidates, relations[0], relations[1:], pattern)
+                    if not(rule.trivial()): rule.store()
             return
         # standard case where you have to go deeper
         r = relations[index]
@@ -279,86 +280,55 @@ class Torm():
             #if self.triples.get_1to1_score(r_next) < 0.05:
             #    continue
             self.search(candidates, (*relations, r_next), index+1, pattern)
-            rule = RuleB(candidates, relations, pattern)
+            #rule = RuleB(candidates, relations[0], relations[1:], pattern)
 
 
     def mine_rules(self):
-        try:
-            mp.set_start_method(config.multithreading["start_method"])
-        except:
-            print(">>> you are running on a plaform that does not support " + str(config.multithreading["start_method"]) + " to start a process, using spawn as fallback")
-            mp.set_start_method('spawn')
-
-        num_of_processes = config.multithreading["worker"]
-
+       
         # ***********************************
         if config.rules['b']['active']:
         
             print(">>> mining b-rules ...")
             candidates = self.mine_b_rule_candidates(config.rules['b']['length'])
-            print(">>> constructed " + str(candidates.size()) + " b-rules candidates, materialization started using " + str(num_of_processes) + " processes ...")
-        
+            print(">>> constructed " + str(candidates.size()) + " b-rules candidates, materialization started ...")
+
             start = time.time()
             
+            batches = math.ceil(candidates.size() / config.rules['b']['batchsize'])
             candidate_lists = []
-            for i in range(num_of_processes): candidate_lists.append([])
+
+            for i in range(0,batches):
+                candidate_lists.append([])
+
             j = 0
             for c in candidates.rules:
                 j += 1
-                index = j % num_of_processes
+                index = j % batches
                 candidate_lists[index].append(c)
-        
-            with mp.Manager() as manager:
-                reciever, sender = mp.Pipe()
-                prediction_data = []
-                locks = []
-                for pid in range(num_of_processes):
-                    prediction_data.append(mp.Array('i', config.multithreading["brules_dataarray_size"]))
-                    locks.append(mp.Lock())
-                procs = []
-                for pid in range(num_of_processes):
-                    if pid == 0:
-                        proc = mp.Process(target=self.mine_b_rules, args=(pid, locks[pid], prediction_data[pid], candidate_lists[pid], self.triples.path, self.triples.index, sender))
-                    else:
-                        proc = mp.Process(target=self.mine_b_rules, args=(pid, locks[pid], prediction_data[pid], candidate_lists[pid], self.triples.path, self.triples.index, None))
-                    procs.append(proc)
-                    proc.start()
 
-                still_running = True
-                fetched = set()
-                progress = 0.0
-                previous_time = 0
-                while still_running:
-                    time.sleep(0.1)
-                    alive_counter = 0
-                    pid = 0
-                    for proc in procs:
-                        if proc.is_alive():
-                            alive_counter += 1
-                            if locks[pid].acquire(block=False):
-                                self.rules.transfer_prediction_data(pid, prediction_data[pid], candidates)
-                                print(">>>  ~> rule scores computed by worker #" + str(pid) + " transferred to main process (buffer was full)")
-                                locks[pid].release()
-                                time.sleep(0.1)
-                        else:
-                            if not(pid in fetched):
-                                self.rules.transfer_prediction_data(pid, prediction_data[pid], candidates)
-                                fetched.add(pid)
-                                print(">>>  ~> rule scores computed by worker #" + str(pid) + " transferred to main process")
-                        pid += 1
-                    current_time = time.time()
-                    if current_time - previous_time > 1:
-                        previous_time = current_time
-                        if 0 in fetched:
-                            print(">>> ... running for " + str(math.floor(current_time - start)) + "s, " + str(alive_counter)+ " subprocesses alive")
-                        else:
-                            while reciever.poll():
-                                progress = reciever.recv()
-                            print(">>> ... running for " + str(math.floor(current_time - start)) + "s, " + str(alive_counter)+ " subprocesses alive, process #0 has materialized " + "{0:.1%}".format(progress) +" of its rules")
-                    if alive_counter == 0:
-                        still_running = False
-                for pid in range(num_of_processes):
-                    self.rules.transfer_prediction_data(pid, prediction_data[pid], candidates)
+
+            print(">>> divided candidates into " + str(batches) + " batches")
+            self.set_c_clause_handler()
+            j = 0
+            for clist in candidate_lists:
+                rlist = list(map(lambda x : str(x), clist))
+                preds = self.c_clause_handler.stats_and_predictions(rlist, self.c_clause_loader,  False, True)
+                print(">>> ... batch #" + str(j) + " of " + str(batches))
+                #print("len clist = " + str(len(clist)))
+                #print("len rlist = " + str(len(rlist)))
+                #print("len preds[1]= " + str(len(preds[1])))
+                for i in range(len(preds[1])):
+                    rule = clist[i]
+                    (pred,cpred) = preds[1][i]
+                    if cpred >= config.rules["b"]["support"] and cpred / pred >= config.rules["b"]["confidence"]:
+                        rule.pred = pred
+                        rule.cpred = cpred
+                        self.rules.add_rule(rule)
+                        #if self.cpred == 0:
+                        #    print(str(rule))
+                        #    exit
+                j += 1
+            # exit()
             end = time.time()
             print(">>> elapsed time for materialization of " + str(self.rules.size()) + " b-rules: " + str(math.floor(end-start)) + "s") 
 

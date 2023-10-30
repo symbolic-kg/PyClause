@@ -183,6 +183,20 @@ class TripleSet:
       obj_per_sum = num_obj / num_sub
       rel_1to1 = min(sub_per_obj, obj_per_sum)
       return rel_1to1
+   
+   def write_masked(self, outpath):
+      f = open(outpath, "w")
+      for triple in self.triples:
+         sub = self.index.id2to[triple.sub].replace(',','~')
+         rel = self.index.id2to[triple.rel].replace(',','~')
+         obj = self.index.id2to[triple.obj].replace(',','~')
+         sub = sub.replace("(", "[")
+         sub = sub.replace(")", "]")
+         obj = obj.replace("(", "[")
+         obj = obj.replace(")", "]")
+         ts = "e" + sub + "\tr" + rel + "\te" + obj
+         f.write(ts + "\n")
+      f.close()
 
 
 class TripleIndex:

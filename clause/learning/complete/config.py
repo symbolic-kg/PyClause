@@ -2,12 +2,10 @@
 rules = dict(
     b = dict(
         active = True,
-        confidence = 0.01,
-        support = 5,
-        # pruning = (0,100), # (x,y) means that the search is stopped if after y attempts not more than x correct predictions have been found
-        length = 2,
-        # timeout = 5, # =1seconds
-        branches_per_level = ((500, (10,10,10)), (500, (10,10,10)))
+        confidence = 0.0001,
+        support = 2,
+        length = 3,
+        batchsize = 1000
     ),
     uc = dict(
         active = True,

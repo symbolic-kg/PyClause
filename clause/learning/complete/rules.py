@@ -13,6 +13,9 @@ from multiprocessing import Array
 
 class Rule:
 
+    var_symbols = (("X","Y"), ("X","A","Y"), ("X","A","B","Y"), ("X","A","B","C","Y"), ("X","A","B","C","D","Y"), ("X","A","B","C","D","E","Y"), ("X","A","B","C","D","E","F","Y"))
+
+
     id_counter = 0
 
     def __init__(self, ruleset):
@@ -23,6 +26,8 @@ class Rule:
         self.cpred = 0
         self.hashcode = None
         self.aconfidence = 0.0 # this is the counterpart to the applied confidence
+
+    def store(self):
         self.ruleset.add_rule(self)
         
     def get_confidence(self):
@@ -136,9 +141,12 @@ class RuleZ(Rule):
             self.target = target
             self.hc = hc
         else:
-            self.target = Rule.index.to2id[target]
-            self.hc = Rule.index.to2id[hc]
+            self.target = self.ruleset.index.to2id[target]
+            self.hc = self.ruleset.index.to2id[hc]
         self.hc_right = hc_right # if true, the rule is an X rule, otherwise it is an Y rule
+
+    def vectorized(self):
+        return ("Z", self.target, self.hc_right, self.hc)
 
     def __str__(self):
         ii = self.ruleset.index
@@ -170,42 +178,61 @@ class RuleUd(Rule):
     A unary rule with a constant in head and a dangling (free) variabale in the body. The body consists of exactly one atom.
     A rule of this type has the form h(X,a) <= b1(X,A).
     """
-    def __init__(self, ruleset, target, rel, hc, hc_right, dangling_right):
+    def __init__(self, ruleset, target, rels, dirs, hc, hc_right):
         super().__init__(ruleset)
-        self.target = target
-        self.rel = rel
-        self.hc = hc
+        if isinstance(rels[0], int):
+            self.target = target
+            self.rels = rels
+            self.hc = hc
+        else:
+            self.target = self.ruleset.index.to2id[target]
+            self.rels = tuple(map(lambda x : self.ruleset.index.to2id[x], rels))
+            self.hc = self.ruleset.index.to2id[hc]
+        self.dirs = dirs
         self.hc_right = hc_right # if true, the rule is an X rule, otherwise it is an Y rule
-        self.dangling_right = dangling_right
+        self.bc_right = dirs[-1]
+
+    def vectorized(self):
+        if self.hc_right:
+            return ("Ud", self.target, (self.rels, self.dirs, self.hc_right, self.hc))
+        else:
+            return ("Ud", self.target, (self.rels[::-1], tuple(map(lambda x : not x, self.dirs))[::-1], self.hc_right, self.hc))
 
     def __str__(self):
         ii = self.ruleset.index
         rep = ""
         (head_left, head_right)  = ("X",ii.id2to[self.hc]) if self.hc_right else (ii.id2to[self.hc],"Y")
-        v = "X" if self.hc_right else "Y"
-        body_left, body_right  = (v,"A") if self.dangling_right else ("A",v)
-        rep += ii.id2to[self.target] + "(" + head_left + "," + head_right + ") <= " + ii.id2to[self.rel] + "(" + body_left + "," + body_right + ")"
+        rep += ii.id2to[self.target] + "(" + head_left + "," + head_right + ") <="
+        my_vars = Rule.var_symbols[len(self.rels)] # on purpose we are chosing a size that is on ehigher
+        for i in range(len(self.rels)):
+            (v1, v2) = (my_vars[i], my_vars[i+1]) if self.dirs[i] else (my_vars[i+1], my_vars[i])
+            if i == 0 and not self.hc_right:
+                if v1 == "X": v1 = "Y"
+                else: v2 = "Y"
+            rep += " " + ii.id2to[self.rels[i]] + "(" + v1 + "," + v2 + ")"
+            if i < len(self.rels)-1: rep += ","
         return rep
-    
+
     def __eq__(self, other):
         if type(self) != type(other): return False
         if self.target != other.target: return False
-        if self.rel != other.rel: return False
+        if self.rels != other.rels: return False
+        if self.dirs != other.dirs: return False
         if self.hc != other.hc: return False
         if self.hc_right != other.hc_right: return False
-        if self.dangling_right != other.dangling_right: return False
         return True
     
     def __hash__(self):
         if (self.hashcode == None):
             self.hashcode = self.hc
             self.hashcode += self.target if self.hc_right else -self.target
-            self.hashcode += self.rel if self.dangling_right else -self.rel
+            i = 0
+            for dir in self.dirs:
+                rel = self.rels[i]
+                self.hashcode += rel if dir else -rel
+                i += 1
         return self.hashcode
     
-    def materialize(self, triples, predictions):
-        # todo, implement if required
-        pass
 
 class RuleUc(Rule): 
     """
@@ -213,96 +240,119 @@ class RuleUc(Rule):
     A rule of this type has the form h(X,a) <= b1(X,b).
     """    
 
-    def __init__(self, ruleset, target, rel, hc, hc_right, bc, bc_right):
+    def __init__(self, ruleset, target, rels, dirs, hc, hc_right, bc):
         super().__init__(ruleset)
-        if isinstance(target, int):
+        if isinstance(rels[0], int):
             self.target = target
-            self.rel = rel
+            self.rels = rels
             self.hc = hc
             self.bc = bc
         else:
             self.target = self.ruleset.index.to2id[target]
-            self.rel = self.ruleset.index.to2id[rel]
+            self.rels = tuple(map(lambda x : self.ruleset.index.to2id[x], rels))
             self.hc = self.ruleset.index.to2id[hc]
             self.bc = self.ruleset.index.to2id[bc]
+        self.dirs = dirs
         self.hc_right = hc_right # if true, the rule is an X rule, otherwise it is an Y rule
-        self.bc_right = bc_right
+        self.bc_right = dirs[-1] 
 
+    def vectorized(self):
+        if self.hc_right:
+            return ("Uc", self.target, (self.rels, self.dirs, self.hc_right, self.hc, self.bc))
+        else:
+            return ("Uc", self.target, (self.rels[::-1], tuple(map(lambda x : not x, self.dirs))[::-1], self.hc_right, self.hc, self.bc))
+    
     def __str__(self):
         ii = self.ruleset.index
         rep = ""
         (head_left, head_right)  = ("X",ii.id2to[self.hc]) if self.hc_right else (ii.id2to[self.hc],"Y")
-        v = "X" if self.hc_right else "Y"
-        body_left, body_right  = (v,ii.id2to[self.bc]) if self.bc_right else (ii.id2to[self.bc],v)
-        rep += ii.id2to[self.target] + "(" + head_left + "," + head_right + ") <= " + self.ruleset.index.id2to[self.rel] + "(" + body_left + "," + body_right + ")"
+        rep += ii.id2to[self.target] + "(" + head_left + "," + head_right + ") <="
+        my_vars = Rule.var_symbols[len(self.rels) - 1]
+        for i in range(len(self.rels)):
+            (v1, v2) = (my_vars[i], my_vars[i+1]) if self.dirs[i] else (my_vars[i+1], my_vars[i])
+            if i == 0 and not self.hc_right:
+                if v1 == "X": v1 = "Y"
+                else: v2 = "Y"
+            if i == len(self.rels) - 1:
+                if self.bc_right: v2 = ii.id2to[self.bc]
+                else: v1 = ii.id2to[self.bc]
+            rep += " " + ii.id2to[self.rels[i]] + "(" + v1 + "," + v2 + ")"
+            if i < len(self.rels)-1: rep += ","
         return rep
 
     def __eq__(self, other):
         if type(self) != type(other): return False
         if self.target != other.target: return False
-        if self.rel != other.rel: return False
+        if self.rels != other.rels: return False
+        if self.dirs != other.dirs: return False
         if self.hc != other.hc: return False
         if self.bc != other.bc: return False
         if self.hc_right != other.hc_right: return False
-        if self.bc_right != other.bc_right: return False
         return True
 
     def __hash__(self):
         if (self.hashcode == None):
-            self.hashcode = self.hc + self.bc
+            self.hashcode = self.hc
             self.hashcode += self.target if self.hc_right else -self.target
-            self.hashcode += self.rel if self.bc_right else -self.rel
+            i = 0
+            for dir in self.dirs:
+                rel = self.rels[i]
+                self.hashcode += rel if dir else -rel
+                i += 1
+            self.hashcode += self.bc
         return self.hashcode
 
-    def materialize(self, triples, predictions):
-        if (self.target == self.rel and self.hc == self.bc and self.hc_right == self.bc_right):
-            return False
-        x_r_2_y = triples.obj_rel_2_sub if self.bc_right else triples.sub_rel_2_obj
-        predicted_sub_obj = []
-        for value in x_r_2_y[self.bc][self.rel]:
-            self.pred += 1
-            (x,y) = (value,self.hc) if self.hc_right else (self.hc,value)
-            predicted_sub_obj.append((x,y))
-            if triples.is_known(x, self.target, y):
-                self.cpred += 1
-        if self.get_confidence() < config.rules['uc']['confidence']: return False
-        if self.cpred < config.rules['uc']['support']: return False
-        for predicted in predicted_sub_obj:
-            predictions.add_prediction(predicted[0], self.target, predicted[1], self)
-        return True
+    # still required ... ???
+    #def materialize(self, triples, predictions):
+    #    if (self.target == self.rel and self.hc == self.bc and self.hc_right == self.bc_right):
+    #        return False
+    #    x_r_2_y = triples.obj_rel_2_sub if self.bc_right else triples.sub_rel_2_obj
+    #    predicted_sub_obj = []
+    #    for value in x_r_2_y[self.bc][self.rel]:
+    #        self.pred += 1
+    #        (x,y) = (value,self.hc) if self.hc_right else (self.hc,value)
+    #        predicted_sub_obj.append((x,y))
+    #        if triples.is_known(x, self.target, y):
+    #            self.cpred += 1
+    #    if self.get_confidence() < config.rules['uc']['confidence']: return False
+    #    if self.cpred < config.rules['uc']['support']: return False
+    #    for predicted in predicted_sub_obj:
+    #        predictions.add_prediction(predicted[0], self.target, predicted[1], self)
+    #    return True
 
 class RuleB(Rule):
     """
-    A binary rule of the form h(X,Y) <= b1(X,A), b2(A,B), b3(B,Y). This rule can have between one and five body atoms.
+    A binary rule of the form h(X,Y) <= b1(X,A), b2(A,B), b3(B,Y). This rule can have between one and seven body atoms.
     """
 
-    var_symbols = (("X","Y"), ("X","A","Y"), ("X","A","B","Y"), ("X","A","B","C","Y"), ("X","A","B","C","D","Y"), ("X","A","B","C","D","E","Y"), ("X","A","B","C","D","E","F","Y"))
 
-    branches_at_zero     = config.rules["b"]["branches_per_level"][0][0]
-    branches_at_zero_rev = config.rules["b"]["branches_per_level"][1][0]
-    branches_per_level     = config.rules["b"]["branches_per_level"][0][1]
-    branches_per_level_rev = config.rules["b"]["branches_per_level"][1][1]
+    #branches_at_zero     = config.rules["b"]["branches_per_level"][0][0]
+    #branches_at_zero_rev = config.rules["b"]["branches_per_level"][1][0]
+    #branches_per_level     = config.rules["b"]["branches_per_level"][0][1]
+    #branches_per_level_rev = config.rules["b"]["branches_per_level"][1][1]
 
 
-    def __init__(self, ruleset, rels, dirs):
+    def __init__(self, ruleset, target, rels, dirs):
         super().__init__(ruleset)
-        if isinstance(rels[0], int):
-            self.target = rels[0]
-            self.rels = tuple(rels[1:])
+        if isinstance(target, int):
+            self.target = target
+            self.rels = tuple(rels)
             self.dirs = tuple(dirs)
         else:
-            self.target = Rule.index.to2id[rels[0]]
-            self.rels = tuple(map(lambda x : Rule.index.to2id[x], rels[1:]))
+            self.target = self.ruleset.index.to2id[target]
+            self.rels = tuple(map(lambda x : self.ruleset.index.to2id[x], rels))
             self.dirs = tuple(dirs)
 
     def __str__(self):
         return self.get_rep(self.ruleset.index.id2to)
     
-    # take care
+    def vectorized(self):
+        return ("B", (self.target,) + self.rels, self.dirs)
+
     def get_rep(self, id2to):
         rep = ""
         rep += id2to[self.target] + "(X,Y) <="
-        my_vars = RuleB.var_symbols[len(self.rels) - 1]
+        my_vars = Rule.var_symbols[len(self.rels) - 1]
         for i in range(len(self.rels)):
             (v1, v2) = (my_vars[i], my_vars[i+1]) if self.dirs[i] else (my_vars[i+1], my_vars[i])
             rep += " " + id2to[self.rels[i]] + "(" + v1 + "," + v2 + ")"
@@ -550,44 +600,68 @@ class RuleB(Rule):
 class RuleSet:
 
     rules = []
-    id2rules = {}
+    #id2rules = {}
 
     def __init__(self, index):
         self.index = index
         self.rules = []
 
     def add_rule(self, rule):
-        self.id2rules[rule.id] = rule
+        #self.id2rules[rule.id] = rule
         self.rules.append(rule)
+
+
+    def add_ruleset(self, other):
+        for orule in other.rules:
+           self.add_rule(orule) 
+
 
     def add_rules(self, myrules):
         for myrule in myrules:
             self.add_rule(myrule)
 
-    def get_rule_by_id(self, id):
-        return self.id2rules[id]
+    #def get_rule_by_id(self, id):
+    #    return self.id2rules[id]
 
     def size(self):
         return len(self.rules)
+    
+    def retainOnly(self, *args):
+        retained_rules = []
+        for rule in self.rules:
+            retain = False
+            for t in args:
+                if t == "B" and isinstance(rule, RuleB): retain = True
+                if t == "Uc" and isinstance(rule, RuleUc): retain = True
+                if t == "Ud" and isinstance(rule, RuleUd): retain = True
+                if t == "Z" and isinstance(rule, RuleZ): retain = True
+                if t == "XXuc" and isinstance(rule, RuleXXuc): retain = True
+                if t == "XXud" and isinstance(rule, RuleXXud): retain = True
+            if retain:
+                retained_rules.append(rule)
+        print(">>> reduced size of ruleset from " + str(len(self.rules)) + " to " + str(len(retained_rules)) + " rules")
+        self.rules = retained_rules
 
-    def transfer_prediction_data(self, pid, prediction_data, candidates):
-        for index,rindex in enumerate(prediction_data[::3]):
-            if rindex == 0: break
-            i0 = index*3
-            i1,i2 = i0+1, i0+2
-            if rindex < 0:
-                rule = candidates.get_rule_by_id(-rindex)
-                rule.pred = prediction_data[i1]
-                rule.cpred = prediction_data[i2]
-                rule.aconfidence = rule.cpred / (rule.pred + config.hyperparams["uce"])
-                self.rules.append(rule)
-            else:
-                rule = candidates.get_rule_by_id(rindex)
-                rel = rule.target
-                sub = prediction_data[i1]
-                obj = prediction_data[i2]
-                self.add_prediction(sub, rel, obj, rule)
-        prediction_data[0] = 0   
+
+
+    #def transfer_prediction_data(self, pid, prediction_data, candidates):
+    #    for index,rindex in enumerate(prediction_data[::3]):
+    #        if rindex == 0: break
+    #        i0 = index*3
+    #        i1,i2 = i0+1, i0+2
+    #        if rindex < 0:
+    #            rule = candidates.get_rule_by_id(-rindex)
+    #            rule.pred = prediction_data[i1]
+    #            rule.cpred = prediction_data[i2]
+    #            rule.aconfidence = rule.cpred / (rule.pred + config.hyperparams["uce"])
+    #            self.rules.append(rule)
+    #        else:
+    #            rule = candidates.get_rule_by_id(rindex)
+    #            rel = rule.target
+    #            sub = prediction_data[i1]
+    #            obj = prediction_data[i2]
+    #            self.add_prediction(sub, rel, obj, rule)
+    #    prediction_data[0] = 0   
 
     def write(self, path, output_format="AnyBURL"):
         f = open(path, "w")
@@ -597,90 +671,22 @@ class RuleSet:
                 if type(rule) is RuleXXud or type(rule) is RuleXXuc:
                     ruleMeMyselfI = str(rule).replace("(X,X)", "(X,me_myself_i)")
                     f.write(str(rule.pred) + "\t" + str(rule.cpred) + "\t" + str(confidence) + "\t" +  ruleMeMyselfI + "\n")
+                    ruleMeMyselfI2 = str(rule).replace("(X,X)", "(me_myself_i,Y)")
+                    ruleMeMyselfI2 = ruleMeMyselfI2.replace("(X,", "(Y,")
+                    ruleMeMyselfI2 = ruleMeMyselfI2.replace(",X)", ",Y)")
+                    f.write(str(rule.pred) + "\t" + str(rule.cpred) + "\t" + str(confidence) + "\t" +  ruleMeMyselfI2 + "\n")
                 else:
                     f.write(str(rule.pred) + "\t" + str(rule.cpred) + "\t" + str(confidence) + "\t" + str(rule) + "\n")
-            print(">>> " + str(len(self.rules)) + " rules written to " +  path + " using AnyBURL format") 
+            print(">>> " + str(len(self.rules)) + " rules written to " +  path + " using AnyBURL format")
+            f.close()
+            return
             
-        if not(output_format == "AnyBURL"):
-            print(">>> could not write rules to disc, outputformat not available")
+        if output_format == "NanyTORM":
+            for rule in self.rules:
+                confidence = '{:.5f}'.format(rule.cpred / rule.pred)
+                f.write(str(rule.pred) + "\t" + str(rule.cpred) + "\t" + str(confidence) + "\t" + str(rule) + "\n")
+            print(">>> " + str(len(self.rules)) + " rules written to " +  path + " using NanyTORM format") 
+            f.close()
+            return
+        print(">>> could not write rules to disc, outputformat not available")
         f.close()
-
-
-class RuleReader:
-
-    def __init__(self):
-        pass
-   
-    def read_file(self, filepath):
-        file = open(filepath, 'r')
-        lines = file.readlines()
-        rules = []
-        count = 0
-        for line in lines:
-            count += 1
-            rule = self.read_line(line.strip())
-            if not(rule == None):
-                rules.append(rule)
-        file.close()
-        return rules
-
-            
-
-    def read_line(self, line):
-        # print("reading: " + line)
-        token = line.split("\t")
-        if len(token) != 4: return None
-        pred = int(token[0])
-        cpred = int(token[1])
-        conf = float(token[2])
-        hb = token[3].split(" <= ")
-        if "(X,Y)" in hb[0]: # RuleB
-            rels = []
-            rels.append(hb[0].split("(")[0])
-            atoms = hb[1].split(", ")
-            dirs = []
-            vars = RuleB.var_symbols[len(atoms)-1]
-            counter = 0
-            for atom in atoms:
-                atoken = atom.split("(")
-                rels.append(atoken[0])
-                dirs.append(atoken[1].startswith(vars[counter]))
-                counter += 1
-            rule = RuleB(rels, dirs)
-            rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
-            return rule
-        else:
-            if not(re.search("\(X,X\)", hb[0])) and not(re.search("\(X, X\)", hb[0])) and not(re.search("me_myself_i", hb[0])):
-                htoken = re.split("\(|,|\)",hb[0])
-                target = htoken[0]
-                if len(hb) == 1 or (len(hb) == 2 and len(hb[1]) < 2): # RuleZ
-                    if (htoken[1] == "X"):
-                        rule = RuleZ(target, htoken[2], True)
-                    else:
-                        rule = RuleZ(target, htoken[1], False) 
-                    rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
-                    return rule
-                else: # Uc or Ud rule
-                    btoken = re.split("\(|,|\)",hb[1])
-                    # print(btoken)
-                    if btoken[1] == "A" or btoken[2] == "A": # Ud rule (not yet supported)
-                        return None
-                    else: # Uc rule
-                        if htoken[1] == "X":
-                            if btoken[1] == "X": rule = RuleUc(target, btoken[0], htoken[2], True, btoken[2], True)
-                            else: rule = RuleUc(target, btoken[0], htoken[2], True, btoken[1], False) 
-                        else:
-                            if btoken[1] == "Y": rule = RuleUc(target, btoken[0], htoken[1], False, btoken[2], True)
-                            else: rule = RuleUc(target, btoken[0], htoken[1], False, btoken[1], False) 
-                        rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
-                    return rule
-            return None
-    
-if __name__ == '__main__':
-    triples = TripleSet("E:/code/eclipse-workspace/AnyBURL/data/wn18rr/train.txt")
-    rr = RuleReader()
-    r1 = rr.read_line("29722	5	1.682255568265931E-4	_derivationally_related_form(02566528,Y) <=")
-    print("Rule that has been read: " +  str(r1))
-    print("")
-    r2 = rr.read_line("2	2	1.0	_instance_hypernym(X,08969798) <= _instance_hypernym(X,08762104) ")
-    print("Rule that has been read: " +  str(r2))
