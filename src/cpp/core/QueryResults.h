@@ -25,13 +25,18 @@ public:
     void clear();
     std::vector<Rule*>& getRulesForCand(int cand);
     NodeToPredRules& getCandRules();
+    std::vector<int>& getCandsOrdered();
     // checks if at least discAtLeast top candidates can be fully disciminated
     bool checkDiscrimination();
+
     
 
 
 private:
+    // stores vector of rules (pointers) for every candidate
+    //typedef NodeToPredRules:  std::unordered_map<int, std::vector<Rule*>> NodeToPredRules;
     NodeToPredRules candRules;
+    // tracks insertion order of candidates elements are candidate idx's
     std::vector<int> candidateOrder;
 
     //**options**

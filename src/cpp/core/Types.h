@@ -36,6 +36,11 @@ typedef std::unordered_map<int, std::vector<Rule*>> NodeToPredRules;
 
 typedef std::vector<std::pair<int, double>> CandidateConfs;
 
+// for each rule (key) a vector of groundings, where a grounding is a vector of 3 ints;
+typedef std::unordered_map<Rule*, std::vector<std::vector<Triple>>> RuleGroundings;
+
+
+
 
 //typedef std::unordered_map<int, std::vector<Rule*>> RelToRules;
 

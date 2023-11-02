@@ -35,7 +35,8 @@ public:
 		rulestring(""),
 		trackInMaterialize(false),
 		confWeight(1.0),
-		numUnseen(5)
+		numUnseen(5),
+		madeTriplePred(false)
 	{};
 	void setID(int ID);
 	void print();
@@ -62,10 +63,19 @@ public:
 	virtual bool predictTailQuery(
 		int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet()
 	);
+
+	// will track groundings if groundings is not null;
+	virtual bool predictTriple(
+		int tail, int head, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings
+	);
+
+
 	void setTrackInMaterialize(bool val);
 	void setConfWeight(double weight);
 	void setRuleString(std::string str);
 	void setNumUnseen(int val);
+	// only used in conjunection with predictTriple and explain
+	void setTrackGroundings(bool ind);
 
 	// only used for Uxxd Uxxc rules when particularly parsed from Anyburl rule files
 	virtual void setPredictHead(bool ind);
@@ -103,6 +113,10 @@ protected:
 	
 	int targetRel;
 
+	// used only for predicTriple
+	bool madeTriplePred;
+
+
 	
 private:
 
@@ -127,6 +141,10 @@ public:
 	static int discriminationBound;
 	// if a nodes in the DFS opens more then specified value branches, go to the next node
 	static int branchingFaktor;
+
+	//
+	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
+
 
 
 
@@ -154,10 +172,15 @@ private:
 	std::vector<int> _relations;
 	std::vector<bool> _directions;
 	
+	// vanilla recursive DFS step
 	void searchCurrGroundings(
 		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
 		Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs 
 	);
+
+	// recursive DFS step with optional grounding tracking and a target closing entity (for scoring triples)
+	void searchCurrTargetGroundings(int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,  RuleGroundings* groundings);
 };
 
 

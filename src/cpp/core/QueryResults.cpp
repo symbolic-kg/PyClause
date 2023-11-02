@@ -51,6 +51,10 @@ void QueryResults::clear(){
     numDiscriminated = 0;
 }
 
+std::vector<int>& QueryResults::getCandsOrdered(){
+    return candidateOrder;
+}
+
 std::vector<Rule*>& QueryResults::getRulesForCand(int cand){
     return candRules[cand];
 }

@@ -94,6 +94,19 @@ void tests(){
     if (preds.size()!=5){
         throw std::runtime_error("Test 7 for B-rule predictTailQuery failed");
     }
+    // check predictTriple: obviously the triples formed with the predicted tailCandidates must be predicted
+    for (int tailCand: preds.getCandsOrdered()){
+        if (!ruleB->predictTriple(index->getIdOfNodestring(node), tailCand, data, preds, nullptr)){
+             throw std::runtime_error("Test 7.1 for B-rule predictTriple failed");
+        }
+        // any other triples must not be predicted
+        if (ruleB->predictTriple(index->getIdOfNodestring(node), 0, data, preds, nullptr)){
+             throw std::runtime_error("Test 7.1 for B-rule predictTriple failed");
+        }
+
+    }
+
+    
 
     node = "08921850";
     preds.clear();
