@@ -1,8 +1,8 @@
 
-from triples import TripleSet,TripleIndex
-from rules import Rule,RuleZ,RuleXXuc,RuleXXud,RuleUc,RuleUd,RuleB,RuleSet
+from clause.data.triples import TripleSet,TripleIndex
+from clause.rules.rules import Rule,RuleZ,RuleXXuc,RuleXXud,RuleUc,RuleUd,RuleB,RuleSet
 
-import config
+import clause.config.config as config
 import c_clause
 
 import time

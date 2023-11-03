@@ -1,8 +1,7 @@
-from torm import Torm
-from triples import TripleSet
+import sys
+import os
+sys.path.append(os.getcwd())
 
-from rules import RuleSet
-from ruleparser import RuleReader
 
 import c_clause
 
@@ -11,13 +10,13 @@ import c_clause
 
 if __name__ == '__main__':
 
-    path_train = "E:/exp/data/yago/train_masked.txt"
-    path_valid = "E:/exp/data/yago/valid_masked.txt"
-    path_test  = "E:/exp/data/yago/test_masked.txt"
+    path_train = "data/wnrr/train.txt"
+    path_valid = "data/wnrr/valid.txt"
+    path_test  = "data/wnrr/test.txt"
 
-    path_rules_input = "E:/exp/pyclause/yago/rules-nanytormx-b-uc2-ud-z-xx"
+    path_rules_input = "local/rules-nanytorm-anyburl-wn18rr"
 
-    path_preds_output = "E:/exp/pyclause/yago/preds-nanytormx-b-uc2-ud-z-xx"
+    path_preds_output = "local/preds-nanytorm-anyburl-wn18rr"
 
 
 
@@ -30,7 +29,7 @@ if __name__ == '__main__':
         "topk": "100",
         "filter_w_train": "true",
         "filter_w_target": "true",
-        "disc_at_least":"10", ## -1 for off, must not be bigger than topk
+        "disc_at_least":"50", ## -1 for off, must not be bigger than topk
         # rule options 
         "rule_b_max_branching_factor": "-1",
         "use_zero_rules": "true",

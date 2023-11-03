@@ -1,6 +1,5 @@
 import sys
-import config
-import math
+
 
 
 
@@ -50,11 +49,12 @@ class TripleSet:
     fast graph traversal of the knowledge graph defined by the triple set.
    """
    
-   def __init__(self, path, index = None):
+   def __init__(self, path, index = None, encod = None):
       print(">>> loading triple set from path " + str(path) + " ...")
       
       # the path from which the triple set has been loaded
       self.path = path
+      self.encod = encod
       
       # list of triples
       self.triples = []
@@ -88,8 +88,9 @@ class TripleSet:
 
       # counts for each relation how many triples of the form r(x,x) instantiate relation r 
       self.r2_count_reflexiv = {}
-
-      f = open(path, "r")
+      f = None
+      if self.encod == None: f = open(path, "r")
+      else: f = open(path, "r", encoding=self.encod)
       for line in f:
          token = line.split()
          if len(token) == 3:
@@ -185,7 +186,11 @@ class TripleSet:
       return rel_1to1
    
    def write_masked(self, outpath):
-      f = open(outpath, "w")
+      f = None
+      if self.encod == None: f = open(outpath, "w")
+      else: f = open(outpath, "w", encoding=self.encod)
+
+      
       for triple in self.triples:
          sub = self.index.id2to[triple.sub].replace(',','~')
          rel = self.index.id2to[triple.rel].replace(',','~')

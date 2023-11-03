@@ -1,21 +1,21 @@
-from torm import Torm
-from triples import TripleSet
+import sys
+import os
+sys.path.append(os.getcwd())
 
-from rules import RuleSet
-from ruleparser import RuleReader
+from clause.learning.complete.torm import Torm
+from clause.data.triples import TripleSet
 
-import c_clause
 
 
 
 
 if __name__ == '__main__':
 
-    path_train = "E:/exp/data/wn18rr/train.txt"
-    path_valid = "E:/exp/data/wn18rr/valid.txt"
-    path_test  = "E:/exp/data/wn18rr/test.txt"
+    path_train = "data/wnrr/train.txt"
+    path_valid = "data/wnrr/valid.txt"
+    path_test  = "data/wnrr/test.txt"
 
-    path_rules_output = "E:/exp/pyclause/dev/rules-nanytorm-wn18rr"
+    path_rules_output = "local/rules-nanytorm-wn18rr"
 
 
     # load a triple set from a file and display some meta info about it

@@ -34,11 +34,6 @@ rules = dict(
     )
 )
 
-multithreading = dict(
-    worker = 4,
-    start_method = "fork", # chose between "fork" and "spawn", if possibe use "fork", "spawn" will automatically be used in windows systems
-    brules_dataarray_size = 6000000
-)
 
 
 completions = dict(

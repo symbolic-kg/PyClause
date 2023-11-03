@@ -1,6 +1,6 @@
 
-from rules import Rule, RuleUc, RuleB, RuleUd, RuleXXuc, RuleXXud, RuleZ, RuleSet
-from triples import TripleSet
+from clause.rules.rules import Rule, RuleUc, RuleB, RuleUd, RuleXXuc, RuleXXud, RuleZ, RuleSet
+from clause.data.triples import TripleSet
 
 
 import re

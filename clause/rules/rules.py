@@ -1,11 +1,12 @@
-import config
-import sys
-from triples import TripleSet,TripleIndex
 import time
 
-import re
+from clause.config import config
+
+# import re
 
 from random import sample
+
+
 
 from multiprocessing import Array
 

@@ -1,8 +1,8 @@
 from torm import Torm
-from triples import Triple,TripleSet,PredictionSet,CompletionSet,id2to
-import triples as ttt
+from clause.data.triples import Triple,TripleSet,PredictionSet,CompletionSet,id2to
+import clause.data.triples as ttt
 
-from rules import RuleB, RuleReader,RuleSet, RuleUc, RuleZ
+from clause.rules.rules import RuleB, RuleReader,RuleSet, RuleUc, RuleZ
 import math
 import random
 
