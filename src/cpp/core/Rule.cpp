@@ -258,6 +258,8 @@ bool RuleB::predictTriple(int head, int tail, TripleStorage& triples, QueryResul
     std::set<int> substitutions = {head};
     std::vector<Triple> currGroundings;
     searchCurrTargetGroundings(1, head, substitutions, triples, tail, relations, directions, currGroundings, groundings);
+    // for simplicity we just use QueryResults here 
+    // we have to remember when calling from the outside what the triple is
     if (madeTriplePred){
         qResults.insertRule(tail, this);
     }
@@ -285,7 +287,7 @@ void RuleB::searchCurrTargetGroundings(int currAtomIdx, int currEntity, std::set
             if (substitutions.find(ent)==substitutions.end() && targetEntity==ent){
                 madeTriplePred = true;
                 
-                // we only track the groundings if groundings is not a nullptr
+                // we only track the groundings if groundings is given
                 if (groundings){
                     Triple triple;
                     if (directions[currAtomIdx-1]){
@@ -295,10 +297,11 @@ void RuleB::searchCurrTargetGroundings(int currAtomIdx, int currEntity, std::set
                     }
                     currentGroundings.push_back(triple);
                     (*groundings)[this].push_back(currentGroundings);
-                    // done with this groundings, increment counter
+                    // we have to pop here (for substitutions we dont add anything so we dont erase)
+                    currentGroundings.pop_back();
                 }else{
-                    // if we are not tracking groundings, we can stop as
-                    // we know that the rule predicted the target entity, thats all we care about
+                    // if we are not tracking groundings, we can stop as we know
+                    // that the rule predicted the target entity, thats all we care about
                     return;
 
                 }
@@ -313,7 +316,7 @@ void RuleB::searchCurrTargetGroundings(int currAtomIdx, int currEntity, std::set
             int ent = begin[i];
             if (substitutions.find(ent)==substitutions.end()){
                 substitutions.insert(ent);
-                // we only track the groundings if groundings is not a nullptr
+                // we only track the groundings if groundings is given
                 if (groundings){
                     Triple triple;
                     if (directions[currAtomIdx-1]){

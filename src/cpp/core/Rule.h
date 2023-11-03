@@ -66,7 +66,7 @@ public:
 
 	// will track groundings if groundings is not null;
 	virtual bool predictTriple(
-		int tail, int head, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings
+		int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings
 	);
 
 
@@ -74,8 +74,6 @@ public:
 	void setConfWeight(double weight);
 	void setRuleString(std::string str);
 	void setNumUnseen(int val);
-	// only used in conjunection with predictTriple and explain
-	void setTrackGroundings(bool ind);
 
 	// only used for Uxxd Uxxc rules when particularly parsed from Anyburl rule files
 	virtual void setPredictHead(bool ind);

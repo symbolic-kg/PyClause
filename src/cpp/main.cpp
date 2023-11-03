@@ -95,19 +95,16 @@ void tests(){
         throw std::runtime_error("Test 7 for B-rule predictTailQuery failed");
     }
     // check predictTriple: obviously the triples formed with the predicted tailCandidates must be predicted
-    for (int tailCand: preds.getCandsOrdered()){
+    std::vector<int> tailPreds = preds.getCandsOrdered();
+    for (int tailCand: tailPreds){
         if (!ruleB->predictTriple(index->getIdOfNodestring(node), tailCand, data, preds, nullptr)){
              throw std::runtime_error("Test 7.1 for B-rule predictTriple failed");
         }
-        // any other triples must not be predicted
+        // any other triples must not be predicted, here tail = 0
         if (ruleB->predictTriple(index->getIdOfNodestring(node), 0, data, preds, nullptr)){
-             throw std::runtime_error("Test 7.1 for B-rule predictTriple failed");
+             throw std::runtime_error("Test 7.2 for B-rule predictTriple failed");
         }
-
     }
-
-    
-
     node = "08921850";
     preds.clear();
     ruleB->predictHeadQuery((index->getIdOfNodestring(node)), data, preds);
@@ -179,8 +176,6 @@ void tests(){
 
     }
 
-
-
     preds_c.clear();
     ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,01189282) <= _synset_domain_topic_of(X,08441203)");
     node_c = "01068012";
@@ -229,9 +224,6 @@ void tests(){
 
     }
     preds.clear();
- 
-
-
 
     //706	4	0.0056657223796034	_also_see(01716491,Y) <= _also_see(Y,A)
     ruleD = ruleFactory->parseAnytimeRule("_also_see(01716491,Y) <= _also_see(Y,A)");
@@ -291,7 +283,7 @@ void tests(){
 
     //67	6	 /dataworld/gardening_hint/split_to(me_myself_i,Y) <= /education/educational_institution/students_graduates./education/education/major_field_of_study(Y,/m/01lj9)
     std::unique_ptr<Rule> ruleXXc = ruleFactory237->parseAnytimeRule("/dataworld/gardening_hint/split_to(me_myself_i,Y) <= /education/educational_institution/students_graduates./education/education/major_field_of_study(Y,/m/01lj9)");
-    std::cout<<"All tests passed."<<std::endl;
+  
     ruleXXc->setTrackInMaterialize(true);
     predictions = ruleXXc->materialize(data237);
     stats = ruleXXc->getStats(true);  
@@ -318,6 +310,101 @@ void tests(){
      if (!(stats[0]==552 && stats[1]==397)){
         throw std::runtime_error("Test 27 for Uxxd rule materialize failed.");
     } 
+
+
+      std::cout<<"All rule query prediction and materialize tests passed."<<std::endl;
+}
+
+
+void tests_groundings(){
+    std::shared_ptr<Index> index = std::make_shared<Index>();
+  
+    std::string dataPath = "/home/patrick/Desktop/kge/data/wnrr/train.txt";
+    TripleStorage data(index);
+    data.read(dataPath);
+    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
+    RuleStorage rules(index, ruleFactory);
+    std::unique_ptr<Rule> ruleB;
+    
+    // Test RuleB predictTailQuery
+    ruleB = ruleFactory->parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
+    QueryResults preds;
+    std::string node = "08791167";
+    ruleB->predictTailQuery((index->getIdOfNodestring(node)),data, preds);
+    if (preds.size()!=5){
+        throw std::runtime_error("Test for B-rule predictTailQuery failed");
+    }
+    // check predictTriple: obviously the triples formed with the predicted tailCandidates must be predicted
+    std::vector<int> tailPreds = preds.getCandsOrdered();
+    for (int tailCand: tailPreds){
+        if (!ruleB->predictTriple(index->getIdOfNodestring(node), tailCand, data, preds, nullptr)){
+             throw std::runtime_error("Test 1 for B-rule predictTriple failed");
+        }
+        // any other triples must not be predicted, here tail = 0
+        if (ruleB->predictTriple(index->getIdOfNodestring(node), 0, data, preds, nullptr)){
+             throw std::runtime_error("Test 2 for B-rule predictTriple failed");
+        }
+    }
+
+    preds.clear();
+    RuleGroundings groundings;
+    ruleB->predictTriple(index->getIdOfNodestring(node), tailPreds[0], data, preds, &groundings);
+    for (std::vector<Triple> grounding: groundings[ruleB.get()]){
+        for (Triple triple: grounding){
+            std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
+        }
+        
+    }
+    // 1549	26	0.016785022595222725	_hypernym(X,Y) <= _verb_group(A,X), _derivationally_related_form(B,A), _derivationally_related_form(Y,B)
+    ruleB = ruleFactory->parseAnytimeRule("_hypernym(X,Y) <= _verb_group(A,X), _derivationally_related_form(B,A), _derivationally_related_form(Y,B)");
+
+    std::set<Triple>predTriples = ruleB->materialize(data);
+
+
+    QueryResults qResults;
+    groundings.clear();
+    for (Triple triple: predTriples){
+        bool madePred = ruleB->predictTriple(triple[0], triple[2], data, qResults, &groundings);
+        // must predict all triples that are predicted from materialization
+        if (!madePred){
+            throw std::runtime_error("Test 1 for predict triple failed.");
+        }
+        groundings.clear();
+        madePred = ruleB->predictTriple(triple[0], 0, data, qResults, &groundings);
+        // must not predict any other triple (here tail=0 works)
+        if (madePred){
+              throw std::runtime_error("Test 2 for predict triple failed.");
+        }
+        groundings.clear();
+
+        
+    }
+
+   
+    // for debugging
+
+    std::string head = "00784727";
+    std::string rel = "_hypernym";
+    std::string tail = "00785008";
+
+    std::cout<<"Triple"<<std::endl;
+    std::cout<<head + " " + rel + " " + tail<<std::endl;
+    std::cout<<"Groundings:"<<std::endl;
+    bool madePred = ruleB->predictTriple(index->getIdOfNodestring(head), index->getIdOfNodestring(tail), data, qResults, &groundings);
+    for (std::vector<Triple> grounding: groundings[ruleB.get()]){
+            std::cout<<"Next grounding:"<<std::endl;
+            for (Triple triple: grounding){
+                std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
+            }
+    }
+
+
+
+    std::cout<<"All predictTriple tests passed."<<std::endl;
+
+    
+
+    
 }
 
     
@@ -367,7 +454,6 @@ void timeRanking(){
 
     std::string rulePath = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600";
     RuleStorage rules(index, ruleFactory);
-    std::cout<<"here";
     rules.readAnyTimeFormat(rulePath, true); 
 
     ApplicationHandler ranker;
@@ -394,7 +480,9 @@ void timeRanking(){
 
 
 int main(){
+    tests_groundings();
     tests();
+   
     //checkRuntimes();
     timeRanking();
     
