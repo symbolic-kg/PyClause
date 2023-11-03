@@ -64,7 +64,8 @@ public:
 		int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet()
 	);
 
-	// will track groundings if groundings is not null;
+	// predict a triple; can track groundings if groundings is not null
+	// see documentation of child classes
 	virtual bool predictTriple(
 		int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings
 	);
@@ -140,7 +141,8 @@ public:
 	// if a nodes in the DFS opens more then specified value branches, go to the next node
 	static int branchingFaktor;
 
-	//
+	// predict triple and optionally tracks grounding
+	// uses searchCurrTargetGroundings()
 	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
 
 
@@ -177,6 +179,8 @@ private:
 	);
 
 	// recursive DFS step with optional grounding tracking and a target closing entity (for scoring triples)
+    // used for scoring triples, e.g., DFS search but with a target end point (targetEntity)
+   // can also be used to track all the groundings (list of triples) 
 	void searchCurrTargetGroundings(int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
 		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,  RuleGroundings* groundings);
 };
@@ -195,6 +199,13 @@ public:
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	
+	// predict triple and optionally tracks grounding
+	// uses searchCurrTargetGroundings()
+	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
+	
+
+
+
 private:
 	// this->relations, this->directions, this->leftC, this->constants, uniquely identify a C (U_c) rule
 	// e.g. relations = [r1, r2, r3]
@@ -221,6 +232,16 @@ private:
 	void searchCurrGroundings(
 		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
 		Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs
+	);
+
+	bool predictL1Triple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
+
+
+
+	void searchCurrTargetGroundings(
+		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,
+		RuleGroundings* groundings
 	);
 };
 

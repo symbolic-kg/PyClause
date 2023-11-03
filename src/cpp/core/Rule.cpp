@@ -266,7 +266,8 @@ bool RuleB::predictTriple(int head, int tail, TripleStorage& triples, QueryResul
     return madeTriplePred;
 }
 
-
+// used for scoring triples, e.g., DFS search but with a target end point (targetEntity)
+// can also be used to track all the groundings (list of triples) 
 void RuleB::searchCurrTargetGroundings(int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
 		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings, RuleGroundings* groundings){
 
@@ -585,6 +586,29 @@ bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& hea
     return false;
 }
 
+bool RuleC::predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings){
+    return false;
+
+}
+
+bool RuleC::predictL1Triple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings){
+    return false;
+}
+
+
+void RuleC::searchCurrTargetGroundings(
+		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,
+		RuleGroundings* groundings
+)
+{
+
+
+return;
+}
+
+
+
 // same implementation as in RuleB except that rels dirs is used depending on leftC s.t.
 // directions can be handled
 void RuleC::searchCurrGroundings(
@@ -594,33 +618,31 @@ void RuleC::searchCurrGroundings(
 {
     Nodes* nextEntities = nullptr;
     int currRel = rels[currAtomIdx];
-    RelNodeToNodes& relNtoN = dirs[currAtomIdx-1] ? triples.getRelHeadToTails() : triples.getRelTailToHeads();
-    auto it = relNtoN.find(rels[currAtomIdx]);
-    if ((it!=relNtoN.end())){
-        NodeToNodes& NtoN = it->second;
-        auto entIt = NtoN.find(currEntity);
-        if (entIt!=NtoN.end()){
-            nextEntities = &(entIt->second);
+    int* begin;
+    int length;
 
-            if (currAtomIdx == rels.size()-1){
-                //copies
-                for(const int& ent: *nextEntities){
-                    // respect object identity constraint
-                    if (substitutions.find(ent)==substitutions.end()){
-                        closingEntities.insert(ent);
-                    }
-                }
-            }else{
-                for(const int& ent: *nextEntities){
-                    if (substitutions.find(ent)==substitutions.end()){
-                        substitutions.insert(ent);
-                        searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities, rels, dirs);
-                        substitutions.erase(ent);
-                    }
-                }
+    dirs[currAtomIdx-1] ? triples.getTforHR(currEntity, currRel, begin, length) : triples.getHforTR(currEntity, currRel, begin, length);
+    // last atom
+    if (currAtomIdx == rels.size()-1){
+        // next entities
+        for (int i=0; i<length; i++){
+            int ent = begin[i];
+            // respect object identity constraint, stop if violated
+            if (substitutions.find(ent)==substitutions.end()){
+                    closingEntities.insert(ent);
             }
         }
-    } 
+    }else{
+         //next entities
+         for (int i=0; i<length; i++){
+            int ent = begin[i];
+            if (substitutions.find(ent)==substitutions.end()){
+                substitutions.insert(ent);
+                searchCurrGroundings(currAtomIdx+1, ent, substitutions, triples, closingEntities, rels, dirs);
+                substitutions.erase(ent);
+            }
+        }
+    }
 }
 
 
