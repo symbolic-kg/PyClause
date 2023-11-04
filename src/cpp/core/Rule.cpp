@@ -426,33 +426,27 @@ bool RuleC::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
 
     std::vector<int>& rels = leftC ? relations : _relations;
     std::vector<bool>& dirs = leftC ? directions: _directions;
-    RelNodeToNodes* relNtoN = nullptr;
-    if (dirs[0]){
-        relNtoN =  &triples.getRelHeadToTails();   
-    }else{
-        relNtoN =  &triples.getRelTailToHeads();
-    }
-    auto it = relNtoN->find(rels[1]);
-    if (it!=relNtoN->end()){
-        NodeToNodes& NtoN = it->second;
-        if (NtoN.count(constants[1])>0){
-            Nodes closingEntities;
-            std::set<int> substitutions = {constants[0], constants[1]};
-            searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities, rels, dirs);
-            bool madePred = false;
-            for (const int& cEnt: closingEntities){
-                // the rule is grounded at the tail so it can only predict this grounding
-                // and the closing entity must be the head grounding in this case
-                if (!leftC && cEnt == head && !filterSet.contains(constants[0])){
-                    tailResults.insertRule(constants[0], this);
-                    return true;
-                }else if(leftC && !filterSet.contains(cEnt)){
-                    tailResults.insertRule(cEnt, this);
-                    madePred = true;
-                }
+
+    int* begin;
+    int length;
+    dirs[0] ? triples.getTforHR(constants[1], rels[1], begin, length) : triples.getHforTR(constants[1], rels[1], begin, length);
+    if (length>0){
+        Nodes closingEntities;
+        std::set<int> substitutions = {constants[0], constants[1]};
+        searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities, rels, dirs);
+        bool madePred = false;
+        for (const int& cEnt: closingEntities){
+            // the rule is grounded at the tail so it can only predict this grounding
+            // and the closing entity must be the head grounding in this case
+            if (!leftC && cEnt == head && !filterSet.contains(constants[0])){
+                tailResults.insertRule(constants[0], this);
+                return true;
+            }else if(leftC && !filterSet.contains(cEnt)){
+                tailResults.insertRule(cEnt, this);
+                madePred = true;
             }
-            return madePred;
         }
+        return madePred;
     }
     return false;
 }
@@ -555,33 +549,28 @@ bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& hea
     // we turn everything around: b2(A,d),b1(X,A) starting with current_entity=d
     std::vector<int>& rels = leftC ? relations : _relations;
     std::vector<bool>& dirs = leftC ? directions: _directions;
-    RelNodeToNodes* relNtoN = nullptr;
-    if (dirs[0]){
-        relNtoN =  &triples.getRelHeadToTails();   
-    }else{
-        relNtoN =  &triples.getRelTailToHeads();
-    }
-    auto it = relNtoN->find(rels[1]);
-    if (it!=relNtoN->end()){
-        NodeToNodes& NtoN = it->second;
-        if (NtoN.count(constants[1])>0){
-            Nodes closingEntities;
-            std::set<int> substitutions = {constants[0], constants[1]};
-            searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities, rels, dirs);
-            bool madePred = false;
-            for (const int& cEnt: closingEntities){
-                // the rule is grounded at the head so it can only predict this grounding
-                // and the closing entity must be the tail grounding in this case
-                if (leftC && cEnt == tail && !filterSet.contains(constants[0])){
-                    headResults.insertRule(constants[0], this);
-                    return true;
-                }else if(!leftC && !filterSet.contains(cEnt)){
-                    headResults.insertRule(cEnt, this);
-                    madePred = true;
-                }
+
+
+    int* begin;
+    int length;
+    dirs[0] ? triples.getTforHR(constants[1], rels[1], begin, length) : triples.getHforTR(constants[1], rels[1], begin, length);
+    if (length>0){
+        Nodes closingEntities;
+        std::set<int> substitutions = {constants[0], constants[1]};
+        searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities, rels, dirs);
+        bool madePred = false;
+        for (const int& cEnt: closingEntities){
+            // the rule is grounded at the head so it can only predict this grounding
+            // and the closing entity must be the tail grounding in this case
+            if (leftC && cEnt == tail && !filterSet.contains(constants[0])){
+                headResults.insertRule(constants[0], this);
+                return true;
+            }else if(!leftC && !filterSet.contains(cEnt)){
+                headResults.insertRule(cEnt, this);
+                madePred = true;
             }
-            return madePred;
         }
+            return madePred;
     }
     return false;
 }
@@ -616,7 +605,6 @@ void RuleC::searchCurrGroundings(
             Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs
 		)
 {
-    Nodes* nextEntities = nullptr;
     int currRel = rels[currAtomIdx];
     int* begin;
     int length;
