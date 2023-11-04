@@ -326,7 +326,7 @@ void tests_groundings(){
     RuleStorage rules(index, ruleFactory);
     std::unique_ptr<Rule> ruleB;
     
-    // Test RuleB predictTailQuery
+    // Test RuleB predict triple
     ruleB = ruleFactory->parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
     QueryResults preds;
     std::string node = "08791167";
@@ -381,7 +381,7 @@ void tests_groundings(){
     }
 
    
-    // for debugging
+    // for debugging ruleB groundings
 
     std::string head = "00784727";
     std::string rel = "_hypernym";
@@ -401,6 +401,49 @@ void tests_groundings(){
 
 
     std::cout<<"All predictTriple tests passed."<<std::endl;
+
+
+    // test ruleC predict triple
+
+   std::unique_ptr<Rule> ruleC;
+   ruleC = ruleFactory->parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
+
+    predTriples.clear();
+    predTriples = ruleC->materialize(data);
+
+
+    qResults.clear();
+    groundings.clear();
+    for (Triple triple: predTriples){
+        bool madePred = ruleC->predictTriple(triple[0], triple[2], data, qResults, &groundings);
+        // must predict all triples that are predicted from materialization
+        if (!madePred){
+            throw std::runtime_error("Test 2 for predict triple RuleC failed.");
+        }
+        groundings.clear();
+        madePred = ruleB->predictTriple(triple[0], 0, data, qResults, &groundings);
+        // must not predict any other triple (here tail=0 works)
+        if (madePred){
+              throw std::runtime_error("Test 3 for predict triple RuleC failed.");
+        }
+        groundings.clear();
+
+        
+    }
+
+    // debugging groundings
+    Triple triple = *predTriples.begin();
+    std::cout<<"C rule triple: ";
+    std::cout<<index->getStringOfNodeId(triple[0]) + " " << index->getStringOfRelId(triple[1]) + " "<<  index->getStringOfNodeId(triple[2])<<std::endl;
+    madePred = ruleC->predictTriple(triple[0], triple[2], data, qResults, &groundings);
+    for (std::vector<Triple> grounding: groundings[ruleC.get()]){
+            std::cout<<"Next grounding:"<<std::endl;
+            for (Triple triple: grounding){
+                std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
+            }
+    }
+
+    
 
     
 
