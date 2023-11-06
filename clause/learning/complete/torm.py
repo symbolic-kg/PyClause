@@ -2,7 +2,6 @@
 from clause.data.triples import TripleSet,TripleIndex
 from clause.rules.rules import Rule,RuleZ,RuleXXuc,RuleXXud,RuleUc,RuleUd,RuleB,RuleSet
 
-import clause.config.config as config
 import c_clause
 
 import time
@@ -12,7 +11,8 @@ import multiprocessing as mp
 
 class Torm():
 
-    def __init__(self, targets, triples):
+    def __init__(self, options, targets, triples):
+        self.options = options
         self.targets = targets
         self.triples = triples
         self.rules = RuleSet(triples.index)
@@ -20,18 +20,18 @@ class Torm():
         self.c_clause_loader = None
 
     def set_c_clause_handler(self):
-        options = {}
-        self.c_clause_loader = c_clause.DataHandler(options)
+        self.c_clause_loader = c_clause.DataHandler(self.options.flatS('core'))
         self.c_clause_loader.load_data(self.triples.path)
         self.c_clause_handler = c_clause.RulesHandler()
 
     def mine_z_rules(self):
         print(">>> mining z-rules ...")
+        roptions = self.options.flat('torm.rules')
         for hr in self.triples.rels:
             for sub in self.triples.r2_sub[hr]:
                 num_obj = len(self.triples.sub_rel_2_obj[sub][hr])
                 preds = len(self.triples.r2_obj[hr])
-                if num_obj >= config.rules["z"]["support"] and num_obj / preds >= config.rules["z"]["confidence"]:
+                if num_obj >= roptions["z.support"] and num_obj / preds >= roptions["z.confidence"]:
                     rule = RuleZ(self.rules, hr, sub, False)
                     rule.pred = preds
                     rule.cpred = num_obj
@@ -39,7 +39,7 @@ class Torm():
             for obj in self.triples.r2_obj[hr]:
                 num_sub = len(self.triples.obj_rel_2_sub[obj][hr])
                 preds = len(self.triples.r2_sub[hr])
-                if num_sub >= config.rules["z"]["support"] and num_sub / preds >= config.rules["z"]["confidence"]:
+                if num_sub >= roptions["z.support"] and num_sub / preds >= roptions["z.confidence"]:
                     rule = RuleZ(self.rules, hr, obj, True)
                     rule.pred = preds
                     rule.cpred = num_sub
@@ -47,25 +47,26 @@ class Torm():
 
     def mine_ud_rules(self):
         print(">>> mining ud-rules ...")
+        roptions = self.options.flat('torm.rules')
         for br in self.triples.rels:
-            if len(self.triples.r2_obj[br]) >= config.rules["ud"]["support"]:
+            if len(self.triples.r2_obj[br]) >= roptions["ud.support"]:
                 preds = len(self.triples.r2_obj[br])
                 (statsx, statsy) = self.mine_u_rule_heads(self.triples.r2_obj[br])
-                self.create_ud_rules_from_stats(statsx, br, preds, True, False)
-                self.create_ud_rules_from_stats(statsy, br, preds, False, False)
+                self.create_ud_rules_from_stats(roptions, statsx, br, preds, True, False)
+                self.create_ud_rules_from_stats(roptions, statsy, br, preds, False, False)
         for br in self.triples.rels:
-            if len(self.triples.r2_sub[br]) >= config.rules["ud"]["support"]:
+            if len(self.triples.r2_sub[br]) >= roptions["ud.support"]:
                 preds = len(self.triples.r2_sub[br])
                 (statsx, statsy) = self.mine_u_rule_heads(self.triples.r2_sub[br])
-                self.create_ud_rules_from_stats(statsx, br, preds, True, True)
-                self.create_ud_rules_from_stats(statsy, br, preds, False, True)
+                self.create_ud_rules_from_stats(roptions, statsx, br, preds, True, True)
+                self.create_ud_rules_from_stats(roptions, statsy, br, preds, False, True)
 
 
     def mine_uc_rules(self):
         print(">>> mining uc-rules ...")
+        roptions = self.options.flat('torm.rules')
         current_time = time.time()
         bc_count = 0
-
         for bc in self.triples.sub_rel_2_obj:
             bc_count += 1
             next_time = time.time()
@@ -74,23 +75,22 @@ class Torm():
                 frac = bc_count / (len(self.triples.sub_rel_2_obj) + len(self.triples.obj_rel_2_sub))
                 print(">>> ...  mined ~" + str(round(frac * 100)) + "%s")
             for br in self.triples.sub_rel_2_obj[bc]:
-                if len(self.triples.sub_rel_2_obj[bc][br]) >= config.rules["uc"]["support"]:
+                if len(self.triples.sub_rel_2_obj[bc][br]) >= roptions["uc.support"]:
                     preds = len(self.triples.sub_rel_2_obj[bc][br])
                     (statsx, statsy) = self.mine_u_rule_heads(self.triples.sub_rel_2_obj[bc][br])
-                    self.create_uc_rules_from_stats(statsx, br, bc, preds, True, False)
-                    self.create_uc_rules_from_stats(statsy, br, bc, preds, False, False)
+                    self.create_uc_rules_from_stats(roptions, statsx, br, bc, preds, True, False)
+                    self.create_uc_rules_from_stats(roptions, statsy, br, bc, preds, False, False)
         for bc in self.triples.obj_rel_2_sub:
             if (current_time + 5 < next_time):
                 current_time = next_time
                 frac = bc_count / (len(self.triples.sub_rel_2_obj) + len(self.triples.obj_rel_2_sub))
                 print(">>> ...  mined ~" + str(round(frac * 100)) + "%")
             for br in self.triples.obj_rel_2_sub[bc]:
-                if len(self.triples.obj_rel_2_sub[bc][br]) >= config.rules["uc"]["support"]:
+                if len(self.triples.obj_rel_2_sub[bc][br]) >= roptions["uc.support"]:
                     preds = len(self.triples.obj_rel_2_sub[bc][br])
                     (statsx, statsy) = self.mine_u_rule_heads(self.triples.obj_rel_2_sub[bc][br])
-                    self.create_uc_rules_from_stats(statsx, br, bc, preds, True, True)
-                    self.create_uc_rules_from_stats(statsy, br, bc, preds, False, True)
-
+                    self.create_uc_rules_from_stats(roptions, statsx, br, bc, preds, True, True)
+                    self.create_uc_rules_from_stats(roptions, statsy, br, bc, preds, False, True)
 
     def mine_u_rule_heads(self, xys):
         statsx = {}
@@ -110,20 +110,20 @@ class Torm():
                         else: statsy[hr][hc] = statsy[hr][hc] + 1
         return (statsx, statsy)
 
-    def create_uc_rules_from_stats(self, stats, br, bc, preds, hc_right, bc_right):
+    def create_uc_rules_from_stats(self, roptions, stats, br, bc, preds, hc_right, bc_right):
         for hr in stats:
             for hc in stats[hr]:
-                if stats[hr][hc] >= config.rules["uc"]["support"] and stats[hr][hc] / preds >= config.rules["uc"]["confidence"] :
+                if stats[hr][hc] >= roptions["uc.support"] and stats[hr][hc] / preds >= roptions["uc.confidence"] :
                     # ef __init__(self, ruleset, target, rels, dirs, hc, hc_right, bc):
                     rule = RuleUc(self.rules, hr, (br,), (bc_right,), hc, hc_right, bc)
                     rule.pred = preds
                     rule.cpred = stats[hr][hc]
                     rule.store()
 
-    def create_ud_rules_from_stats(self, stats, br, preds, hc_right, dangling_right):
+    def create_ud_rules_from_stats(self, roptions, stats, br, preds, hc_right, dangling_right):
         for hr in stats:
             for hc in stats[hr]:
-                if stats[hr][hc] >= config.rules["ud"]["support"] and stats[hr][hc] / preds >= config.rules["ud"]["confidence"] :
+                if stats[hr][hc] >= roptions["ud.support"] and stats[hr][hc] / preds >= roptions["ud.confidence"] :
                     rule = RuleUd(self.rules, hr, (br,), (dangling_right,), hc, hc_right)
                     rule.pred = preds
                     rule.cpred = stats[hr][hc]
@@ -132,32 +132,34 @@ class Torm():
 
     def mine_xx_uc_rules(self):
         print(">>> mining xx-rules (with uc bodies) ...")
+        roptions = self.options.flat('torm.rules')
         for bc in self.triples.sub_rel_2_obj:
             for br in self.triples.sub_rel_2_obj[bc]:
-                if len(self.triples.sub_rel_2_obj[bc][br]) >= config.rules["xx_uc"]["support"]:
+                if len(self.triples.sub_rel_2_obj[bc][br]) >= roptions["xx_uc.support"]:
                     preds = len(self.triples.sub_rel_2_obj[bc][br])
                     stats = self.mine_xx_u_rule_heads(self.triples.sub_rel_2_obj[bc][br])
-                    self.create_xx_uc_rules_from_stats(self.rules, stats, br, bc, preds, False)
+                    self.create_xx_uc_rules_from_stats(roptions, self.rules, stats, br, bc, preds, False)
         for bc in self.triples.obj_rel_2_sub:
             for br in self.triples.obj_rel_2_sub[bc]:
-                if len(self.triples.obj_rel_2_sub[bc][br]) >= config.rules["xx_uc"]["support"]:
+                if len(self.triples.obj_rel_2_sub[bc][br]) >= roptions["xx_uc.support"]:
                     preds = len(self.triples.obj_rel_2_sub[bc][br])
                     stats = self.mine_xx_u_rule_heads(self.triples.obj_rel_2_sub[bc][br])
-                    self.create_xx_uc_rules_from_stats(self.rules, stats, br, bc, preds, True)
+                    self.create_xx_uc_rules_from_stats( roptions, self.rules, stats, br, bc, preds, True)
 
 
     def mine_xx_ud_rules(self):
         print(">>> mining xx-rules (with ud bodies) ...")
+        roptions = self.options.flat('torm.rules')
         for br in self.triples.rels:
-            if len(self.triples.r2_obj[br]) >= config.rules["xx_ud"]["support"]:
+            if len(self.triples.r2_obj[br]) >= roptions["xx_ud.support"]:
                 preds = len(self.triples.r2_obj[br])
                 stats = self.mine_xx_u_rule_heads(self.triples.r2_obj[br])
-                self.create_xx_ud_rules_from_stats(self.rules, stats, br, preds, False)
+                self.create_xx_ud_rules_from_stats(roptions, self.rules, stats, br, preds, False)
         for br in self.triples.rels:
-            if len(self.triples.r2_sub[br]) >= config.rules["xx_ud"]["support"]:
+            if len(self.triples.r2_sub[br]) >= roptions["xx_ud.support"]:
                 preds = len(self.triples.r2_sub[br])
                 stats = self.mine_xx_u_rule_heads(self.triples.r2_sub[br])
-                self.create_xx_ud_rules_from_stats(self.rules, stats, br, preds, True)
+                self.create_xx_ud_rules_from_stats(roptions, self.rules, stats, br, preds, True)
 
 
     def mine_xx_u_rule_heads(self, xys):
@@ -170,17 +172,17 @@ class Torm():
                         stats[hr] = stats[hr] + 1
         return stats
     
-    def create_xx_uc_rules_from_stats(self, rules, stats, br, bc, preds, bc_right):
+    def create_xx_uc_rules_from_stats(self, roptions, rules, stats, br, bc, preds, bc_right):
         for hr in stats:
-            if stats[hr] >= config.rules["xx_uc"]["support"] and stats[hr] / preds >= config.rules["xx_uc"]["confidence"]:
+            if stats[hr] >= roptions["xx_uc.support"] and stats[hr] / preds >= roptions["xx_uc.confidence"]:
                 rule = RuleXXuc(rules, hr, br, bc, bc_right)
                 rule.pred = preds
                 rule.cpred = stats[hr]
                 rule.store()
 
-    def create_xx_ud_rules_from_stats(self, rules, stats, br, preds, dangling_right):
+    def create_xx_ud_rules_from_stats(self, roptions, rules, stats, br, preds, dangling_right):
         for hr in stats:
-            if stats[hr] >= config.rules["xx_ud"]["support"] and stats[hr] / preds >= config.rules["xx_ud"]["confidence"]:
+            if stats[hr] >= roptions["xx_ud.support"] and stats[hr] / preds >= roptions["xx_ud.confidence"]:
                 pass
                 rule = RuleXXud(rules, hr, br, dangling_right)
                 rule.pred = preds
@@ -284,17 +286,19 @@ class Torm():
 
 
     def mine_rules(self):
+
+        roptions = self.options.flat('torm.rules')
        
         # ***********************************
-        if config.rules['b']['active']:
+        if roptions['b.active']:
         
             print(">>> mining b-rules ...")
-            candidates = self.mine_b_rule_candidates(config.rules['b']['length'])
+            candidates = self.mine_b_rule_candidates(roptions['b.length'])
             print(">>> constructed " + str(candidates.size()) + " b-rules candidates, materialization started ...")
 
             start = time.time()
             
-            batches = math.ceil(candidates.size() / config.rules['b']['batchsize'])
+            batches = math.ceil(candidates.size() / roptions['b.batchsize'])
             candidate_lists = []
 
             for i in range(0,batches):
@@ -320,7 +324,7 @@ class Torm():
                 for i in range(len(preds[1])):
                     rule = clist[i]
                     (pred,cpred) = preds[1][i]
-                    if cpred >= config.rules["b"]["support"] and cpred / pred >= config.rules["b"]["confidence"]:
+                    if cpred >= roptions["b.support"] and cpred / pred >= roptions["b.confidence"]:
                         rule.pred = pred
                         rule.cpred = cpred
                         self.rules.add_rule(rule)
@@ -333,7 +337,7 @@ class Torm():
             print(">>> elapsed time for materialization of " + str(self.rules.size()) + " b-rules: " + str(math.floor(end-start)) + "s") 
 
 
-        if config.rules['uc']['active']:
+        if roptions['uc.active']:
             start = time.time()
             prev_rule_count = self.rules.size()
             self.mine_uc_rules()
@@ -341,7 +345,7 @@ class Torm():
             end = time.time()
             print(">>> elapsed time for materialization of " + str(uc_rule_count) + " uc-rules: " + str(math.floor(end-start)) + "s") # time in seconds
 
-        if config.rules['ud']['active']:
+        if roptions['ud.active']:
             start = time.time()
             prev_rule_count = self.rules.size()
             self.mine_ud_rules()
@@ -349,7 +353,7 @@ class Torm():
             end = time.time()
             print(">>> elapsed time for materialization of " + str(uc_rule_count) + " ud-rules: " + str(math.floor(end-start)) + "s") # time in seconds
 
-        if config.rules['z']['active']:
+        if roptions['z.active']:
             start = time.time()
             prev_rule_count = self.rules.size()
             self.mine_z_rules()
@@ -357,7 +361,7 @@ class Torm():
             end = time.time()
             print(">>> elapsed time for materialization of " + str(uc_rule_count) + " ud-rules: " + str(math.floor(end-start)) + "s") # time in seconds
 
-        if config.rules['xx_uc']['active']:
+        if roptions['xx_uc.active']:
             start = time.time()
             prev_rule_count = self.rules.size()
             self.mine_xx_uc_rules()
@@ -365,7 +369,7 @@ class Torm():
             end = time.time()
             print(">>> ... elapsed time for materialization of " + str(xx_rule_count) + " xx_uc-rules: " + str(math.floor(end-start)) + "s") 
 
-        if config.rules['xx_ud']['active']:
+        if roptions['xx_ud.active']:
             start = time.time()
             prev_rule_count = self.rules.size()
             self.mine_xx_ud_rules()

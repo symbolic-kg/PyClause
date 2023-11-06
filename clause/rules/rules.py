@@ -1,6 +1,6 @@
 import time
 
-from clause.config import config
+from clause.config import options
 
 # import re
 
@@ -78,8 +78,8 @@ class RuleXXuc(Rule):
             predicted_sub_obj.append((value,value))
             if triples.is_known(value, self.target, value):
                 self.cpred += 1
-        if self.get_confidence() < config.rules['uxx']['confidence']: return False
-        if self.cpred < config.rules['uxx']['support']: return False
+        if self.get_confidence() < options.rules['uxx']['confidence']: return False
+        if self.cpred < options.rules['uxx']['support']: return False
         for predicted in predicted_sub_obj:
             predictions.add_prediction(predicted[0], self.target, predicted[1], self)
         return True
@@ -124,8 +124,8 @@ class RuleXXud(Rule):
             predicted_sub_obj.append((value,value))
             if triples.is_known(value, self.target, value):
                 self.cpred += 1
-        if self.get_confidence() < config.rules['uxx']['confidence']: return False
-        if self.cpred < config.rules['uxx']['support']: return False
+        if self.get_confidence() < options.rules['uxx']['confidence']: return False
+        if self.cpred < options.rules['uxx']['support']: return False
         for predicted in predicted_sub_obj:
             predictions.add_prediction(predicted[0], self.target, predicted[1], self)
         return True 
@@ -381,9 +381,9 @@ class RuleB(Rule):
         self.pred = int(scores[0])
         if self.pred == 0: return data_index, False
         # confidence threshold
-        if (self.cpred / self.pred) < config.rules['b']['confidence']: return data_index, False
+        if (self.cpred / self.pred) < options.rules['b']['confidence']: return data_index, False
         # support threshold
-        if self.cpred < config.rules['b']['support']: return data_index, False
+        if self.cpred < options.rules['b']['support']: return data_index, False
         # the rule is accepted, its predictions will now be stored
         prediction_data[data_index] = -self.id
         prediction_data[data_index + 1] = self.pred
@@ -427,7 +427,7 @@ class RuleB(Rule):
             current = time.time()
 
             count += 1
-            if (current - start > config.rules["b"]["timeout"]): return data_index, False
+            if (current - start > options.rules["b"]["timeout"]): return data_index, False
             # if self.cpred < config.rules['b']['pruning'][0] and self.pred > config.rules['b']['pruning'][1]: return data_index, False
         # from y to x
         count_rev = 0
@@ -458,16 +458,16 @@ class RuleB(Rule):
                 cpred_global += cpred_local / pred_local
             current = time.time()
             count_rev += 1
-            if (current - start > config.rules["b"]["timeout"]): break
+            if (current - start > options.rules["b"]["timeout"]): break
             # if self.cpred < config.rules['b']['pruning'][0] and self.pred > config.rules['b']['pruning'][1]: return data_index, False
         # at least one prediction should be made
         self.cpred = int(cpred_global)
         self.pred = int(pred_global)
         if self.pred == 0: return data_index, False
         # confidence threshold
-        if (self.cpred / self.pred) < config.rules['b']['confidence']: return data_index, False
+        if (self.cpred / self.pred) < options.rules['b']['confidence']: return data_index, False
         # support threshold
-        if self.cpred < config.rules['b']['support']: return data_index, False
+        if self.cpred < options.rules['b']['support']: return data_index, False
         # the rule is accepted, its predictions will now be stored
         prediction_data[data_index] = -self.id
         prediction_data[data_index + 1] = self.pred
