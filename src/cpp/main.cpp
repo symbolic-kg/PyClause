@@ -349,9 +349,10 @@ void tests_groundings(){
     preds.clear();
     RuleGroundings groundings;
     ruleB->predictTriple(index->getIdOfNodestring(node), tailPreds[0], data, preds, &groundings);
+    // example of how to retrieve groundings
     for (std::vector<Triple> grounding: groundings[ruleB.get()]){
         for (Triple triple: grounding){
-            std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
+            //std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
         }
         
     }
@@ -381,32 +382,27 @@ void tests_groundings(){
     }
 
    
-    // for debugging ruleB groundings
+    // // for debugging ruleB groundings
 
-    std::string head = "00784727";
-    std::string rel = "_hypernym";
-    std::string tail = "00785008";
+    // std::string head = "00784727";
+    // std::string rel = "_hypernym";
+    // std::string tail = "00785008";
 
-    std::cout<<"Triple"<<std::endl;
-    std::cout<<head + " " + rel + " " + tail<<std::endl;
-    std::cout<<"Groundings:"<<std::endl;
-    bool madePred = ruleB->predictTriple(index->getIdOfNodestring(head), index->getIdOfNodestring(tail), data, qResults, &groundings);
-    for (std::vector<Triple> grounding: groundings[ruleB.get()]){
-            std::cout<<"Next grounding:"<<std::endl;
-            for (Triple triple: grounding){
-                std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
-            }
-    }
+    // std::cout<<"Triple"<<std::endl;
+    // std::cout<<head + " " + rel + " " + tail<<std::endl;
+    // std::cout<<"Groundings:"<<std::endl;
+    // bool madePred = ruleB->predictTriple(index->getIdOfNodestring(head), index->getIdOfNodestring(tail), data, qResults, &groundings);
+    // for (std::vector<Triple> grounding: groundings[ruleB.get()]){
+    //         std::cout<<"Next grounding:"<<std::endl;
+    //         for (Triple triple: grounding){
+    //             std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
+    //         }
+    // }
 
+    // test ruleC leftC predict triple
 
-
-    std::cout<<"All predictTriple tests passed."<<std::endl;
-
-
-    // test ruleC predict triple
-
-   std::unique_ptr<Rule> ruleC;
-   ruleC = ruleFactory->parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
+    std::unique_ptr<Rule> ruleC;
+    ruleC = ruleFactory->parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
 
     predTriples.clear();
     predTriples = ruleC->materialize(data);
@@ -426,28 +422,144 @@ void tests_groundings(){
         if (madePred){
               throw std::runtime_error("Test 3 for predict triple RuleC failed.");
         }
-        groundings.clear();
-
-        
+        groundings.clear();   
     }
-
     // debugging groundings
-    Triple triple = *predTriples.begin();
-    std::cout<<"C rule triple: ";
-    std::cout<<index->getStringOfNodeId(triple[0]) + " " << index->getStringOfRelId(triple[1]) + " "<<  index->getStringOfNodeId(triple[2])<<std::endl;
-    madePred = ruleC->predictTriple(triple[0], triple[2], data, qResults, &groundings);
-    for (std::vector<Triple> grounding: groundings[ruleC.get()]){
-            std::cout<<"Next grounding:"<<std::endl;
-            for (Triple triple: grounding){
-                std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
-            }
+    // Triple triple = *predTriples.begin();
+    // std::cout<<"C rule triple: ";
+    // std::cout<<index->getStringOfNodeId(triple[0]) + " " << index->getStringOfRelId(triple[1]) + " "<<  index->getStringOfNodeId(triple[2])<<std::endl;
+    // madePred = ruleC->predictTriple(triple[0], triple[2], data, qResults, &groundings);
+    // for (std::vector<Triple> grounding: groundings[ruleC.get()]){
+    //         std::cout<<"Next grounding:"<<std::endl;
+    //         for (Triple triple: grounding){
+    //             std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
+    //         }
+    // }
+
+
+    // test ruleC !leftC predict triple
+    ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
+
+    predTriples.clear();
+    predTriples = ruleC->materialize(data);
+
+
+    qResults.clear();
+    groundings.clear();
+    for (Triple triple: predTriples){
+        bool madePred = ruleC->predictTriple(triple[0], triple[2], data, qResults, &groundings);
+        // must predict all triples that are predicted from materialization
+        if (!madePred){
+            throw std::runtime_error("Test 2 for predict triple RuleC failed.");
+        }
+        groundings.clear();
+        madePred = ruleB->predictTriple(triple[0], 0, data, qResults, &groundings);
+        // must not predict any other triple (here tail=0 works)
+        if (madePred){
+              throw std::runtime_error("Test 3 for predict triple RuleC failed.");
+        }
+        groundings.clear();   
+    }
+    // debugging groundings
+    // triple = *predTriples.begin();
+    // std::cout<<"C rule triple: ";
+    // std::cout<<index->getStringOfNodeId(triple[0]) + " " << index->getStringOfRelId(triple[1]) + " "<<  index->getStringOfNodeId(triple[2])<<std::endl;
+    // madePred = ruleC->predictTriple(triple[0], triple[2], data, qResults, &groundings);
+    // for (std::vector<Triple> grounding: groundings[ruleC.get()]){
+    //         std::cout<<"Next grounding:"<<std::endl;
+    //         for (Triple triple: grounding){
+    //             std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
+    //         }
+    // }
+
+
+    // test ruleD !left predict Triple
+
+    //309	2	0.006472491909385114	_hypernym(X,05653848) <= _synset_domain_topic_of(A,X)
+    std::unique_ptr<Rule> ruleD;
+    ruleD = ruleFactory->parseAnytimeRule("_hypernym(X,05653848) <= _synset_domain_topic_of(A,X)");
+
+    predTriples.clear();
+    predTriples = ruleD->materialize(data);
+
+
+    qResults.clear();
+    groundings.clear();
+    // test with grounding tracking
+    for (Triple triple: predTriples){
+        bool madePred = ruleD->predictTriple(triple[0], triple[2], data, qResults, &groundings);
+        // must predict all triples that are predicted from materialization
+        if (!madePred){
+            throw std::runtime_error("Test 4 for predict triple RuleD failed.");
+        }
+        groundings.clear();
+        madePred = ruleD->predictTriple(triple[0], 0, data, qResults, &groundings);
+        // must not predict any other triple (here tail=0 works)
+        if (madePred){
+              throw std::runtime_error("Test 5 for predict triple RuleD failed.");
+        }
+        groundings.clear();   
     }
 
-    
+    // test without grounding tracking
+    qResults.clear();
+    groundings.clear();
+    for (Triple triple: predTriples){
+        bool madePred = ruleD->predictTriple(triple[0], triple[2], data, qResults, nullptr);
+        // must predict all triples that are predicted from materialization
+        if (!madePred){
+            throw std::runtime_error("Test 6 for predict triple RuleD failed.");
+        }
+        groundings.clear();
+        madePred = ruleD->predictTriple(triple[0], 0, data, qResults, nullptr);
+        // must not predict any other triple (here tail=0 works)
+        if (madePred){
+              throw std::runtime_error("Test 7 for predict triple RuleD failed.");
+        }
+        groundings.clear();   
+    }
 
-    
+    // grounding debugging
+    // triple = *predTriples.begin();
+    // std::cout<<"D rule triple: ";
+    // std::cout<<index->getStringOfNodeId(triple[0]) + " " << index->getStringOfRelId(triple[1]) + " "<<  index->getStringOfNodeId(triple[2])<<std::endl;
+    // madePred = ruleD->predictTriple(triple[0], triple[2], data, qResults, &groundings);
+    // for (std::vector<Triple> grounding: groundings[ruleD.get()]){
+    //         std::cout<<"Next grounding:"<<std::endl;
+    //         for (Triple triple: grounding){
+    //             std::cout<<index->getStringOfNodeId(triple[0]) + " " + index->getStringOfRelId(triple[1]) + " " + index->getStringOfNodeId(triple[2])<<std::endl;
+    //         }
+    // }
 
-    
+
+    // test ruleD leftC predictTriple
+   ruleD = ruleFactory->parseAnytimeRule("_also_see(01716491,Y) <= _also_see(Y,A)");
+
+    predTriples.clear();
+    predTriples = ruleD->materialize(data);
+
+
+    qResults.clear();
+    groundings.clear();
+    // test with grounding tracking
+    for (Triple triple: predTriples){
+        bool madePred = ruleD->predictTriple(triple[0], triple[2], data, qResults, &groundings);
+        // must predict all triples that are predicted from materialization
+        if (!madePred){
+            throw std::runtime_error("Test 8 for predict triple RuleD failed.");
+        }
+        groundings.clear();
+        madePred = ruleD->predictTriple(triple[0], 0, data, qResults, &groundings);
+        // must not predict any other triple (here tail=0 works)
+        if (madePred){
+              throw std::runtime_error("Test 9 for predict triple RuleD failed.");
+        }
+        groundings.clear();   
+    }
+
+
+
+    std::cout<<"All predictTriple tests passed."<<std::endl;
 }
 
     

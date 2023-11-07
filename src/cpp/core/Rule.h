@@ -109,6 +109,19 @@ protected:
 	// see child classes
 	std::vector<int> relations;
 	std::vector<bool> directions;
+
+
+	// recursive DFS step with optional grounding tracking and a target closing entity (for scoring triples)
+    // used for scoring triples, e.g., DFS search but with a target end point (targetEntity)
+    // can also be used to track all the groundings (list of triples) 
+	// used by B, C and D rules
+	void searchCurrTargetGroundings(
+		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,
+		RuleGroundings* groundings, bool invertGrounding=false
+	);
+
+
 	
 	int targetRel;
 
@@ -169,6 +182,8 @@ private:
 	// i.e., that are assigned to Y in h(X,Y)<-b1(X,A),b2(A,Y)
 
 	//used for predicting tails
+	//when relations [r1,r2,r3] then _relations [r1, r3, r2] (r1 is head relation)
+	// when directions [1,0] then _directions [0,1]
 	std::vector<int> _relations;
 	std::vector<bool> _directions;
 	
@@ -177,12 +192,6 @@ private:
 		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
 		Nodes& closingEntities, std::vector<int>& rels, std::vector<bool>& dirs 
 	);
-
-	// recursive DFS step with optional grounding tracking and a target closing entity (for scoring triples)
-    // used for scoring triples, e.g., DFS search but with a target end point (targetEntity)
-   // can also be used to track all the groundings (list of triples) 
-	void searchCurrTargetGroundings(int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
-		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,  RuleGroundings* groundings);
 };
 
 
@@ -236,13 +245,6 @@ private:
 
 	bool predictL1Triple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
 
-
-
-	void searchCurrTargetGroundings(
-		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
-		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,
-		RuleGroundings* groundings
-	);
 };
 
 
@@ -288,6 +290,12 @@ public:
 	bool predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+
+
+	// predict triple and optionally tracks grounding
+	// uses searchCurrTargetGroundings()
+	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
+
 private:
 	bool leftC;
 	int constant;

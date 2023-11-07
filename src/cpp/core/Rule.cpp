@@ -118,6 +118,83 @@ bool Rule::predictTriple(int tail, int head, TripleStorage& triples, QueryResult
   throw std::runtime_error("Not implemented yet.");
 }
 
+
+void Rule::searchCurrTargetGroundings(
+		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
+		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,
+		RuleGroundings* groundings, bool invertGrounding
+)
+{
+    int currRel = rels[currAtomIdx];
+    int* begin;
+    int length;
+
+    if (madeTriplePred && !groundings){
+        return;
+    }
+    dirs[currAtomIdx-1] ? triples.getTforHR(currEntity, currRel, begin, length) : triples.getHforTR(currEntity, currRel, begin, length);
+    if (currAtomIdx == rels.size()-1){
+        // next entities
+        for (int i=0; i<length; i++){
+            int ent = begin[i];
+            // IO and target checking
+            if (substitutions.find(ent)==substitutions.end() && targetEntity==ent){
+                madeTriplePred = true;
+                
+                // we only track the groundings if groundings is given
+                if (groundings){
+                    Triple triple;
+                    if (dirs[currAtomIdx-1]){
+                        triple = {currEntity, currRel, ent};
+                    }else{
+                        triple = {ent, currRel, currEntity};
+                    }
+                    currentGroundings.push_back(triple);
+                    if (!invertGrounding){
+                        (*groundings)[this].push_back(currentGroundings);
+                    }else{
+                        std::vector<Triple> reverseGr = currentGroundings;
+                        std::reverse(reverseGr.begin(), reverseGr.end());
+                        (*groundings)[this].push_back(reverseGr);
+                    }
+                    
+                    // we have to pop here (for substitutions we dont add anything so we dont erase)
+                    currentGroundings.pop_back();
+                    // now continue the loop, we want to find all the groundings
+                }else{
+                    // if we are not tracking groundings, we can stop as we know
+                    // that the rule predicted the target triple, thats all we care about
+                    return;
+
+                }
+            }
+        }
+    }else{
+        //next entities
+        for (int i=0; i<length; i++){
+            int ent = begin[i];
+            if (substitutions.find(ent)==substitutions.end()){
+                substitutions.insert(ent);
+                // we only track the groundings if groundings is given
+                if (groundings){
+                    Triple triple;
+                    if (dirs[currAtomIdx-1]){
+                        triple = {currEntity, currRel, ent};
+                    }else{
+                        triple = {ent, currRel, currEntity};
+                    }
+                    currentGroundings.push_back(triple);
+                }
+                searchCurrTargetGroundings(currAtomIdx+1, ent, substitutions, triples, targetEntity, rels, dirs, currentGroundings, groundings, invertGrounding);
+                substitutions.erase(ent);
+                if (groundings){
+                    currentGroundings.pop_back();
+                }
+            }
+        }
+    }
+}
+
 // ***RuleB implementation*** 
 
 int RuleB::branchingFaktor=-1;
@@ -265,79 +342,6 @@ bool RuleB::predictTriple(int head, int tail, TripleStorage& triples, QueryResul
     }
     return madeTriplePred;
 }
-
-// used for scoring triples, e.g., DFS search but with a target end point (targetEntity)
-// can also be used to track all the groundings (list of triples) 
-void RuleB::searchCurrTargetGroundings(int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
-		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings, RuleGroundings* groundings){
-
-
-    int currRel = rels[currAtomIdx];
-    int* begin;
-    int length;
-
-    if (madeTriplePred && !groundings){
-        return;
-    }
-    dirs[currAtomIdx-1] ? triples.getTforHR(currEntity, currRel, begin, length) : triples.getHforTR(currEntity, currRel, begin, length);
-    if (currAtomIdx == rels.size()-1){
-        // next entities
-        for (int i=0; i<length; i++){
-            int ent = begin[i];
-            // IO and target checking
-            if (substitutions.find(ent)==substitutions.end() && targetEntity==ent){
-                madeTriplePred = true;
-                
-                // we only track the groundings if groundings is given
-                if (groundings){
-                    Triple triple;
-                    if (directions[currAtomIdx-1]){
-                        triple = {currEntity, currRel, ent};
-                    }else{
-                        triple = {ent, currRel, currEntity};
-                    }
-                    currentGroundings.push_back(triple);
-                    (*groundings)[this].push_back(currentGroundings);
-                    // we have to pop here (for substitutions we dont add anything so we dont erase)
-                    currentGroundings.pop_back();
-                }else{
-                    // if we are not tracking groundings, we can stop as we know
-                    // that the rule predicted the target entity, thats all we care about
-                    return;
-
-                }
-            }
-        }
-    }else{
-        if (RuleB::branchingFaktor>0 && length>RuleB::branchingFaktor){
-            return;
-        }
-        //next entities
-        for (int i=0; i<length; i++){
-            int ent = begin[i];
-            if (substitutions.find(ent)==substitutions.end()){
-                substitutions.insert(ent);
-                // we only track the groundings if groundings is given
-                if (groundings){
-                    Triple triple;
-                    if (directions[currAtomIdx-1]){
-                        triple = {currEntity, currRel, ent};
-                    }else{
-                        triple = {ent, currRel, currEntity};
-                    }
-                    currentGroundings.push_back(triple);
-                }
-                searchCurrTargetGroundings(currAtomIdx+1, ent, substitutions, triples, targetEntity, rels, dirs, currentGroundings, groundings);
-                substitutions.erase(ent);
-                if (groundings){
-                    currentGroundings.pop_back();
-                }
-            }
-        }
-    }
-}
-
-
 
 // ***RuleC implementation*** 
 
@@ -576,6 +580,9 @@ bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& hea
 }
 
 bool RuleC::predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings){
+   
+    
+    
     if (leftC && head!=constants[0]){
         return false;
     }else if (!leftC && tail!=constants[0]){
@@ -592,7 +599,11 @@ bool RuleC::predictTriple(int head, int tail, TripleStorage& triples, QueryResul
     std::set<int> substitutions = {constants[0], constants[1]};
     std::vector<Triple> currGroundings;
     int targetEnt = leftC ? tail : head;
-    searchCurrTargetGroundings(1, constants[1], substitutions, triples, targetEnt, rels, dirs, currGroundings, groundings);
+    // h(c,Y) <-- b1(d,A), b2(A,Y)
+    // h(X,c) <-- b1(X,A), b2(A,d)
+    // for both directions we start with the atom with the constant
+    // so we have to invert groundings in both cases (given we want to return AnyBURL order) aka the true in last input param
+    searchCurrTargetGroundings(1, constants[1], substitutions, triples, targetEnt, rels, dirs, currGroundings, groundings, true);
     // for simplicity we just use QueryResults here; this also holds for U_c rules 
     // we have to remember when calling from the outside what the triple is
     if (madeTriplePred){
@@ -604,78 +615,6 @@ bool RuleC::predictTriple(int head, int tail, TripleStorage& triples, QueryResul
 bool RuleC::predictL1Triple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings){
     return false;
 }
-
-
-void RuleC::searchCurrTargetGroundings(
-		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
-		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,
-		RuleGroundings* groundings
-)
-{
-    int currRel = rels[currAtomIdx];
-    int* begin;
-    int length;
-
-    if (madeTriplePred && !groundings){
-        return;
-    }
-    dirs[currAtomIdx-1] ? triples.getTforHR(currEntity, currRel, begin, length) : triples.getHforTR(currEntity, currRel, begin, length);
-    if (currAtomIdx == rels.size()-1){
-        // next entities
-        for (int i=0; i<length; i++){
-            int ent = begin[i];
-            // IO and target checking
-            if (substitutions.find(ent)==substitutions.end() && targetEntity==ent){
-                madeTriplePred = true;
-                
-                // we only track the groundings if groundings is given
-                if (groundings){
-                    Triple triple;
-                    if (directions[currAtomIdx-1]){
-                        triple = {currEntity, currRel, ent};
-                    }else{
-                        triple = {ent, currRel, currEntity};
-                    }
-                    currentGroundings.push_back(triple);
-                    (*groundings)[this].push_back(currentGroundings);
-                    // we have to pop here (for substitutions we dont add anything so we dont erase)
-                    currentGroundings.pop_back();
-                    // now continue the loop, we want to find all the groundings
-                }else{
-                    // if we are not tracking groundings, we can stop as we know
-                    // that the rule predicted the target triple, thats all we care about
-                    return;
-
-                }
-            }
-        }
-    }else{
-        //next entities
-        for (int i=0; i<length; i++){
-            int ent = begin[i];
-            if (substitutions.find(ent)==substitutions.end()){
-                substitutions.insert(ent);
-                // we only track the groundings if groundings is given
-                if (groundings){
-                    Triple triple;
-                    if (directions[currAtomIdx-1]){
-                        triple = {currEntity, currRel, ent};
-                    }else{
-                        triple = {ent, currRel, currEntity};
-                    }
-                    currentGroundings.push_back(triple);
-                }
-                searchCurrTargetGroundings(currAtomIdx+1, ent, substitutions, triples, targetEntity, rels, dirs, currentGroundings, groundings);
-                substitutions.erase(ent);
-                if (groundings){
-                    currentGroundings.pop_back();
-                }
-            }
-        }
-    }
-}
-
-
 
 // same implementation as in RuleB except that rels dirs is used depending on leftC s.t.
 // directions can be handled
@@ -805,7 +744,7 @@ RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& l
     confWeight = RuleD::dConfWeight;
 
 
-    // used for rules where leftC=false and predicting heads
+    // used for rules where leftC=false
     this->_relations = relations;
     std::reverse(_relations.begin()+1, _relations.end());
     this->_directions = directions;
@@ -895,7 +834,6 @@ void RuleD::searchCurrGroundings(
         }
     }
 }
-
 
 bool RuleD::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet){
     // h(X,d) <-- b1(X,A), b2(A,B), b3(B,C)
@@ -1025,7 +963,7 @@ bool RuleD::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
         }
     } else {
         
-        // we start from the last atom grounded with head
+        // we start from the last atom (using _relations _directions)
         RelNodeToNodes* relNtoN = nullptr;
         if (_directions[0]){
             relNtoN =  &triples.getRelHeadToTails();
@@ -1034,7 +972,7 @@ bool RuleD::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
             relNtoN =  &triples.getRelTailToHeads();
         }
         // first body relation
-        auto it = relNtoN->find(relations[1]);
+        auto it = relNtoN->find(_relations[1]);
         bool predicted = false;
         if (!(it==relNtoN->end())){
             NodeToNodes& NtoN = it->second;
@@ -1054,6 +992,84 @@ bool RuleD::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
         }
         return predicted;
     }
+}
+
+bool RuleD::predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings){
+    // h(X,c) <-- b1(X,A), b2(A,B), b3(B,C)
+    //  leftC=false, relations=[h, b1, b2, b3], directions=[1,1,1]
+    // h(c,Y) <-- b1(A,B), b2(B,C), b3(C,Y)
+    // leftC=true, relations=[h, b1, b2, b3], directions=[1,1,1]
+    // h(c,Y) <-- b1(A,B), b2(C,D), b3(Y,C)
+    // leftC=true, relations=[h, b1, b2, b3], directions=[1,0,0]
+
+    if (leftC && head!=constant){
+        return false;
+    }else if (!leftC && tail!=constant){
+        return false;
+    }
+
+    madeTriplePred = false;
+    // for leftC we start with the first body atom and move to the last atom
+    // if we hit a Y=tail(==targetEnt) we can stop (if not tracking groundings) 
+    if (leftC){
+        RelNodeToNodes* relNtoN = nullptr;
+        if (directions[0]){
+            relNtoN =  &triples.getRelHeadToTails();
+          
+        }else{
+            relNtoN =  &triples.getRelTailToHeads();
+        }
+
+        auto it = relNtoN->find(relations[1]);
+        if (!(it==relNtoN->end())){
+            NodeToNodes& NtoN = it->second;
+            for (auto const& pair: NtoN){
+                const int& e = pair.first;
+                std::set<int> substitutions = {e, constant};
+                std::vector<Triple> currGroundings;
+                searchCurrTargetGroundings(1, e, substitutions, triples, tail, relations, directions, currGroundings, groundings, true);
+                // stop after hitting tail once when we not track groundings
+                if (!groundings && madeTriplePred){
+                    qResults.insertRule(tail, this);
+                    return true;
+                }
+            }
+        }
+        if (madeTriplePred){
+            qResults.insertRule(tail, this);
+        }
+        return madeTriplePred;
+    // not leftC we move from last atom to first atom and see if we hit the head
+    } else{
+         RelNodeToNodes* relNtoN = nullptr;
+         if (_directions[0]){
+            relNtoN =  &triples.getRelHeadToTails();
+          
+        }else{
+            relNtoN =  &triples.getRelTailToHeads();
+        }
+
+        auto it = relNtoN->find(_relations[1]);
+        if (!(it==relNtoN->end())){
+            NodeToNodes& NtoN = it->second;
+            for (auto const& pair: NtoN){
+                const int& e = pair.first;
+                std::set<int> substitutions = {e, constant};
+                std::vector<Triple> currGroundings;
+                searchCurrTargetGroundings(1, e, substitutions, triples, head, _relations, _directions, currGroundings, groundings, true);
+                // stop after hitting tail once when we not track groundings
+                if (!groundings && madeTriplePred){
+                    qResults.insertRule(tail, this);
+                    return true;
+                }
+            }
+        }
+        if (madeTriplePred){
+            qResults.insertRule(tail, this);
+        }
+        return madeTriplePred;
+
+    }    
 }
 
 
