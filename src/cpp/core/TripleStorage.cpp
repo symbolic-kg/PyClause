@@ -34,7 +34,10 @@ RelNodeToNodes& TripleStorage::getRelTailToHeads() {
 }
 
 // read a file with tab separated triples and create data
-void TripleStorage::read(std::string filepath) {
+// loadCSR is true per default, when multiple datasets are loaded it should be set to false
+// and after all the data is loaded (and the index is constructed) the csr should be loaded
+// with loadCSR() otherwise the CSR are bugged in cases where the set of entities of the different datasets differs
+void TripleStorage::read(std::string filepath, bool loadCSR) {
 	std::string line;
 	std::ifstream file(filepath);
 	if (file.is_open())
@@ -56,9 +59,13 @@ void TripleStorage::read(std::string filepath) {
 		exit(-1);
 	}
 
+	if (loadCSR){
+		rcsr = std::make_unique<RelationalCSR>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
+	}
+}
+
+void TripleStorage::loadCSR(){
 	rcsr = std::make_unique<RelationalCSR>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
-
-
 }
 
 void TripleStorage::add(std::string head, std::string relation, std::string tail) {

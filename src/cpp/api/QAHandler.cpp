@@ -40,6 +40,7 @@ void QAHandler::setOptions(std::map<std::string, std::string> options){
         std::pair<int,int>& query = queries[i];
         isTailQuery ?  target.addIdx(query.first, query.second, 0) : target.addIdx(0, query.second, query.first);
     }
+    target.loadCSR();
     ranker.makeRanking(target, dHandler->getData(), dHandler->getRules(), dHandler->getFilter());
 
     // CandidateConfs is  std::vector<pair<int,double>>
@@ -97,6 +98,7 @@ void QAHandler::setOptions(std::map<std::string, std::string> options){
        
         isTailQuery ?  target.add(query.first, query.second, index->getStringOfNodeId(d)) : target.add(index->getStringOfNodeId(d), query.second, query.first);
     }
+    target.loadCSR();
     ranker.makeRanking(target, dHandler->getData(), dHandler->getRules(), dHandler->getFilter());
 
     // CandidateConfs is  std::vector<pair<int,double>>

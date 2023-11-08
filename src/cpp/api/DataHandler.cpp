@@ -18,7 +18,7 @@ void DataHandler::loadData(std::string path){
     if (loadedData){
         throw std::runtime_error("Please load the data only once or use a new data handler.");
     }
-    data->read(path); 
+    data->read(path, true); 
     loadedData = true;
 }
 
@@ -26,10 +26,14 @@ void DataHandler::loadData(std::string path, std::string filterPath){
     if (loadedData){
         throw std::runtime_error("Please load the data only once or use a new data handler.");
     }
-    data->read(path); 
+    data->read(path, false); 
 
     if (filterPath!=""){
-        filter->read(filterPath);
+        filter->read(filterPath, false);
+        data->loadCSR();
+        filter->loadCSR();
+    }else{
+        data->loadCSR();
     }
     loadedData = true;
 }
@@ -51,13 +55,20 @@ void DataHandler::loadDatasets(std::string targetPath, std::string trainPath, st
     std::cout<<"Load data... \n";
 
 
-    target->read(targetPath);
+    target->read(targetPath, false);
     if (filterPath!=""){
-        filter->read(filterPath);
+        // can also just call with true here
+        filter->read(filterPath, false);
+        
     }
-    
-    // sets loadedData to true
+    // index constructed after train/data is loaded
+    // loads CSR directly
+    // sets loadedData
     loadData(trainPath);
+    target->loadCSR();
+    if(filterPath!=""){
+        filter->loadCSR();
+    }
 }
 
 

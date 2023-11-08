@@ -17,7 +17,8 @@ public:
 
 	RelNodeToNodes& getRelHeadToTails();
 	RelNodeToNodes& getRelTailToHeads();
-	void read(std::string filepath);
+	void read(std::string filepath, bool loadCSR=true);
+	void loadCSR();
 	void add(std::string head, std::string relation, std::string tail);
 	void addIdx(int head, int relation, int tail);
 	// return true if the triple exists in the data, otherwise false
@@ -28,7 +29,7 @@ public:
 	void getTforHR(int head, int relation, int*& begin, int& length);
 	void getHforTR(int tail, int relation, int*& begin, int& length);
 	Index* getIndex();
-	std::unique_ptr<RelationalCSR> rcsr;
+	
 	RelationalCSR* getCSR();
 	void calcEntityFreq();
 	int getFreq(int entity);
@@ -36,6 +37,7 @@ public:
 protected:
 
 private:
+    std::unique_ptr<RelationalCSR> rcsr;
 	std::shared_ptr<Index> index;
 	RelNodeToNodes relHeadToTails;
 	RelNodeToNodes relTailToHeads;
