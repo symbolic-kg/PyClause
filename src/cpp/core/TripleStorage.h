@@ -14,6 +14,7 @@ class TripleStorage
 {
 public:
 	TripleStorage(std::shared_ptr<Index> index);
+	std::unique_ptr<RelationalCSR> rcsr;
 
 	RelNodeToNodes& getRelHeadToTails();
 	RelNodeToNodes& getRelTailToHeads();
@@ -37,7 +38,7 @@ public:
 protected:
 
 private:
-    std::unique_ptr<RelationalCSR> rcsr;
+  
 	std::shared_ptr<Index> index;
 	RelNodeToNodes relHeadToTails;
 	RelNodeToNodes relTailToHeads;

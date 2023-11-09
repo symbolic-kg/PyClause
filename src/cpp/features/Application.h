@@ -2,6 +2,7 @@
 #define RANKING_H
 
 #include <map>
+#include <unordered_map>
 
 #include "../core/TripleStorage.h"
 #include "../core/RuleStorage.h"
@@ -46,12 +47,21 @@ public:
     void setTieHandling(std::string opt);
     void setVerbose(bool ind);
 
+    //triple scoring
+    void calculateTripleScores(std::vector<Triple>, TripleStorage& train, RuleStorage& rules);
+    std::vector<std::pair<Triple, double>>& getTripleScores();
+    std::vector<std::pair<Triple, RuleGroundings>>& getTripleGroundings();
+
 
 
 private:
+    // tail candidates for head queries and all the respective rules that predicted them
+    // [relation][tail] --> cands
     std::unordered_map<int,std::unordered_map<int, NodeToPredRules>> headQcandsRules;
+    // tail candidates and the aggregated confidences
     std::unordered_map<int,std::unordered_map<int, CandidateConfs>> headQcandsConfs;
 
+    // se above vice versa
     std::unordered_map<int,std::unordered_map<int, NodeToPredRules>> tailQcandsRules;
     std::unordered_map<int,std::unordered_map<int, CandidateConfs>> tailQcandsConfs;
 
@@ -63,6 +73,12 @@ private:
     //};
     //std::unordered_map<int,std::unordered_map<int, QueryResults>> headQueryResults;
     //std::unordered_map<int,std::unordered_map<int, QueryResults>> tailQueryResults;
+
+
+    // triple scoring and grounding tracking
+    std::vector<std::pair<Triple, double>> tripleScores;
+    std::vector<std::pair<Triple, RuleGroundings>> tripleGroundings;
+
 
     // ***ranking options***
 
@@ -100,6 +116,18 @@ private:
     //***running options***
     // output current relation and direction during ranking
     bool verbose = true;
+
+
+    //***triple scoring options***
+
+    // after how many of the top (conf) rules to stop scoring
+    // if maxplus aggregation is chosen this is set to 1
+    // might be changed in the future, currently maxplus outputs the max scores
+    int score_numTopRules = -1;
+
+    // for each scores triples the rules and groundings of the rules are collected
+    // how many rules is directly affected by score_numTopRules
+    bool score_collectGr=false;
 
 
 

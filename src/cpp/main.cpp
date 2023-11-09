@@ -562,6 +562,92 @@ void tests_groundings(){
     std::cout<<"All predictTriple tests passed."<<std::endl;
 }
 
+
+void testTripleScoring(){
+    std::shared_ptr<Index> index = std::make_shared<Index>();
+    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
+    ruleFactory->setCreateRuleB(true);
+    ruleFactory->setCreateRuleZ(false);
+    ruleFactory->setCreateRuleC(true);
+    ruleFactory->setCreateRuleD(true);
+    ruleFactory->setCreateRuleXXd(false);
+    ruleFactory->setCreateRuleXXc(false);
+    RuleZ::zConfWeight = 0.01;
+    RuleD::dConfWeight = 0.1;
+
+    std::string trainPath = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
+    std::string filterPath = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt";
+    std::string targetPath = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt";
+   
+    //test
+    TripleStorage target(index);
+    target.read(targetPath, false);
+    //valid 
+    TripleStorage filter(index);
+    filter.read(filterPath, false);
+    std::cout<<"data loaded. \n";
+
+    //train
+    TripleStorage train(index);
+    train.read(trainPath,false);
+
+    target.loadCSR();
+    train.loadCSR();
+    filter.loadCSR();
+
+
+    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
+    RuleStorage rules(index, ruleFactory);
+    rules.readAnyTimeFormat(rulePath, true); 
+
+    ApplicationHandler ranker;
+
+    ranker.setTopK(100);
+    ranker.setDiscAtLeast(100);
+    std::vector<Triple> triples;
+
+    ranker.setSaveCandidateRules(true);
+    ranker.makeRanking(target, train, rules, filter);
+    std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& candsConfs = ranker.getTailQcandsConfs();
+
+    std::unordered_map<int,std::unordered_map<int, NodeToPredRules>> candRules = ranker.getTailQcandsRules();
+    std::vector<Rule*> predrules = candRules[7][4008][4008];
+    // 4008 7 4008
+    std::vector<double> scores;
+    for(auto& outer_pair : candsConfs) {
+    int rel = outer_pair.first;
+        for(auto& inner_pair : outer_pair.second){
+            int head = inner_pair.first;
+            for(auto& candidate_conf : inner_pair.second){
+                int tail = candidate_conf.first;
+                triples.push_back({head, rel, tail});
+                scores.push_back({candidate_conf.second});
+            }
+        }
+    }
+
+    ranker.clearAll();
+    std::cout<<"make scores"<<std::endl;
+    //triples = {{3707,7,3707}};
+    ranker.calculateTripleScores(triples, train, rules);
+    std::cout<<"made scores"<<std::endl;
+
+    std::vector<std::pair<Triple, double>>& newScores = ranker.getTripleScores();
+
+    for (int i=0; i<newScores.size(); i++){
+        bool same = (newScores[i].second == scores[i]);
+        std::cout<<same<<std::endl;
+    }
+
+
+
+
+    std::cout<<"made scores"<<std::endl;
+
+
+
+}
+
     
 
 
@@ -571,43 +657,53 @@ void timeRanking(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
     ruleFactory->setCreateRuleB(true);
-    ruleFactory->setCreateRuleZ(true);
+    ruleFactory->setCreateRuleZ(false);
     ruleFactory->setCreateRuleC(true);
     ruleFactory->setCreateRuleD(true);
-    ruleFactory->setCreateRuleXXd(true);
-    ruleFactory->setCreateRuleXXc(true);
+    ruleFactory->setCreateRuleXXd(false);
+    ruleFactory->setCreateRuleXXc(false);
     RuleZ::zConfWeight = 0.01;
-    RuleD::dConfWeight = 0.01;
-    std::string trainPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt";
-    std::string filterPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt";
-    std::string targetPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt";
+    RuleD::dConfWeight = 0.1;
+    // std::string trainPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt";
+    // std::string filterPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt";
+    // std::string targetPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt";
+
+
+    std::string trainPath = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
+    std::string filterPath = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt";
+    std::string targetPath = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt";
    
     //test
     TripleStorage target(index);
-    target.read(targetPath);
+    target.read(targetPath, false);
     //valid 
     TripleStorage filter(index);
-    filter.read(filterPath);
+    filter.read(filterPath, false);
     std::cout<<"data loaded. \n";
 
     //train
     TripleStorage train(index);
-    train.read(trainPath);
+    train.read(trainPath,false);
+
+    target.loadCSR();
+    train.loadCSR();
+    filter.loadCSR();
 
 
-    //683 258 0.37774524158125916 /location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)
-    std::unique_ptr<Rule> ruleXXd = ruleFactory->parseAnytimeRule("/location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)");
-    std::string node = "/m/09c7w0";
-    QueryResults preds;
-    //ruleXXd->predictHeadQuery(index->getIdOfNodestring(node), train, preds);
-    std::set<Triple> predictions;
-    ruleXXd->setTrackInMaterialize(true);
-    predictions = ruleXXd->materialize(train);
-    //TODO: test
+    // //683 258 0.37774524158125916 /location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)
+    // std::unique_ptr<Rule> ruleXXd = ruleFactory->parseAnytimeRule("/location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)");
+    // std::string node = "/m/09c7w0";
+    // QueryResults preds;
+    // //ruleXXd->predictHeadQuery(index->getIdOfNodestring(node), train, preds);
+    // std::set<Triple> predictions;
+    // ruleXXd->setTrackInMaterialize(true);
+    // predictions = ruleXXd->materialize(train);
+    // //TODO: test
     
 
 
-    std::string rulePath = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600";
+    //std::string rulePath = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600";
+    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
     RuleStorage rules(index, ruleFactory);
     rules.readAnyTimeFormat(rulePath, true); 
 
@@ -615,6 +711,7 @@ void timeRanking(){
 
     ranker.setTopK(100);
     ranker.setDiscAtLeast(100);
+
 
 
     ranker.makeRanking(target, train, rules, filter);
@@ -635,8 +732,10 @@ void timeRanking(){
 
 
 int main(){
+    
     tests_groundings();
     tests();
+    testTripleScoring();
    
     //checkRuntimes();
     timeRanking();

@@ -15,6 +15,72 @@
 #include "../core/Globals.h"
 
 
+
+
+
+void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, TripleStorage& train, RuleStorage& rules){
+
+    tripleScores.resize(triples.size());
+    if (score_collectGr){
+        tripleGroundings.resize(triples.size());
+    }
+    for (int i=0; i<triples.size(); i++){
+        Triple triple = triples[i];
+        std::cout<<triple[0]<<" "<<triple[1]<<" "<<triple[2]<<std::endl;
+        int head = triple[0];
+        int rel = triple[1];
+        int tail = triple[2];
+        auto& relRules = rules.getRelRules(rel);
+        QueryResults tripleResults(1, 1);
+        RuleGroundings ruleGroundings;
+               
+        //triple = head, rel, tail
+        int ctr = 0;
+        for (Rule* rule: relRules){
+            bool madePred;
+            if (score_collectGr){
+                madePred = rule->predictTriple(head, tail, train, tripleResults, &ruleGroundings);
+            }else{
+                madePred = rule->predictTriple(head, tail, train, tripleResults, nullptr);
+            }
+                    
+            if (madePred){
+                ctr+= 1;
+            }
+            if (ctr>=score_numTopRules && score_numTopRules>0){
+                break;
+            }
+
+        }
+        #pragma omp critical
+        {
+                    
+        // aggregation is performed on tripleResults that only holds one (tail) candidate
+        // for triple =head, rel, tail tripleResults holds the tail "candidate" for the triple
+        // note that tie handling has no effect, we are just aggregating one candidate
+
+        // the int represents the tail of the triple, vector is not necessary but we keep it simple here
+        std::vector<std::pair<int, double>> score;
+        if (rank_aggrFunc=="maxplus"){
+            scoreMaxPlus(tripleResults.getCandRules(), score, train);
+        }
+        tripleScores.at(i) = std::make_pair(triple, score[0].second);    
+        if (score_collectGr){
+            tripleGroundings.at(i) = std::make_pair(triple, ruleGroundings);
+        }    
+    }
+    tripleResults.clear();
+    ruleGroundings.clear();
+
+
+   }
+
+
+
+
+}
+
+
 void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, bool dirIsTail){
     // define rule prediction function depending on direction
     typedef bool (Rule::*RulePredFunc)(int, TripleStorage&, QueryResults&, ManySet);
@@ -117,7 +183,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                             scoreMaxPlus(qResults.getCandRules(), writeResults[relation][source], train);
                         }
                         else{
-                            throw std::runtime_error("Aggregation function is not recognized in calcualte ranking.");
+                            throw std::runtime_error("Aggregation function is not recognized in calculate ranking.");
                         }
                    }
                 }
@@ -140,7 +206,7 @@ void ApplicationHandler::aggregateQueryResults(std::string direction, TripleStor
                 if (rank_aggrFunc=="maxplus"){
                     scoreMaxPlus(query.second, writeResults[relation][source], train);
                 }else{
-                    throw std::runtime_error("Aggregation function is not recognized in calcualte ranking.");
+                    throw std::runtime_error("Aggregation function is not recognized in calculate ranking.");
                 }
                 
             }
@@ -285,6 +351,8 @@ void ApplicationHandler::clearAll(){
     headQcandsConfs.clear();
     tailQcandsRules.clear();
     tailQcandsConfs.clear();
+    tripleScores.clear();
+    tripleGroundings.clear();
 }
  
 void ApplicationHandler::setNumPreselect(int num){
@@ -316,6 +384,14 @@ void ApplicationHandler::setDiscAtLeast(int num){
     rank_discAtLeast = num;
 }
 
+void ApplicationHandler::setTieHandling(std::string opt){
+    rank_tie_handling = opt;
+}
+
+void ApplicationHandler::setVerbose(bool ind){
+    verbose = ind;
+}
+
 std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>& ApplicationHandler::getHeadQcandsRules(){
     return headQcandsRules;
 }
@@ -330,10 +406,12 @@ std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& ApplicationHand
     return tailQcandsConfs;
 }
 
-void ApplicationHandler::setTieHandling(std::string opt){
-    rank_tie_handling = opt;
+std::vector<std::pair<Triple, double>>& ApplicationHandler::getTripleScores(){
+    return tripleScores;
+}
+std::vector<std::pair<Triple, RuleGroundings>>& ApplicationHandler::getTripleGroundings(){
+    return tripleGroundings;
 }
 
-void ApplicationHandler::setVerbose(bool ind){
-    verbose = ind;
-}
+
+

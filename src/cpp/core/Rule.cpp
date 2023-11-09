@@ -64,7 +64,7 @@ void Rule::setTrackInMaterialize(bool val){
 }
 
 std::string Rule::getRuleString(){
-    throw std::runtime_error("Not implemented yet");
+   return rulestring;
 }
 long long Rule::getBodyHash(){
     throw std::runtime_error("Not implemented yet");
@@ -471,7 +471,7 @@ bool RuleC::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& t
         int bodyRel = this->relations[1];
         directions[0] ? triples.getTforHR(head, bodyRel, begin, length) :  triples.getHforTR(head, bodyRel, begin, length);
         int* end = begin + length;
-        if (std::find(begin, end, constants[1]) != end){
+        if (std::find(begin, end, constants[1])!= end && constants[0]!=head){
             tailResults.insertRule(constants[0], this);
             return true;
         }
@@ -484,7 +484,7 @@ bool RuleC::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& t
         bool predicted = false;
         for (int i=0; i<length; i++){
             int cand = begin[i];
-            if (!filterSet.contains(cand)){
+            if (!filterSet.contains(cand) && cand!=constants[0]){
                 tailResults.insertRule(cand, this);
                 predicted = true;
             }
@@ -509,7 +509,7 @@ bool RuleC::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
         int bodyRel = this->relations[1];
         directions[0] ? csr->getHforTREfficient(tail, bodyRel, begin, length) :  csr->getTforHREfficient(tail, bodyRel, begin, length);
         int* end = begin + length;
-        if (std::find(begin, end, constants[1]) != end){
+        if (std::find(begin, end, constants[1])!= end && constants[0]!=tail){
             headResults.insertRule(constants[0], this);
             return true;
         }
@@ -523,7 +523,7 @@ bool RuleC::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
         bool predicted = false;
         for (int i=0; i<length; i++){
             int cand = begin[i];
-            if (!filterSet.contains(cand)){
+            if (!filterSet.contains(cand) && cand!=constants[0]){
                 headResults.insertRule(cand, this);
                 predicted = true;
             }
@@ -731,11 +731,8 @@ RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& l
         throw std::invalid_argument("'Directions' size should be one less than 'relations' size in construction of RuleB");
     }
     if(relations.size() < 2) {
-        throw std::invalid_argument("Cannot construct a RuleB with no body atom.");
+        throw std::invalid_argument("Cannot construct a RuleD with no body atom.");
     }		
-
-
-
     this->directions = directions;
     this->relations=relations;
     this->targetRel=relations[0];
