@@ -25,8 +25,10 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
         tripleGroundings.resize(triples.size());
     }
     for (int i=0; i<triples.size(); i++){
+        if (verbose && i%1000==0 && i>0){
+            std::cout<<"Scored "<<i<<" triples..."<<std::endl;
+        }
         Triple triple = triples[i];
-        std::cout<<triple[0]<<" "<<triple[1]<<" "<<triple[2]<<std::endl;
         int head = triple[0];
         int rel = triple[1];
         int tail = triple[2];
@@ -60,11 +62,16 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
         // note that tie handling has no effect, we are just aggregating one candidate
 
         // the int represents the tail of the triple, vector is not necessary but we keep it simple here
+        // and use existing functionality
         std::vector<std::pair<int, double>> score;
         if (rank_aggrFunc=="maxplus"){
             scoreMaxPlus(tripleResults.getCandRules(), score, train);
         }
-        tripleScores.at(i) = std::make_pair(triple, score[0].second);    
+        double trScore = 0;
+        if (score.size()>0){
+            trScore = score[0].second;
+        }
+        tripleScores.at(i) = std::make_pair(triple, trScore);    
         if (score_collectGr){
             tripleGroundings.at(i) = std::make_pair(triple, ruleGroundings);
         }    
@@ -390,6 +397,14 @@ void ApplicationHandler::setTieHandling(std::string opt){
 
 void ApplicationHandler::setVerbose(bool ind){
     verbose = ind;
+}
+
+void ApplicationHandler::setScoreCollectGroundings(bool ind){
+    score_collectGr = ind;
+}
+
+void ApplicationHandler::setScoreNumTopRules(int num){
+    score_numTopRules = num; 
 }
 
 std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>& ApplicationHandler::getHeadQcandsRules(){

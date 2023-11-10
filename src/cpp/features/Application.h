@@ -46,6 +46,9 @@ public:
     void setDiscAtLeast(int num);
     void setTieHandling(std::string opt);
     void setVerbose(bool ind);
+    // scoring
+    void setScoreNumTopRules(int num);
+    void setScoreCollectGroundings(bool ind);
 
     //triple scoring
     void calculateTripleScores(std::vector<Triple>, TripleStorage& train, RuleStorage& rules);

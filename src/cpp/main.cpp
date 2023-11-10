@@ -559,7 +559,7 @@ void tests_groundings(){
 
 
 
-    std::cout<<"All predictTriple tests passed."<<std::endl;
+    std::cout<<"All predictTriple rule tests passed."<<std::endl;
 }
 
 
@@ -602,17 +602,41 @@ void testTripleScoring(){
 
     ApplicationHandler ranker;
 
+
+    // Test correct handling of a triple that is not predicted by any of the rules 
+    std::vector<Triple> triples = {{3707,7,3707}};
+    ranker.setScoreCollectGroundings(true);
+    ranker.calculateTripleScores(triples, train, rules);
+
+    std::vector<std::pair<Triple, double>>& trScores = ranker.getTripleScores();
+    std::vector<std::pair<Triple, RuleGroundings>>& trGroundings = ranker.getTripleGroundings();
+
+    if (trGroundings[0].second.size()!=0){
+        throw std::runtime_error("Test 1 for triple Scoring failed. Should not predict the triple.");
+    }
+
+     if (trScores[0].second!=0){
+        throw std::runtime_error("Test 2 for triple Scoring failed. Should predict 0 for not existing triple.");
+    }
+    ranker.clearAll();
+
+
+
+
+
+    // test of the scores of predictTriples match the scores of a predicted triple from a ranking
     ranker.setTopK(100);
     ranker.setDiscAtLeast(100);
-    std::vector<Triple> triples;
+    
 
     ranker.setSaveCandidateRules(true);
     ranker.makeRanking(target, train, rules, filter);
     std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& candsConfs = ranker.getTailQcandsConfs();
 
+    // calculate ranking and collect some triples
+    triples.clear();
     std::unordered_map<int,std::unordered_map<int, NodeToPredRules>> candRules = ranker.getTailQcandsRules();
     std::vector<Rule*> predrules = candRules[7][4008][4008];
-    // 4008 7 4008
     std::vector<double> scores;
     for(auto& outer_pair : candsConfs) {
     int rel = outer_pair.first;
@@ -622,30 +646,33 @@ void testTripleScoring(){
                 int tail = candidate_conf.first;
                 triples.push_back({head, rel, tail});
                 scores.push_back({candidate_conf.second});
+                // just take one triple per query
+                break;
             }
         }
     }
 
-    ranker.clearAll();
-    std::cout<<"make scores"<<std::endl;
-    //triples = {{3707,7,3707}};
+    // score the collected triples
+    ranker.setScoreCollectGroundings(true);
+    std::cout<<"Calculating triple scores"<<std::endl;
     ranker.calculateTripleScores(triples, train, rules);
-    std::cout<<"made scores"<<std::endl;
 
-    std::vector<std::pair<Triple, double>>& newScores = ranker.getTripleScores();
+    trScores = ranker.getTripleScores();
+    trGroundings = ranker.getTripleGroundings();
 
-    for (int i=0; i<newScores.size(); i++){
-        bool same = (newScores[i].second == scores[i]);
-        std::cout<<same<<std::endl;
+
+    // now the scores from calculating rankings for the triples must obviously be the same than the scores 
+    // of calculate triples
+    for (int i=0; i<trScores.size(); i++){
+        bool same = (trScores[i].second == scores[i]);
+        if (!same){
+            std::cout<<trScores[i].first[0]<<" "<<trScores[i].first[1]<<" "<<trScores[i].first[2]<<std::endl;
+            throw std::runtime_error("The score of this triple does not match its score from ranking.");
+        }
     }
 
 
-
-
-    std::cout<<"made scores"<<std::endl;
-
-
-
+    std::cout<<"All apply predictTriples tests passed"<<std::endl;
 }
 
     
