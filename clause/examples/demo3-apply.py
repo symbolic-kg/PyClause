@@ -17,9 +17,9 @@ if __name__ == '__main__':
     path_valid = "data/wnrr/valid.txt"
     path_test  = "data/wnrr/test.txt"
 
-    path_rules_input = "local/rules-nanytorm-anyburl-wn18rr"
+    path_rules_input = "local/rules-wn18rr-torm-b3"
 
-    path_preds_output = "local/preds-nanytorm-anyburl-wn18rr"
+    path_preds_output = "local/preds-wn18rr-torm-b3"
 
 
 

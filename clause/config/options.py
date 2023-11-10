@@ -29,40 +29,50 @@ class Options():
         }
 
         # the options relevenat for rule learning
-        self.options['torm'] = dict(rules = dict(
-            tautology = False, # if set to false, rules that do not make any wrong prediction are surpressed
-            b = dict(
-                active = False,
+
+
+        self.options['learning'] = dict(
+            # tautology = False, # if set to false, rules that do not make any wrong prediction are surpressed
+            mode = "hybrid",  # chose betweeen anyburl / hybrid / nanytorm; default shoudl be hybrid
+            anyburl = dict(
+                time = 60, # time for anyburl rule mining in seconds
                 confidence = 0.0001,
                 support = 2,
-                length = 3,
-                batchsize = 1000
+                b_length = 3,
             ),
-            uc = dict(
-                active = True,
-                confidence = 0.0001,
-                support = 2
-            ),
-            ud = dict(
-                active = True,
-                confidence = 0.0001,
-                support = 2
-            ),
-            z = dict(
-                active = True,
-                confidence = 0.0001,
-                support = 2
-            ),
-            xx_uc = dict(
-                active = True,
-                confidence = 0.0001,
-                support = 2
-            ),
-            xx_ud = dict(
-                active = True,
-                confidence = 0.0001,
-                support = 2
-            )
+            torm = dict(
+                b = dict(
+                    active = True,
+                    confidence = 0.0001,
+                    support = 2,
+                    length = 3,
+                    batchsize = 1000
+                ),
+                uc = dict(
+                    active = True,
+                    confidence = 0.0001,
+                    support = 2
+                ),
+                ud = dict(
+                    active = True,
+                    confidence = 0.0001,
+                    support = 2
+                ),
+                z = dict(
+                    active = True,
+                    confidence = 0.0001,
+                    support = 2
+                ),
+                xx_uc = dict(
+                    active = True,
+                    confidence = 0.0001,
+                    support = 2
+                ),
+                xx_ud = dict(
+                    active = True,
+                    confidence = 0.0001,
+                    support = 2
+                )
         ))
 
     def set(self, param, value):

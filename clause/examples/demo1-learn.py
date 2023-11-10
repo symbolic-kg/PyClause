@@ -17,7 +17,7 @@ if __name__ == '__main__':
     path_valid = "data/wnrr/valid.txt"
     path_test  = "data/wnrr/test.txt"
 
-    path_rules_output = "local/rules-nanytorm-wn18rr"
+    path_rules_output = "local/rules-wn18rr-hybrid-b2"
 
 
     # load a triple set from a file and display some meta info about it
@@ -28,6 +28,9 @@ if __name__ == '__main__':
     # instead of that, a specific list of target relations can be determined as first argument
 
     options = Options()
+
+    options.set("learning.mode", "hybrid")
+    options.set("learning.anyburl.b_length", 2)
 
 
     torm = Torm(options, triples.rels, triples)
