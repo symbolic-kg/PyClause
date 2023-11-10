@@ -59,17 +59,6 @@ PYBIND11_MODULE(c_clause, m) {
         .def("set_options", &QAHandler::setOptions)
     ; //class end
 
-    py::class_<RuleHandler>(m, "RuleHandler") 
-        .def(py::init<std::string>())
-        .def(
-            "calcRulesPredictions", &RuleHandler::calcRulesPredictions,
-            R"pbdoc(
-                Given a string rule calculates all stats and predictions of rules. 
-                args: string:rulestring; bool returnPredictions: if true return predictions; bool returnStats: if true returns exact stats.
-                returns: tuple where tuple[0] are the predictions , tuple[1][0] are number of exact predictions tuple[1][1] number of true predictions.
-
-            )pbdoc" )
-    ; //class end
     py::class_<RulesHandler>(m, "RulesHandler") 
         .def(py::init<>())
         .def(

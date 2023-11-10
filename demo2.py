@@ -44,6 +44,9 @@ options = {
 }
 
 
+
+#### Calculate a ranking and serialize / use in python
+start = time.time()
 loader = c_clause.DataHandler(options)
 loader.load_datasets(target, train, filter)
 loader.load_rules(rules)
@@ -56,33 +59,28 @@ loader.load_rules(rules)
 
 
 ### Calculate exact rule statistics through materialization
-#calcStats returns list[num_pred, num_correct_pred]
 
-handler = c_clause.RuleHandler(train)
 print("Get predictions")
 rules_list = [
     "_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)",
     "_hypernym(X,06355894) <= "
 ]
 rules_list = rules_list
-## calculateRulesPredictions: input: list, bool, bool
+## stats_and_predictions: input: list, bool, bool
 ## list: list of string rule
 ## first boolean parameter: if predictions will be returned
 ## second boolean: if stats will be returned
 ## returns: tuple with tuple[0] being the string predictions, and tuple[1] being the stats
-start = time.time()
-preds = handler.calcRulesPredictions(rules_list, True, True)
-end = time.time()
-print(f"All time (+serialization) was {end-start} seconds")
-
-handlerNew = c_clause.RulesHandler()
-predsNew = handlerNew.stats_and_predictions(rules_list, loader,  True, True)
+handler = c_clause.RulesHandler()
+preds = handler.stats_and_predictions(rules_list, loader,  True, True)
 
 
 
 
-#### Calculate a ranking and serialize / use in python
-start = time.time()
+
+
+
+
 
 
 
