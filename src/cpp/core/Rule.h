@@ -35,8 +35,7 @@ public:
 		rulestring(""),
 		trackInMaterialize(false),
 		confWeight(1.0),
-		numUnseen(5),
-		madeTriplePred(false)
+		numUnseen(5)
 	{};
 	void setID(int ID);
 	void print();
@@ -118,16 +117,12 @@ protected:
 	void searchCurrTargetGroundings(
 		int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
 		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,
-		RuleGroundings* groundings, bool invertGrounding=false
+		RuleGroundings* groundings, bool& reachedTarget, bool invertGrounding=false
 	);
 
 
 	
 	int targetRel;
-
-	// used only for predicTriple
-	bool madeTriplePred;
-
 
 	
 private:

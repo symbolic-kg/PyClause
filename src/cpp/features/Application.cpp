@@ -24,67 +24,70 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
     if (score_collectGr){
         tripleGroundings.resize(triples.size());
     }
-    for (int i=0; i<triples.size(); i++){
-        if (verbose && i%1000==0 && i>0){
-            std::cout<<"Scored "<<i<<" triples..."<<std::endl;
-        }
-        Triple triple = triples[i];
-        int head = triple[0];
-        int rel = triple[1];
-        int tail = triple[2];
-        auto& relRules = rules.getRelRules(rel);
+    #pragma omp parallel //num_threads(1)
+    {
         QueryResults tripleResults(1, 1);
-        RuleGroundings ruleGroundings;
-               
-        //triple = head, rel, tail
-        int ctr = 0;
-        for (Rule* rule: relRules){
-            bool madePred;
-            if (score_collectGr){
-                madePred = rule->predictTriple(head, tail, train, tripleResults, &ruleGroundings);
-            }else{
-                madePred = rule->predictTriple(head, tail, train, tripleResults, nullptr);
+        RuleGroundings ruleGroundings;   
+        #pragma omp for
+        for (int i=0; i<triples.size(); i++){
+           
+            if (verbose && i%1000==0 && i>0){
+                std::cout<<"Scored 1000 triples..."<<std::endl;
             }
-                    
-            if (madePred){
-                ctr+= 1;
-            }
-            if (ctr>=score_numTopRules && score_numTopRules>0){
-                break;
-            }
+            Triple triple = triples[i];
+            int head = triple[0];
+            int rel = triple[1];
+            int tail = triple[2];
+            auto& relRules = rules.getRelRules(rel);
+            
+                
+            //triple = head, rel, tail
+            int ctr = 0;
+            for (Rule* rule: relRules){
+                bool madePred;
+                if (score_collectGr){
+                    madePred = rule->predictTriple(head, tail, train, tripleResults, &ruleGroundings);
+                }else{
+                    madePred = rule->predictTriple(head, tail, train, tripleResults, nullptr);
+                }
+                        
+                if (madePred){
+                    ctr+= 1;
+                }
+                if (ctr>=score_numTopRules && score_numTopRules>0){
+                    break;
+                }
+                if (rank_aggrFunc=="maxplus" && ctr==1){
+                    break;
+                }
 
-        }
-        #pragma omp critical
-        {
-                    
-        // aggregation is performed on tripleResults that only holds one (tail) candidate
-        // for triple =head, rel, tail tripleResults holds the tail "candidate" for the triple
-        // note that tie handling has no effect, we are just aggregating one candidate
+            }
+            #pragma omp critical
+            {
+                        
+                // aggregation is performed on tripleResults that only holds one (tail) candidate
+                // for triple =head, rel, tail tripleResults holds the tail "candidate" for the triple
+                // note that tie handling has no effect, we are just aggregating one candidate
 
-        // the int represents the tail of the triple, vector is not necessary but we keep it simple here
-        // and use existing functionality
-        std::vector<std::pair<int, double>> score;
-        if (rank_aggrFunc=="maxplus"){
-            scoreMaxPlus(tripleResults.getCandRules(), score, train);
+                // the int represents the tail of the triple, vector is not necessary but we keep it simple here
+                // and use existing functionality
+                std::vector<std::pair<int, double>> score;
+                if (rank_aggrFunc=="maxplus"){
+                    scoreMaxPlus(tripleResults.getCandRules(), score, train);
+                }
+                double trScore = 0;
+                if (score.size()>0){
+                    trScore = score[0].second;
+                }
+                tripleScores.at(i) = std::make_pair(triple, trScore);    
+                if (score_collectGr){
+                    tripleGroundings.at(i) = std::make_pair(triple, ruleGroundings);
+                }    
+            }
+            tripleResults.clear();
+            ruleGroundings.clear();
         }
-        double trScore = 0;
-        if (score.size()>0){
-            trScore = score[0].second;
-        }
-        tripleScores.at(i) = std::make_pair(triple, trScore);    
-        if (score_collectGr){
-            tripleGroundings.at(i) = std::make_pair(triple, ruleGroundings);
-        }    
     }
-    tripleResults.clear();
-    ruleGroundings.clear();
-
-
-   }
-
-
-
-
 }
 
 
