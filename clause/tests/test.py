@@ -289,4 +289,51 @@ def test_qa_handler():
     print("Test for QA Handler idx and string version successful.")
 
     
+def test_loader():
+    import c_clause
+    
+    options = {
+        # ranking options
+        "aggregation_function": "maxplus",
+        "num_preselect": "10000000",
+        "topk": "100",
+        "filter_w_train": "true",
+        "filter_w_target": "true",
+        "disc_at_least":"100", ## -1 for off, must not be bigger than topk
+        # rule options 
+        "rule_b_max_branching_factor": "-1",
+        "use_zero_rules": "true",
+        "rule_zero_weight":"0.01",
+        "use_u_c_rules": "true",
+        "use_b_rules": "true",
+        "use_u_d_rules": "true",
+        "rule_u_d_weight":"0.01",
+        "use_u_xxc_rules": "true",
+        "use_u_xxd_rules": "true",
+        "tie_handling": "frequency",
+        "rule_num_unseen": "5",
+        
+    }
+    max_ent = 15000
+    max_rel = 237
+    
+    loader = c_clause.DataHandler(options)
+    triples = [[1, 0, max_ent], [1, max_rel, 3]]
+    loader.load_data(triples)
+    
+    assert len(loader.entity_map()) == max_ent + 1
+    for key, val in loader.entity_map().items():
+        assert int(key) == val
+        assert val < max_ent + 1
+        
+    assert len(loader.relation_map()) == max_rel + 1
+    for key, val in loader.relation_map().items():
+        assert int(key) == val
+        assert val < max_rel + 1
+    
+    loader = c_clause.DataHandler(options)
+    triples = [["a", "r1", "b"], ["a", "r1", "c"], ["c", "r2", "d"]]
+    loader.load_data(triples)
+    assert len(loader.entity_map()) == 4
+    assert len(loader.relation_map()) == 2
 

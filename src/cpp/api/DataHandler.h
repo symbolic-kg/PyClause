@@ -17,6 +17,7 @@
 #include "../core/Types.h"
 
 #include <array>
+#include <vector>
 #include <string>
 
 
@@ -29,6 +30,8 @@ public:
     void loadDatasets(std::string dataPath, std::string filterPath, std::string targetPath);
     void loadData(std::string dataPath);
     void loadData(std::string dataPath, std::string filterPath);
+    void loadData(std::vector<std::array<int, 3>> triples);
+    void loadData(std::vector<std::array<std::string, 3>> triples);
     void loadRules(std::string rulePath);
     std::unordered_map<std::string, int>& getNodeToIdx();
 	std::unordered_map<std::string, int>& getRelationToIdx();

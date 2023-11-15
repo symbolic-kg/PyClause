@@ -41,6 +41,52 @@ void DataHandler::loadData(std::string path, std::string filterPath){
     loadedData = true;
 }
 
+void DataHandler::loadData(std::vector<std::array<int, 3>> triples){
+    std::cout<< "Loading raw integer triples..." << "\n";
+    if (loadedData){
+        throw std::runtime_error("Please load the data only once or use a new data handler.");
+    }
+    // 'no-label' index needed
+    // right now we assume a sequential node index from range [0, max_entity_id], same for relations
+    // e.g. if triples = [[1, 0, 15000], [1, 237, 3]]
+    //      we construct a node index [0, 15000] and a relation index of [0, 237]
+    int max_entity_id = 0;
+    int max_relation_id = 0;
+    for (auto& triple : triples){
+        if (triple[0] > max_entity_id) {
+            max_entity_id = triple[0];
+        }
+        if (triple[1] > max_relation_id) {
+            max_relation_id = triple[1];
+        }
+        if (triple[2] > max_entity_id) {
+            max_entity_id = triple[2];
+        }
+    }
+    std::cout << "Constructing 'no-label' index using " << max_entity_id << " entities and " << max_relation_id << "relations...\n";
+    for (int i = 0; i < max_entity_id + 1; i++){
+        // need some label, cannot do empty string for each, using str(idx)
+        std::string lbl = std::to_string(i);
+	    index->addNode(lbl);
+    }
+    for (int i = 0; i < max_relation_id + 1; i++){
+        std::string lbl = std::to_string(i);
+	    index->addRelation(lbl); 
+    }
+
+    data->read(triples, true); 
+    loadedData = true;
+}
+
+void DataHandler::loadData(std::vector<std::array<std::string, 3>> triples){
+    std::cout<< "Loading string triples..." << "\n";    
+    if (loadedData){
+        throw std::runtime_error("Please load the data only once or use a new data handler.");
+    }
+    data->read(triples, true); 
+    loadedData = true;
+}
+
 bool DataHandler::getLoadedData(){
     return loadedData;
 }

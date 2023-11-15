@@ -9,6 +9,9 @@
 #include "Types.h"
 #include "Util.hpp"
 #include "RelationalCSR.hpp"
+#include <string>
+#include <array>
+#include <vector>
 
 class TripleStorage
 {
@@ -19,8 +22,11 @@ public:
 	RelNodeToNodes& getRelHeadToTails();
 	RelNodeToNodes& getRelTailToHeads();
 	void read(std::string filepath, bool loadCSR=true);
+	void read(std::vector<std::array<int, 3>> triples, bool loadCSR=true);
+	void read(std::vector<std::array<std::string, 3>> triples, bool loadCSR=true);
 	void loadCSR();
 	void add(std::string head, std::string relation, std::string tail);
+	void add(int head, int relation, int tail);
 	void addIdx(int head, int relation, int tail);
 	// return true if the triple exists in the data, otherwise false
 	bool contains(int head, int relation, int tail);

@@ -64,6 +64,25 @@ void TripleStorage::read(std::string filepath, bool loadCSR) {
 	}
 }
 
+
+void TripleStorage::read(std::vector<std::array<std::string, 3>> triples, bool loadCSR) {
+	for(auto& triple : triples){
+		add(triple[0], triple[1], triple[2]);
+	}
+	if (loadCSR){
+		rcsr = std::make_unique<RelationalCSR>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
+	}
+}
+
+void TripleStorage::read(std::vector<std::array<int, 3>> triples, bool loadCSR) {
+	for(auto& triple : triples){
+		add(triple[0], triple[1], triple[2]);
+	}
+	if (loadCSR){
+		rcsr = std::make_unique<RelationalCSR>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
+	}
+}
+
 void TripleStorage::loadCSR(){
 	rcsr = std::make_unique<RelationalCSR>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
 }
@@ -81,6 +100,13 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 	relHeadToTails[relId][headNodeId].insert(tailNodeId);
 	relTailToHeads[relId][tailNodeId].insert(headNodeId);
 	
+}
+
+// Need a way to add idx triples without the error handling (for e.g. loadData([[0,0,0]]))
+// With error handling -> chicken and egg problem
+void TripleStorage::add(int head, int relation, int tail) {
+	relHeadToTails[relation][head].insert(tail);
+	relTailToHeads[relation][tail].insert(head);
 }
 
 // can only add idx'es that already exist
