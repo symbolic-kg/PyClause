@@ -7,8 +7,6 @@
 class QAHandler: public BackendHandler{
 public:
     QAHandler(std::map<std::string, std::string> options);
-    void loadDatasets(std::string dataPath, std::string filterPath);
-
     //queries are (sourceEntity, relation)
     std::vector<std::vector<std::pair<std::string,double>>> answerQueries(
         std::vector<std::pair<std::string, std::string>> queries, std::shared_ptr<DataHandler> dHandler, std::string headOrTail

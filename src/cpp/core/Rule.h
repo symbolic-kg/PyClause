@@ -19,7 +19,6 @@
 
 
 
-
 class Rule 
 {
 public:
@@ -128,6 +127,17 @@ protected:
 private:
 
 };
+
+inline bool compareRule::operator()(Rule* lhs, Rule* rhs) const {
+    double lconf = lhs->getConfidence(false);
+    double rconf = rhs->getConfidence(false);
+    if (lconf != rconf) {
+        return lconf > rconf;
+    }else{
+		return true;
+	}
+}
+
 
 // ***RuleB: closed connected cyclical rules***
 
@@ -335,3 +345,5 @@ private:
 
 
 #endif // RULE_H
+
+

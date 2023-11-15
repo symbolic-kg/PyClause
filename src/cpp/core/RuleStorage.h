@@ -8,21 +8,6 @@
 
 #include <vector>
 
-
-struct compareRule {
-    bool operator () (Rule* lhs, Rule* rhs) const {
-        double lconf =  lhs->getConfidence(_cfg_exactConf);
-        double rconf = rhs->getConfidence(_cfg_exactConf);
-        if (lconf != rconf){
-            return lconf>rconf;
-        }
-        else{
-            return true;
-        }
-    }
-};
-
-
 class RuleStorage
 {
 

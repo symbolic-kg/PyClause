@@ -16,6 +16,7 @@ options = {
     "topk": "100",
     "filter_w_train": "false",
     "filter_w_target": "true",
+    "tie_handling": "frequency",
     "disc_at_least":"100", ## -1 for off, must not be bigger than topk
     # rule options 
     "rule_b_max_branching_factor": "-1",
@@ -27,7 +28,6 @@ options = {
     "rule_u_d_weight":"0.01",
     "use_u_xxc_rules": "true",
     "use_u_xxd_rules": "true",
-    "tie_handling": "frequency"
 }
 
 loader = c_clause.DataHandler(options)

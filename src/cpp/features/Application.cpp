@@ -79,7 +79,8 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
                 if (score.size()>0){
                     trScore = score[0].second;
                 }
-                tripleScores.at(i) = std::make_pair(triple, trScore);    
+                // for easy conversion later
+                tripleScores.at(i) = { (double) triple[0],  (double) triple[1], (double) triple[2], trScore};  
                 if (score_collectGr){
                     tripleGroundings.at(i) = std::make_pair(triple, ruleGroundings);
                 }    
@@ -355,7 +356,6 @@ void ApplicationHandler::scoreMaxPlus(
      }
 }
 
-
 void ApplicationHandler::clearAll(){
     headQcandsRules.clear();
     headQcandsConfs.clear();
@@ -424,7 +424,7 @@ std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& ApplicationHand
     return tailQcandsConfs;
 }
 
-std::vector<std::pair<Triple, double>>& ApplicationHandler::getTripleScores(){
+std::vector<std::array<double, 4>>& ApplicationHandler::getTripleScores(){
     return tripleScores;
 }
 std::vector<std::pair<Triple, RuleGroundings>>& ApplicationHandler::getTripleGroundings(){

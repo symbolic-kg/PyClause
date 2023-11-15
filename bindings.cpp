@@ -5,7 +5,9 @@
 #include "src/cpp/api/RankingHandler.h"
 #include "src/cpp/api/QAHandler.h"
 #include "src/cpp/api/DataHandler.h"
+#include "src/cpp/api/PredictionHandler.h"
 #include <string>
+#include <array>
 
 // *Example* 
 int add(int i, int j) {
@@ -82,6 +84,26 @@ PYBIND11_MODULE(c_clause, m) {
         .def("relation_map", &DataHandler::getRelationToIdx)
         .def("replace_ent_tokens", &DataHandler::subsEntityStrings)
         .def("replace_rel_tokens", &DataHandler::subsRelationStrings)
+    ; // class end
+
+
+    py::class_<PredictionHandler>(m, "PredictionHandler") 
+        .def(py::init<std::map<std::string, std::string>>())
+        .def("score_triples", py::overload_cast<std::string, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples))
+        .def("score_triples", py::overload_cast<std::vector<std::array<int,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples))
+        .def("score_triples", py::overload_cast<std::vector<std::array<std::string,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples))
+        .def(
+            "get_scores",
+            [](PredictionHandler& self, bool return_strings)->py::object{
+                        if (return_strings){
+                            return py::cast(self.getStrScores()); //TODO kinda spooky why this works, getStrScores is no python function binding
+                        }else{
+                            return py::cast(self.getIdxScores());
+                        }
+                    }
+        )
+        .def("get_explanations", &PredictionHandler::getStrExplanations)
+        
     ; // class end
 }
 

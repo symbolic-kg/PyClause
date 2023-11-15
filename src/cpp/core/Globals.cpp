@@ -10,8 +10,6 @@ std::string _cfg_prs_equalityToken = "me_myself_i";
 std::string _cfg_prs_ruleSeparator = " <= ";
 std::string _cfg_prs_atomSeparator = ", ";
 
-bool _cfg_exactConf = false;
-
 
 
 

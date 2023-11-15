@@ -3,6 +3,7 @@
 #include "Rule.h"
 #include "Types.h"
 
+
 // ***Base Rule implementation***
 
 void Rule::setID(int ID){

@@ -10,6 +10,9 @@
 
 
 
+
+
+
 class ApplicationHandler
 {
 public:
@@ -51,8 +54,10 @@ public:
     void setScoreCollectGroundings(bool ind);
 
     //triple scoring
-    void calculateTripleScores(std::vector<Triple>, TripleStorage& train, RuleStorage& rules);
-    std::vector<std::pair<Triple, double>>& getTripleScores();
+    void calculateTripleScores(std::vector<Triple> triples, TripleStorage& train, RuleStorage& rules);
+    // each element is head,rel,tail,score
+    std::vector<std::array<double, 4>>& getTripleScores();
+    // typedef std::unordered_map<Rule*, std::vector<std::vector<Triple>>> RuleGroundings;
     std::vector<std::pair<Triple, RuleGroundings>>& getTripleGroundings();
 
 
@@ -78,8 +83,9 @@ private:
     //std::unordered_map<int,std::unordered_map<int, QueryResults>> tailQueryResults;
 
 
-    // triple scoring and grounding tracking
-    std::vector<std::pair<Triple, double>> tripleScores;
+    // tripleScores the first 3 elements is the triple head,rel,tail the last element is the score
+    // data type is chosen such that scores can be outputted fast
+    std::vector<std::array<double, 4>> tripleScores;
     std::vector<std::pair<Triple, RuleGroundings>> tripleGroundings;
 
 
@@ -131,9 +137,6 @@ private:
     // for each scores triples the rules and groundings of the rules are collected
     // how many rules is directly affected by score_numTopRules
     bool score_collectGr=false;
-
-
-
 
 };
 

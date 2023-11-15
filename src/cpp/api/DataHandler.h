@@ -50,6 +50,11 @@ public:
     std::shared_ptr<Index> getIndex();
     bool getLoadedData();
     bool getLoadedRules();
+
+    //load a triple dataset (tab separated, 3 elements per line) conisting of tokens/strings into a std::vector<Triple> (Triple is std::array<int,3>)
+    // note that all the strings need to be in the index already
+    // no member is stored here, only a ptr is returned
+    std::unique_ptr<std::vector<Triple>> loadTriplesToVec(std::string path); 
     
 
 

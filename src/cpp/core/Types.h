@@ -9,6 +9,11 @@
 #include <set>
 #include <array>
 #include <string>
+#include <map>
+
+
+#include "Globals.h"
+
 
 typedef std::unordered_set<int> Nodes;
 typedef std::unordered_map<int, Nodes> NodeToNodes;
@@ -31,17 +36,19 @@ typedef std::array<int, 3> Triple;
 
 
 class Rule;
+
+
+
+struct compareRule {
+    bool operator()(Rule* lhs, Rule* rhs) const;
+};
+
+typedef std::map<Rule*, std::vector<std::vector<Triple>>, compareRule> RuleGroundings;
+
 // it needs to be ensured that rules are added in sorted order
 typedef std::unordered_map<int, std::vector<Rule*>> NodeToPredRules;
 
 typedef std::vector<std::pair<int, double>> CandidateConfs;
-
-// per target triple there is one RuleGroundings type
-// for each rule (key) a vector of groundings, where a grounding is a vector of 3 ints;
-typedef std::unordered_map<Rule*, std::vector<std::vector<Triple>>> RuleGroundings;
-
-
-
 
 //typedef std::unordered_map<int, std::vector<Rule*>> RelToRules;
 

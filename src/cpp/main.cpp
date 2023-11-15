@@ -608,14 +608,14 @@ void testTripleScoring(){
     ranker.setScoreCollectGroundings(true);
     ranker.calculateTripleScores(triples, train, rules);
 
-    std::vector<std::pair<Triple, double>>& trScores = ranker.getTripleScores();
+    std::vector<std::array<double, 4>>& trScores = ranker.getTripleScores();
     std::vector<std::pair<Triple, RuleGroundings>>& trGroundings = ranker.getTripleGroundings();
 
     if (trGroundings[0].second.size()!=0){
         throw std::runtime_error("Test 1 for triple Scoring failed. Should not predict the triple.");
     }
 
-     if (trScores[0].second!=0){
+     if (trScores[0][3]!=0){
         throw std::runtime_error("Test 2 for triple Scoring failed. Should predict 0 for not existing triple.");
     }
     ranker.clearAll();
@@ -664,9 +664,9 @@ void testTripleScoring(){
     // now the scores from calculating rankings for the triples must obviously be the same than the scores 
     // of calculate triples
     for (int i=0; i<trScores.size(); i++){
-        bool same = (trScores[i].second == scores[i]);
+        bool same = (trScores[i][3] == scores[i]);
         if (!same){
-            std::cout<<trScores[i].first[0]<<" "<<trScores[i].first[1]<<" "<<trScores[i].first[2]<<std::endl;
+            std::cout<<trScores[i][3]<<" "<<trScores[i][3]<<" "<<trScores[i][3]<<std::endl;
             throw std::runtime_error("The score of this triple does not match its score from ranking.");
         }
     }

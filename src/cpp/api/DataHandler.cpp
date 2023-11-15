@@ -1,6 +1,9 @@
 #include "DataHandler.h"
 
 #include <functional>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 
  DataHandler::DataHandler(std::map<std::string, std::string> options){
@@ -139,27 +142,67 @@ void DataHandler::setRuleOptions(std::map<std::string, std::string> options, Rul
 }
 
 
-    TripleStorage& DataHandler::getData(){
-        return *data;
-    }
-    TripleStorage& DataHandler::getFilter(){
-        return *filter;
-    }
-    TripleStorage& DataHandler::getTarget(){
-        return *target;
+TripleStorage& DataHandler::getData(){
+    return *data;
+}
+TripleStorage& DataHandler::getFilter(){
+    return *filter;
+}
+TripleStorage& DataHandler::getTarget(){
+    return *target;
 
-    }
-    RuleStorage& DataHandler::getRules(){
-        return *rules;
+}
+RuleStorage& DataHandler::getRules(){
+    return *rules;
+}
+
+RuleFactory& DataHandler::getRuleFactory(){
+    return *ruleFactory;
+}
+
+
+std::shared_ptr<Index> DataHandler::getIndex(){
+    return index;
+}
+
+
+std::unique_ptr<std::vector<Triple>> DataHandler::loadTriplesToVec(std::string path){
+
+    auto triples = std::make_unique<std::vector<Triple>>();
+
+    // Open the file
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file: " + path);
     }
 
-    RuleFactory& DataHandler::getRuleFactory(){
-        return *ruleFactory;
+    // Read the file line by line
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string element;
+        Triple triple;
+
+        std::getline(iss, element, '\t');
+        triple[0] = index->getIdOfNodestring(element);
+
+        std::getline(iss, element, '\t');
+        triple[1] = index->getIdOfRelationstring(element);
+
+        std::getline(iss, element, '\t');
+        triple[2] = index->getIdOfNodestring(element);
+        if (!iss.fail() || iss.eof()) {
+            triples->push_back(triple);
+        }else{
+            throw std::runtime_error("Error while reading a file with Triples please check that every line follows tab separeated: head relation tail format. ");
+        }
     }
 
+    return std::move(triples);
+}
 
-    std::shared_ptr<Index> DataHandler::getIndex(){
-        return index;
-    }
+
+
+
 
 
