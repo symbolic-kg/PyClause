@@ -63,7 +63,7 @@ void DataHandler::loadData(std::vector<std::array<int, 3>> triples){
             max_entity_id = triple[2];
         }
     }
-    std::cout << "Constructing 'no-label' index using " << max_entity_id << " entities and " << max_relation_id << "relations...\n";
+    std::cout << "Constructing 'no-label' index using " << max_entity_id << " entities and " << max_relation_id << " relations...\n";
     for (int i = 0; i < max_entity_id + 1; i++){
         // need some label, cannot do empty string for each, using str(idx)
         std::string lbl = std::to_string(i);

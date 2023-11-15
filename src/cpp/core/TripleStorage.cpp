@@ -102,7 +102,7 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 	
 }
 
-// Need a way to add idx triples without the error handling (for e.g. loadData([[0,0,0]]))
+// Needed a way to add idx triples without the error handling (cannot use addIdx; for e.g. loadData([[0,0,0]]))
 // With error handling -> chicken and egg problem
 void TripleStorage::add(int head, int relation, int tail) {
 	relHeadToTails[relation][head].insert(tail);
