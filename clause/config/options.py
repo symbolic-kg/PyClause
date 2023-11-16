@@ -8,6 +8,12 @@ class Options():
         Creates an option onject that contains all parameters in their default value.
         """
         self.options = {}
+
+        self.options['io'] = {
+            "rule_format": "PyClause", # you can choose AnyBURL instead which makes a difference for XX rules
+        }
+
+
         # the core options that are relavent whenever the c++ backend is called
         self.options['core'] = {
             "aggregation_function": "maxplus",

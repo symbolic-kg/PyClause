@@ -12,7 +12,7 @@ import math
 
 import multiprocessing as mp
 
-class Torm():
+class Miner():
 
     def __init__(self, options, targets, triples):
         self.options = options
@@ -288,7 +288,7 @@ class Torm():
             #rule = RuleB(candidates, relations[0], relations[1:], pattern)
 
 
-    def mine_rules(self):
+    def mine_rules(self, path_rules_output = None):
 
         aoptions = self.options.flat('learning.anyburl')
         toptions = self.options.flat('learning.torm')
@@ -297,6 +297,10 @@ class Torm():
         start = time.time()
 
         if self.options.options['learning']['mode'] == "anyburl": 
+            if path_rules_output == None:
+                print("!!! execution interrupted")
+                print("!!! running in anyburl mode requires to specify an output path for the rules") 
+                exit()
             arule_path = anyburl_wrapper.learn(
                 self.triples.path,
                 aoptions['time'],
@@ -304,7 +308,7 @@ class Torm():
                 aoptions['support'],
                 aoptions['confidence'],
                 True,
-                
+                path_rules_output
             )
 
 
@@ -360,7 +364,11 @@ class Torm():
             end = time.time()
             print(">>> elapsed time for materialization of " + str(self.rules.size()) + " b-rules: " + str(math.floor(end-start)) + "s") 
 
-
+        # anyburl case
+        if self.options.options['learning']['mode'] == "anyburl": 
+            print(">>> anyburl stored the mined rules here: " + path_rules_output)
+            return
+        # torm and hybrid case
         if toptions['uc.active']:
             start = time.time()
             prev_rule_count = self.rules.size()
@@ -403,4 +411,10 @@ class Torm():
 
         print(">>> ~~~ DONE with mining rules! ~~~")
         print(">>> rules collected " +  str(self.rules.size()))
+
+        # write rules if output path has been sepcified and the mode is not anyburl
+        if path_rules_output != None:
+            rule_format = self.options.options['io']['rule_format']
+            self.rules.write(path_rules_output, rule_format)
+
 

@@ -583,7 +583,7 @@ class RuleSet:
     #            self.add_prediction(sub, rel, obj, rule)
     #    prediction_data[0] = 0   
 
-    def write(self, path, output_format="AnyBURL"):
+    def write(self, path, output_format="PyClause"):
         f = open(path, "w")
         if output_format == "AnyBURL":
             for rule in self.rules:
@@ -601,12 +601,13 @@ class RuleSet:
             f.close()
             return
             
-        if output_format == "NanyTORM":
+        if output_format == "PyClause":
             for rule in self.rules:
                 confidence = '{:.5f}'.format(rule.cpred / rule.pred)
                 f.write(str(rule.pred) + "\t" + str(rule.cpred) + "\t" + str(confidence) + "\t" + str(rule) + "\n")
-            print(">>> " + str(len(self.rules)) + " rules written to " +  path + " using NanyTORM format") 
+            print(">>> " + str(len(self.rules)) + " rules written to " +  path + " using PyClause format") 
             f.close()
             return
+        
         print(">>> could not write rules to disc, outputformat not available")
         f.close()

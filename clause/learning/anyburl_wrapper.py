@@ -1,13 +1,16 @@
 import sys
 import os
 sys.path.append(os.getcwd())
+import multiprocessing
 
 from clause.util.utils import get_ab_dir, get_base_dir, join_u
 
 from os import path
 from subprocess import CalledProcessError, Popen, PIPE
 
-def learn(train_path, time, brule_length, threshold_cp, threshold_confidence, all_rules):
+
+
+def learn(train_path, time, brule_length, threshold_cp, threshold_confidence, all_rules, path_rules_output = None):
 
     base_dir = get_base_dir()
     learn_dir = join_u(base_dir, join_u("local", "anyburl-learn"))
@@ -15,8 +18,16 @@ def learn(train_path, time, brule_length, threshold_cp, threshold_confidence, al
     if not path.isdir(learn_dir):
         os.mkdir(learn_dir)
 
-    rule_path = join_u(learn_dir, "anyburl-rules")
+    if path_rules_output == None:
+        rule_path = join_u(learn_dir, "anyburl-rules")
+    else:
+        rule_path = path_rules_output
+
     conf_path = join_u(learn_dir, "config-learn.properties")
+
+    cpu_count = multiprocessing.cpu_count()
+    # cpu_count = cpu_count - 1
+    cpu_count = 1 if cpu_count <= 1 else cpu_count - 1
 
     learn_config = [
         "PATH_TRAINING = "  + train_path,
@@ -25,7 +36,7 @@ def learn(train_path, time, brule_length, threshold_cp, threshold_confidence, al
         "MAX_LENGTH_CYCLIC = " + str(brule_length),
         "THRESHOLD_CORRECT_PREDICTIONS = " + str(threshold_cp),
         "THRESHOLD_CONFIDENCE = " + str(threshold_confidence),
-        "WORKER_THREADS = 4",
+        "WORKER_THREADS = " + str(cpu_count),
         ]
     if all_rules == False:
         learn_config.extend([

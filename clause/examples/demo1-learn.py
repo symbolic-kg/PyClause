@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.getcwd())
 
-from clause.learning.complete.torm import Torm
+from clause.learning.miner import Miner
 from clause.data.triples import TripleSet
 
 from clause.config.options import Options
@@ -29,17 +29,23 @@ if __name__ == '__main__':
 
     options = Options()
 
-    options.set("learning.mode", "hybrid")
+    options.set("learning.mode", "anyburl")
+
     options.set("learning.anyburl.b_length", 2)
+    options.set("learning.anyburl.time", 30)
 
 
-    torm = Torm(options, triples.rels, triples)
-    # torm = Torm([triples.index.to2id["_also_see"]], triples)
+
+    miner = Miner(options, triples.rels, triples)
+    # miner= Miner([triples.index.to2id["_also_see"]], triples)
+
+
 
     # mine rules, what type of rules are mined is determined in config.py
-    torm.mine_rules()
+    # 
+    miner.mine_rules(path_rules_output)
 
     # write the rules that have been mined to a file
-    torm.rules.write(path_rules_output)
+    # miner.rules.write(path_rules_output)
     # use outputformat of NanyTorm, which differs only with respect to xx rules
     # torm.rules.write(path_rules_output, "NanyTORM")
