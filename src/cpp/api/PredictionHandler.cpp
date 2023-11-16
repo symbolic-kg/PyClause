@@ -44,6 +44,7 @@ void PredictionHandler::scoreTriples(std::vector<std::array<int, 3>> triples,  s
         throw std::runtime_error("You must first load data and load rules with the loader before scoring triples.");
     }
     scorer.clearAll();
+    index = dHandler->getIndex();
     scorer.calculateTripleScores(triples, dHandler->getData(), dHandler->getRules());
 }
 
@@ -70,6 +71,7 @@ void PredictionHandler::scoreTriples(std::string path,  std::shared_ptr<DataHand
     std::unique_ptr<std::vector<Triple>> triples;
     triples = dHandler->loadTriplesToVec(path);
     scorer.clearAll();
+    index = dHandler->getIndex();
     scorer.calculateTripleScores(*triples, dHandler->getData(), dHandler->getRules());
 }
 
@@ -78,21 +80,9 @@ std::vector<std::array<double, 4 >> PredictionHandler::getIdxScores(){
 }
 
 std::vector<std::pair<std::array<std::string, 3>, double>> PredictionHandler::getStrScores(){
-
-    for (int i=0; i<5; i++){
-         std::cout<<"REACHED THIS";
-    }
-
-
-
-   
     std::vector<std::array<double, 4>>& scores = scorer.getTripleScores();
     std::vector<std::pair<std::array<std::string, 3>, double>> out(scores.size());
-
     int it = 0;
-        for (int i=0; i<5; i++){
-         std::cout<<"REACHED THIS other thing";
-    }
     for (std::array<double, 4>& arr: scores){
         std::array<std::string, 3> triple;
         int head = (int) arr[0];
@@ -107,10 +97,10 @@ std::vector<std::pair<std::array<std::string, 3>, double>> PredictionHandler::ge
     return out;
 }
 
-std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::string>>,  std::vector<std::vector<std::vector<std::array<std::string,3>>>>> PredictionHandler::getStrExplanations(){
+std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::string>>,  std::vector<std::vector<std::vector<std::vector<std::array<std::string,3>>>>>> PredictionHandler::getStrExplanations(){
     std::vector<std::array<std::string, 3>> targets;
     std::vector<std::vector<std::string>> strRules;
-    std::vector<std::vector<std::vector<std::array<std::string,3>>>> groundings;
+    std::vector<std::vector<std::vector<std::vector<std::array<std::string,3>>>>> groundings;
 
 
     std::vector<std::pair<Triple, RuleGroundings>>& trGroundings = scorer.getTripleGroundings();
@@ -141,7 +131,7 @@ std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::
                 }
                 strExplanations.push_back(oneStrGrounding);
             }
-            groundings.push_back(strExplanations);
+            //groundings.push_back(strExplanations);
 
         }
         strRules.push_back(strRulesPerTarget);

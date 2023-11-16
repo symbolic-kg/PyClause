@@ -49,12 +49,26 @@ loader.load_datasets(target, train, filter)
 loader.load_rules(rules)
 scorer = c_clause.PredictionHandler(options)
 scorer.score_triples("./data/wnrr/test.txt", loader)
+loader.replace_ent_tokens(entity_names)
+explanations = scorer.get_explanations()
 
+
+
+for i in range(len(explanations[0])):
+    print("-----------------------------------------------")
+    print(f"Target triple: {explanations[0][i]}")
+    for j in range(len(explanations[1][i])):
+        print("Rule:")
+        print(explanations[1][i][j])
+        print("Groundings:")
+        for grounding in explanations[2][i][j]:
+            print(grounding)
+    
 #scorer.score_triples([("07554856",	"_hypernym", 	"07553301")], loader)
-#loader.replace_ent_tokens(entity_names)
+#
 #explanations = scorer.get_explanations()
-scorer.get_scores(True)
-print(explanations)
+#scorer.get_scores(True)
+#print(explanations)
 
 #print(scorer.get_scores(True))
 
@@ -86,15 +100,7 @@ print(explanations)
 
 
 
-# for i in range(len(explanations[0])):
-#     print("-----------------------------------------------")
-#     print(f"Target triple: {explanations[0][i]}")
-#     for j in range(len(explanations[1])):
-#         print("Rule:")
-#         print(explanations[1][j])
-#         print("Groundings:")
-#         for grounding in explanations[2][j]:
-#             print(grounding)
+
 
 
 
