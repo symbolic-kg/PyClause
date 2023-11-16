@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include <map>
+#include <vector>
 
 class Index {
 
@@ -26,6 +27,9 @@ public:
 	void subsEntityStrings(std::map<std::string, std::string>& newNames);
 	// exchange the strings of relations with the strings found in the keys of the map
 	void subsRelationStrings(std::map<std::string, std::string>& newNames);
+
+	void setNodeIndex(std::vector<std::string>& idxToNode);
+	void setRelIndex(std::vector<std::string>& idxToRel);
 
 
 private:

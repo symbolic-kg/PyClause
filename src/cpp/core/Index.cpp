@@ -2,6 +2,7 @@
 
 #include <map>
 
+
 void Index::addNode(std::string& nodesstring) {
 	if (nodeToId.find(nodesstring) == nodeToId.end()) {
 		nodeToId[nodesstring] = maxNodeID;
@@ -32,11 +33,7 @@ int Index::getIdOfNodestring(std::string& node) {
 		return it->second;
 	}
 	else {
-		//if(Properties::get().PREDICT_UNKNOWN){
-		//	return getIdOfNodestring(Properties::get().UNK_TOKEN);
-		//} else {
-			throw std::runtime_error(("Error: Node " + node + " does not appear in the loaded data.").c_str());
-		//}
+			throw std::runtime_error(("Error: Node " + node + " not found in Trainingset").c_str());
 	}
 }
 
@@ -111,4 +108,24 @@ void Index::subsRelationStrings(std::map<std::string, std::string>& newStrings){
 			idToRel[tempID] = pair.second;
     	}
 	}
+}
+
+void Index::setNodeIndex(std::vector<std::string>& newIdxToNode){
+	idToNode.clear();
+	nodeToId.clear();
+	maxNodeID = 0;
+
+	for (int i=0; i<newIdxToNode.size(); i++){
+		addNode(newIdxToNode[i]);
+	}
+}
+
+void Index::setRelIndex(std::vector<std::string>& newIdxToRel){
+	idToRel.clear();
+	relToId.clear();
+	maxRelID = 0;
+	for (int i=0; i<newIdxToRel.size(); i++){
+		addRelation(newIdxToRel[i]);
+	}
+	
 }

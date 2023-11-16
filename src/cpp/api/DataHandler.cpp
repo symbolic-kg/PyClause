@@ -1,9 +1,7 @@
 #include "DataHandler.h"
 
 #include <functional>
-#include <fstream>
-#include <sstream>
-#include <iostream>
+#include <vector>
 
 
  DataHandler::DataHandler(std::map<std::string, std::string> options){
@@ -45,7 +43,10 @@ void DataHandler::loadData(std::string dataPath, std::string filterPath, std::st
     if (loadedData){
         throw std::runtime_error("Please load the data only once or use a new data handler.");
     }
-    std::cout<<"Load data... \n";
+    if (verbose){
+         std::cout<<"Load data... \n";
+    }
+   
     target->read(targetPath, false);
     if (filterPath!=""){
         // can also just call with true here
@@ -63,7 +64,10 @@ void DataHandler::loadData(std::string dataPath, std::string filterPath, std::st
 }
 
 void DataHandler::loadData(std::vector<std::array<int, 3>> triples){
-    std::cout<< "Loading raw integer triples..." << "\n";
+    if (verbose){
+        std::cout<< "Loading raw integer triples..." << "\n";
+    }
+    
     if (loadedData){
         throw std::runtime_error("Please load the data only once or use a new data handler.");
     }
@@ -84,7 +88,10 @@ void DataHandler::loadData(std::vector<std::array<int, 3>> triples){
             max_entity_id = triple[2];
         }
     }
-    std::cout << "Constructing 'no-label' index using " << max_entity_id << " entities and " << max_relation_id << " relations...\n";
+    if (verbose){
+        std::cout << "Constructing 'no-label' index using " << max_entity_id << " entities and " << max_relation_id << " relations...\n";
+    }
+    
     for (int i = 0; i < max_entity_id + 1; i++){
         // need some label, cannot do empty string for each, using str(idx)
         std::string lbl = std::to_string(i);
@@ -100,7 +107,10 @@ void DataHandler::loadData(std::vector<std::array<int, 3>> triples){
 }
 
 void DataHandler::loadData(std::vector<std::array<std::string, 3>> triples){
-    std::cout<< "Loading string triples..." << "\n";    
+    if (verbose){
+        std::cout<< "Loading string triples..." << "\n"; 
+    }
+       
     if (loadedData){
         throw std::runtime_error("Please load the data only once or use a new data handler.");
     }
@@ -246,5 +256,22 @@ std::unique_ptr<std::vector<Triple>> DataHandler::loadTriplesToVec(std::string p
 
 
 
+
+
+    void DataHandler::setNodeIndex(std::vector<std::string>& idxToNode){
+        if (loadedData){
+            throw std::runtime_error("You can only set an entity index before you loaded data.");
+        }
+        index->setNodeIndex(idxToNode);
+
+    }
+	void DataHandler::setRelIndex(std::vector<std::string>& idxToRel){
+        if (loadedData){
+            throw std::runtime_error("You can only set a relation index before you loaded data.");
+        }
+        index->setRelIndex(idxToRel);
+
+
+    }
 
 

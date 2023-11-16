@@ -13,10 +13,6 @@ TripleStorage::TripleStorage(std::shared_ptr<Index> index) {
 	}
 	relHeadToTails.rehash(relHeadToTails.size());
 	relTailToHeads.rehash(relTailToHeads.size());
-
-	
-
-	//csr = new CSR<int, int>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
 }
 
 
