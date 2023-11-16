@@ -58,7 +58,10 @@ def test_uc_b_zero_ranking():
     }
 
     loader = c_clause.DataHandler(options)
+    loader.set_entity_index(["mustnotbreakanything"])
+    loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_data(train_path, filter_path, test_path)
+    loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_rules(rules_path)
 
 
@@ -148,6 +151,8 @@ def test_237_all_ranking():
     }
 
     loader = c_clause.DataHandler(options)
+    loader.set_entity_index(["mustnotbreakanything"])
+    loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_data(train_path, filter_path, test_path)
     loader.load_rules(rules_path)
 
