@@ -38,7 +38,6 @@ class Options():
 
 
         self.options['learning'] = dict(
-            # tautology = False, # if set to false, rules that do not make any wrong prediction are surpressed
             mode = "hybrid",  # chose betweeen anyburl / hybrid / nanytorm; default shoudl be hybrid
             anyburl = dict(
                 time = 60, # time for anyburl rule mining in seconds
@@ -47,6 +46,7 @@ class Options():
                 b_length = 3,
             ),
             torm = dict(
+                tautology = False, # if set to false, rules that do not make any wrong prediction are surpressed
                 b = dict(
                     active = True,
                     confidence = 0.0001,

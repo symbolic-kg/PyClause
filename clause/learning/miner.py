@@ -116,12 +116,12 @@ class Miner():
     def create_uc_rules_from_stats(self, toptions, stats, br, bc, preds, hc_right, bc_right):
         for hr in stats:
             for hc in stats[hr]:
-                if stats[hr][hc] >= toptions["uc.support"] and stats[hr][hc] / preds >= toptions["uc.confidence"] :
-                    # ef __init__(self, ruleset, target, rels, dirs, hc, hc_right, bc):
-                    rule = RuleUc(self.rules, hr, (br,), (bc_right,), hc, hc_right, bc)
-                    rule.pred = preds
-                    rule.cpred = stats[hr][hc]
-                    rule.store()
+                if stats[hr][hc] >= toptions["uc.support"] and stats[hr][hc] / preds >= toptions["uc.confidence"]:
+                    if toptions["tautology"] or stats[hr][hc] < preds:
+                        rule = RuleUc(self.rules, hr, (br,), (bc_right,), hc, hc_right, bc)
+                        rule.pred = preds
+                        rule.cpred = stats[hr][hc]
+                        rule.store()
 
     def create_ud_rules_from_stats(self, toptions, stats, br, preds, hc_right, dangling_right):
         for hr in stats:

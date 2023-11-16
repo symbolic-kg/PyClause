@@ -17,7 +17,7 @@ if __name__ == '__main__':
     path_valid = "data/wnrr/valid.txt"
     path_test  = "data/wnrr/test.txt"
 
-    path_rules_output = "local/rules-wn18rr-hybrid-b2"
+    path_rules_output = "local/rules-wn18rr-torm-b1-special"
 
 
     # load a triple set from a file and display some meta info about it
@@ -29,10 +29,17 @@ if __name__ == '__main__':
 
     options = Options()
 
-    options.set("learning.mode", "anyburl")
+    options.set("learning.mode", "torm")
 
-    options.set("learning.anyburl.b_length", 2)
-    options.set("learning.anyburl.time", 30)
+    # options.set("learning.anyburl.b_length", 1)
+    # options.set("learning.anyburl.time", 30)
+
+    options.set("learning.torm.b.length", 1)
+    options.set("learning.torm.uc.support", 10)
+    options.set("learning.torm.xx_ud.active", False)
+    options.set("learning.torm.xx_uc.active", False)
+    options.set("learning.torm.ud.active", False)
+    options.set("learning.torm.z.active", False)
 
 
 
@@ -48,4 +55,4 @@ if __name__ == '__main__':
     # write the rules that have been mined to a file
     # miner.rules.write(path_rules_output)
     # use outputformat of NanyTorm, which differs only with respect to xx rules
-    # torm.rules.write(path_rules_output, "NanyTORM")
+    # miner.rules.write(path_rules_output, "PyClause")
