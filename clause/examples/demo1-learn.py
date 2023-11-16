@@ -35,7 +35,7 @@ if __name__ == '__main__':
     # options.set("learning.anyburl.time", 30)
 
     options.set("learning.torm.b.length", 1)
-    options.set("learning.torm.uc.support", 10)
+    options.set("learning.torm.uc.support", 2)
     options.set("learning.torm.xx_ud.active", False)
     options.set("learning.torm.xx_uc.active", False)
     options.set("learning.torm.ud.active", False)

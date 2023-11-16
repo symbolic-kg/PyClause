@@ -76,7 +76,7 @@ class Miner():
             if (current_time + 5 < next_time):
                 current_time = next_time
                 frac = bc_count / (len(self.triples.sub_rel_2_obj) + len(self.triples.obj_rel_2_sub))
-                print(">>> ...  mined ~" + str(round(frac * 100)) + "%s")
+                print(">>> ...  mined ~" + str(round(frac * 100)) + "%")
             for br in self.triples.sub_rel_2_obj[bc]:
                 if len(self.triples.sub_rel_2_obj[bc][br]) >= toptions["uc.support"]:
                     preds = len(self.triples.sub_rel_2_obj[bc][br])
@@ -84,6 +84,7 @@ class Miner():
                     self.create_uc_rules_from_stats(toptions, statsx, br, bc, preds, True, False)
                     self.create_uc_rules_from_stats(toptions, statsy, br, bc, preds, False, False)
         for bc in self.triples.obj_rel_2_sub:
+            next_time = time.time()
             if (current_time + 5 < next_time):
                 current_time = next_time
                 frac = bc_count / (len(self.triples.sub_rel_2_obj) + len(self.triples.obj_rel_2_sub))
