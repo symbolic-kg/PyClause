@@ -17,19 +17,19 @@
  }
 
 
-void DataHandler::loadData(std::string path){
+void DataHandler::loadData(std::string dataPath){
     if (loadedData){
         throw std::runtime_error("Please load the data only once or use a new data handler.");
     }
-    data->read(path, true); 
+    data->read(dataPath, true); 
     loadedData = true;
 }
 
-void DataHandler::loadData(std::string path, std::string filterPath){
+void DataHandler::loadData(std::string dataPath, std::string filterPath){
     if (loadedData){
         throw std::runtime_error("Please load the data only once or use a new data handler.");
     }
-    data->read(path, false); 
+    data->read(dataPath, false); 
 
     if (filterPath!=""){
         filter->read(filterPath, false);
@@ -39,6 +39,27 @@ void DataHandler::loadData(std::string path, std::string filterPath){
         data->loadCSR();
     }
     loadedData = true;
+}
+
+void DataHandler::loadData(std::string dataPath, std::string filterPath, std::string targetPath){
+    if (loadedData){
+        throw std::runtime_error("Please load the data only once or use a new data handler.");
+    }
+    std::cout<<"Load data... \n";
+    target->read(targetPath, false);
+    if (filterPath!=""){
+        // can also just call with true here
+        filter->read(filterPath, false);
+        
+    }
+    // index constructed after train/data is loaded
+    // loads CSR directly
+    // sets loadedData
+    loadData(dataPath);
+    target->loadCSR();
+    if(filterPath!=""){
+        filter->loadCSR();
+    }
 }
 
 void DataHandler::loadData(std::vector<std::array<int, 3>> triples){
@@ -93,31 +114,6 @@ bool DataHandler::getLoadedData(){
 
 bool DataHandler::getLoadedRules(){
     return loadedRules;
-}
-
-
-void DataHandler::loadDatasets(std::string targetPath, std::string trainPath, std::string filterPath){
-    if (loadedData){
-        throw std::runtime_error("Please load the data only once or use a new data handler.");
-    }
-
-    std::cout<<"Load data... \n";
-
-
-    target->read(targetPath, false);
-    if (filterPath!=""){
-        // can also just call with true here
-        filter->read(filterPath, false);
-        
-    }
-    // index constructed after train/data is loaded
-    // loads CSR directly
-    // sets loadedData
-    loadData(trainPath);
-    target->loadCSR();
-    if(filterPath!=""){
-        filter->loadCSR();
-    }
 }
 
 

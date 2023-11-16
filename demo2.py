@@ -48,7 +48,7 @@ options = {
 #### Calculate a ranking and serialize / use in python
 start = time.time()
 loader = c_clause.DataHandler(options)
-loader.load_datasets(target, train, filter)
+loader.load_data(train, filter, target)
 loader.load_rules(rules)
 
 

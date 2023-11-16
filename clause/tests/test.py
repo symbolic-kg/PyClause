@@ -58,7 +58,7 @@ def test_uc_b_zero_ranking():
     }
 
     loader = c_clause.DataHandler(options)
-    loader.load_datasets(test_path, train_path, filter_path)
+    loader.load_data(train_path, filter_path, test_path)
     loader.load_rules(rules_path)
 
 
@@ -148,7 +148,7 @@ def test_237_all_ranking():
     }
 
     loader = c_clause.DataHandler(options)
-    loader.load_datasets(test_path, train_path, filter_path)
+    loader.load_data(train_path, filter_path, test_path)
     loader.load_rules(rules_path)
 
 

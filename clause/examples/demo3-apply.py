@@ -28,7 +28,7 @@ if __name__ == '__main__':
     options.set("core.disc_at_least", 50)
 
     loader = c_clause.DataHandler(options.flatS('core'))
-    loader.load_datasets(path_test, path_train, path_valid)
+    loader.load_data(path_train, path_valid, path_test)
     loader.load_rules(path_rules_input)
 
     ranker = c_clause.RankingHandler(options.flatS('core'))

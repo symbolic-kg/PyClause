@@ -27,9 +27,9 @@ class DataHandler{
 public:
     DataHandler(std::map<std::string, std::string> options);
     //exposed functions
-    void loadDatasets(std::string dataPath, std::string filterPath, std::string targetPath);
-    void loadData(std::string dataPath);
+    void loadData(std::string dataPath, std::string filterPath, std::string targetPath);
     void loadData(std::string dataPath, std::string filterPath);
+    void loadData(std::string dataPath);
     void loadData(std::vector<std::array<int, 3>> triples);
     void loadData(std::vector<std::array<std::string, 3>> triples);
     void loadRules(std::string rulePath);
