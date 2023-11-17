@@ -16,8 +16,18 @@ def get_base_dir():
 
 
 def get_ab_dir():
+    """Returns file path to AnyBURL binary"""
     base_dir = get_base_dir()
     return path.abspath(path.join(base_dir, join_u("bin", "AnyBURL-23-1.jar")))
+
+
+def list_from_idx_file(filename):
+    outlist = []
+    with open(filename, 'r') as file:
+        for line in file:
+            category_type = line.split('\t')[1].strip()
+            outlist.append(category_type)
+    return outlist
 
 
 
