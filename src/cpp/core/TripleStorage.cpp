@@ -72,7 +72,7 @@ void TripleStorage::read(std::vector<std::array<std::string, 3>> triples, bool l
 
 void TripleStorage::read(std::vector<std::array<int, 3>> triples, bool loadCSR) {
 	for(auto& triple : triples){
-		add(triple[0], triple[1], triple[2]);
+		addIdx(triple[0], triple[1], triple[2]);
 	}
 	if (loadCSR){
 		rcsr = std::make_unique<RelationalCSR>(index->getRelSize(), index->getNodeSize(), relHeadToTails, relTailToHeads);
@@ -98,12 +98,13 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 	
 }
 
+// TODO lets see if we need this;
 // Needed a way to add idx triples without the error handling (cannot use addIdx; for e.g. loadData([[0,0,0]]))
 // With error handling -> chicken and egg problem
-void TripleStorage::add(int head, int relation, int tail) {
-	relHeadToTails[relation][head].insert(tail);
-	relTailToHeads[relation][tail].insert(head);
-}
+// void TripleStorage::add(int head, int relation, int tail) {
+// 	relHeadToTails[relation][head].insert(tail);
+// 	relTailToHeads[relation][tail].insert(head);
+// }
 
 // can only add idx'es that already exist
 void TripleStorage::addIdx(int head, int relation, int tail) {

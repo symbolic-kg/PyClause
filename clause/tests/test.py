@@ -61,7 +61,6 @@ def test_uc_b_zero_ranking():
     loader.set_entity_index(["mustnotbreakanything"])
     loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_data(train_path, filter_path, test_path)
-    loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_rules(rules_path)
 
 
@@ -296,7 +295,6 @@ def test_qa_handler():
     
 def test_loader():
     import c_clause
-    
     options = {
         # ranking options
         "aggregation_function": "maxplus",
@@ -319,26 +317,36 @@ def test_loader():
         "rule_num_unseen": "5",
         
     }
-    max_ent = 15000
-    max_rel = 237
+    num_ent = 10
+    num_rel = 5
+
+
+    entity_index = [str(i) for i in range(num_ent)]
+    relation_index = [str(j) for j in range(num_rel)]
     
     loader = c_clause.DataHandler(options)
-    triples = [[1, 0, max_ent], [1, max_rel, 3]]
+    loader.set_entity_index(entity_index)
+    loader.set_relation_index(relation_index)
+
+    triples = [[1, 0, num_ent-1], [1, num_rel-1, 3], [1,0,num_ent-2], [1, num_rel-2, 3]]
     loader.load_data(triples)
     
-    assert len(loader.entity_map()) == max_ent + 1
+    assert len(loader.entity_map()) == num_ent
+    assert len(loader.relation_map()) == num_rel
     for key, val in loader.entity_map().items():
         assert int(key) == val
-        assert val < max_ent + 1
+        assert val < num_ent
         
-    assert len(loader.relation_map()) == max_rel + 1
+    assert len(loader.relation_map()) == num_rel
     for key, val in loader.relation_map().items():
         assert int(key) == val
-        assert val < max_rel + 1
+        assert val < num_rel
     
     loader = c_clause.DataHandler(options)
     triples = [["a", "r1", "b"], ["a", "r1", "c"], ["c", "r2", "d"]]
     loader.load_data(triples)
     assert len(loader.entity_map()) == 4
     assert len(loader.relation_map()) == 2
+
+    print("Test for loading idx's successful")
 

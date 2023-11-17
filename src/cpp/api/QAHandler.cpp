@@ -40,6 +40,7 @@ void QAHandler::setOptions(std::map<std::string, std::string> options){
         std::pair<int,int>& query = queries[i];
         isTailQuery ?  target.addIdx(query.first, query.second, 0) : target.addIdx(0, query.second, query.first);
     }
+    // note that loadCSR does not break anything for the other CSRs as we only allow already existing idx's (entities and relations)
     target.loadCSR();
     ranker.makeRanking(target, dHandler->getData(), dHandler->getRules(), dHandler->getFilter());
 
