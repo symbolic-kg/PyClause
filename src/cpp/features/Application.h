@@ -128,7 +128,7 @@ private:
     // output current relation and direction during ranking
     bool verbose = true;
     // set to -1 for all possible threads
-    int num_thr = -1;
+    int num_thr = omp_get_max_threads();
 
 
     //***triple scoring options***
