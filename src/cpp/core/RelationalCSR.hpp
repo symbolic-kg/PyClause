@@ -1,5 +1,6 @@
 #include <numeric>
 #include "Types.h"
+#include <algorithm>
 
 struct CSR{
     int *rowPtr;
@@ -71,7 +72,7 @@ class RelationalCSR {
 
             csr->colInd = new int[nnz];
             for (auto& itNodeToNodes: nodeToNodes) {
-                std::copy(itNodeToNodes.second.begin(), itNodeToNodes.second.end(), &csr->colInd[csr->rowPtr[itNodeToNodes.first]]);
+		std::partial_sort_copy(itNodeToNodes.second.begin(), itNodeToNodes.second.end(), &csr->colInd[csr->rowPtr[itNodeToNodes.first]], &csr->colInd[csr->rowPtr[itNodeToNodes.first]] + itNodeToNodes.second.size());
             }
             return csr;
         }
