@@ -3,6 +3,7 @@
 
 #include <map>
 #include <unordered_map>
+#include <omp.h>
 
 #include "../core/TripleStorage.h"
 #include "../core/RuleStorage.h"
@@ -49,6 +50,7 @@ public:
     void setDiscAtLeast(int num);
     void setTieHandling(std::string opt);
     void setVerbose(bool ind);
+    void setNumThr(int num);
     // scoring
     void setScoreNumTopRules(int num);
     void setScoreCollectGroundings(bool ind);
@@ -125,6 +127,8 @@ private:
     //***running options***
     // output current relation and direction during ranking
     bool verbose = true;
+    // set to -1 for all possible threads
+    int num_thr = -1;
 
 
     //***triple scoring options***

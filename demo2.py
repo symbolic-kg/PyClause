@@ -40,6 +40,7 @@ options = {
     "use_u_xxd_rules": "true",
     "tie_handling": "frequency",
     "rule_num_unseen": "5",
+    "num_threads": "-1"
     
 }
 

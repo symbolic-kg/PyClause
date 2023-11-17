@@ -7,6 +7,7 @@
 #include <functional>
 #include <chrono>
 
+
 #include "Application.h"
 #include "../core/TripleStorage.h"
 #include "../core/RuleStorage.h"
@@ -89,8 +90,10 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
             ruleGroundings.clear();
         }
     }
+    tripleResults.clear();
+    ruleGroundings.clear();
+   }
 }
-
 
 void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, bool dirIsTail){
     // define rule prediction function depending on direction
@@ -130,8 +133,9 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
 
         auto& relRules = rules.getRelRules(relation);
 
+        
         // parallize rule application for each query in target
-        #pragma omp parallel //num_threads(1)
+        #pragma omp parallel num_threads(num_thr)
         {
             QueryResults qResults(rank_topk, rank_discAtLeast);
             ManySet filter;
@@ -431,5 +435,11 @@ std::vector<std::pair<Triple, RuleGroundings>>& ApplicationHandler::getTripleGro
     return tripleGroundings;
 }
 
-
-
+void ApplicationHandler::setNumThr(int num){
+    if (num==-1){
+        num_thr = omp_get_max_threads();
+    }else{
+        num_thr = num;
+    }
+   
+}
