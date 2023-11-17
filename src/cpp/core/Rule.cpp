@@ -472,7 +472,7 @@ bool RuleC::predictL1TailQuery(int head, TripleStorage& triples, QueryResults& t
         int bodyRel = this->relations[1];
         directions[0] ? triples.getTforHR(head, bodyRel, begin, length) :  triples.getHforTR(head, bodyRel, begin, length);
         int* end = begin + length;
-        if (std::find(begin, end, constants[1])!= end && constants[0]!=head){
+        if (std::binary_search(begin, end, constants[1]) && constants[0]!=head){
             tailResults.insertRule(constants[0], this);
             return true;
         }
@@ -510,7 +510,7 @@ bool RuleC::predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& h
         int bodyRel = this->relations[1];
         directions[0] ? csr->getHforTREfficient(tail, bodyRel, begin, length) :  csr->getTforHREfficient(tail, bodyRel, begin, length);
         int* end = begin + length;
-        if (std::find(begin, end, constants[1])!= end && constants[0]!=tail){
+        if (std::binary_search(begin, end, constants[1]) && constants[0]!=tail){
             headResults.insertRule(constants[0], this);
             return true;
         }
@@ -1229,7 +1229,7 @@ bool RuleXXc::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& h
     int bodyRel = this->relations[1];
     directions[0] ? triples.getTforHR(tail, bodyRel, begin, length) :  triples.getHforTR(tail, bodyRel, begin, length);
     int* end = begin + length;
-    if (std::find(begin, end, constant)!= end && !filterSet.contains(tail)){
+    if (std::binary_search(begin, end, constant) && !filterSet.contains(tail)){
         headResults.insertRule(tail, this);
         return true;
     }
@@ -1248,7 +1248,7 @@ bool RuleXXc::predictTailQuery(int head, TripleStorage& triples, QueryResults& t
     int bodyRel = this->relations[1];
     directions[0] ? triples.getTforHR(head, bodyRel, begin, length) :  triples.getHforTR(head, bodyRel, begin, length);
     int* end = begin + length;
-    if (std::find(begin, end, constant)!= end && !filterSet.contains(head)){
+    if (std::binary_search(begin, end, constant) && !filterSet.contains(head)){
         tailResults.insertRule(head, this);
         return true;
     }
