@@ -22,7 +22,7 @@ options = {
     # scoring options
     "aggregation_function": "maxplus",
     "collect_explanations": "true",
-    "num_top_rules":"1",
+    "num_top_rules":"5",
     # rule options 
     "rule_b_max_branching_factor": "-1",
     "use_zero_rules": "false",
@@ -37,11 +37,10 @@ options = {
 
 loader = c_clause.DataHandler(options)
 
-# okay loading like this is wrong, but it should not segm fault me
-#loader.load_datasets(target, filter, train)
 
 
-loader.load_datasets(target, train, filter)
+
+loader.load_data(train, filter, target)
 
 
 
@@ -53,6 +52,39 @@ loader.replace_ent_tokens(entity_names)
 explanations = scorer.get_explanations()
 
 
+# print(scorer.get_scores(True)[0])
+
+
+
+for i in range(len(explanations[0])):
+    print("-----------------------------------------------")
+    print(f"Target triple: {explanations[0][i]}")
+    for j in range(len(explanations[1][i])):
+        print("Rule:")
+        print(explanations[1][i][j])
+        print("Groundings:")
+        ctr = 0
+        for grounding in explanations[2][i][j]:
+            ctr +=1
+            if ctr>5:
+                break
+            print("Next grounding")
+            print(grounding)
+    
+
+
+print("debug")
+
+exit()
+
+
+scorer = c_clause.PredictionHandler(options)
+scorer.score_triples([['suborder_manteodea', '_member_meronym', 'mantidae']], loader)
+explanations = scorer.get_explanations()
+print(explanations[0])
+print(explanations[1])
+print(explanations[2])
+
 
 for i in range(len(explanations[0])):
     print("-----------------------------------------------")
@@ -63,6 +95,14 @@ for i in range(len(explanations[0])):
         print("Groundings:")
         for grounding in explanations[2][i][j]:
             print(grounding)
+
+
+
+for gr in explanations[2][0][0]:
+    print(gr)
+    print("")
+
+
     
 #scorer.score_triples([("07554856",	"_hypernym", 	"07553301")], loader)
 #

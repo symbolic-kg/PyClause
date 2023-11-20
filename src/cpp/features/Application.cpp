@@ -58,9 +58,11 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
                 if (ctr>=score_numTopRules && score_numTopRules>0){
                     break;
                 }
-                if (rank_aggrFunc=="maxplus" && ctr==1){
-                    break;
-                }
+                // potentially this is possible for scoring as maxplus scores are currently the same as max scores
+                // however, for groundings tracking we want the num_top_rules parameter to have effect
+                // if (rank_aggrFunc=="maxplus" && ctr==1){
+                //     break;
+                // }
 
             }
             #pragma omp critical

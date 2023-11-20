@@ -35,7 +35,11 @@ public:
 		trackInMaterialize(false),
 		confWeight(1.0),
 		numUnseen(5)
-	{};
+	{
+    std::ostringstream ss;
+    ss << static_cast<const void*>(this);
+    rulestring = ss.str();
+	};
 	void setID(int ID);
 	void print();
 	//Getter
@@ -134,7 +138,7 @@ inline bool compareRule::operator()(Rule* lhs, Rule* rhs) const {
     if (lconf != rconf) {
         return lconf > rconf;
     }else{
-		return true;
+		return lhs->getRuleString() > rhs->getRuleString();
 	}
 }
 

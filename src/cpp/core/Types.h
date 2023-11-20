@@ -38,7 +38,7 @@ typedef std::array<int, 3> Triple;
 class Rule;
 
 
-
+// implemented in rule class to avoid circular includes
 struct compareRule {
     bool operator()(Rule* lhs, Rule* rhs) const;
 };

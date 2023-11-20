@@ -684,11 +684,11 @@ void timeRanking(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
     ruleFactory->setCreateRuleB(true);
-    ruleFactory->setCreateRuleZ(false);
+    ruleFactory->setCreateRuleZ(true);
     ruleFactory->setCreateRuleC(true);
     ruleFactory->setCreateRuleD(true);
-    ruleFactory->setCreateRuleXXd(false);
-    ruleFactory->setCreateRuleXXc(false);
+    ruleFactory->setCreateRuleXXd(true);
+    ruleFactory->setCreateRuleXXc(true);
     RuleZ::zConfWeight = 0.01;
     RuleD::dConfWeight = 0.1;
     // std::string trainPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt";

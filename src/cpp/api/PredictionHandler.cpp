@@ -112,10 +112,13 @@ std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::
         Triple triple = el.first;
         targets.push_back({index->getStringOfNodeId(triple[0]), index->getStringOfRelId(triple[1]), index->getStringOfNodeId(triple[2])});
         RuleGroundings& elGroundings = el.second;
-        // for every rule + groundings that predicted the target
         std::vector<std::string> strRulesPerTarget;
+        std::vector<std::vector<std::vector<std::array<std::string, 3>>>> expPerTarget;
+        // for every rule + groundings that predicted the target
         for (auto& pair: elGroundings){
             Rule* rule = pair.first;
+            std::cout<<rule<<std::endl;
+            std::cout<<rule->getRuleString()<<std::endl;
             strRulesPerTarget.push_back(rule->getRuleString());
             // groundings for the rule
             std::vector<std::vector<Triple>>& explanations = pair.second;
@@ -131,9 +134,9 @@ std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::
                 }
                 strExplanations.push_back(oneStrGrounding);
             }
-            //groundings.push_back(strExplanations);
-
+            expPerTarget.push_back(strExplanations);
         }
+        groundings.push_back(expPerTarget);
         strRules.push_back(strRulesPerTarget);
 
     }
