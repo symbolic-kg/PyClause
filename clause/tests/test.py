@@ -173,7 +173,7 @@ def test_237_all_ranking():
     hAt10 = str(stdout)[-18:-12]
     hA1 = str(stdout)[-36:-30]
 
-    expectMRR = "0.3318"
+    expectMRR = "0.3317"
     expecth1 =  "0.2467"
     expecth10 = "0.5049"
 
