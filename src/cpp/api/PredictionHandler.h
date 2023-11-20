@@ -21,7 +21,7 @@ public:
 
     // ugly but its just a tuple with: a list of target triples, a list of lists of predicting rules, a list of list of grounding triples to the predicting rules    
     std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::string>>,  std::vector<std::vector<std::vector<std::vector<std::array<std::string,3>>>>>> getStrExplanations();
-
+    std::tuple<std::vector<std::array<int,3>>, std::vector<std::vector<int>>,  std::vector<std::vector<std::vector<std::vector<std::array<int,3>>>>>> getIdxExplanations();
 private:
     ApplicationHandler scorer;
     void setOptions(std::map<std::string, std::string> options, ApplicationHandler& scorer);

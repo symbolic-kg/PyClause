@@ -22,7 +22,7 @@ options = {
     # scoring options
     "aggregation_function": "maxplus",
     "collect_explanations": "true",
-    "num_top_rules":"5",
+    "num_top_rules":"1",
     # rule options 
     "rule_b_max_branching_factor": "-1",
     "use_zero_rules": "false",
@@ -49,7 +49,7 @@ loader.load_rules(rules)
 scorer = c_clause.PredictionHandler(options)
 scorer.score_triples("./data/wnrr/test.txt", loader)
 loader.replace_ent_tokens(entity_names)
-explanations = scorer.get_explanations()
+explanations = scorer.get_explanations(False)
 
 
 # print(scorer.get_scores(True)[0])

@@ -25,7 +25,7 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
     if (score_collectGr){
         tripleGroundings.resize(triples.size());
     }
-    #pragma omp parallel //num_threads(1)
+    #pragma omp parallel num_threads(num_thr)
     {
         QueryResults tripleResults(1, 1);
         RuleGroundings ruleGroundings;   

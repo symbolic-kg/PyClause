@@ -107,7 +107,16 @@ PYBIND11_MODULE(c_clause, m) {
                     }
         )
         .def("get_explanations", &PredictionHandler::getStrExplanations)
-        
+        .def(
+            "get_explanations",
+            [](PredictionHandler& self, bool return_strings)->py::object{
+                        if (return_strings){
+                            return py::cast(self.getStrExplanations());
+                        }else{
+                            return py::cast(self.getIdxExplanations());
+                        }
+                    }
+        )        
     ; // class end
 }
 

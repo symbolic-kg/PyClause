@@ -22,6 +22,7 @@ void PredictionHandler::setOptions(std::map<std::string, std::string> options, A
         {"aggregation_function", [&scorer](std::string val) {scorer.setAggregationFunc(val);}},
         {"collect_explanations", [&scorer](std::string val) {scorer.setScoreCollectGroundings(util::stringToBool(val));}},
         {"num_top_rules", [&scorer](std::string val) {scorer.setScoreNumTopRules(std::stoi(val));}},
+        {"num_threads", [&scorer](std::string val) {scorer.setNumThr(std::stoi(val));}},
 
 
     };
@@ -117,8 +118,6 @@ std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::
         // for every rule + groundings that predicted the target
         for (auto& pair: elGroundings){
             Rule* rule = pair.first;
-            std::cout<<rule<<std::endl;
-            std::cout<<rule->getRuleString()<<std::endl;
             strRulesPerTarget.push_back(rule->getRuleString());
             // groundings for the rule
             std::vector<std::vector<Triple>>& explanations = pair.second;
@@ -143,6 +142,38 @@ std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::
     return std::make_tuple(targets, strRules, groundings);
 }
 
+
+std::tuple<std::vector<std::array<int,3>>, std::vector<std::vector<int>>,  std::vector<std::vector<std::vector<std::vector<std::array<int,3>>>>>> PredictionHandler::getIdxExplanations(){
+    std::vector<std::array<int, 3>> targets;
+    std::vector<std::vector<int>> rulesIdxs;
+    std::vector<std::vector<std::vector<std::vector<std::array<int,3>>>>> groundings;
+
+
+    std::vector<std::pair<Triple, RuleGroundings>>& trGroundings = scorer.getTripleGroundings();
+
+
+    // for each target
+    for (int i=0; i<trGroundings.size(); i++){
+        std::pair<Triple, RuleGroundings>& el = trGroundings[i];
+        Triple triple = el.first;
+        targets.push_back({triple[0], triple[1], triple[2]});
+        RuleGroundings& elGroundings = el.second;
+        std::vector<int> rulesPerTarget;
+        std::vector<std::vector<std::vector<std::array<int, 3>>>> expPerTarget;
+        // for every rule + groundings that predicted the target
+        for (auto& pair: elGroundings){
+            Rule* rule = pair.first;
+            rulesPerTarget.push_back(rule->getID());
+            // groundings for the rule
+            std::vector<std::vector<Triple>>& explanations = pair.second;
+            expPerTarget.push_back(explanations);
+        }
+        groundings.push_back(expPerTarget);
+        rulesIdxs.push_back(rulesPerTarget);
+
+    }
+    return std::make_tuple(targets, rulesIdxs, groundings);
+}
 
 
 
