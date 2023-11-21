@@ -170,7 +170,6 @@ std::tuple<std::vector<std::array<int,3>>, std::vector<std::vector<int>>,  std::
         }
         groundings.push_back(expPerTarget);
         rulesIdxs.push_back(rulesPerTarget);
-
     }
     return std::make_tuple(targets, rulesIdxs, groundings);
 }
