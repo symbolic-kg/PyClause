@@ -215,6 +215,22 @@ void DataHandler::setRuleOptions(std::map<std::string, std::string> options, Rul
     }
 }
 
+std::vector<std::string> DataHandler::getRuleIdx(){
+    if (!loadedRules){
+        throw std::runtime_error("You cannot obtain a rule index before you loaded rules into the laoder.");
+    }
+    std::vector<std::unique_ptr<Rule>>& allRules = rules->getRules();
+    std::vector<std::string> out(allRules.size());
+    for (int i=0; i<allRules.size(); i++){
+        Rule* rule = allRules[i].get();
+        if (rule->getID() != i){
+            throw std::runtime_error("A rule's idx does not match its position. This is an internal; error check the backend.");
+        }
+        out.at(i) = rule->getRuleString();
+    }
+    return out;
+}
+
 
 TripleStorage& DataHandler::getData(){
     return *data;

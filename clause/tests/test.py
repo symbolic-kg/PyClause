@@ -452,3 +452,84 @@ def test_triple_scoring():
             assert(idx_scores[i][3]==head_ranking[head])
 
     print("Test Triple scoring successful.")      
+
+
+
+def test_explanation_tracking():
+    """Testing if explanations are consistent. This also tests the rule_index."""
+    train = "./data/wnrr/train.txt"
+    filter = "./data/wnrr/valid.txt"
+    target = "./data/wnrr/test.txt"
+    rules = "./data/wnrr/anyburl-rules-c5-3600"
+
+    num_top_rules = 10
+    options = {
+        # scoring/ranking options
+        "aggregation_function": "maxplus",
+        "collect_explanations": "true",
+        "disc_at_least": "-1",
+        "topk":"40000", #complete ranking as we need every candidate
+        "num_top_rules": str(num_top_rules),
+        # rule options 
+        "rule_b_max_branching_factor": "-1",
+        "use_zero_rules": "false",
+        "rule_zero_weight":"0.01",
+        "use_u_c_rules": "true",
+        "use_b_rules": "true",
+        "use_u_d_rules": "true",
+        "rule_u_d_weight":"0.01",
+        "use_u_xxc_rules": "false",
+        "use_u_xxd_rules": "false",
+    }
+
+    loader = c_clause.DataHandler(options)
+    loader.load_data(train, filter, target)
+    loader.load_rules(rules)
+
+
+    scorer = c_clause.PredictionHandler(options)
+    scorer.score_triples("./data/wnrr/test.txt", loader)
+
+    idx_scores = scorer.get_scores(False)
+    str_scores = scorer.get_scores(True)
+
+    idx_explanations = scorer.get_explanations(False)
+    str_explanations = scorer.get_explanations(True)
+
+    rule_idx = loader.rule_index()
+
+    entity_map = loader.entity_map()
+    relation_map = loader.relation_map()
+
+
+
+    assert(
+        len(idx_explanations[0])==len(idx_explanations[1])==len(idx_explanations[2])\
+        ==len(str_explanations[0])==len(str_explanations[1])==len(str_explanations[2])
+    )
+
+    for i in range(len(idx_explanations[0])):
+        str_rules = str_explanations[1][i]
+        idx_rules = idx_explanations[1][i]
+
+        assert(len(idx_rules)<=num_top_rules and len(idx_rules)==len(str_rules))
+
+        ## check that the rules from idx map back to the outputted string rules
+        assert([rule_idx[j] for j in idx_rules] == str_rules)
+
+        #print(f"Target triple: {explanations[0][i]}")
+
+        # all rule groundings
+        for j in range(len(str_rules)):
+            # list of groundings; a grounding itself is a list with triples
+            for l in range(len(str_explanations[2][i][j])):
+                ## str_explanations[2][i][j][l]) is ONE GROUNDING, that is, a list of triples where a triple is again a list/tuple
+                ## for every triple of the grounding
+                for k in range(len(str_explanations[2][i][j][l])):
+                    triple = str_explanations[2][i][j][l][k]
+
+                    ## check that every entity/relation string of every grounding triple maps back to the idx representation
+                    assert(entity_map[triple[0]] == idx_explanations[2][i][j][l][k][0])
+                    assert(relation_map[triple[1]] == idx_explanations[2][i][j][l][k][1])
+                    assert(entity_map[triple[2]] == idx_explanations[2][i][j][l][k][2])
+    print("Test for explanation consistency successful")

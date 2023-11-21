@@ -26,7 +26,7 @@
 class DataHandler{
 public:
     DataHandler(std::map<std::string, std::string> options);
-    //exposed functions
+    //exposed python functions
     void loadData(std::string dataPath, std::string filterPath, std::string targetPath);
     void loadData(std::string dataPath, std::string filterPath);
     void loadData(std::string dataPath);
@@ -37,8 +37,12 @@ public:
 	std::unordered_map<std::string, int>& getRelationToIdx();
     void subsEntityStrings(std::map<std::string, std::string>& newNames);
     void subsRelationStrings(std::map<std::string, std::string>& newNames);
+    std::vector<std::string> getRuleIdx();
 
-    //dodo delete set options
+
+
+
+    //TODO probably remove, too complicated
     void setOptions(std::map<std::string, std::string> options);
     void setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory);
 

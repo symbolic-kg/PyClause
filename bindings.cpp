@@ -88,6 +88,7 @@ PYBIND11_MODULE(c_clause, m) {
         .def("replace_rel_tokens", &DataHandler::subsRelationStrings)
         .def("set_entity_index",  &DataHandler::setNodeIndex)
         .def("set_relation_index",  &DataHandler::setRelIndex)
+        .def("rule_index",  &DataHandler::getRuleIdx)
     ; // class end
 
 
