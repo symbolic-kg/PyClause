@@ -80,19 +80,16 @@ std::vector<std::array<double, 4 >> PredictionHandler::getIdxScores(){
     return scorer.getTripleScores();
 }
 
-std::vector<std::pair<std::array<std::string, 3>, double>> PredictionHandler::getStrScores(){
+std::vector<std::array<std::string, 4>> PredictionHandler::getStrScores(){
     std::vector<std::array<double, 4>>& scores = scorer.getTripleScores();
-    std::vector<std::pair<std::array<std::string, 3>, double>> out(scores.size());
+    std::vector<std::array<std::string, 4>> out(scores.size());
     int it = 0;
     for (std::array<double, 4>& arr: scores){
         std::array<std::string, 3> triple;
         int head = (int) arr[0];
-        triple[0] = index->getStringOfNodeId(head);
         int rel = (int) arr[1];
-        triple[1] = index->getStringOfRelId(rel);
         int tail = int (arr[2]);
-        triple[2] = index->getStringOfNodeId(tail);
-        out.at(it) = std::make_pair(triple, arr[3]);
+        out.at(it) = {index->getStringOfNodeId(head), index->getStringOfRelId(rel), index->getStringOfNodeId(tail), std::to_string(arr[3])};
         it++;
     }
     return out;
