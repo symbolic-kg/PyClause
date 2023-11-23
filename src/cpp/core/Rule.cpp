@@ -73,8 +73,13 @@ long long Rule::getBodyHash(){
 }
 void Rule::computeBodyHash(){
     throw std::runtime_error("Not implemented yet");
+}
+
+std::string Rule::computeRuleString(Index* index){
+    throw std::runtime_error("Not implemented yet");
 
 }
+
 int Rule::getTargetRel(){
    return targetRel;
 

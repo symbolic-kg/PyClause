@@ -292,24 +292,20 @@ std::unique_ptr<std::vector<Triple>> DataHandler::loadTriplesToVec(std::string p
 }
 
 
-
-
-
-
-    void DataHandler::setNodeIndex(std::vector<std::string>& idxToNode){
-        if (loadedData){
-            throw std::runtime_error("You can only set an entity index before you loaded data.");
-        }
+void DataHandler::setNodeIndex(std::vector<std::string>& idxToNode){
+    if (loadedData){
+        throw std::runtime_error("You can only set an entity index before you loaded data.");
+    }
         index->setNodeIndex(idxToNode);
 
+}
+void DataHandler::setRelIndex(std::vector<std::string>& idxToRel){
+    if (loadedData){
+        throw std::runtime_error("You can only set a relation index before you loaded data.");
     }
-	void DataHandler::setRelIndex(std::vector<std::string>& idxToRel){
-        if (loadedData){
-            throw std::runtime_error("You can only set a relation index before you loaded data.");
-        }
-        index->setRelIndex(idxToRel);
+    index->setRelIndex(idxToRel);
 
 
-    }
+}
 
 

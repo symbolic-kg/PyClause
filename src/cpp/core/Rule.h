@@ -16,7 +16,7 @@
 #include "TripleStorage.h"
 #include "ManySet.h"
 #include "QueryResults.h"
-
+#include "Index.h"
 
 
 class Rule 
@@ -49,6 +49,8 @@ public:
 	void setStats(int cpredicted, int predicted, bool exact=false);
 	std::array<int,2> getStats(bool exact=false);
 	std::string getRuleString();
+	// Maybe substitute getRuleString with this function
+	std::string computeRuleString(Index* index);
 	long long getBodyHash();
 	void computeBodyHash();
 	int getTargetRel();
