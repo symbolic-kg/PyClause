@@ -238,7 +238,7 @@ std::string RuleB::computeRuleString(Index* index){
     for (int i=1; i<relations.size(); i++){
         out += index->getStringOfRelId(relations[i]);
         std::string var1 = std::string(1, _cfg_prs_anyTimeVars[i-1]);
-        std::string var2 = std::string(1, _cfg_prs_anyTimeVars[i]);
+        std::string var2 =  (i<relations.size()-1) ? std::string(1, _cfg_prs_anyTimeVars[i]): std::string(1, _cfg_prs_anyTimeVars.back());
         std::string atom = directions[i-1] ? "(" + var1 + "," + var2 + ")" : "(" + var2 + "," + var1 + ")";
 
         if (i==relations.size()-1){
@@ -769,15 +769,11 @@ std::string RuleZ::computeRuleString(Index* index){
                    + "," + index->getStringOfNodeId(constant)
                    + ")"
                    + _cfg_prs_ruleSeparator;
-        
-        out += _cfg_prs_ruleSeparator;
-        
     }else{
         out += "(" +  index->getStringOfNodeId(constant)
                    + "," + std::string(1,_cfg_prs_anyTimeVars.back())
                    + ")"
                    + _cfg_prs_ruleSeparator;
-        out += _cfg_prs_ruleSeparator;
     }
     return out;
 
@@ -847,7 +843,7 @@ int RuleD::branchingFactor = -1;
 RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, int constant) {
 
     if(relations.size() != (directions.size() + 1)) {
-        throw std::invalid_argument("'Directions' size should be one less than 'relations' size in construction of RuleB");
+        throw std::invalid_argument("'Directions' size should be one less than 'relations' size in construction of RuleD");
     }
     if(relations.size() < 2) {
         throw std::invalid_argument("Cannot construct a RuleD with no body atom.");
@@ -885,7 +881,6 @@ std::string RuleD::computeRuleString(Index* index){
                 std::string var1 = std::string(1, _cfg_prs_anyTimeVars[i-1]);
                 std::string var2 = std::string(1, _cfg_prs_anyTimeVars[i]);
                 std::string atom = directions[i-1] ? "(" + var1 + "," + var2 + ")" : "(" + var2 + "," + var1 + ")";
-                out += atom;
 
                 if (i==relations.size()-1){
                     out += atom;
@@ -916,7 +911,6 @@ std::string RuleD::computeRuleString(Index* index){
             std::string var1 = std::string(1, newOrder[i-1]);
             std::string var2 = std::string(1, newOrder[i]);
             std::string atom = _directions[i-1] ? "(" + var1 + "," + var2 + ")" : "(" + var2 + "," + var1 + ")";
-            out += atom;
             if (i==relations.size()-1){
                 out += atom;
             }else{

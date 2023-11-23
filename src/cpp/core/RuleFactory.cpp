@@ -269,8 +269,15 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
                 // our representation would be: h(c,Y) <-- otherRel(A,B), someRel(B,Y)
                 // note (!!) not only the atoms are flipped also A and B are flipped!
                 // so to get the first body atom we need to take the second body atom of the rule
-                relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
-                relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+                if (leftC){
+                    relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
+                    relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+                // normal order
+                }else{
+                    relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
+                    relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
+                }
+               
                 //our first body atom; second atom of anyburl; leftC no X appears
                 if (leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[2]){
                     directions.push_back(true);

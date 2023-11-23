@@ -675,6 +675,198 @@ void testTripleScoring(){
     std::cout<<"All apply predictTriples tests passed"<<std::endl;
 }
 
+
+void test_compute_strings(){
+    std::shared_ptr<Index> index = std::make_shared<Index>();
+    std::string dataPath = "/home/patrick/Desktop/kge/data/wnrr/train.txt";
+    TripleStorage data(index);
+    data.read(dataPath, true);
+    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
+
+    // test Brule compute string
+
+    std::string ruleStr = "_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)";
+    std::unique_ptr<Rule> ruleB = ruleFactory->parseAnytimeRule(ruleStr);
+    std::string computeStr = ruleB->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 1 for compute B rule string failed.");
+    }
+
+    ruleStr = "_member_of_domain_region(X,Y) <= _has_part(Y,X)";
+    ruleB = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleB->computeRuleString(index.get());
+
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 2 for compute B rule string failed.");
+    }
+
+    // test RuleC compute string
+
+
+    ruleStr = "_hypernym(X,00732746) <= _synset_domain_topic_of(X,A), _derivationally_related_form(A,10225219)";
+    std::unique_ptr<Rule> ruleC = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleC->computeRuleString(index.get());
+
+
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 3 for compute C rule string failed.");
+    }
+
+
+    ruleStr = "_hypernym(X,00732746) <= _synset_domain_topic_of(X,A), _derivationally_related_form(10225219,A)";
+    ruleC = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleC->computeRuleString(index.get());
+
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 4 for compute C rule string failed.");
+    }
+
+    ruleStr = "_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)";
+    ruleC = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleC->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 5 for compute C rule string failed.");
+    }
+
+    ruleStr = "_derivationally_related_form(07007945,Y) <= _derivationally_related_form(Y,A), _derivationally_related_form(A,07007945)";
+    ruleC = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleC->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 6 for compute C rule string failed.");
+    }
+
+
+    ruleStr = "_derivationally_related_form(07007945,Y) <= _derivationally_related_form(10225219,Y)";
+    ruleC = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleC->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 7 for compute C rule string failed.");
+    }
+
+
+    ruleStr = "_derivationally_related_form(07007945,Y) <= _derivationally_related_form(Y,10225219)";
+    ruleC = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleC->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 8 for compute C rule string failed.");
+    }
+
+    ruleStr = "_derivationally_related_form(X,07007945) <= _derivationally_related_form(10225219,X)";
+    ruleC = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleC->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 9 for compute C rule string failed.");
+    }
+
+
+    ruleStr = "_derivationally_related_form(X,07007945) <= _derivationally_related_form(X,10225219)";
+    ruleC = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleC->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 10 for compute C rule string failed.");
+    }
+
+
+    // test D rules
+    ruleStr = "_derivationally_related_form(X,01264336) <= _derivationally_related_form(A,X)";
+    std::unique_ptr<Rule> ruleD = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleD->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 11 for compute D rule string failed.");
+    }
+
+    // test D rules
+    ruleStr = "_derivationally_related_form(01264336,Y) <= _derivationally_related_form(A,Y)";
+    ruleD = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleD->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 12 for compute D rule string failed.");
+    }
+
+     // test D rules
+    ruleStr = "_derivationally_related_form(01264336,Y) <= _derivationally_related_form(Y,A)";
+    ruleD = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleD->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 13 for compute D rule string failed.");
+    }
+
+
+    ruleStr = "_member_meronym(08176077,Y) <= _has_part(A,Y), _derivationally_related_form(B,A)";
+    ruleD = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleD->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 14 for compute D rule string failed.");
+    }
+
+
+    ruleStr = "_member_meronym(X,08176077) <= _has_part(A,X), _derivationally_related_form(A,B)";
+    ruleD = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleD->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 15 for compute D rule string failed.");
+    }
+
+    ruleStr = "_member_meronym(X,08176077) <= _has_part(X,A), _derivationally_related_form(A,B)";
+    ruleD = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleD->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 16 for compute D rule string failed.");
+    }
+
+
+    // XX rules
+
+    ruleStr = "_member_meronym(X,X) <= _derivationally_related_form(10225219,X)";
+    std::unique_ptr<Rule>ruleXX = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleXX->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 17 for compute XX rule string failed.");
+    }
+
+    ruleStr = "_member_meronym(X,X) <= _derivationally_related_form(X,10225219)";
+    ruleXX = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleXX->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 18 for compute XX rule string failed.");
+    }
+
+    ruleStr = "_member_meronym(X,X) <= _member_of_domain_region(X,A)";
+    ruleXX = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleXX->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 19 for compute XX rule string failed.");
+    }
+
+
+    ruleStr = "_member_of_domain_region(X,X) <= _derivationally_related_form(A,X)";
+    ruleXX = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleXX->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 20 for compute XX rule string failed.");
+    }
+    
+    // zero rule
+    ruleStr = "_member_of_domain_region(X,10225219) <= ";
+    ruleXX = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleXX->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 21 for compute Z rule string failed.");
+    }
+
+
+    // zero rule
+    ruleStr = "_member_of_domain_region(10225219,Y) <= ";
+    ruleXX = ruleFactory->parseAnytimeRule(ruleStr);
+    computeStr = ruleXX->computeRuleString(index.get());
+    if (computeStr!=ruleStr){
+        throw std::runtime_error("Test 22 for compute Z rule string failed.");
+    }
+
+    std::cout<<"Tests for compute rule strings passed."<<std::endl;
+
+}
+
     
 
 
@@ -759,7 +951,7 @@ void timeRanking(){
 
 
 int main(){
-    
+    test_compute_strings();
     tests_groundings();
     tests();
     testTripleScoring();
