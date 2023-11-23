@@ -50,7 +50,7 @@ public:
 	std::array<int,2> getStats(bool exact=false);
 	std::string getRuleString();
 	// Maybe substitute getRuleString with this function
-	std::string computeRuleString(Index* index);
+	virtual std::string computeRuleString(Index* index);
 	long long getBodyHash();
 	void computeBodyHash();
 	int getTargetRel();
@@ -169,6 +169,8 @@ public:
 	// uses searchCurrTargetGroundings()
 	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
 
+	std::string computeRuleString(Index* index);
+
 
 
 
@@ -222,6 +224,8 @@ public:
 	// predict triple and optionally tracks grounding
 	// uses searchCurrTargetGroundings()
 	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
+
+	std::string computeRuleString(Index* index);
 	
 
 
@@ -275,6 +279,7 @@ public:
 	double getConfidence(int nUnseen, bool exact);
 	// zero rules downweighting
 	static double zConfWeight;
+	std::string computeRuleString(Index* index);
 private:
 	bool leftC;
 	int constant;
@@ -307,6 +312,8 @@ public:
 	// uses searchCurrTargetGroundings()
 	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
 
+	std::string computeRuleString(Index* index);
+
 private:
 	bool leftC;
 	int constant;
@@ -329,6 +336,7 @@ public:
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	std::set<Triple> materialize(TripleStorage& triples);
+	std::string computeRuleString(Index* index);
 private:
 
 };
@@ -343,6 +351,7 @@ public:
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	std::set<Triple> materialize(TripleStorage& triples);
+	std::string computeRuleString(Index* index);
 private:
 	int constant;
 

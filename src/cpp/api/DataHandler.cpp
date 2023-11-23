@@ -226,7 +226,7 @@ std::vector<std::string> DataHandler::getRuleIdx(){
         if (rule->getID() != i){
             throw std::runtime_error("A rule's idx does not match its position. This is an internal; error check the backend.");
         }
-        out.at(i) = rule->getRuleString();
+        out.at(i) = rule->computeRuleString(index.get());
     }
     return out;
 }

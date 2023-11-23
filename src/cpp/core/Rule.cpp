@@ -225,6 +225,30 @@ RuleB::RuleB(std::vector<int>& relations, std::vector<bool>& directions) {
     _directions.flip();   
 }
 
+std::string RuleB::computeRuleString(Index* index){
+    // internal represention of backend matches string anytime string representation, simple
+    std::string out;
+    out += index->getStringOfRelId(relations[0]);
+    // head
+    out += "(" + std::string(1, _cfg_prs_anyTimeVars[0])
+               + "," + std::string(1, _cfg_prs_anyTimeVars.back()) 
+               + ")" 
+               +  _cfg_prs_ruleSeparator;
+    // body
+    for (int i=1; i<relations.size(); i++){
+        out += index->getStringOfRelId(relations[i]);
+        std::string var1 = std::string(1, _cfg_prs_anyTimeVars[i-1]);
+        std::string var2 = std::string(1, _cfg_prs_anyTimeVars[i]);
+        std::string atom = directions[i-1] ? "(" + var1 + "," + var2 + ")" : "(" + var2 + "," + var1 + ")";
+
+        if (i==relations.size()-1){
+             out += atom;
+        }else{
+            out += atom + _cfg_prs_atomSeparator;
+        }
+    }
+    return out;
+}
 
 std::set<Triple> RuleB::materialize(TripleStorage& triples){
 
@@ -370,6 +394,75 @@ RuleC::RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& l
     this->_directions = directions;
     std::reverse(_directions.begin(), _directions.end());
     _directions.flip();   
+}
+
+
+std::string RuleC::computeRuleString(Index* index){
+    // we parse into the anytime string representation for !leftC and all length=1 rules it is the same as the internatl represention
+    // for 
+    std::string out;
+    out += index->getStringOfRelId(relations[0]);
+
+    if (!leftC){
+        out += "(" + std::string(1,_cfg_prs_anyTimeVars[0]) 
+                   + "," + index->getStringOfNodeId(constants[0])
+                   + ")"
+                   + _cfg_prs_ruleSeparator;
+    
+        // body
+        for (int i=1; i<relations.size(); i++){
+            if (i<relations.size()-1){
+                out += index->getStringOfRelId(relations[i]);
+                std::string var1 = std::string(1, _cfg_prs_anyTimeVars[i-1]);
+                std::string var2 = std::string(1, _cfg_prs_anyTimeVars[i]);
+                std::string atom = directions[i-1] ? "(" + var1 + "," + var2 + ")" : "(" + var2 + "," + var1 + ")";
+                out += atom + _cfg_prs_atomSeparator;
+            }
+            // last atom contains constant
+            if (i==relations.size()-1){
+                out += index->getStringOfRelId(relations[i]);
+                std::string var1 = std::string(1, _cfg_prs_anyTimeVars[i-1]);
+                std::string var2 = index->getStringOfNodeId(constants[1]);
+                std::string atom = directions[i-1] ? "(" + var1 + "," + var2 + ")" : "(" + var2 + "," + var1 + ")";
+                out += atom;
+            }
+        }
+    } else{
+        out += "(" +  index->getStringOfNodeId(constants[0])
+                    + "," + std::string(1,_cfg_prs_anyTimeVars.back())
+                    + ")"
+                    + _cfg_prs_ruleSeparator;
+        
+        // okay the anytime string representations - compared to the internal represenation - 
+        // reverses the order of the body then flips dirs AND then uses the variable ordering YABCD..X instead of 
+        // XABCD..Y , so we can readily use _relations and _directions and also have to flip the variable ordering
+
+        // old ordering 
+        std::string newOrder = _cfg_prs_anyTimeVars;
+        newOrder[0] = _cfg_prs_anyTimeVars.back();
+        newOrder.back() = _cfg_prs_anyTimeVars[0];
+
+        // thats it, now we just do the same as above with _relations, _directions.
+        // For readability we just repeat the black above here
+        for (int i=1; i<_relations.size(); i++){
+            if (i<_relations.size()-1){
+                out += index->getStringOfRelId(_relations[i]);
+                std::string var1 = std::string(1, newOrder[i-1]);
+                std::string var2 = std::string(1, newOrder[i]);
+                std::string atom = _directions[i-1] ? "(" + var1 + "," + var2 + ")" : "(" + var2 + "," + var1 + ")";
+                out += atom + _cfg_prs_atomSeparator;
+            }
+            // last atom contains constant
+            if (i==_relations.size()-1){
+                out += index->getStringOfRelId(_relations[i]);
+                std::string var1 = std::string(1, newOrder[i-1]);
+                std::string var2 = index->getStringOfNodeId(constants[1]);
+                std::string atom = _directions[i-1] ? "(" + var1 + "," + var2 + ")" : "(" + var2 + "," + var1 + ")";
+                out += atom;
+            }
+        }
+    }
+    return out;
 }
 
 
@@ -587,8 +680,6 @@ bool RuleC::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& hea
 
 bool RuleC::predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings){
    
-    
-    
     if (leftC && head!=constants[0]){
         return false;
     }else if (!leftC && tail!=constants[0]){
@@ -668,6 +759,28 @@ RuleZ::RuleZ(int& relation, bool& leftC, int& constant) {
     this->leftC = leftC;
     this->constant = constant;
     confWeight = RuleZ::zConfWeight;
+}
+
+std::string RuleZ::computeRuleString(Index* index){
+    std::string out;
+    out += index->getStringOfRelId(relation);
+    if (!leftC){
+        out += "(" + std::string(1,_cfg_prs_anyTimeVars[0]) 
+                   + "," + index->getStringOfNodeId(constant)
+                   + ")"
+                   + _cfg_prs_ruleSeparator;
+        
+        out += _cfg_prs_ruleSeparator;
+        
+    }else{
+        out += "(" +  index->getStringOfNodeId(constant)
+                   + "," + std::string(1,_cfg_prs_anyTimeVars.back())
+                   + ")"
+                   + _cfg_prs_ruleSeparator;
+        out += _cfg_prs_ruleSeparator;
+    }
+    return out;
+
 }
 
 
@@ -753,6 +866,65 @@ RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& l
     this->_directions = directions;
     std::reverse(_directions.begin(), _directions.end());
     _directions.flip();   
+}
+
+std::string RuleD::computeRuleString(Index* index){
+    // we parse into the anytime string representation for !leftC and all length=1 rules it is the same as the internatl represention
+    std::string out;
+    out += index->getStringOfRelId(relations[0]);
+
+    if (!leftC){
+        out += "(" + std::string(1,_cfg_prs_anyTimeVars[0]) 
+                   + "," + index->getStringOfNodeId(constant)
+                   + ")"
+                   + _cfg_prs_ruleSeparator;
+    
+        // body
+        for (int i=1; i<relations.size(); i++){
+                out += index->getStringOfRelId(relations[i]);
+                std::string var1 = std::string(1, _cfg_prs_anyTimeVars[i-1]);
+                std::string var2 = std::string(1, _cfg_prs_anyTimeVars[i]);
+                std::string atom = directions[i-1] ? "(" + var1 + "," + var2 + ")" : "(" + var2 + "," + var1 + ")";
+                out += atom;
+
+                if (i==relations.size()-1){
+                    out += atom;
+                }else{
+                    out += atom + _cfg_prs_atomSeparator;
+                }
+                
+        }
+    } else{
+        out += "(" +  index->getStringOfNodeId(constant)
+                    + "," + std::string(1,_cfg_prs_anyTimeVars.back())
+                    + ")"
+                    + _cfg_prs_ruleSeparator;
+        
+        // same as in U_c: the anytime string representations - compared to the internal represenation - 
+        // reverses the order of the body then flips dirs AND then uses the variable ordering YABCD..X instead of 
+        // XABCD..Y , so we can readily use _relations and _directions and also have to flip the variable ordering
+
+        // old ordering 
+        std::string newOrder = _cfg_prs_anyTimeVars;
+        newOrder[0] = _cfg_prs_anyTimeVars.back();
+        newOrder.back() = _cfg_prs_anyTimeVars[0];
+
+        // thats it, now we just do the same as above with _relations, _directions.
+        // For readability we just repeat the black above here
+        for (int i=1; i<_relations.size(); i++){
+            out += index->getStringOfRelId(_relations[i]);
+            std::string var1 = std::string(1, newOrder[i-1]);
+            std::string var2 = std::string(1, newOrder[i]);
+            std::string atom = _directions[i-1] ? "(" + var1 + "," + var2 + ")" : "(" + var2 + "," + var1 + ")";
+            out += atom;
+            if (i==relations.size()-1){
+                out += atom;
+            }else{
+                out += atom + _cfg_prs_atomSeparator;
+            }    
+        }
+    }
+    return out;
 }
 
 
@@ -1139,6 +1311,15 @@ void RuleXXd::setPredictTail(bool ind){
     this->predictTail = ind;
 }
 
+std::string RuleXXd::computeRuleString(Index* index){
+
+    std::string out;
+    out += index->getStringOfRelId(relations[0]) + "(X,X)" + _cfg_prs_ruleSeparator + index->getStringOfRelId(relations[1]);
+    out += directions[0] ?  "(" + std::string(1,_cfg_prs_anyTimeVars[0]) + "," + std::string(1,_cfg_prs_anyTimeVars[1]) + ")" :
+                            "(" + std::string(1,_cfg_prs_anyTimeVars[1]) + "," + std::string(1,_cfg_prs_anyTimeVars[0]) + ")";
+    return out;
+}
+
 bool RuleXXd::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet){
     // h(X,X) <-- b(X,A)
     // h(X,X) <-- b(A,X)
@@ -1219,6 +1400,15 @@ RuleXXc::RuleXXc(std::vector<int>& relations, std::vector<bool>& directions, int
     // only used and set after a rule is contructed and parsed from AnyBURL rule files
     this->predictHead = true;
     this->predictHead = true;
+}
+
+std::string RuleXXc::computeRuleString(Index* index){
+
+    std::string out;
+    out += index->getStringOfRelId(relations[0]) + "(X,X)" + _cfg_prs_ruleSeparator + index->getStringOfRelId(relations[1]);
+    out += directions[0] ?  "(" + std::string(1,_cfg_prs_anyTimeVars[0]) + "," + index->getStringOfNodeId(constant) + ")" :
+                            "(" +index->getStringOfNodeId(constant) + "," + std::string(1,_cfg_prs_anyTimeVars[0]) + ")";
+    return out;
 }
 
 

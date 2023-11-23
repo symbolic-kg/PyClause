@@ -115,7 +115,7 @@ std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::
         // for every rule + groundings that predicted the target
         for (auto& pair: elGroundings){
             Rule* rule = pair.first;
-            strRulesPerTarget.push_back(rule->getRuleString());
+            strRulesPerTarget.push_back(rule->computeRuleString(index.get()));
             // groundings for the rule
             std::vector<std::vector<Triple>>& explanations = pair.second;
             std::vector<std::vector<std::array<std::string, 3>>> strExplanations;
