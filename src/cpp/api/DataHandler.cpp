@@ -268,26 +268,26 @@ std::unique_ptr<std::vector<Triple>> DataHandler::loadTriplesToVec(std::string p
 
     // Read the file line by line
     std::string line;
-    while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        std::string element;
-        Triple triple;
 
-        std::getline(iss, element, '\t');
-        triple[0] = index->getIdOfNodestring(element);
 
-        std::getline(iss, element, '\t');
-        triple[1] = index->getIdOfRelationstring(element);
+    while (!util::safeGetline(file, line).eof()){
+		std::istringstream iss(line);
+		std::vector<std::string> results = util::split(line, '\t');
+		if (results.size() != 3) {
+			throw std::runtime_error("Error while reading a file with Triples please check that every line follows tab separeated: head relation tail format. ");
+		}
+		Triple triple;
+        triple[0] = index->getIdOfNodestring(results[0]);
+        triple[1] = index->getIdOfRelationstring(results[1]);
+        triple[2] = index->getIdOfNodestring(results[2]);
 
-        std::getline(iss, element, '\t');
-        triple[2] = index->getIdOfNodestring(element);
         if (!iss.fail() || iss.eof()) {
             triples->push_back(triple);
         }else{
             throw std::runtime_error("Error while reading a file with Triples please check that every line follows tab separeated: head relation tail format. ");
         }
-    }
-
+	}
+	file.close();
     return std::move(triples);
 }
 

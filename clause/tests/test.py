@@ -292,6 +292,86 @@ def test_qa_handler():
 
     print("Test for QA Handler idx and string version successful.")
 
+
+def test_triple_scoring_B_237():
+    import c_clause
+    import numpy as np
+
+
+    base_dir = get_base_dir()
+    train = join_u(base_dir, join_u("data", "fb15k-237", "train.txt"))
+    filter = join_u(base_dir, join_u("data", "fb15k-237", "valid.txt"))
+
+    target = join_u(base_dir, join_u("data", "fb15k-237", "test.txt"))
+    rules = join_u(base_dir, join_u("data", "fb15k-237", "anyburl-rules-c3-3600"))
+
+    options = {
+        # scoring/ranking options
+        "aggregation_function": "maxplus",
+        "collect_explanations": "true",
+        "disc_at_least": "2",
+        "topk":"2", #should be enough for one rule type
+        #"num_preselect":"10",
+        "num_top_rules":"1",
+        # rule options 
+        "rule_b_max_branching_factor": "-1",
+        "use_zero_rules": "false",
+        "rule_zero_weight":"0.01",
+        "use_u_c_rules": "false",
+        "use_b_rules": "true",
+        "use_u_d_rules": "false",
+        "rule_u_d_weight":"0.01",
+        "use_u_xxc_rules": "false",
+        "use_u_xxd_rules": "false",
+    }
+
+    loader = c_clause.DataHandler(options)
+    loader.load_data(train, filter, target)
+    loader.load_rules(rules)
+
+    scorer = c_clause.PredictionHandler(options)
+    print(target)
+    scorer.score_triples(target, loader)
+
+    idx_scores = scorer.get_scores(False)
+    str_scores = scorer.get_scores(True)
+
+
+    ranker = c_clause.RankingHandler(options)
+    ranker.calc_ranking(loader)
+
+    tails = ranker.get_ranking("tail")
+    heads = ranker.get_ranking("head")
+
+    for i in range(len(idx_scores)):
+        # same scores; string scores are rounded to 6 decimals in backend
+        assert(round(idx_scores[i][3], 6)==float(str_scores[i][3]))
+        head = idx_scores[i][0]
+        rel = idx_scores[i][1]
+        tail = idx_scores[i][2]
+    
+    ## extract all triples from ranker and score
+    triples = []
+    for rel, head_dict in tails.items():
+        for head, tail_list in head_dict.items():
+            for tail_tup in tail_list:
+                triple = [head, rel, tail_tup[0]]
+                triples.append(triple)
+
+    scorer.score_triples(triples, loader)
+    idx_scores = scorer.get_scores(False)
+    explanations = scorer.get_explanations(True)
+
+    for i in range(len(idx_scores)):
+        head = idx_scores[i][0]
+        rel = idx_scores[i][1]
+        tail = idx_scores[i][2]
+
+        idx_scores[i][3]
+        tails_dict = dict(tails[rel][head])
+        assert(idx_scores[i][3]==tails_dict[tail])
+    print("Test Triple scoring for B 237 successful.")      
+
     
 def test_loader():
     import c_clause

@@ -568,8 +568,8 @@ void testTripleScoring(){
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
     ruleFactory->setCreateRuleB(true);
     ruleFactory->setCreateRuleZ(false);
-    ruleFactory->setCreateRuleC(true);
-    ruleFactory->setCreateRuleD(true);
+    ruleFactory->setCreateRuleC(false);
+    ruleFactory->setCreateRuleD(false);
     ruleFactory->setCreateRuleXXd(false);
     ruleFactory->setCreateRuleXXc(false);
     RuleZ::zConfWeight = 0.01;
