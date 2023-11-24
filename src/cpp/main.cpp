@@ -854,7 +854,6 @@ void test_compute_strings(){
         throw std::runtime_error("Test 21 for compute Z rule string failed.");
     }
 
-
     // zero rule
     ruleStr = "_member_of_domain_region(10225219,Y) <= ";
     ruleXX = ruleFactory->parseAnytimeRule(ruleStr);

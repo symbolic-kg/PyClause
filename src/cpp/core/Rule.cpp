@@ -796,6 +796,24 @@ bool RuleZ::predictTailQuery(int head, TripleStorage& triples, QueryResults& tai
     return false;
 }
 
+
+bool RuleZ::predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings){
+    if (leftC && head!=constant){
+        return false;
+    } else if(!leftC && tail!=constant){
+        return false;
+    }
+
+    if (groundings){
+        (*groundings)[this].push_back({});
+        qResults.insertRule(tail, this);
+        return true;
+    }else
+        qResults.insertRule(tail, this);
+        return true;
+}
+
+
 std::set<Triple> RuleZ::materialize(TripleStorage& triples){
     std::set<Triple> predictions;
     // predict c when h(c,X)<-- given all h(--, a) in train and vice versa
@@ -1314,6 +1332,38 @@ std::string RuleXXd::computeRuleString(Index* index){
     return out;
 }
 
+
+bool RuleXXd::predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings){
+    // h(X,X) <-- b(X,A)
+    // h(X,X) <-- b(A,X)
+    if (head!=tail){
+        return false;
+    }
+    int length;
+    int* begin;
+    int bodyRel = this->relations[1];
+    directions[0] ? triples.getTforHR(head, bodyRel, begin, length) :  triples.getHforTR(tail, bodyRel, begin, length); //head==tail anyways
+    if (length>0 && !groundings){
+        qResults.insertRule(tail, this);
+        return true;
+    }else if(length>0 && groundings){
+        for (int i=0; i<length; i++){
+            std::vector<Triple> oneGrounding;
+            if (directions[0]){
+                oneGrounding.push_back({head, relations[1], begin[i]});
+            }else{
+                oneGrounding.push_back({begin[i], relations[1], head}); //head==tail
+            }
+            (*groundings)[this].push_back(oneGrounding); 
+        }
+        qResults.insertRule(tail, this);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+
 bool RuleXXd::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet){
     // h(X,X) <-- b(X,A)
     // h(X,X) <-- b(A,X)
@@ -1403,6 +1453,36 @@ std::string RuleXXc::computeRuleString(Index* index){
     out += directions[0] ?  "(" + std::string(1,_cfg_prs_anyTimeVars[0]) + "," + index->getStringOfNodeId(constant) + ")" :
                             "(" +index->getStringOfNodeId(constant) + "," + std::string(1,_cfg_prs_anyTimeVars[0]) + ")";
     return out;
+}
+
+bool RuleXXc::predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings){
+    // h(X,X) <-- b(X,d)
+    // h(X,X) <-- b(d,X)
+    if (head!=tail){
+        return false;
+    }
+    int length;
+    int* begin;
+    int bodyRel = this->relations[1];
+    directions[0] ? triples.getTforHR(head, bodyRel, begin, length) :  triples.getHforTR(tail, bodyRel, begin, length); //head==tail
+    int* end = begin + length;
+    if (std::binary_search(begin, end, constant)){
+        if (groundings){
+            std::vector<Triple> oneGrounding;
+            if (directions[0]){
+                oneGrounding.push_back({tail, bodyRel, constant});
+            }else{
+                oneGrounding.push_back({constant, bodyRel, tail});
+            }
+            (*groundings)[this].push_back(oneGrounding);
+            qResults.insertRule(tail, this);
+            return true;
+        }else{
+            qResults.insertRule(tail, this);
+            return true;
+        }
+    }
+    return false;
 }
 
 

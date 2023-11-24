@@ -280,6 +280,8 @@ public:
 	// zero rules downweighting
 	static double zConfWeight;
 	std::string computeRuleString(Index* index);
+	// predict triple (grounding tracking returns empty vector)
+	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
 private:
 	bool leftC;
 	int constant;
@@ -337,6 +339,7 @@ public:
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	std::set<Triple> materialize(TripleStorage& triples);
 	std::string computeRuleString(Index* index);
+	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
 private:
 
 };
@@ -352,6 +355,7 @@ public:
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	std::set<Triple> materialize(TripleStorage& triples);
 	std::string computeRuleString(Index* index);
+	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
 private:
 	int constant;
 
