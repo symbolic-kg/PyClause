@@ -1,0 +1,9 @@
+# ************************************************************
+# *** SPECIFIC CONFIGURATION: EXAMPLE                      ***
+# *** values specified here will overwrite default values  ***
+# *** other default values are kept as they are by default ***
+# ************************************************************
+
+
+learning:
+  mode: "anyburl" 

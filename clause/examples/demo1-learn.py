@@ -27,19 +27,21 @@ if __name__ == '__main__':
     # we choose all relations in the datasets as targets to learn rules for
     # instead of that, a specific list of target relations can be determined as first argument
 
-    options = Options()
+    options = Options("config-my.yaml")
 
-    options.set("learning.mode", "torm")
+    # options.set("learning.mode", "torm")
+
+    # print(str(options.flat()))
 
     # options.set("learning.anyburl.b_length", 1)
     # options.set("learning.anyburl.time", 30)
 
-    options.set("learning.torm.b.length", 1)
-    options.set("learning.torm.uc.support", 2)
-    options.set("learning.torm.xx_ud.active", False)
-    options.set("learning.torm.xx_uc.active", False)
-    options.set("learning.torm.ud.active", False)
-    options.set("learning.torm.z.active", False)
+    #options.set("learning.torm.b.length", 1)
+    #options.set("learning.torm.uc.support", 2)
+    #options.set("learning.torm.xx_ud.active", False)
+    #options.set("learning.torm.xx_uc.active", False)
+    #options.set("learning.torm.ud.active", False)
+    #options.set("learning.torm.z.active", False)
 
 
 

@@ -1,85 +1,29 @@
 import flatdict
+import yaml
 
 
 class Options():
 
-    def __init__(self):
+    def __init__(self, path_config_extra=None):
         """
         Creates an option onject that contains all parameters in their default value.
         """
         self.options = {}
+        with open('config-default.yaml', 'r') as file:
+            self.options  = yaml.safe_load(file)
 
-        self.options['io'] = {
-            "rule_format": "PyClause", # you can choose AnyBURL instead which makes a difference for XX rules
-        }
+        if path_config_extra != None:
+            options_extra = {}
+            with open(path_config_extra, 'r') as file:
+                print(">>> using options in " + path_config_extra + " to overwrite some default options")
+                options_extra  = yaml.safe_load(file)
 
-
-        # the core options that are relavent whenever the c++ backend is called
-        self.options['core'] = {
-            "aggregation_function": "maxplus",
-            "num_preselect": 10000000,
-            "topk": 100,
-            "filter_w_train": True,
-            "filter_w_target": True,
-            "disc_at_least": 10, ## -1 for off, must not be bigger than topk
-            "rule_b_max_branching_factor": -1,
-            "use_zero_rules": True,
-            "rule_zero_weight": 0.01,
-            "use_u_c_rules": True,
-            "use_b_rules": True,
-            "use_u_d_rules": True,
-            "rule_u_d_weight": 0.01,
-            "use_u_xxc_rules": True,
-            "use_u_xxd_rules": True,
-            "tie_handling": "frequency"
-        }
-
-        # the options relevenat for rule learning
-
-
-        self.options['learning'] = dict(
-            mode = "hybrid",  # chose betweeen anyburl / hybrid / nanytorm; default shoudl be hybrid
-            anyburl = dict(
-                time = 60, # time for anyburl rule mining in seconds
-                confidence = 0.0001,
-                support = 2,
-                b_length = 3,
-            ),
-            torm = dict(
-                tautology = False, # if set to false, rules that do not make any wrong prediction are surpressed
-                b = dict(
-                    active = True,
-                    confidence = 0.0001,
-                    support = 2,
-                    length = 3,
-                    batchsize = 1000
-                ),
-                uc = dict(
-                    active = True,
-                    confidence = 0.0001,
-                    support = 2
-                ),
-                ud = dict(
-                    active = True,
-                    confidence = 0.0001,
-                    support = 2
-                ),
-                z = dict(
-                    active = True,
-                    confidence = 0.0001,
-                    support = 2
-                ),
-                xx_uc = dict(
-                    active = True,
-                    confidence = 0.0001,
-                    support = 2
-                ),
-                xx_ud = dict(
-                    active = True,
-                    confidence = 0.0001,
-                    support = 2
-                )
-        ))
+            # note that the following code won't work correctly, in the case of nested dictionaries
+            # self.options.update(options_extra)
+            # instead, we have to go his more complicated way ... 
+            options_extra_flat = dict(flatdict.FlatDict(options_extra, delimiter='.'))
+            for param in options_extra_flat:
+                self.set(param, options_extra_flat[param])
 
     def set(self, param, value):
         """

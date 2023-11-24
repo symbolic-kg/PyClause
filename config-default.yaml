@@ -1,0 +1,60 @@
+# ******************************************************
+# *** DEFAULT CONFIGURATION: DO NOT CHANGE THIS FILE ***
+# ******************************************************
+
+io:
+  rule_format: "PyClause" # possible values are 
+core:
+  aggregation_function: "maxplus"
+  num_preselect: 10000000
+  topk: 100
+  filter_w_train: True
+  filter_w_target: True
+  disc_at_least: 10, # -1 for off, must not be bigger than topk
+  rule_b_max_branching_factor": -1,
+  use_zero_rules: True
+  rule_zero_weight: 0.01
+  use_u_c_rules: True
+  use_b_rules: True
+  use_u_d_rules: True
+  rule_u_d_weight: 0.01
+  use_u_xxc_rules: True
+  use_u_xxd_rules: True
+  tie_handling: "frequency"
+learning:
+  mode: "hybrid"  # chose betweeen "anyburl" / "hybrid" (mixing anyburl any nanytorm) / "nanytorm" / "amie"
+  anyburl:
+    time: 60
+    confidence: 0.0001
+    support: 2
+    b_length: 3
+  amie:
+    param: "value" # not yet implemented
+  torm:
+    tautology: False # if set to false, rules that do not make any wrong prediction are surpressed
+    b:
+      active: True
+      confidence: 0.0001
+      support: 2
+      length: 3
+      batchsize: 1000
+    uc:
+      active: True
+      confidence: 0.0001
+      support: 2
+    ud:
+      active: True
+      confidence: 0.0001
+      support: 2
+    z:
+      active: True
+      confidence: 0.0001
+      support: 2
+    xx_uc:
+      active: True
+      confidence: 0.0001
+      support: 2
+    xx_ud:
+      active: True
+      confidence: 0.0001
+      support: 2
