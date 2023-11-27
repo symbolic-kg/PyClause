@@ -1,9 +1,9 @@
 
 from clause.data.triples import TripleSet,TripleIndex
-from clause.rules.rules import RuleZ,RuleXXuc,RuleXXud,RuleUc,RuleUd,RuleB,RuleSet
-from clause.rules.ruleparser import RuleReader
+from clause.rules import RuleZ,RuleXXuc,RuleXXud,RuleUc,RuleUd,RuleB,RuleSet
+from clause.ruleparser import RuleReader
 
-from clause.learning import anyburl_wrapper
+from clause.learning import anyburl_wrapper, amie_wrapper
 
 import c_clause
 
@@ -291,7 +291,8 @@ class Miner():
 
     def mine_rules(self, path_rules_output = None):
 
-        aoptions = self.options.flat('learning.anyburl')
+        anyburl_options = self.options.flat('learning.anyburl')
+        amie_options = self.options.flat('learning.amie')
         toptions = self.options.flat('learning.torm')
        
         # ***********************************
@@ -304,11 +305,21 @@ class Miner():
                 exit()
             arule_path = anyburl_wrapper.learn(
                 self.triples.path,
-                aoptions['time'],
-                aoptions['b_length'], 
-                aoptions['support'],
-                aoptions['confidence'],
+                anyburl_options['time'],
+                anyburl_options['b_length'], 
+                anyburl_options['support'],
+                anyburl_options['confidence'],
                 True,
+                path_rules_output
+            )
+        if self.options.options['learning']['mode'] == "amie": 
+            if path_rules_output == None:
+                print("!!! execution interrupted")
+                print("!!! running in amie mode requires to specify an output path for the rules") 
+                exit()
+            arule_path = amie_wrapper.learn(
+                self.triples.path,
+                amie_options,
                 path_rules_output
             )
 
@@ -316,10 +327,10 @@ class Miner():
         if self.options.options['learning']['mode'] == "hybrid": 
             arule_path = anyburl_wrapper.learn(
                 self.triples.path,
-                aoptions['time'],
-                aoptions['b_length'], 
-                aoptions['support'],
-                aoptions['confidence'],
+                anyburl_options['time'],
+                anyburl_options['b_length'], 
+                anyburl_options['support'],
+                anyburl_options['confidence'],
                 False
             )
             rules_b = RuleSet(self.triples.index)
@@ -368,6 +379,10 @@ class Miner():
         # anyburl case
         if self.options.options['learning']['mode'] == "anyburl": 
             print(">>> anyburl stored the mined rules here: " + path_rules_output)
+            return
+                # anyburl case
+        if self.options.options['learning']['mode'] == "amie": 
+            print(">>> amie stored the mined rules here: " + path_rules_output)
             return
         # torm and hybrid case
         if toptions['uc.active']:

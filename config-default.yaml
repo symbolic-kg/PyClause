@@ -22,14 +22,19 @@ core:
   use_u_xxd_rules: True
   tie_handling: "frequency"
 learning:
-  mode: "hybrid"  # chose betweeen "anyburl" / "hybrid" (mixing anyburl any nanytorm) / "nanytorm" / "amie"
+  mode: "amie"  # chose betweeen "anyburl" / "hybrid" (mixing anyburl any nanytorm) / "nanytorm" / "amie"
   anyburl:
     time: 60
+  
     confidence: 0.0001
     support: 2
     b_length: 3
   amie:
-    param: "value" # not yet implemented
+    raw:
+      mins: 2
+      maxad: 4 # number of atoms = 1 head atom + body atoms
+      minhc: 0.0001
+      minpca: 0.0001
   torm:
     tautology: False # if set to false, rules that do not make any wrong prediction are surpressed
     b:

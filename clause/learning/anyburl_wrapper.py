@@ -33,9 +33,9 @@ def learn(train_path, time, brule_length, threshold_cp, threshold_confidence, al
         "PATH_TRAINING = "  + train_path,
         "PATH_OUTPUT   = " + rule_path,
         "SNAPSHOTS_AT = " +  str(time),
-        "MAX_LENGTH_CYCLIC = " + str(brule_length),
-        "THRESHOLD_CORRECT_PREDICTIONS = " + str(threshold_cp),
-        "THRESHOLD_CONFIDENCE = " + str(threshold_confidence),
+        #"MAX_LENGTH_CYCLIC = " + str(brule_length),
+        #"THRESHOLD_CORRECT_PREDICTIONS = " + str(threshold_cp),
+        #"THRESHOLD_CONFIDENCE = " + str(threshold_confidence),
         "WORKER_THREADS = " + str(cpu_count),
         ]
     if all_rules == False:

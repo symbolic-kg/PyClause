@@ -27,9 +27,11 @@ if __name__ == '__main__':
     # we choose all relations in the datasets as targets to learn rules for
     # instead of that, a specific list of target relations can be determined as first argument
 
-    options = Options("config-my.yaml")
 
-    options.set("learning.mode", "anyburl")
+    options = Options()
+    # options = Options("config-my.yaml")
+
+    options.set("learning.mode", "amie")
 
     # print(str(options.flat()))
 

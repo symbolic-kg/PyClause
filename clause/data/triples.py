@@ -2,9 +2,6 @@ import sys
 
 
 
-
-
-
 class Triple:
    """
    A triple from a knowledge graph which consist of subject, relation, object.

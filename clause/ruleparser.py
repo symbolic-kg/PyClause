@@ -1,5 +1,5 @@
 
-from clause.rules.rules import Rule, RuleUc, RuleB, RuleUd, RuleXXuc, RuleXXud, RuleZ, RuleSet
+from clause.rules import Rule, RuleUc, RuleB, RuleUd, RuleXXuc, RuleXXud, RuleZ, RuleSet
 from clause.data.triples import TripleSet
 
 import re
