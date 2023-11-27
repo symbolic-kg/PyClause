@@ -52,7 +52,7 @@ def learn(train_path, time, brule_length, threshold_cp, threshold_confidence, al
     f.close()
 
 
-    with Popen(f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Learn {conf_path}", stdout=PIPE, bufsize=1, universal_newlines=True) as p:
+    with Popen(f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Learn {conf_path}", shell=True, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
         for line in p.stdout:
             print("-> anyburl call: " + line, end='') # process line here
 

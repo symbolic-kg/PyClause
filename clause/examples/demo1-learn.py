@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     options = Options("config-my.yaml")
 
-    # options.set("learning.mode", "torm")
+    options.set("learning.mode", "anyburl")
 
     # print(str(options.flat()))
 
