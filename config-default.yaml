@@ -25,12 +25,12 @@ learning:
   mode: "amie"  # chose betweeen "anyburl" / "hybrid" (mixing anyburl any nanytorm) / "nanytorm" / "amie"
   anyburl:
     time: 60
-  
-    confidence: 0.0001
-    support: 2
-    b_length: 3
-  amie:
     raw:
+      MAX_LENGTH_CYCLIC: 3
+      THRESHOLD_CORRECT_PREDICTIONS: 2
+      THRESHOLD_CONFIDENCE: 0.0001
+  amie:
+    raw: # the -symbol infront of each param is added automatically
       mins: 2
       maxad: 4 # number of atoms = 1 head atom + body atoms
       minhc: 0.0001
