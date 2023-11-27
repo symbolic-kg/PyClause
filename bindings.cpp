@@ -76,7 +76,8 @@ PYBIND11_MODULE(c_clause, m) {
 
     py::class_<DataHandler,  std::shared_ptr<DataHandler>>(m, "DataHandler") 
         .def(py::init<std::map<std::string, std::string>>())
-        .def("load_rules", &DataHandler::loadRules)
+        .def("load_rules", py::overload_cast<std::string>(&DataHandler::loadRules))
+        .def("load_rules", py::overload_cast<std::vector<std::string>>(&DataHandler::loadRules))
         .def("load_data", py::overload_cast<std::string>(&DataHandler::loadData))
         .def("load_data", py::overload_cast<std::string, std::string>(&DataHandler::loadData))
         .def("load_data", py::overload_cast<std::string, std::string, std::string>(&DataHandler::loadData))

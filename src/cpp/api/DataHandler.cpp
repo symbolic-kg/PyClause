@@ -158,11 +158,19 @@ void DataHandler::loadRules(std::string path){
     if (!loadedData){
          throw std::runtime_error("Please load the data first with the the Handlers load data functionality.");
     }
-    rules->readAnyTimeFormat(path, true);
+    rules->readAnyTimeFormat(path, false);
     loadedRules = true;
-
-
 }
+
+
+void DataHandler::loadRules(std::vector<std::string> ruleStrings){
+    if (!loadedData){
+         throw std::runtime_error("Please load the data first with the the Handlers load data functionality.");
+    }
+    rules->readAnyTimeFromVec(ruleStrings, false);
+    loadedRules = true;
+}
+
 
 std::unordered_map<std::string, int>& DataHandler::getNodeToIdx(){
     return index->getNodeToIdx();

@@ -15,11 +15,13 @@ public:
     RuleStorage(std::shared_ptr<Index> index, std::shared_ptr<RuleFactory> ruleFactory);
     // expects a file with lines val\tval\t\val\trulestring
     //if sampled the first 3 values in a ruleset refer to sampled values
-    void readAnyTimeFormat(std::string path, bool sampled); 
+    void readAnyTimeFormat(std::string path, bool exact); 
+    void readAnyTimeFromVec(std::vector<std::string>& stringLines, bool exact); 
+
+    bool addAnyTimeRule(std::string ruleLine, int id, bool exact);
     std::vector<std::unique_ptr<Rule>>& getRules();
     std::set<Rule*, compareRule>& getRelRules(int relation);
 
-    void addRule(std::unique_ptr<Rule*> rule);
     
 
 private:

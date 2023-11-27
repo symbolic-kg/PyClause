@@ -26,13 +26,17 @@
 class DataHandler{
 public:
     DataHandler(std::map<std::string, std::string> options);
+
     //exposed python functions
     void loadData(std::string dataPath, std::string filterPath, std::string targetPath);
     void loadData(std::string dataPath, std::string filterPath);
     void loadData(std::string dataPath);
     void loadData(std::vector<std::array<int, 3>> triples);
     void loadData(std::vector<std::array<std::string, 3>> triples);
+
     void loadRules(std::string rulePath);
+    void loadRules(std::vector<std::string> ruleStrings);
+    
     std::unordered_map<std::string, int>& getNodeToIdx();
 	std::unordered_map<std::string, int>& getRelationToIdx();
     void subsEntityStrings(std::map<std::string, std::string>& newNames);
