@@ -1,6 +1,13 @@
 
+import sys
+import os
+sys.path.append(os.getcwd())
+
+
 from clause.rules import Rule, RuleUc, RuleB, RuleUd, RuleXXuc, RuleXXud, RuleZ, RuleSet
 from clause.data.triples import TripleSet
+
+
 
 import re
 
@@ -81,69 +88,64 @@ class RuleReader:
             rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
             return rule
         else:
-            if not(re.search("\(X,X\)", hb[0])) and not(re.search("\(X, X\)", hb[0])) and not(re.search("me_myself_i", hb[0])):
-                htoken = re.split("\(|,|\)",hb[0])
-                # print("htoken: " + str(htoken))
-                target = htoken[0]
-                # *************** RuleZ ***********************
-                if len(hb) == 1 or (len(hb) == 2 and len(hb[1]) < 2):
-                    if (htoken[1] == "X"):
-                        rule = RuleZ(self.rules, target, htoken[2], True)
+            # if not(re.search("\(X,X\)", hb[0])) and not(re.search("\(X, X\)", hb[0])) and not(re.search("me_myself_i", hb[0])):
+            htoken = re.split("\(|,|\)",hb[0])
+            # print("htoken: " + str(htoken))
+            target = htoken[0]
+            # *************** RuleZ ***********************
+            if (len(hb) == 1 or (len(hb) == 2 and len(hb[1]) < 2)):
+                if re.search("me_myself_i", hb[0]): return None           
+                # print(line)
+                if (htoken[1] == "X"):
+                    rule = RuleZ(self.rules, target, htoken[2], True)
+                else:
+                    rule = RuleZ(self.rules, target, htoken[1], False) 
+                rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
+                return rule
+            # *************** RuleUc or Ud ***********************
+            else:
+                target = hb[0].split("(")[0]
+                atoms = hb[1].split(", ")
+                rels, dirs = get_dir_and_rels_of_body_atoms(atoms, False)
+                
+                btoken = re.split("\(|,|\)",hb[1])
+
+                btoken = list(filter(lambda x: not (x.isspace() or x == ''), btoken))
+                btoken = list(map(lambda x: x.strip(), btoken))
+                bterms = get_terms(btoken)
+
+                b_consts = list(filter(lambda x: len(x) > 1, bterms))
+                b_const = b_consts[0] if len(b_consts) > 0 else None
+                
+                # this is a special case of rules learned by AnyBURL that reflect regularities that are casued by a tricky rewriting
+                # these rules make no sense
+                if b_const == "me_myself_i": return None
+
+                    # XX rule
+                if htoken[1] == "me_myself_i" or htoken[2] == "me_myself_i" or (htoken[1] == "X" and htoken[2] == "X"):
+                        # *************** XX - RuleUd ***********************
+                    if b_const == None:
+                        rule = RuleXXud(self.rules, target, rels[0], dirs[0])
                     else:
-                        rule = RuleZ(self.rules, target, htoken[1], False) 
+                        rule = RuleXXuc(self.rules, target, rels[0], b_const, dirs[0])
                     rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
                     return rule
-                # *************** RuleUc or Ud ***********************
-
-               
-
-
-
                 else:
-                    target = hb[0].split("(")[0]
-                    atoms = hb[1].split(", ")
-                    rels, dirs = get_dir_and_rels_of_body_atoms(atoms, False)
-
-
-                    
-                    btoken = re.split("\(|,|\)",hb[1])
-
-                    btoken = list(filter(lambda x: not (x.isspace() or x == ''), btoken))
-                    btoken = list(map(lambda x: x.strip(), btoken))
-                    bterms = get_terms(btoken)
-
-                    b_consts = list(filter(lambda x: len(x) > 1, bterms))
-                    b_const = b_consts[0] if len(b_consts) > 0 else None
-                    
-                    # this is a special case of rules learned by AnyBURL that reflect regularities that are casued by a tricky rewriting
-                    # these rules make no sense
-                    if b_const == "me_myself_i": return None
-
-                     # XX rule
-                    if htoken[1] == "me_myself_i" or htoken[2] == "me_myself_i" or (htoken[1] == "X" and htoken[2] == "X"):
-                         # *************** XX - RuleUd ***********************
-                        if b_const == None:
-                            rule = RuleXXud(self.rules, target, rels[0], dirs[0])
+                    # *************** RuleUd ***********************
+                    if b_const == None:
+                        if htoken[1] == "X":
+                            rule = RuleUd(self.rules, target, rels, dirs, htoken[2], True)
                         else:
-                            rule = RuleXXuc(self.rules, target, rels[0], b_const, dirs[0])
+                            rule = RuleUd(self.rules, target, rels, dirs, htoken[1], False)
                         rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
-                        return rule
+                    # *************** RuleUc ***********************
                     else:
-                        # *************** RuleUd ***********************
-                        if b_const == None:
-                            if htoken[1] == "X":
-                                rule = RuleUd(self.rules, target, rels, dirs, htoken[2], True)
-                            else:
-                                rule = RuleUd(self.rules, target, rels, dirs, htoken[1], False)
-                            rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
-                        # *************** RuleUc ***********************
+                        if htoken[1] == "X":
+                            rule = RuleUc(self.rules, target, rels, dirs, htoken[2], True, b_const)
                         else:
-                            if htoken[1] == "X":
-                                rule = RuleUc(self.rules, target, rels, dirs, htoken[2], True, b_const)
-                            else:
-                                rule = RuleUc(self.rules, target, rels, dirs, htoken[1], False, b_const)
-                            rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
-                        return rule
+                            rule = RuleUc(self.rules, target, rels, dirs, htoken[1], False, b_const)
+                        rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
+                    return rule
             return None
 
 
@@ -153,9 +155,9 @@ if __name__ == '__main__':
     rules = RuleSet(triples.index)
     rr = RuleReader(rules)
 
-    # r1s = "2972	5	1.68	_derivationally_related_form(X,07554856) <= _also_see(X,A), _also_see(A,B), _derivationally_related_form(B,C)"
-    r1s = "2972	5	1.68	_derivationally_related_form(07554856,Y) <= _also_see(Y,A), _also_see(A,B), _derivationally_related_form(B,C)"
-    r1 = rr.read_line(r1s)
-    print("Rule input:  " +  r1s)
-    print("Rule check:  " +  str(r1))
-    print("Rule vector: " +  str(r1.vectorized()))
+    rr.read_file("data/wnrr/anyburl-rules-c5-3600")
+
+    for rule in rules.rules:
+        # print(str(rule))
+        if type(rule) is RuleXXud or type(rule) is RuleXXuc:
+            print(str(rule))

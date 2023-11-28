@@ -45,9 +45,14 @@ class RuleXXuc(Rule):
     """  
     def __init__(self, ruleset, target, rel, bc, bc_right):
         super().__init__(ruleset)
-        self.target = target
-        self.rel = rel
-        self.bc = bc
+        if isinstance(rel, int):
+            self.target = target
+            self.rel = rel
+            self.bc = bc
+        else:
+            self.target = self.ruleset.index.to2id[target]
+            self.rel = self.ruleset.index.to2id[rel]
+            self.bc = self.ruleset.index.to2id[bc]
         self.bc_right = bc_right
 
     def __str__(self):
@@ -95,6 +100,12 @@ class RuleXXud(Rule):
         super().__init__(ruleset)
         self.target = target
         self.rel = rel
+        if isinstance(rel, int):
+            self.target = target
+            self.rel = rel
+        else:
+            self.target = self.ruleset.index.to2id[target]
+            self.rel = self.ruleset.index.to2id[rel]
         self.dangling_right = dangling_right
 
     def __str__(self):
