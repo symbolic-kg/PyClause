@@ -6,6 +6,53 @@ from os import path
 from subprocess import Popen, PIPE
 
 
+def test_rule_loading():
+    from clause.ruleparser import RuleReader, RuleSet
+    from clause.data.triples import TripleSet
+    print(get_ab_dir())
+
+    base_dir = get_base_dir()
+    train_path = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
+    rules_path = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
+
+
+    # load an anyburl ruleset with frontend
+    triples = TripleSet(train_path)
+    rules = RuleSet(triples.index)
+    rule_reader = RuleReader(rules)
+    rule_reader.read_file(rules_path)
+
+    options = {}
+
+    loader = c_clause.DataHandler(options)
+    loader.load_data(train_path)
+    ## serialize rules from frontend
+    loader.load_rules([rule.get_serialization() for rule in rules.rules])
+
+
+    loader2 = c_clause.DataHandler(options)
+    loader2.load_data(train_path)
+    ## load rules from disk
+    loader2.load_rules(rules_path)
+
+    index1 = loader.rule_index()
+    index2 = loader2.rule_index()
+
+    for i in range(len(index2)):
+        assert(index1==index2)
+
+
+    print("Test for rule loading successful.")
+
+
+
+
+
+
+
+    
+
+
 def test_uc_b_zero_ranking():
     print(get_ab_dir())
 
@@ -445,7 +492,7 @@ def test_triple_scoring():
 
     train = "./data/wnrr/train.txt"
     filter = "./data/wnrr/valid.txt"
-    target = "./data/wnrr/test.txt"
+    target = "./local/test-data/test-wnrr-small.txt"
     rules = "./data/wnrr/anyburl-rules-c5-3600"
 
     options = {
@@ -473,7 +520,7 @@ def test_triple_scoring():
 
 
     scorer = c_clause.PredictionHandler(options)
-    scorer.score_triples("./data/wnrr/test.txt", loader)
+    scorer.score_triples(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
@@ -507,7 +554,7 @@ def test_triple_scoring():
     # now without the track grounding option
     options["collect_explanations"] = "false"
     scorer = c_clause.PredictionHandler(options)
-    scorer.score_triples("./data/wnrr/test.txt", loader)
+    scorer.score_triples(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)

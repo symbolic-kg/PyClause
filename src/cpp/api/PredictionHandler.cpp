@@ -88,7 +88,7 @@ std::vector<std::array<std::string, 4>> PredictionHandler::getStrScores(){
         std::array<std::string, 3> triple;
         int head = (int) arr[0];
         int rel = (int) arr[1];
-        int tail = int (arr[2]);
+        int tail = (int) (arr[2]);
         out.at(it) = {index->getStringOfNodeId(head), index->getStringOfRelId(rel), index->getStringOfNodeId(tail), std::to_string(arr[3])};
         it++;
     }
