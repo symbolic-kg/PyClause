@@ -38,8 +38,8 @@ def test_rule_loading():
     index1 = loader.rule_index()
     index2 = loader2.rule_index()
 
-    for i in range(len(index2)):
-        assert(index1==index2)
+    assert(index1==index2)
+        
 
 
     print("Test for rule loading successful.")
