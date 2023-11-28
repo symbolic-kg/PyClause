@@ -14,6 +14,7 @@
     rules = std::make_unique<RuleStorage>(index, ruleFactory);
  }
 
+//////////////// Path triples loading functions ////////////////
 
 void DataHandler::loadData(std::string dataPath){
     if (loadedData){
@@ -108,6 +109,7 @@ void DataHandler::loadData(std::string dataPath, std::string filterPath, std::st
 //     loadedData = true;
 // }
 
+//////////////// Int triples loading functions ////////////////
 
 // index has to be set before loading idx data
 void DataHandler::loadData(std::vector<std::array<int, 3>> triples){
@@ -128,6 +130,50 @@ void DataHandler::loadData(std::vector<std::array<int, 3>> triples){
     loadedData = true;
 }
 
+void DataHandler::loadData(std::vector<std::array<int, 3>> data, std::vector<std::array<int, 3>> filter){
+    if (index->getNodeSize()==0){
+        throw std::runtime_error(
+            "You have to set an index first with DataHandler.set_entity_index(list[string]) DataHandler._set_relation_index(list[string]) before loading idx data."
+        );
+    }
+
+    if (verbose){
+        std::cout<< "Loading data from idx..." << "\n";
+    }
+    
+    if (loadedData){
+        throw std::runtime_error("Please load the data only once or use a new data handler.");
+    }
+    this->filter->read(filter, false);
+    this->data->read(data, true);
+    this->filter->loadCSR();
+    loadedData = true;
+}
+
+void DataHandler::loadData(std::vector<std::array<int, 3>> data, std::vector<std::array<int, 3>> filter, std::vector<std::array<int, 3>> target){
+    if (index->getNodeSize()==0){
+        throw std::runtime_error(
+            "You have to set an index first with DataHandler.set_entity_index(list[string]) DataHandler._set_relation_index(list[string]) before loading idx data."
+        );
+    }
+
+    if (verbose){
+        std::cout<< "Loading data from idx..." << "\n";
+    }
+    
+    if (loadedData){
+        throw std::runtime_error("Please load the data only once or use a new data handler.");
+    }
+    this->target->read(target, false);
+    this->filter->read(filter, false);
+    this->data->read(data, true);
+    this->filter->loadCSR();
+    this->target->loadCSR();
+    loadedData = true;
+}
+
+//////////////// String triples loading functions ////////////////
+
 void DataHandler::loadData(std::vector<std::array<std::string, 3>> triples){
     if (verbose){
         std::cout<< "Loading string triples..." << "\n"; 
@@ -137,6 +183,36 @@ void DataHandler::loadData(std::vector<std::array<std::string, 3>> triples){
         throw std::runtime_error("Please load the data only once or use a new data handler.");
     }
     data->read(triples, true); 
+    loadedData = true;
+}
+
+void DataHandler::loadData(std::vector<std::array<std::string, 3>> data, std::vector<std::array<std::string, 3>> filter){
+    if (verbose){
+        std::cout<< "Loading string triples..." << "\n"; 
+    }
+       
+    if (loadedData){
+        throw std::runtime_error("Please load the data only once or use a new data handler.");
+    }
+    this->filter->read(filter, false);
+    this->data->read(data, true);
+    this->filter->loadCSR();
+    loadedData = true;
+}
+
+void DataHandler::loadData(std::vector<std::array<std::string, 3>> data, std::vector<std::array<std::string, 3>> filter, std::vector<std::array<std::string, 3>> target){
+    if (verbose){
+        std::cout<< "Loading string triples..." << "\n"; 
+    }
+       
+    if (loadedData){
+        throw std::runtime_error("Please load the data only once or use a new data handler.");
+    }
+    this->target->read(target, false);
+    this->filter->read(filter, false);
+    this->data->read(data, true);
+    this->filter->loadCSR();
+    this->target->loadCSR();
     loadedData = true;
 }
 

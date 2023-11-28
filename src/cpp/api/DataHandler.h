@@ -31,8 +31,12 @@ public:
     void loadData(std::string dataPath, std::string filterPath, std::string targetPath);
     void loadData(std::string dataPath, std::string filterPath);
     void loadData(std::string dataPath);
-    void loadData(std::vector<std::array<int, 3>> triples);
-    void loadData(std::vector<std::array<std::string, 3>> triples);
+    void loadData(std::vector<std::array<int, 3>> data, std::vector<std::array<int, 3>> filter, std::vector<std::array<int, 3>> target);
+    void loadData(std::vector<std::array<int, 3>> data, std::vector<std::array<int, 3>> filter);
+    void loadData(std::vector<std::array<int, 3>> data);
+    void loadData(std::vector<std::array<std::string, 3>> data, std::vector<std::array<std::string, 3>> filter, std::vector<std::array<std::string, 3>> target);
+    void loadData(std::vector<std::array<std::string, 3>> data, std::vector<std::array<std::string, 3>> filter);
+    void loadData(std::vector<std::array<std::string, 3>> data);
 
     void loadRules(std::string rulePath);
     void loadRules(std::vector<std::string> ruleStrings);
