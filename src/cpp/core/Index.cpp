@@ -37,7 +37,7 @@ int Index::getIdOfNodestring(std::string& node) {
 	}
 }
 
-std::string Index::getStringOfNodeId(int& id) {
+std::string Index::getStringOfNodeId(int id) {
 	auto it = idToNode.find(id);
 	if (it != idToNode.end()) {
 		return it->second;
@@ -58,7 +58,7 @@ int Index::getIdOfRelationstring(std::string& relation) {
 	}
 }
 
-std::string Index::getStringOfRelId(int& id) {
+std::string Index::getStringOfRelId(int id) {
 	auto it = idToRel.find(id);
 	if (it != idToRel.end()) {
 		return it->second;

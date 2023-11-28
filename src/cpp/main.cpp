@@ -12,6 +12,7 @@
 #include "features/Application.h"
 #include "core/QueryResults.h"
 #include "core/RuleFactory.h"
+#include "core/Types.h"
 
 void tests(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
@@ -22,10 +23,15 @@ void tests(){
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
     RuleStorage rules(index, ruleFactory);
     std::unique_ptr<Rule> ruleB = ruleFactory->parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
-    size_t size = (ruleB->materialize(data)).size();
+    std::unordered_set<Triple>triplePreds;
+    ruleB->materialize(data, triplePreds);
+    size_t size = triplePreds.size();
+    
     if (!size==83){
         throw std::runtime_error("Test 1 for B-rule failed.");
     }
+
+    triplePreds.clear();
 
     
     // Test num predictions
@@ -36,26 +42,31 @@ void tests(){
     // RuleC* ruleCPtr = dynamic_cast<RuleC*>(ruleC.get());
     // ruleC.release(); // Release old pointer
     // std::unique_ptr<RuleC> ruleCC(ruleCPtr); // Create new unique_ptr
-    size = (ruleC->materialize(data)).size();
+    ruleC->materialize(data, triplePreds);
+    size = triplePreds.size();
     if (size!=276){
         throw std::runtime_error("Test 1 for C-rule failed.");
     }
-
+    triplePreds.clear();
 
     //test me 97	3	0.030927835051546393	_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)
     ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
-    size = (ruleC->materialize(data)).size();
+    ruleC->materialize(data, triplePreds);
+    size = triplePreds.size();
     if (size!=97){
         throw std::runtime_error("Test 1.1 for C-rule failed.");
     }
+    triplePreds.clear();
 
     //Test num predictions
     // 13	2	0.15384615384615385	_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)
     ruleC = ruleFactory->parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
-    size = (ruleC->materialize(data)).size();
+    ruleC->materialize(data, triplePreds);
+    size = triplePreds.size();
     if (size!=13){
         throw std::runtime_error("Test 2 for C-rule failed.");
     }
+    triplePreds.clear();
 
     // flip direction of both atoms
     ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,00732746) <= _synset_domain_topic_of(A,X), _derivationally_related_form(10225219,A)");
@@ -72,18 +83,25 @@ void tests(){
     //Test num predictions
     // 59	11	0.1864406779661017	_member_meronym(12998349,Y) <= _hypernym(Y,11590783)
     ruleC = ruleFactory->parseAnytimeRule("_member_meronym(12998349,Y) <= _hypernym(Y,11590783)");
-    size = (ruleC->materialize(data)).size();
+    triplePreds.clear();
+    ruleC->materialize(data, triplePreds);
+    size = triplePreds.size();
+    
     if (size!=59){
         throw std::runtime_error("Test 5 for C-rule failed.");
     }
+    triplePreds.clear();
 
     //Test num predictions
     //162	2	0.012345679012345678	_hypernym(X,11669921) <= _member_meronym(11911591,X)
     ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,11669921) <= _member_meronym(11911591,X)");
-    size = (ruleC->materialize(data)).size();
+
+    ruleC->materialize(data, triplePreds);
+    size = triplePreds.size();
     if (size!=162){
         throw std::runtime_error("Test 6 for C-rule failed.");
     }
+    triplePreds.clear();
 
 
     // Test RuleB predictTailQuery
@@ -191,11 +209,13 @@ void tests(){
      //309	2	0.006472491909385114	_hypernym(X,05653848) <= _synset_domain_topic_of(A,X)
     ruleD = ruleFactory->parseAnytimeRule("_hypernym(X,05653848) <= _synset_domain_topic_of(A,X)");
     ruleD->setTrackInMaterialize(true);
-    std::set<Triple> matPreds = ruleD->materialize(data);
+    triplePreds.clear();
+    ruleD->materialize(data, triplePreds);
     std::array<int,2> stats = ruleD->getStats(true);
     if (! (stats[0]==309 & stats[1]==2) ){
          throw std::runtime_error("Test 17 for D-rule length 1 materialize failed");
     }
+    triplePreds.clear();
 
 
 
@@ -203,7 +223,7 @@ void tests(){
     // note that a very minor bug in AnyBURL23 leads to 16108 for stats[0]
     ruleD = ruleFactory->parseAnytimeRule("_derivationally_related_form(X,01264336) <= _derivationally_related_form(A,X)");
     ruleD->setTrackInMaterialize(true);
-    matPreds = ruleD->materialize(data);
+    ruleD->materialize(data, triplePreds);
     stats = ruleD->getStats(true);
     if (!(stats[0]==16106 & stats[1]==2)){
          throw std::runtime_error("Test 18 for D-rule length 1 materialize failed");
@@ -228,11 +248,13 @@ void tests(){
     //706	4	0.0056657223796034	_also_see(01716491,Y) <= _also_see(Y,A)
     ruleD = ruleFactory->parseAnytimeRule("_also_see(01716491,Y) <= _also_see(Y,A)");
     ruleD->setTrackInMaterialize(true);
-    matPreds = ruleD->materialize(data);
+    triplePreds.clear();
+    ruleD->materialize(data, triplePreds);
     stats = ruleD->getStats(true);
     if (!(stats[0]==706 & stats[1]==4) ){
           throw std::runtime_error("Test 21 for D-rule length 1 materialize failed");
     }
+    triplePreds.clear();
 
     preds.clear();
     nodeStr = "01716491";
@@ -255,8 +277,8 @@ void tests(){
     // should parse to: _member_meronym(08176077,Y) <= _has_part(A,B), _has_part(B,Y)     [A,B are flipped]
     ruleD = ruleFactory->parseAnytimeRule("_member_meronym(08176077,Y) <= _has_part(A,Y), _has_part(B,A)");
     ruleD->setTrackInMaterialize(true);
-    matPreds = ruleD->materialize(data);
-    size = matPreds.size();
+    ruleD->materialize(data, triplePreds);
+    size = triplePreds.size();
     // 	_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)
     // should parse to same representation
     ruleD = ruleFactory->parseAnytimeRule("_synset_domain_topic_of(X,00543233) <= _derivationally_related_form(X,A), _derivationally_related_form(B,A)");
@@ -275,7 +297,8 @@ void tests(){
     std::unique_ptr<Rule> ruleXXd = ruleFactory237->parseAnytimeRule("/location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)");
     std::set<Triple> predictions;
     ruleXXd->setTrackInMaterialize(true);
-    predictions = ruleXXd->materialize(data237); 
+    triplePreds.clear();
+    ruleXXd->materialize(data237, triplePreds); 
     stats = ruleXXd -> getStats(true);  
     if (!(stats[0]==683 && stats[1]==258)){
         throw std::runtime_error("Test 24 for Uxxd rule materialize failed.");
@@ -284,8 +307,10 @@ void tests(){
     //67	6	 /dataworld/gardening_hint/split_to(me_myself_i,Y) <= /education/educational_institution/students_graduates./education/education/major_field_of_study(Y,/m/01lj9)
     std::unique_ptr<Rule> ruleXXc = ruleFactory237->parseAnytimeRule("/dataworld/gardening_hint/split_to(me_myself_i,Y) <= /education/educational_institution/students_graduates./education/education/major_field_of_study(Y,/m/01lj9)");
   
+
     ruleXXc->setTrackInMaterialize(true);
-    predictions = ruleXXc->materialize(data237);
+    triplePreds.clear();
+    ruleXXc->materialize(data237, triplePreds);
     stats = ruleXXc->getStats(true);  
     if (!(stats[0]==67 && stats[1]==6)){
         throw std::runtime_error("Test 25 for Uxxc rule materialize failed.");
@@ -296,7 +321,8 @@ void tests(){
     // 843	258	0.30605	/education/educational_institution/campuses(X,X) <= /location/location/contains(/m/09c7w0,X)
     ruleXXc = ruleFactory237->parseAnytimeRule("/education/educational_institution/campuses(X,X) <= /location/location/contains(/m/09c7w0,X)");
     ruleXXc->setTrackInMaterialize(true);
-    predictions = ruleXXc->materialize(data237);
+    triplePreds.clear();
+    ruleXXc->materialize(data237, triplePreds);
     stats = ruleXXc->getStats(true);  
     if (!(stats[0]==843 && stats[1]==258)){
         throw std::runtime_error("Test 26 for Uxxc rule materialize failed.");
@@ -305,7 +331,8 @@ void tests(){
     // 552	397	0.71920	/education/educational_institution/campuses(X,X) <= /education/educational_institution/school_type(X,A)
     ruleXXd = ruleFactory237->parseAnytimeRule("/education/educational_institution/campuses(X,X) <= /education/educational_institution/school_type(X,A)");
     ruleXXd->setTrackInMaterialize(true);
-    predictions = ruleXXd->materialize(data237);
+    triplePreds.clear();
+    ruleXXd->materialize(data237, triplePreds);
     stats = ruleXXd->getStats(true);
      if (!(stats[0]==552 && stats[1]==397)){
         throw std::runtime_error("Test 27 for Uxxd rule materialize failed.");
@@ -359,8 +386,8 @@ void tests_groundings(){
     // 1549	26	0.016785022595222725	_hypernym(X,Y) <= _verb_group(A,X), _derivationally_related_form(B,A), _derivationally_related_form(Y,B)
     ruleB = ruleFactory->parseAnytimeRule("_hypernym(X,Y) <= _verb_group(A,X), _derivationally_related_form(B,A), _derivationally_related_form(Y,B)");
 
-    std::set<Triple>predTriples = ruleB->materialize(data);
-
+    std::unordered_set<Triple>predTriples;
+    ruleB->materialize(data, predTriples);
 
     QueryResults qResults;
     groundings.clear();
@@ -380,6 +407,7 @@ void tests_groundings(){
 
         
     }
+    predTriples.clear();
 
    
     // // for debugging ruleB groundings
@@ -387,7 +415,6 @@ void tests_groundings(){
     // std::string head = "00784727";
     // std::string rel = "_hypernym";
     // std::string tail = "00785008";
-
     // std::cout<<"Triple"<<std::endl;
     // std::cout<<head + " " + rel + " " + tail<<std::endl;
     // std::cout<<"Groundings:"<<std::endl;
@@ -405,7 +432,7 @@ void tests_groundings(){
     ruleC = ruleFactory->parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
 
     predTriples.clear();
-    predTriples = ruleC->materialize(data);
+    ruleC->materialize(data, predTriples);
 
 
     qResults.clear();
@@ -441,7 +468,7 @@ void tests_groundings(){
     ruleC = ruleFactory->parseAnytimeRule("_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)");
 
     predTriples.clear();
-    predTriples = ruleC->materialize(data);
+    ruleC->materialize(data, predTriples);
 
 
     qResults.clear();
@@ -480,7 +507,7 @@ void tests_groundings(){
     ruleD = ruleFactory->parseAnytimeRule("_hypernym(X,05653848) <= _synset_domain_topic_of(A,X)");
 
     predTriples.clear();
-    predTriples = ruleD->materialize(data);
+    ruleD->materialize(data, predTriples);
 
 
     qResults.clear();
@@ -533,10 +560,10 @@ void tests_groundings(){
 
 
     // test ruleD leftC predictTriple
-   ruleD = ruleFactory->parseAnytimeRule("_also_see(01716491,Y) <= _also_see(Y,A)");
+    ruleD = ruleFactory->parseAnytimeRule("_also_see(01716491,Y) <= _also_see(Y,A)");
 
     predTriples.clear();
-    predTriples = ruleD->materialize(data);
+    ruleD->materialize(data, predTriples);
 
 
     qResults.clear();
@@ -956,165 +983,6 @@ int main(){
     testTripleScoring();
    
     //checkRuntimes();
-    timeRanking();
-    
-   
-    exit(0);
-
-
-    // data loading
-    std::shared_ptr<Index> index = std::make_shared<Index>();
-    std::string dataPath = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
-    TripleStorage data(index);
-    data.read(dataPath);
-    std::cout<<"data loaded \n";
-    std::cout<<"bye \n";
-
-    //test
-    std::string testPath = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt";
-    TripleStorage test(index);
-    test.read(testPath);
-
-    //valid 
-    std::string validPath = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt";
-    TripleStorage valid(index);
-    valid.read(validPath);
-
-
-    // rule example
-    //std::vector<int> relations = {1,6,4};
-    //std::vector<bool> directions = {true,true};
-
-    //RuleB rule(relations, directions);
-    //std::cout<<rule.getTargetRel()<<"\n";
-
-    // Rule empty;
-    // std::cout<<empty.getTargetRel()<<"\n";
-
-    // // real C-rule
-    // std::string rel1Str = "_instance_hypernym";
-    // std::string rel2Str = "_instance_hypernym";
-    // int rel1 = index->getIdOfRelationstring(rel1Str);
-    // int rel2 = index->getIdOfRelationstring(rel2Str);
-
-    // std::string c1str = "08638442";
-    // std::string c2str = "08524735";
-    // int c1 = index->getIdOfNodestring(c1str);
-    // int c2 = index->getIdOfNodestring(c2str);
-    // std::vector<int> relations = {rel1, rel2};
-    // std::vector<bool> directions = {true};
-    // bool leftC = false;
-    // std::array<int,2> constants = {c1, c2};
-
-    // RuleC rule(relations, directions, leftC, constants);
-
-
-    //25 predictions? :"_has_part(X,Y) <= _has_part(A,X), _member_meronym(A,B), _derivationally_related_form(B,C), _derivationally_related_form(C,D), _has_part(D,Y)"
-    // parse a real B rule and materialize
-
-    //83 30 rule correct preds from christian _has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)
-    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
-    RuleStorage rules(index, ruleFactory);
-    // std::unique_ptr<Rule> ruleB = ruleFactory->parseAnytimeRule("_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)");
-    
-    // strAtom atom;
-    // std::string input = "rel1(X,Y)";
-    // ruleFactory->parseAtom(input, atom);
-
-
-    // std::string node_c = "06898352"; 
-    // std::unique_ptr<Rule>ruleC = ruleFactory->parseAnytimeRule("_derivationally_related_form(07007945,Y) <= _derivationally_related_form(A,Y), _derivationally_related_form(07007945,A)");
-    // NodeToPredRules preds_c;
-    // ruleC->predictHeadQuery(index->getIdOfNodestring(node_c), data, preds_c);
-
-    //  // print predictions for rule
-    // int counter = 0;
-    // for (auto pred: ruleC->materialize(data)) {
-    //     counter +=1;
-    //     RelNodeToNodes& relHtoT = data.getRelHeadToTails();
-    //     auto it = relHtoT.find(pred[1]);
-    //     NodeToNodes& HtoT = it->second;
-    //     auto _it = HtoT.find(pred[0]);
-    //     if (_it != HtoT.end()){
-    //         if ((_it->second).count(pred[2])>0){
-    //             std::cout<<"Exists in train: ";
-    //         }
-    //     }
-    //     std::cout << "[";
-    //     for (int i = 0; i < pred.size(); ++i) {
-    //         if (i==0 | i==2){
-    //             std::cout << index->getStringOfNodeId(pred[i]);
-    //         }else{
-    //             std::cout << index->getStringOfRelId(pred[i]);
-    //         }
-    //         if (i != pred.size() - 1) // not the last item
-    //             std::cout << ", ";
-    //     }
-    //     std::cout << "]\n";
-    // }  
-    // std::cout<<"found:"<<counter<<"\n";
-
-    // NodeToPredRules preds;
-    // std::string node = "08791167";
-    // ruleB->predictTailQuery((index->getIdOfNodestring(node)), data, preds);
-    // std::cout<<"hi"<<preds.size()<<std::endl;
-
-    // node = "08921850";
-    // preds.clear();
-    // ruleB->predictHeadQuery((index->getIdOfNodestring(node)), data, preds);
-    // std::cout<<"hi"<<preds.size()<<std::endl;
-
-
-    
-    //**** read and materialize rules ***
-    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
-    rules.readAnyTimeFormat(rulePath, true); 
-    std::vector<std::unique_ptr<Rule>>& allRules = rules.getRules();
-
-    // ranking example
-
-    ApplicationHandler ranker;
-    ranker.makeRanking(test, data, rules, valid);
-    std::string rankFile = "/home/patrick/Desktop/PyClause/data/wnrr/firstRanking.txt";
-    ranker.writeRanking(test, rankFile);
-    return 0;
-
-
-   
-    // // // int ctr = 0;
-    // // // for (auto& srule: allRules){
-    // // //     srule->materialize(data);
-    // // //     std::cout<<"materialized rule:"<<ctr<<"\n";
-    // // //     ctr+=1;
-    // // // }
-
-
-    #pragma omp parallel
-    {
-    #pragma omp for
-    for (int i = 0; i < allRules.size(); ++i){
-        std::set<Triple> preds = allRules[i]->materialize(data);
-        for (auto pred: preds){
-            RelNodeToNodes& relHtoT = data.getRelHeadToTails();
-            auto it = relHtoT.find(pred[1]);
-            NodeToNodes& HtoT = it->second;
-            auto _it = HtoT.find(pred[0]);
-            if (_it != HtoT.end()){
-                if ((_it->second).count(pred[2])>0){
-                    // you can set the rule confidences like this
-                    // pred exists in train
-                    int a = 3;
-                }
-            }
-        }
-
-        std::cout<<"materialize rule:"<< i <<"\n";
-    }
-    }
-
-
-    // std::cout<<"bye";
-
-   
+    timeRanking();   
     return 0;
 }

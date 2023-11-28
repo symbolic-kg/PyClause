@@ -32,7 +32,9 @@ std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std:
             if (!rule){
                 throw std::runtime_error("Error in parsing rule:" + stringRules[i]);
             }
-            for (auto triple : rule->materialize(data)){
+            std::unordered_set<Triple> outputs;
+            rule->materialize(data, outputs);
+            for (const Triple& triple : outputs){
                     if (!retPredictions){
                         break; // stats are calculated with invoking materialize
                     }

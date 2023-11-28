@@ -17,9 +17,9 @@ public:
 	int getNodeSize();
 	int getRelSize();
 	int getIdOfNodestring(std::string& node);
-	std::string getStringOfNodeId(int& id);
+	std::string getStringOfNodeId(int id);
 	int getIdOfRelationstring(std::string& relation);
-	std::string getStringOfRelId(int& id);
+	std::string getStringOfRelId(int id);
 	void rehash();
 	std::unordered_map<std::string, int>& getNodeToIdx();
 	std::unordered_map<std::string, int>& getRelationToIdx();

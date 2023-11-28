@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 
 #include "Rule.h"
 #include "Types.h"
@@ -84,7 +85,7 @@ int Rule::getTargetRel(){
    return targetRel;
 
 }
-std::set<Triple> Rule::materialize(TripleStorage& triples){
+ void Rule::materialize(TripleStorage& triples, std::unordered_set<Triple>& preds){
     throw std::runtime_error("Not implemented yet");
 }
 
@@ -250,10 +251,7 @@ std::string RuleB::computeRuleString(Index* index){
     return out;
 }
 
-std::set<Triple> RuleB::materialize(TripleStorage& triples){
-
-    std::set<Triple> predictions;
-
+void RuleB::materialize(TripleStorage& triples, std::unordered_set<Triple>& preds){
     RelNodeToNodes* relNtoN = nullptr;
      // first body atom is (v1,v2)
     if (directions[0]){
@@ -275,7 +273,7 @@ std::set<Triple> RuleB::materialize(TripleStorage& triples){
                 searchCurrGroundings(1, e, substitutions, triples, closingEntities, relations, directions);
                 for (const int& cEnt:  closingEntities){
                     Triple triple = {e, targetRel, cEnt};
-                    auto isNew = predictions.insert(triple);
+                    auto isNew = preds.insert(triple);
                     // add to count if this triple is predicted for the first time
                     if (trackInMaterialize && isNew.second){
                         predicted+=1;
@@ -286,8 +284,6 @@ std::set<Triple> RuleB::materialize(TripleStorage& triples){
                 }
             }
     }
-    return predictions;
-
 }
 
 bool RuleB::predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet){ 
@@ -466,13 +462,9 @@ std::string RuleC::computeRuleString(Index* index){
 }
 
 
-// TODO: dont return, just add predictions to a passed data structure
-// or not return a copy
 //DFS search where the starting point is the grounded body atom
 // in the rule representation here this is the last body atom if leftC=false and first body atom if leftC=true
-std::set<Triple> RuleC::materialize(TripleStorage& triples){
-
-    std::set<Triple> predictions;
+void RuleC::materialize(TripleStorage& triples, std::unordered_set<Triple>& preds){
     // if left head variable is grounded we start with with the first body atom it contains the second constant
     // if right is grounded we start with last body atom which then contains the second constant
     std::vector<int>& rels = leftC ? relations : _relations;
@@ -492,17 +484,17 @@ std::set<Triple> RuleC::materialize(TripleStorage& triples){
             std::set<int> substitutions = {constants[0], constants[1]};
             searchCurrGroundings(1, constants[1], substitutions, triples, closingEntities, rels, dirs);
             for (const int& cEnt:  closingEntities){
-                std::pair<std::set<Triple>::iterator, bool> isNew;
+                bool isNew;
                 Triple triple;
                 if (leftC){
                     triple = {constants[0], targetRel, cEnt};
-                    isNew = predictions.insert(triple);
+                    isNew = preds.insert(triple).second;
                 }else{
                     triple = {cEnt, targetRel, constants[0]};
-                    isNew = predictions.insert(triple);
+                    isNew = preds.insert(triple).second;
                 }
                 // if triple is predicted for the first time track stats
-                if (trackInMaterialize && isNew.second){
+                if (trackInMaterialize && isNew){
                     predicted += 1;
                     if (triples.contains(triple[0], triple[1], triple[2])){
                         cpredicted += 1;
@@ -510,7 +502,6 @@ std::set<Triple> RuleC::materialize(TripleStorage& triples){
 
                 }
             }
-            return predictions;
         }
     }
 }
@@ -814,7 +805,7 @@ bool RuleZ::predictTriple(int head, int tail, TripleStorage& triples, QueryResul
 }
 
 
-std::set<Triple> RuleZ::materialize(TripleStorage& triples){
+void RuleZ::materialize(TripleStorage& triples, std::unordered_set<Triple>& preds){
     std::set<Triple> predictions;
     // predict c when h(c,X)<-- given all h(--, a) in train and vice versa
     RelNodeToNodes& relNtoN = leftC ? triples.getRelTailToHeads() : triples.getRelHeadToTails();
@@ -823,18 +814,18 @@ std::set<Triple> RuleZ::materialize(TripleStorage& triples){
     if (it!=relNtoN.end()){
         NodeToNodes& NtoN = it->second;
         for (auto const& pair: NtoN){
-            std::pair<std::set<Triple>::iterator, bool> isNew;
+            bool isNew;
             Triple triple;
             // source node 
             const int& e = pair.first;
             if (leftC){
                 triple = {constant, relation, e};
-                isNew = predictions.insert(triple);
+                isNew = predictions.insert(triple).second;
             }else{
                 triple = {e, relation, constant};
-                isNew = predictions.insert(triple);
+                isNew = predictions.insert(triple).second;
             }
-            if (trackInMaterialize && isNew.second){
+            if (trackInMaterialize && isNew){
                 predicted += 1;
                 if (triples.contains(triple[0], triple[1], triple[2])){
                     cpredicted += 1;
@@ -842,7 +833,6 @@ std::set<Triple> RuleZ::materialize(TripleStorage& triples){
             }
         }
     }
-    return predictions;
 }
 
 
@@ -940,8 +930,7 @@ std::string RuleD::computeRuleString(Index* index){
 }
 
 
-std::set<Triple> RuleD::materialize(TripleStorage& triples){
-    std::set<Triple> predictions;
+void RuleD::materialize(TripleStorage& triples, std::unordered_set<Triple>& preds){
     RelNodeToNodes* relNtoN = nullptr;
      // first body atom is (v1,v2)
     if (directions[0]){
@@ -972,7 +961,7 @@ std::set<Triple> RuleD::materialize(TripleStorage& triples){
                     }else{
                         triple = {constant, targetRel, cEnt};
                     }
-                    auto isNew = predictions.insert(triple);
+                    auto isNew = preds.insert(triple);
                     // add to count if this triple is predicted for the first time
                     if (trackInMaterialize && isNew.second){
                         predicted+=1;
@@ -983,7 +972,6 @@ std::set<Triple> RuleD::materialize(TripleStorage& triples){
                 }
             }
     }
-    return predictions;
 }
 
 
@@ -1400,10 +1388,9 @@ bool RuleXXd::predictTailQuery(int head, TripleStorage& triples, QueryResults& t
     return false;
 }
 
-std::set<Triple> RuleXXd::materialize(TripleStorage& triples){
+void RuleXXd::materialize(TripleStorage& triples, std::unordered_set<Triple>& preds){
     // h(X,X) <-- b(X,A)
     // h(X,X) <-- b(A,X)
-    std::set<Triple> predictions;
     Index* index = triples.getIndex();
     for (int i=0; i<index->getNodeSize(); i++){
         int bodyRel = relations[1];
@@ -1412,7 +1399,7 @@ std::set<Triple> RuleXXd::materialize(TripleStorage& triples){
         directions[0] ? triples.getTforHR(i, bodyRel, begin, length) : triples.getHforTR(i, bodyRel, begin, length);
         if (length>0){
             Triple triple = {i, targetRel, i};
-            auto isNew = predictions.insert(triple);
+            auto isNew = preds.insert(triple);
             if (trackInMaterialize && isNew.second){
                 predicted+=1;
                 if (triples.contains(triple[0], triple[1], triple[2])){
@@ -1421,7 +1408,6 @@ std::set<Triple> RuleXXd::materialize(TripleStorage& triples){
             }
         }
     }
-    return predictions;
 }
 
 
@@ -1533,17 +1519,16 @@ void RuleXXc::setPredictTail(bool ind){
 }
 
 
-std::set<Triple> RuleXXc::materialize(TripleStorage& triples){
+void RuleXXc::materialize(TripleStorage& triples, std::unordered_set<Triple>& preds){
     // h(X,X) <-- b(X,d)
     // h(X,X) <-- b(d,X)
-    std::set<Triple> predictions;
     int bodyRel = relations[1];
     int* begin;
     int length;
     directions[0] ? triples.getHforTR(constant, bodyRel, begin, length) : triples.getTforHR(constant, bodyRel, begin, length);
     for (int i=0; i<length; i++){
         Triple triple = {begin[i], targetRel, begin[i]};
-        auto isNew = predictions.insert(triple);
+        auto isNew = preds.insert(triple);
         if (trackInMaterialize && isNew.second){
             predicted+=1;
             if (triples.contains(triple[0], triple[1], triple[2])){
@@ -1551,7 +1536,6 @@ std::set<Triple> RuleXXc::materialize(TripleStorage& triples){
             }
         }
     }
-    return predictions;
 }
 
 

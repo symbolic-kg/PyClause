@@ -33,6 +33,17 @@ struct symAtom {
 //[head, relation, tail]
 typedef std::array<int, 3> Triple; 
 
+namespace std {
+    template<> struct hash<Triple> {
+        std::size_t operator()(const Triple& triple) const {
+            std::size_t h1 = std::hash<int>{}(triple[0]);
+            std::size_t h2 = std::hash<int>{}(triple[1]);
+            std::size_t h3 = std::hash<int>{}(triple[2]);
+            return h1 ^ (h2 << 1) ^ (h3 << 2); 
+        }
+    };
+}
+
 
 
 class Rule;

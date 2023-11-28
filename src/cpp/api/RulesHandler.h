@@ -14,6 +14,7 @@
 #include "../core/Types.h"
 #include "Api.h"
 #include "DataHandler.h"
+#include "../core/Types.h"
 
 #include <string>
 #include <vector>
