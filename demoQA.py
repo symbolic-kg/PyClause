@@ -52,7 +52,9 @@ queries = [("12184337","_hypernym"), ("12184337","_verb_group")]
 ## output: list[list[tuple[string,float]]] 
 ## e.g. output[0] contains a list with the answers for the first query
 ## note that output[i] does not have same length as output[k] as different queries have different amounts of answers
-answers = qa_handler.answer_queries(queries, loader, "tail")
+qa_handler.calculate_answers(queries, loader, "tail")
+as_string = True
+answers = qa_handler.get_answers(as_string)
 print(answers)
 
 
@@ -66,7 +68,8 @@ queries = np.array([(4,5), (0,1)])
 
 # answers to first query
 
-answers = qa_handler.answer_queries(queries, loader, "tail")
+qa_handler.calculate_answers(queries, loader, "tail")
+answers = qa_handler.get_answers(not as_string)
 answer_set = np.array(answers[0], dtype=object)
 # print idx answers
 print(answer_set[:,0])

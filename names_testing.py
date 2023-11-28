@@ -54,8 +54,8 @@ loader.replace_ent_tokens(entity_names)
 
 qa_handler = c_clause.QAHandler(options)
 
-
-answers = qa_handler.answer_queries([("italy", "_has_part")], loader, "head")
+qa_handler.calculate_answers([("italy", "_has_part")], loader, "head")
+answers = qa_handler.get_answers(True)
 answers = answers[0]
 for i in range(len(answers)):
     print(answers[i][0], answers[i][1])

@@ -56,8 +56,18 @@ PYBIND11_MODULE(c_clause, m) {
 
     py::class_<QAHandler>(m, "QAHandler") 
         .def(py::init<std::map<std::string, std::string>>())
-        .def("answer_queries", py::overload_cast<std::vector<std::pair<int, int>>, std::shared_ptr<DataHandler>, std::string>(&QAHandler::answerQueries))
-        .def("answer_queries", py::overload_cast<std::vector<std::pair<std::string, std::string>>, std::shared_ptr<DataHandler>, std::string>(&QAHandler::answerQueries))
+        .def("calculate_answers", py::overload_cast<std::vector<std::pair<int, int>>, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers))
+        .def("calculate_answers", py::overload_cast<std::vector<std::pair<std::string, std::string>>, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers))
+        .def(
+            "get_answers",
+            [](QAHandler& self, bool return_strings)->py::object{
+                if (return_strings){
+                    return py::cast(self.getStrAnswers());
+                }else{
+                    return py::cast(self.getIdxAnswers());
+                }
+            }
+        )
         .def("set_options", &QAHandler::setOptions)
     ; //class end
 

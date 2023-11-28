@@ -263,7 +263,7 @@ std::shared_ptr<Index> DataHandler::getIndex(){
     return index;
 }
 
-
+// loads a file with tab separated string (token) triples
 std::unique_ptr<std::vector<Triple>> DataHandler::loadTriplesToVec(std::string path){
 
     auto triples = std::make_unique<std::vector<Triple>>();
@@ -285,6 +285,7 @@ std::unique_ptr<std::vector<Triple>> DataHandler::loadTriplesToVec(std::string p
 			throw std::runtime_error("Error while reading a file with Triples please check that every line follows tab separeated: head relation tail format. ");
 		}
 		Triple triple;
+        //TODO catch error here when unseen entity appears; for more informative error handling
         triple[0] = index->getIdOfNodestring(results[0]);
         triple[1] = index->getIdOfRelationstring(results[1]);
         triple[2] = index->getIdOfNodestring(results[2]);

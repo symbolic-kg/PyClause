@@ -9,6 +9,13 @@ num_tests = 0
 """Used in development for fast debugging of tests."""
 
 try:
+    test_qa_handler()
+    count_true +=1
+    num_tests +=1
+except Exception as e:
+    num_tests +=1
+    print(e)
+try:
     test_triple_scoring()
     count_true += 1
     num_tests +=1
@@ -38,13 +45,6 @@ try:
     num_tests +=1
 except Exception as e:
     print("Test loader failed")
-    num_tests +=1
-    print(e)
-try:
-    test_qa_handler()
-    count_true +=1
-    num_tests +=1
-except Exception as e:
     num_tests +=1
     print(e)
 try:

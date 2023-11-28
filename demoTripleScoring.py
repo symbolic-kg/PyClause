@@ -45,7 +45,7 @@ str_scores = scorer.get_scores(True)
 ## explanation is a tuple with 3 elements
 ## 0: list of target (input) triples
 ## 1: list of list of rules (at position i, a list of rules that predicted target i)
-## 2: list of list of list of groundings
+## 2: list of list of list of groundings (at position [i][j] a list of groundings that ground rule j predicting target i)
 idx_explanations = scorer.get_explanations(False)
 str_explanations = scorer.get_explanations(True)
 
