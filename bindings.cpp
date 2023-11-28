@@ -6,8 +6,10 @@
 #include "src/cpp/api/QAHandler.h"
 #include "src/cpp/api/DataHandler.h"
 #include "src/cpp/api/PredictionHandler.h"
+#include "src/cpp/core/Types.h"
 #include <string>
 #include <array>
+#include <optional>
 
 // *Example* 
 int add(int i, int j) {
@@ -88,15 +90,12 @@ PYBIND11_MODULE(c_clause, m) {
         .def(py::init<std::map<std::string, std::string>>())
         .def("load_rules", py::overload_cast<std::string>(&DataHandler::loadRules))
         .def("load_rules", py::overload_cast<std::vector<std::string>>(&DataHandler::loadRules))
-        .def("load_data", py::overload_cast<std::string>(&DataHandler::loadData))
-        .def("load_data", py::overload_cast<std::string, std::string>(&DataHandler::loadData))
-        .def("load_data", py::overload_cast<std::string, std::string, std::string>(&DataHandler::loadData))
-        .def("load_data", py::overload_cast<std::vector<std::array<int, 3>>>(&DataHandler::loadData))
-        .def("load_data", py::overload_cast<std::vector<std::array<int, 3>>, std::vector<std::array<int, 3>>>(&DataHandler::loadData))
-        .def("load_data", py::overload_cast<std::vector<std::array<int, 3>>, std::vector<std::array<int, 3>>, std::vector<std::array<int, 3>>>(&DataHandler::loadData))
-        .def("load_data", py::overload_cast<std::vector<std::array<std::string, 3>>>(&DataHandler::loadData))
-        .def("load_data", py::overload_cast<std::vector<std::array<std::string, 3>>, std::vector<std::array<std::string, 3>>>(&DataHandler::loadData))
-        .def("load_data", py::overload_cast<std::vector<std::array<std::string, 3>>, std::vector<std::array<std::string, 3>>, std::vector<std::array<std::string, 3>>>(&DataHandler::loadData))
+        .def("load_data", [](DataHandler &self, const std::string &data, const std::optional<std::string> &filter, const std::optional<std::string> &target) { return self.loadData<std::string>(data, filter, target); }, 
+            py::arg("data"), py::arg("filter") = py::none(), py::arg("target") = py::none())
+        .def("load_data", [](DataHandler &self, const StringTripleSet &data, const std::optional<StringTripleSet> &filter, const std::optional<StringTripleSet> &target) { return self.loadData<StringTripleSet>(data, filter, target); }, 
+            py::arg("data"), py::arg("filter") = py::none(), py::arg("target") = py::none())
+        .def("load_data", [](DataHandler &self, const TripleSet &data, const std::optional<TripleSet> &filter, const std::optional<TripleSet> &target) { return self.loadData<TripleSet>(data, filter, target); }, 
+            py::arg("data"), py::arg("filter") = py::none(), py::arg("target") = py::none())
         .def("entity_map", &DataHandler::getNodeToIdx)
         .def("relation_map", &DataHandler::getRelationToIdx)
         .def("replace_ent_tokens", &DataHandler::subsEntityStrings)

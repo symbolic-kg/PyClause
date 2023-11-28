@@ -32,6 +32,8 @@ struct symAtom {
 //used in internal processing
 //[head, relation, tail]
 typedef std::array<int, 3> Triple; 
+typedef std::vector<Triple> TripleSet;
+typedef std::vector<std::array<std::string, 3>> StringTripleSet;
 
 namespace std {
     template<> struct hash<Triple> {

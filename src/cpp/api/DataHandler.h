@@ -19,6 +19,7 @@
 #include <array>
 #include <vector>
 #include <string>
+#include <optional>
 
 
 
@@ -27,16 +28,8 @@ class DataHandler{
 public:
     DataHandler(std::map<std::string, std::string> options);
 
-    //exposed python functions
-    void loadData(std::string dataPath, std::string filterPath, std::string targetPath);
-    void loadData(std::string dataPath, std::string filterPath);
-    void loadData(std::string dataPath);
-    void loadData(std::vector<std::array<int, 3>> data, std::vector<std::array<int, 3>> filter, std::vector<std::array<int, 3>> target);
-    void loadData(std::vector<std::array<int, 3>> data, std::vector<std::array<int, 3>> filter);
-    void loadData(std::vector<std::array<int, 3>> data);
-    void loadData(std::vector<std::array<std::string, 3>> data, std::vector<std::array<std::string, 3>> filter, std::vector<std::array<std::string, 3>> target);
-    void loadData(std::vector<std::array<std::string, 3>> data, std::vector<std::array<std::string, 3>> filter);
-    void loadData(std::vector<std::array<std::string, 3>> data);
+    template<class T>
+    void loadData(T data, std::optional<T> filter, std::optional<T> target);
 
     void loadRules(std::string rulePath);
     void loadRules(std::vector<std::string> ruleStrings);
@@ -47,14 +40,9 @@ public:
     void subsRelationStrings(std::map<std::string, std::string>& newNames);
     std::vector<std::string> getRuleIdx();
 
-
-
-
     //TODO probably remove, too complicated
     void setOptions(std::map<std::string, std::string> options);
     void setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory);
-
-
 
     // internal
     TripleStorage& getData();
@@ -67,10 +55,6 @@ public:
     bool getLoadedRules();
     void setNodeIndex(std::vector<std::string>& idxToNode);
 	void setRelIndex(std::vector<std::string>& idxToRel);
-    
-
-
-
 
 private:
     std::shared_ptr<Index> index;
@@ -84,11 +68,35 @@ private:
     bool loadedData = false;
 
     bool verbose = true;
-
-
-
 };
 
-
+template<class T>
+void DataHandler::loadData(T data, std::optional<T> filter, std::optional<T> target){
+    if (typeid(data) == typeid(TripleSet) && index->getNodeSize()==0){
+        throw std::runtime_error(
+            "You have to set an index first with DataHandler.set_entity_index(list[string]) DataHandler._set_relation_index(list[string]) before loading idx data."
+        );
+    }
+    if (this->verbose){
+        std::cout<< "Loading triples..." << "\n"; 
+    }
+    if (this->loadedData){
+        throw std::runtime_error("Please load the data only once or use a new data handler.");
+    }
+    if (target.has_value()) {
+        this->target->read(target.value(), false);
+    }
+    if (filter.has_value()) {
+        this->filter->read(filter.value(), false);
+    }
+    this->data->read(data, true);
+    if (target.has_value()) {
+        this->target->loadCSR();
+    }
+    if (filter.has_value()) {
+        this->filter->loadCSR();
+    }
+    this->loadedData = true;
+};
 
 #endif

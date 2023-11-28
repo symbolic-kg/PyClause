@@ -27,7 +27,8 @@ def has_flag(compiler, flagname):
 # (c) Sylvain Corlay, https://github.com/pybind/python_example
 def cpp_flag(compiler):
 
-  if   has_flag(compiler,'-std=c++14'): return '-std=c++14'
+  if   has_flag(compiler,'-std=c++17'): return '-std=c++17'
+  elif   has_flag(compiler,'-std=c++14'): return '-std=c++14'
   elif has_flag(compiler,'-std=c++11'): return '-std=c++11'
   raise RuntimeError('Unsupported compiler: at least C++11 support is needed')
 
