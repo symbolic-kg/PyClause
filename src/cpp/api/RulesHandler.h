@@ -20,7 +20,6 @@
 #include <vector>
 #include <array>
 #include <map>
-#include <omp.h>
 
 
 class RulesHandler: public BackendHandler{
@@ -38,10 +37,10 @@ public:
     std::vector<std::vector<std::array<std::string, 3>>> getStrPredictions();
     std::vector<std::array<int,2>>& getStats();
 
-    void setNumThr(int num);
-
 
 private:
+    bool collectPredictions = true;
+    bool collectStats = true;
      // for every input rule a collection of triples
     std::vector<std::unordered_set<Triple>> predictions;
     // for every input rule a tuple (num_predictions, num_true_predictions)
@@ -51,16 +50,6 @@ private:
     // just string rules no stats in the strings;
     std::vector<std::string> rules; 
     std::shared_ptr<Index> index;
-
-    // uses its own ruleFact to not interfere with the data loader, in fact, rule factory should use all rules
-    std::unique_ptr<RuleFactory> ruleFactory;
-
-    // ***rules Handler options***
-
-    bool collectPredictions = true;
-    bool collectStats = true;
-    // set to -1 for all possible threads
-    int num_thr = omp_get_max_threads();
 };
 
 

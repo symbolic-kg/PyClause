@@ -12,6 +12,8 @@ public:
     //calculate query answers, queries are (sourceEntity, relation)
     void calculate_answers(std::vector<std::pair<std::string, std::string>>& queries, std::shared_ptr<DataHandler> dHandler, std::string headOrTail);
     void calculate_answers(std::vector<std::pair<int, int>>& queries, std::shared_ptr<DataHandler> dHandler, std::string headOrTail);
+
+
     std::vector<std::vector<std::pair<std::string,double>>> getStrAnswers();
     std::vector<std::vector<std::pair<int, double>>> getIdxAnswers();
 

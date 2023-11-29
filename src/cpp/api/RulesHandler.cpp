@@ -9,7 +9,6 @@ RulesHandler::RulesHandler(std::map<std::string, std::string> options): BackendH
 
 void RulesHandler::setOptions(std::map<std::string, std::string> options){
 
-
     // register options for ranker
 
      struct OptionHandler {
@@ -19,8 +18,7 @@ void RulesHandler::setOptions(std::map<std::string, std::string> options){
 
     std::vector<OptionHandler> handlers = {
         {"collect_predictions", [this](std::string val) {this->setCollectPredictions(util::stringToBool(val));}},
-        {"collect_statistics", [this](std::string val) {this->setCollectStats(util::stringToBool(val));}},
-        {"num_threads", [this](std::string val) {this->setNumThr(std::stoi(val));}}
+        {"collect_statistics", [this](std::string val) {this->setCollectStats(util::stringToBool(val));}}
     };
 
     for (auto& handler : handlers) {
@@ -44,14 +42,6 @@ void RulesHandler::setCollectStats(bool ind){
     collectStats = ind;
 }
 
-void RulesHandler::setNumThr(int num){
-    if (num==-1){
-        num_thr = omp_get_max_threads();
-    }else{
-        num_thr = num;
-    }
-}
-
 
 void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, std::shared_ptr<DataHandler> dHandler){
 
@@ -63,18 +53,6 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
     if (!dHandler->getLoadedData()){
         throw std::runtime_error("Please load data before you calculate rule predictions/stats.");
     }
-
-    if (!ruleFactory){
-        // use your own factory to not interfere with the options of the data loader
-        ruleFactory = std::make_unique<RuleFactory>(dHandler->getIndex());
-        ruleFactory->setCreateRuleB(true);
-        ruleFactory->setCreateRuleC(true);
-        ruleFactory->setCreateRuleD(true);
-        ruleFactory->setCreateRuleXXc(true);
-        ruleFactory->setCreateRuleXXd(true);
-        ruleFactory->setCreateRuleZ(true);
-    }
-    
 
     rules.resize(stringRules.size());
 
@@ -89,12 +67,13 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
 
     #pragma omp parallel num_threads(num_thr)
     {
+         RuleFactory& ruleFactory = dHandler->getRuleFactory();
         TripleStorage& data = dHandler->getData();
         std::shared_ptr<Index> index = dHandler->getIndex();
 
         #pragma omp for schedule(dynamic)
         for (int i=0; i<stringRules.size(); i++){
-            std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(stringRules[i]);
+            std::unique_ptr<Rule> rule = ruleFactory.parseAnytimeRule(stringRules[i]);
             rule->setTrackInMaterialize(collectStats);
             if (!rule){
                 throw std::runtime_error("Error in parsing rule:" + stringRules[i]);
@@ -118,13 +97,6 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
 
 
 std::vector<std::vector<std::array<int, 3>>> RulesHandler::getIdxPredictions(){
-    if (!collectPredictions){
-        throw std::runtime_error(
-            "The handler has set rules_handler.collect_predictions=False. Please set the option to true before creating the handler."
-            );
-    }
-
-
     std::vector<std::vector<std::array<int, 3>>> out(predictions.size());
     for (int i=0; i<predictions.size(); i++){
         out[i] = std::vector<std::array<int,3>>(predictions[i].begin(), predictions[i].end());
@@ -134,12 +106,6 @@ std::vector<std::vector<std::array<int, 3>>> RulesHandler::getIdxPredictions(){
 
 
 std::vector<std::vector<std::array<std::string, 3>>> RulesHandler::getStrPredictions(){
-
-     if (!collectPredictions){
-        throw std::runtime_error(
-            "The handler has set rules_handler.collect_predictions=False. Please set the option to true before creating the handler."
-            );
-    }
 
     std::vector<std::vector<std::array<std::string, 3>>> out(predictions.size());
 
@@ -155,10 +121,5 @@ std::vector<std::vector<std::array<std::string, 3>>> RulesHandler::getStrPredict
 }
 
 std::vector<std::array<int,2>>& RulesHandler::getStats(){
-     if (!collectStats){
-        throw std::runtime_error(
-            "The handler has set rules_handler.collect_statistics=False. Please set the option to true before creating the handler."
-            );
-    }
     return stats;
 }

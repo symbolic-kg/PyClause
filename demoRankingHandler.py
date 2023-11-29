@@ -1,7 +1,7 @@
 import time
-from c_clause import RankingHandler, DataHandler
+import c_clause
 from clause.util.utils import get_base_dir
-from clause.config.options import Options
+
 
 
 
@@ -11,31 +11,51 @@ from clause.config.options import Options
 # rules = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600"
 # ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/rankingFile.txt"
 
+
 train = "./data/wnrr/train.txt"
 filter = "./data/wnrr/valid.txt"
 target = "./data/wnrr/test.txt"
 
-rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
+rules = "./data/wnrr/anyburl-rules-c5-3600"
+ranking_file = "./local/rankingFile.txt"
 
-ranking_file = "./local/rankingFileNoisy.txt"
 
-options = Options()
-options.set("ranking_handler.disc_at_least", -1)
-options.set("ranking_handler.aggregation_function", "noisyor")
+options = {
+    # ranking options
+    "aggregation_function": "maxplus",
+    "num_preselect": "10000000",
+    "topk": "100",
+    "filter_w_train": "true",
+    "filter_w_target": "true",
+    "disc_at_least":"100", ## -1 for off, must not be bigger than topk
+    # rule options 
+    "rule_b_max_branching_factor": "-1",
+    "use_zero_rules": "true",
+    "rule_zero_weight":"0.01",
+    "use_u_c_rules": "true",
+    "use_b_rules": "true",
+    "use_u_d_rules": "true",
+    "rule_u_d_weight":"0.01",
+    "use_u_xxc_rules": "true",
+    "use_u_xxd_rules": "true",
+    "tie_handling": "frequency",
+    "rule_num_unseen": "5",
+    "num_threads": "-1" 
+}
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()
-loader = DataHandler(options.flatS("data_handler"))
+loader = c_clause.DataHandler(options)
 loader.load_data(train, filter, target)
 loader.load_rules(rules)
 
 
-ranker = RankingHandler(options.flatS("ranking_handler"))
-ranker.calculate_ranking(loader)
+ranker = c_clause.RankingHandler(options)
+ranker.calc_ranking(loader)
 ranker.write_ranking(ranking_file, loader)
 rankingtime = time.time()
-headRanking = ranker.get_ranking("head", False)
-tailRanking = ranker.get_ranking("tail", False)
+headRanking = ranker.get_ranking("head")
+tailRanking = ranker.get_ranking("tail")
 serializeTime = time.time()
 
 
