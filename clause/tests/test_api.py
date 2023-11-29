@@ -262,8 +262,6 @@ def test_qa_handler():
     target = join_u(base_dir, join_u("data", "wnrr", "test.txt"))
     rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
 
-    options = Options()
-
     options.set("qa_handler.filter_w_train", False)
     loader = c_clause.DataHandler(options.flatS("data_handler"))
     loader.load_data(train, filter)
@@ -702,15 +700,6 @@ def test_explanation_tracking():
 
     target = join_u(base_dir, join_u("data", "wnrr", "test.txt"))
     rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
-
-    options = Options()
-    
-    options.set("prediction_handler.collect_explanations", True)
-
-
-    options.set("data_handler.use_u_xxd_rules", False)
-    options.set("data_handler.use_u_xxc_rules", False)
-    options.set("data_handler.use_zero_rules", False)
 
     num_top_rules = 10
 
