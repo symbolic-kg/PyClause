@@ -44,6 +44,16 @@ namespace std {
             return h1 ^ (h2 << 1) ^ (h3 << 2); 
         }
     };
+    template<> struct hash<array<string, 3>> {
+        size_t operator()(const array<string, 3>& arr) const {
+            size_t combined_hash = 0;
+            hash<string> string_hasher;
+            for (const auto& element : arr) {
+                combined_hash ^= string_hasher(element) + 0x9e3779b9 + (combined_hash << 6) + (combined_hash >> 2);
+            }
+            return combined_hash;
+        }
+    };
 }
 
 

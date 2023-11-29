@@ -806,7 +806,6 @@ bool RuleZ::predictTriple(int head, int tail, TripleStorage& triples, QueryResul
 
 
 void RuleZ::materialize(TripleStorage& triples, std::unordered_set<Triple>& preds){
-    std::set<Triple> predictions;
     // predict c when h(c,X)<-- given all h(--, a) in train and vice versa
     RelNodeToNodes& relNtoN = leftC ? triples.getRelTailToHeads() : triples.getRelHeadToTails();
     //TODO optimize
@@ -820,10 +819,10 @@ void RuleZ::materialize(TripleStorage& triples, std::unordered_set<Triple>& pred
             const int& e = pair.first;
             if (leftC){
                 triple = {constant, relation, e};
-                isNew = predictions.insert(triple).second;
+                isNew = preds.insert(triple).second;
             }else{
                 triple = {e, relation, constant};
-                isNew = predictions.insert(triple).second;
+                isNew = preds.insert(triple).second;
             }
             if (trackInMaterialize && isNew){
                 predicted += 1;

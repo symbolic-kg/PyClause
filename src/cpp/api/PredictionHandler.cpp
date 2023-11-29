@@ -36,8 +36,6 @@ void PredictionHandler::setOptions(std::map<std::string, std::string> options, A
             handler.setter(opt->second);
         }
     }
-
-
 }
 
 void PredictionHandler::scoreTriples(std::vector<std::array<int, 3>> triples,  std::shared_ptr<DataHandler> dHandler){

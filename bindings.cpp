@@ -58,8 +58,8 @@ PYBIND11_MODULE(c_clause, m) {
 
     py::class_<QAHandler>(m, "QAHandler") 
         .def(py::init<std::map<std::string, std::string>>())
-        .def("calculate_answers", py::overload_cast<std::vector<std::pair<int, int>>, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers))
-        .def("calculate_answers", py::overload_cast<std::vector<std::pair<std::string, std::string>>, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers))
+        .def("calculate_answers", py::overload_cast<std::vector<std::pair<int, int>>&, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers))
+        .def("calculate_answers", py::overload_cast<std::vector<std::pair<std::string, std::string>>&, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers))
         .def(
             "get_answers",
             [](QAHandler& self, bool return_strings)->py::object{
@@ -74,16 +74,27 @@ PYBIND11_MODULE(c_clause, m) {
     ; //class end
 
     py::class_<RulesHandler>(m, "RulesHandler") 
-        .def(py::init<>())
+        .def(py::init<std::map<std::string, std::string>>())
         .def(
-            "stats_and_predictions", &RulesHandler::calcRulesPredictions,
+            "calculate_predictions", &RulesHandler::calcRulesPredictions,
             R"pbdoc(
-                Given a string rule calculates all stats and predictions of rules. 
-                args: string:rulestring; bool returnPredictions: if true return predictions; bool returnStats: if true returns exact stats.
-                returns: tuple where tuple[0] are the predictions , tuple[1][0] are number of exact predictions tuple[1][1] number of true predictions.
+                Given a list of string rules calculate predictions and rule statistics (num_pred, num_true_pred). 
+                Option parameters can specify if predictions are stored or if statistics are stored. If only statistics 
+                need to be computed, turn of collect_predictions parameter for efficiency.
 
             )pbdoc" 
         )
+        .def(
+            "get_predictions",
+            [](RulesHandler& self, bool return_strings)->py::object{
+                        if (return_strings){
+                            return py::cast(self.getStrPredictions());
+                        }else{
+                            return py::cast(self.getIdxPredictions());
+                        }
+                    }
+        )        
+        .def("get_statistics", &RulesHandler::getStats)
     ; //class end
 
     py::class_<DataHandler,  std::shared_ptr<DataHandler>>(m, "DataHandler") 

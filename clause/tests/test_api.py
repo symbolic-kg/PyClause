@@ -6,6 +6,59 @@ from os import path
 from subprocess import Popen, PIPE
 
 
+def test_rules_handler():
+
+    base_dir = get_base_dir()
+
+    data = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
+
+
+    options = {
+    "collect_statistics": "true",
+    "collect_predictions": "true"
+    }
+
+    loader = c_clause.DataHandler(options)
+    loader.load_data(data)
+
+    entities = loader.entity_map()
+    relations = loader.relation_map()
+
+    rules_list = [
+        "_derivationally_related_form(05755883,Y) <= ",
+        "_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)",
+        "_member_meronym(12998349,Y) <= _hypernym(Y,11590783)",
+        "_derivationally_related_form(X,01264336) <= _derivationally_related_form(A,X)",
+        "_has_part(X,Y) <= _has_part(X,A), _member_of_domain_region(A,B), _member_of_domain_region(Y,B)", 
+    ]
+
+    handler = c_clause.RulesHandler(options)
+    handler.calculate_predictions(rules_list, loader)
+
+    str_preds = handler.get_predictions(True)
+    idx_preds = handler.get_predictions(False)
+
+    stats = handler.get_statistics()
+
+    assert(len(str_preds[0])==len(idx_preds[0])==16109==stats[0][0])
+    assert(len(str_preds[1])==len(idx_preds[1])==97==stats[1][0])
+    assert(len(str_preds[2])==len(idx_preds[2])==59==stats[2][0])
+    assert(len(str_preds[3])==len(idx_preds[3])==16106==stats[3][0])
+    assert(len(str_preds[4])==len(idx_preds[4])==83==stats[4][0])
+
+
+    ## Pick one rule and check that the idx map back to the correct tokens
+
+    for i in range(len(idx_preds[4])):
+        str_head = str_preds[4][i][0]
+        str_rel = str_preds[4][i][1]
+        str_tail = str_preds[4][i][2]
+        assert(entities[str_head] == idx_preds[4][i][0])
+        assert(relations[str_rel] == idx_preds[4][i][1])
+        assert(entities[str_tail] == idx_preds[4][i][2])
+    print("Testing RulesHandler successful")
+
+
 def test_rule_loading():
     from clause.ruleparser import RuleReader, RuleSet
     from clause.data.triples import TripleSet

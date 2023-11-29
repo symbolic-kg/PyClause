@@ -40,50 +40,14 @@ options = {
     "use_u_xxd_rules": "true",
     "tie_handling": "frequency",
     "rule_num_unseen": "5",
-    "num_threads": "-1"
-    
+    "num_threads": "-1" 
 }
-
-
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()
 loader = c_clause.DataHandler(options)
 loader.load_data(train, filter, target)
 loader.load_rules(rules)
-
-
-
-
-
-
-
-
-### Calculate exact rule statistics through materialization
-
-print("Get predictions")
-rules_list = [
-    "_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)",
-    "_hypernym(X,06355894) <= "
-]
-rules_list = rules_list
-## stats_and_predictions: input: list, bool, bool
-## list: list of string rule
-## first boolean parameter: if predictions will be returned
-## second boolean: if stats will be returned
-## returns: tuple with tuple[0] being the string predictions, and tuple[1] being the stats
-handler = c_clause.RulesHandler()
-preds = handler.stats_and_predictions(rules_list, loader,  True, True)
-
-
-
-
-
-
-
-
-
-
 
 
 ranker = c_clause.RankingHandler(options)
@@ -93,10 +57,6 @@ rankingtime = time.time()
 headRanking = ranker.get_ranking("head")
 tailRanking = ranker.get_ranking("tail")
 serializeTime = time.time()
-
-
-
-
 
 
 print(f"all time: {serializeTime-start}")

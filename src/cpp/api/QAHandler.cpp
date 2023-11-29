@@ -14,7 +14,7 @@ void QAHandler::setOptions(std::map<std::string, std::string> options){
 
 
 //calculate query answers, queries are (sourceEntity, relation)
-void QAHandler::calculate_answers(std::vector<std::pair<std::string, std::string>> queries, std::shared_ptr<DataHandler> dHandler, std::string headOrTail){
+void QAHandler::calculate_answers(std::vector<std::pair<std::string, std::string>>& queries, std::shared_ptr<DataHandler> dHandler, std::string headOrTail){
     std::vector<std::pair<int, int>> intQueries(queries.size());
 
     // like this we need later only optimize the idx version of calculate_answers
@@ -26,7 +26,7 @@ void QAHandler::calculate_answers(std::vector<std::pair<std::string, std::string
 }
 
 
-void QAHandler::calculate_answers(std::vector<std::pair<int, int>> queries, std::shared_ptr<DataHandler> dHandler, std::string headOrTail){
+void QAHandler::calculate_answers(std::vector<std::pair<int, int>>& queries, std::shared_ptr<DataHandler> dHandler, std::string headOrTail){
     if (!dHandler->getLoadedData()){
         throw std::runtime_error("You must load data before you can answer questions.");
     }
