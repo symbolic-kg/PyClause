@@ -228,13 +228,13 @@ def test_qa_handler():
     import c_clause
     import numpy as np
 
+    base_dir = get_base_dir()
 
-    train = "./data/wnrr/train.txt"
-    filter = "./data/wnrr/valid.txt"
-    target = "./data/wnrr/test.txt"
+    train = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
+    filter = join_u(base_dir, join_u("data", "wnrr", "valid.txt"))
 
-    rules = "./data/wnrr/anyburl-rules-c5-3600"
-
+    target = join_u(base_dir, join_u("data", "wnrr", "test.txt"))
+    rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
 
     options = {
         # ranking options
@@ -492,11 +492,12 @@ def test_triple_scoring():
     import c_clause
     import numpy as np
 
+    base_dir = get_base_dir()
+    train = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
+    filter = join_u(base_dir, join_u("data", "wnrr", "valid.txt"))
+    rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
+    target = join_u(base_dir, join_u("data", "wnrr-sample", "test-wnrr-small.txt"))
 
-    train = "./data/wnrr/train.txt"
-    filter = "./data/wnrr/valid.txt"
-    target = "./local/test-data/test-wnrr-small.txt"
-    rules = "./data/wnrr/anyburl-rules-c5-3600"
 
     options = {
         # scoring/ranking options
@@ -587,10 +588,14 @@ def test_triple_scoring():
 
 def test_explanation_tracking():
     """Testing if explanations are consistent. This also tests the rule_index."""
-    train = "./data/wnrr/train.txt"
-    filter = "./data/wnrr/valid.txt"
-    target = "./data/wnrr/test.txt"
-    rules = "./data/wnrr/anyburl-rules-c5-3600"
+
+
+    base_dir = get_base_dir()
+    train = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
+    filter = join_u(base_dir, join_u("data", "wnrr", "valid.txt"))
+
+    target = join_u(base_dir, join_u("data", "wnrr", "test.txt"))
+    rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
 
     num_top_rules = 10
     options = {
