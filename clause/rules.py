@@ -386,24 +386,6 @@ class RuleB(Rule):
                 self.hashcode += self.rels[i] if self.dirs[i] else -self.rels[i]
         return self.hashcode    
 
-    def score(self, triples, lock, prediction_data, data_index, c_clause_handler):
-        scores = c_clause_handler.calcStats(self.get_rep(triples.index.id2to))
-        self.cpred = int(scores[1])
-        self.pred = int(scores[0])
-        if self.pred == 0: return data_index, False
-        # confidence threshold
-        if (self.cpred / self.pred) < options.rules['b']['confidence']: return data_index, False
-        # support threshold
-        if self.cpred < options.rules['b']['support']: return data_index, False
-        # the rule is accepted, its predictions will now be stored
-        prediction_data[data_index] = -self.id
-        prediction_data[data_index + 1] = self.pred
-        prediction_data[data_index + 2] = self.cpred
-        data_index = self.maybe_transfer_prediction_data(prediction_data, data_index, lock)
-        return data_index, True
-
-
-
 
     def normalize_anchor_list(self, anchors, expected_length):
         anchors_normalized = []
