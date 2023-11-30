@@ -149,7 +149,7 @@ def test_uc_b_zero_ranking():
 
 
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options)
     ranker.calculate_ranking(loader)
     ranker.write_ranking(ranking_path, loader)
 
@@ -220,7 +220,7 @@ def test_237_all_ranking():
     loader.load_rules(rules_path)
 
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options)
     ranker.calculate_ranking(loader)
     ranker.write_ranking(ranking_path, loader)
 
@@ -388,7 +388,7 @@ def test_triple_scoring_B_237():
     str_scores = scorer.get_scores(True)
 
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options)
     ranker.calculate_ranking(loader)
 
     tails = ranker.get_ranking("tail", False)
@@ -517,14 +517,14 @@ def test_triple_scoring():
     loader.load_rules(rules)
 
 
-    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer = c_clause.PredictionHandler(options)
     scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
 
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options)
     ranker.calculate_ranking(loader)
 
     tails = ranker.get_ranking("tail", False)
@@ -550,8 +550,8 @@ def test_triple_scoring():
 
 
     # now without the track grounding option
-    options.set("prediction_handler.collect_explanations", False)
-    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    options["collect_explanations"] = "false"
+    scorer = c_clause.PredictionHandler(options)
     scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
@@ -711,7 +711,7 @@ def test_explanation_tracking():
     loader.load_rules(rules)
 
 
-    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer = c_clause.PredictionHandler(options)
     scorer.calculate_scores("./data/wnrr/test.txt", loader)
 
     idx_scores = scorer.get_scores(False)

@@ -31,6 +31,6 @@ if __name__ == "__main__":
     loader.load_data(path_train, path_valid, path_test)
     loader.load_rules(path_rules_input)
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options.flatS('core'))
     ranker.calculate_ranking(loader)
     ranker.write_ranking(path_preds_output, loader)

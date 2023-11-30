@@ -52,6 +52,7 @@ PYBIND11_MODULE(c_clause, m) {
     py::class_<RankingHandler>(m, "RankingHandler") 
         .def(py::init<std::map<std::string, std::string>>())
         .def("calculate_ranking", &RankingHandler::calculateRanking)
+        .def("get_ranking", &RankingHandler::getRanking)
         .def("write_ranking", &RankingHandler::writeRanking)
          .def(
             "get_ranking",

@@ -52,7 +52,7 @@ loader.load_rules(rules)
 
 
 ranker = c_clause.RankingHandler(options)
-ranker.calc_ranking(loader)
+ranker.calculate_ranking(loader)
 ranker.write_ranking(ranking_file, loader)
 rankingtime = time.time()
 headRanking = ranker.get_ranking("head")
