@@ -170,7 +170,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                     ctr += 1;
                     (rule->*predictHeadOrTail)(source, train, qResults, filter);
                     currSize = qResults.size();
-                    if (currSize>=rank_numPreselect){
+                    if (rank_numPreselect>0 && currSize>=rank_numPreselect){
                         break;
                     }
                     // TODO possibly optimize

@@ -1,28 +1,89 @@
-# ******************************************************
-# *** DEFAULT CONFIGURATION: DO NOT CHANGE THIS FILE ***
-# ******************************************************
+# ************************************************************************
+# *********** DEFAULT CONFIGURATION: DO NOT CHANGE THIS FILE *************
+# ************************************************************************
+ 
 
-io:
-  rule_format: "PyClause" # possible values are 
-core:
-  aggregation_function: "maxplus"
-  num_preselect: 10000000
-  topk: 100
-  filter_w_train: True
-  filter_w_target: True
-  disc_at_least: 10, # -1 for off, must not be bigger than topk
-  rule_b_max_branching_factor": -1,
+## BACKEND c_clause handler options ######################################
+
+# Example:
+# import c_clause
+# from clause.config.options import Options
+# opts = Options()
+# loader = c_clause.DataHandler(opts.flatS("data_handler"))
+# qa = c_clause.QAHandler(opts.flatS("qa_handler"))
+
+
+# loads rulesets and datasets
+data_handler:
   use_zero_rules: True
   rule_zero_weight: 0.01
   use_u_c_rules: True
   use_b_rules: True
+  rule_b_max_branching_factor": -1 #-1 for off
   use_u_d_rules: True
   rule_u_d_weight: 0.01
   use_u_xxc_rules: True
   use_u_xxd_rules: True
+  ## laplace smoothing applied to all rules
+  ## conf = num_correct_predictions / (num_unseen+num_predictions)
+  rule_num_unseen: 5
+
+# calculates rankings based on the target set loaded into DataLoader
+ranking_handler:
+  aggregation_function: "maxplus"
+  num_preselect: -1 #-1 for off
+  topk: 100
+  filter_w_train: True
+  filter_w_target: True
+  disc_at_least: 10 # -1 for off, must not be bigger than topk
+  # choose between "random" / "frequency"
   tie_handling: "frequency"
+  # -1 for using ALL available threads
+  num_threads: -1 
+
+# calculates answer candidates and scores based on 
+# questions (h, r, ?) and (?, r, t)
+qa_handler:
+  aggregation_function: "maxplus"
+  num_preselect: -1 #-1 for off
+  topk: 100
+  filter_w_train: True
+  disc_at_least: 10 # -1 for off, must not be bigger than topk
+  # choose between "random" / "frequency"
+  tie_handling: "frequency"
+  # -1 for using ALL available threads
+  num_threads: -1 
+
+# given input rules, calculates materialization (predictions)
+# and stats (num_pred, num_true_preds)
+rules_handler:
+  # whether to store triple predictions 
+  # and stats (num_pred, num_true)
+  # to obtained with handler.get_predictions(bool) , handler.get_statistics()
+  collect_predictions: True
+  collect_statistics: True
+
+# given input triples, calculates scores and can output all
+# predicting rules + groundings (explanations)
+prediction_handler:
+  collect_explanations: False
+  aggregation_function: "maxplus"
+  # for a given triple stop rule application if it was predicted by the
+  # num_top_rules with the highest confidences
+  num_top_rules: 5 
+  num_threads: -1 #-1 for ALL available threads
+
+
+
+
+## FRONTEND clause options ################################################
+
+io:
+  rule_format: "PyClause"
 learning:
-  mode: "amie"  # chose betweeen "anyburl" / "hybrid" (mixing anyburl any nanytorm) / "nanytorm" / "amie"
+  # chose betweeen:
+  # "anyburl" / "hybrid" (mixing anyburl any nanytorm) / "nanytorm" / "amie"
+  mode: "amie"  
   anyburl:
     time: 60
     raw:
@@ -36,7 +97,8 @@ learning:
       minhc: 0.0001
       minpca: 0.0001
   torm:
-    tautology: False # if set to false, rules that do not make any wrong prediction are surpressed
+    # if set to false, rules that do not make any wrong prediction are surpressed
+    tautology: False 
     b:
       active: True
       confidence: 0.0001
