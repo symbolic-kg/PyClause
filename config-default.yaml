@@ -25,7 +25,7 @@ data_handler:
   use_u_xxc_rules: True
   use_u_xxd_rules: True
   ## laplace smoothing applied to all rules
-  ## conf = num_correct_predictions / (num_unseen+num_predictions)
+  ## confidence = num_correct_predictions / (num_unseen+num_predictions)
   rule_num_unseen: 5
 
 # calculates rankings based on the target set loaded into DataLoader
@@ -59,7 +59,7 @@ qa_handler:
 rules_handler:
   # whether to store triple predictions 
   # and stats (num_pred, num_true)
-  # to obtained with handler.get_predictions(bool) , handler.get_statistics()
+  # to obtained with handler.get_predictions(bool), handler.get_statistics()
   collect_predictions: True
   collect_statistics: True
 
@@ -76,7 +76,7 @@ prediction_handler:
 
 
 
-## FRONTEND clause options ################################################
+## FRONTEND clause options ###############################################
 
 io:
   rule_format: "PyClause"
