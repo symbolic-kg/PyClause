@@ -5,18 +5,19 @@ from clause.util.utils import get_base_dir
 
 
 
-# train = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt"
-# filter = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt"
-# target = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt"
-# rules = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600"
-# ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/rankingFile.txt"
+
 
 
 train = "./data/wnrr/train.txt"
 filter = "./data/wnrr/valid.txt"
 target = "./data/wnrr/test.txt"
 
-rules = "./data/wnrr/anyburl-rules-c5-3600"
+train = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt"
+filter = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt"
+target = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt"
+rules = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600"
+ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/rankingFile.txt"
+
 ranking_file = "./local/rankingFile.txt"
 
 
@@ -27,7 +28,7 @@ options = {
     "topk": "100",
     "filter_w_train": "true",
     "filter_w_target": "true",
-    "disc_at_least":"100", ## -1 for off, must not be bigger than topk
+    "disc_at_least":"10", ## -1 for off, must not be bigger than topk
     # rule options 
     "rule_b_max_branching_factor": "-1",
     "use_zero_rules": "true",

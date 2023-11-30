@@ -9,6 +9,7 @@ RulesHandler::RulesHandler(std::map<std::string, std::string> options): BackendH
 
 void RulesHandler::setOptions(std::map<std::string, std::string> options){
 
+
     // register options for ranker
 
      struct OptionHandler {
@@ -54,6 +55,18 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
         throw std::runtime_error("Please load data before you calculate rule predictions/stats.");
     }
 
+    if (!ruleFactory){
+        // use your own factory to not interfere with the options of the data loader
+        ruleFactory = std::make_unique<RuleFactory>(dHandler->getIndex());
+        ruleFactory->setCreateRuleB(true);
+        ruleFactory->setCreateRuleC(true);
+        ruleFactory->setCreateRuleD(true);
+        ruleFactory->setCreateRuleXXc(true);
+        ruleFactory->setCreateRuleXXd(true);
+        ruleFactory->setCreateRuleZ(true);
+    }
+    
+
     rules.resize(stringRules.size());
 
 
@@ -67,13 +80,12 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
 
     #pragma omp parallel num_threads(num_thr)
     {
-         RuleFactory& ruleFactory = dHandler->getRuleFactory();
         TripleStorage& data = dHandler->getData();
         std::shared_ptr<Index> index = dHandler->getIndex();
 
         #pragma omp for schedule(dynamic)
         for (int i=0; i<stringRules.size(); i++){
-            std::unique_ptr<Rule> rule = ruleFactory.parseAnytimeRule(stringRules[i]);
+            std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(stringRules[i]);
             rule->setTrackInMaterialize(collectStats);
             if (!rule){
                 throw std::runtime_error("Error in parsing rule:" + stringRules[i]);
