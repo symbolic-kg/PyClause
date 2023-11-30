@@ -23,8 +23,10 @@ class Miner():
         self.c_clause_loader = None
 
     def set_c_clause_handler(self):
-        self.c_clause_loader = c_clause.DataHandler(self.options.flatS('core'))
+        # we don't need any particular option for the loader 
+        self.c_clause_loader = c_clause.DataHandler({})
         self.c_clause_loader.load_data(self.triples.path)
+        # we just want to calculate stats, don't cache predictions
         self.c_clause_handler = c_clause.RulesHandler({"collect_explanations": "false"})
 
     def mine_z_rules(self):
