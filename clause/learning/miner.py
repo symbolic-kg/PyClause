@@ -7,6 +7,7 @@ from clause.learning import anyburl_wrapper, amie_wrapper
 
 import c_clause
 
+import os
 import time
 import math
 
@@ -377,8 +378,9 @@ class Miner():
             print(">>> elapsed time for materialization of " + str(self.rules.size()) + " b-rules: " + str(math.floor(end-start)) + "s") 
 
         # anyburl case
-        if self.options.options['learning']['mode'] == "anyburl": 
-            print(">>> anyburl stored the mined rules here: " + path_rules_output)
+        if self.options.options['learning']['mode'] == "anyburl":
+            os.rename(f"{path_rules_output}-{self.options.flat('learning.anyburl')['time']}", path_rules_output) 
+            print(">>> renamed and stored the mined rules here: " + path_rules_output)
             return
                 # anyburl case
         if self.options.options['learning']['mode'] == "amie": 

@@ -17,7 +17,7 @@ if __name__ == '__main__':
     path_valid = "data/wnrr/valid.txt"
     path_test  = "data/wnrr/test.txt"
 
-    path_rules_output = "local/rules-wn18rr-torm-b1-special"
+    path_rules_output = "local/rules-wn18rr-anyburl.txt"
 
 
     # load a triple set from a file and display some meta info about it

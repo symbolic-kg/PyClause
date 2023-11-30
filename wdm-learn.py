@@ -28,7 +28,6 @@ options.set("learning.torm.xx_ud.active", False)
 options.set("learning.torm.b.active", False)
 #options.set("learning.torm.b.support", 100)
 #options.set("learning.torm.b.length", 1)
-#options.set("core.rule_b_max_branching_factor to", "10000")
 
 # u_c rule options (len=1 rules: head(X,a) <-- b(X,b))
 options.set("learning.torm.uc.support", 15)

@@ -10,27 +10,27 @@ from clause.config.options import Options
 
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
 
     path_train = "data/wnrr/train.txt"
     path_valid = "data/wnrr/valid.txt"
     path_test  = "data/wnrr/test.txt"
 
-    path_rules_input = "local/rules-wn18rr-torm-b3"
+    path_rules_input = "local/rules-wn18rr-anyburl.txt"
 
-    path_preds_output = "local/preds-wn18rr-torm-b3"
+    path_preds_output = "local/preds-wn18rr-anyburl.txt"
 
 
 
     options = Options()
     # change on specific parameter of the default setting
-    options.set("core.disc_at_least", 50)
+    options.set("ranking_handler.disc_at_least", 50)
 
-    loader = c_clause.DataHandler(options.flatS('core'))
+    loader = c_clause.DataHandler(options.flatS("data_handler"))
     loader.load_data(path_train, path_valid, path_test)
     loader.load_rules(path_rules_input)
 
-    ranker = c_clause.RankingHandler(options.flatS('core'))
+    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
     ranker.calculate_ranking(loader)
     ranker.write_ranking(path_preds_output, loader)
