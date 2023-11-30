@@ -34,7 +34,7 @@ loader.load_rules(rules)
 
 scorer = c_clause.PredictionHandler(options)
 ## you can also input np.array with idx's or list of string triples
-scorer.score_triples("./data/wnrr/test.txt", loader)
+scorer.calculate_scores("./data/wnrr/test.txt", loader)
 
 ## false --> idx's are returned (set index if you want your own)
 idx_scores = scorer.get_scores(False)

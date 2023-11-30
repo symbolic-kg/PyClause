@@ -61,7 +61,7 @@ loader.load_rules(rules)
 ranker = c_clause.RankingHandler(options)
 
 # Calculate ranking, the data is cached in the ranker (backend)
-ranker.calc_ranking(loader)
+ranker.calculate_ranking(loader)
 ranker.write_ranking(output_ranking, loader)
 rankingtime = time.time()
 

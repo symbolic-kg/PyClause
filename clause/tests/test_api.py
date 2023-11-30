@@ -158,7 +158,7 @@ def test_uc_b_zero_ranking():
 
 
     ranker = c_clause.RankingHandler(options)
-    ranker.calc_ranking(loader)
+    ranker.calculate_ranking(loader)
     ranker.write_ranking(ranking_path, loader)
 
     p = Popen(
@@ -248,7 +248,7 @@ def test_237_all_ranking():
 
 
     ranker = c_clause.RankingHandler(options)
-    ranker.calc_ranking(loader)
+    ranker.calculate_ranking(loader)
     ranker.write_ranking(ranking_path, loader)
 
 
@@ -434,14 +434,14 @@ def test_triple_scoring_B_237():
 
     scorer = c_clause.PredictionHandler(options)
     print(target)
-    scorer.score_triples(target, loader)
+    scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
 
 
     ranker = c_clause.RankingHandler(options)
-    ranker.calc_ranking(loader)
+    ranker.calculate_ranking(loader)
 
     tails = ranker.get_ranking("tail")
     heads = ranker.get_ranking("head")
@@ -461,7 +461,7 @@ def test_triple_scoring_B_237():
                 triple = [head, rel, tail_tup[0]]
                 triples.append(triple)
 
-    scorer.score_triples(triples, loader)
+    scorer.calculate_scores(triples, loader)
     idx_scores = scorer.get_scores(False)
     explanations = scorer.get_explanations(True)
 
@@ -577,14 +577,14 @@ def test_triple_scoring():
 
 
     scorer = c_clause.PredictionHandler(options)
-    scorer.score_triples(target, loader)
+    scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
 
 
     ranker = c_clause.RankingHandler(options)
-    ranker.calc_ranking(loader)
+    ranker.calculate_ranking(loader)
 
     tails = ranker.get_ranking("tail")
     heads = ranker.get_ranking("head")
@@ -611,7 +611,7 @@ def test_triple_scoring():
     # now without the track grounding option
     options["collect_explanations"] = "false"
     scorer = c_clause.PredictionHandler(options)
-    scorer.score_triples(target, loader)
+    scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
@@ -676,7 +676,7 @@ def test_explanation_tracking():
 
 
     scorer = c_clause.PredictionHandler(options)
-    scorer.score_triples("./data/wnrr/test.txt", loader)
+    scorer.calculate_scores("./data/wnrr/test.txt", loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)

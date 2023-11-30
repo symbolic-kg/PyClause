@@ -32,5 +32,5 @@ if __name__ == '__main__':
     loader.load_rules(path_rules_input)
 
     ranker = c_clause.RankingHandler(options.flatS('core'))
-    ranker.calc_ranking(loader)
+    ranker.calculate_ranking(loader)
     ranker.write_ranking(path_preds_output, loader)

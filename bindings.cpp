@@ -51,7 +51,7 @@ PYBIND11_MODULE(c_clause, m) {
     // **backend bindings**
     py::class_<RankingHandler>(m, "RankingHandler") 
         .def(py::init<std::map<std::string, std::string>>())
-        .def("calc_ranking", &RankingHandler::calculateRanking)
+        .def("calculate_ranking", &RankingHandler::calculateRanking)
         .def("get_ranking", &RankingHandler::getRanking)
         .def("write_ranking", &RankingHandler::writeRanking)
     ; //class end
@@ -119,15 +119,15 @@ PYBIND11_MODULE(c_clause, m) {
 
     py::class_<PredictionHandler>(m, "PredictionHandler") 
         .def(py::init<std::map<std::string, std::string>>())
-        .def("score_triples", py::overload_cast<std::string, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples),
+        .def("calculate_scores", py::overload_cast<std::string, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples),
                R"pbdoc(
                     Takes as input np.array/list of idx's or a list of string/token triples (tuples or lists)
                     or a path to a file containing tab separarated string/token triples. Entities and relation tokens must
                     be known, e.g., they must have be loaded in some triples in the DataLoader.
                 )pbdoc"
             ) 
-        .def("score_triples", py::overload_cast<std::vector<std::array<int,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples))
-        .def("score_triples", py::overload_cast<std::vector<std::array<std::string,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples))
+        .def("calculate_scores", py::overload_cast<std::vector<std::array<int,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples))
+        .def("calculate_scores", py::overload_cast<std::vector<std::array<std::string,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples))
         .def(
             "get_scores",
             [](PredictionHandler& self, bool return_strings)->py::object{
