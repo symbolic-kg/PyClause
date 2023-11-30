@@ -26,10 +26,17 @@ class Options():
                 self.set(param, options_extra_flat[param])
 
     def set(self, param, value):
-        """
-        Overwrites an entry in the options. They key is specified in e.g. the format 'torm.rules.b'.
-        A value can be anything (that ahs a string representation). It is not possible to add
-        a new parameter/value pair with this method.
+        """Overwrites an entry in the options.
+
+        They key is specified in e.g. the format 'torm.rules.b'.
+        A value can be anything (that has a string representation). It is not possible to add
+        a new key hierarchy with this method. But new keys + values can be added on the level of
+        the lowest key of an existing hierarchy.
+         
+        Example: existing hierarchy in config-default.yaml "learning.anyburl.raw.THRESHOLD_CONFIDENCE": 0.0001
+        You can create new key, val by conf.set("learning.anyburl.raw.NEW_KEY", someVal).
+       
+
         """
         if "." in param:
             ktoken = param.split(".")
