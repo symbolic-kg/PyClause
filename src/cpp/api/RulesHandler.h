@@ -50,6 +50,10 @@ private:
     // just string rules no stats in the strings;
     std::vector<std::string> rules; 
     std::shared_ptr<Index> index;
+
+    // ises its own ruleFact to not interfere with the data loader, in fact, rule factory should use all rules
+    std::unique_ptr<RuleFactory> ruleFactory;
+
 };
 
 

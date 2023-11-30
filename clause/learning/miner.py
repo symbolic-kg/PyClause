@@ -25,7 +25,7 @@ class Miner():
     def set_c_clause_handler(self):
         self.c_clause_loader = c_clause.DataHandler(self.options.flatS('core'))
         self.c_clause_loader.load_data(self.triples.path)
-        self.c_clause_handler = c_clause.RulesHandler()
+        self.c_clause_handler = c_clause.RulesHandler({"collect_explanations": "false"})
 
     def mine_z_rules(self):
         print(">>> mining z-rules ...")
@@ -360,17 +360,17 @@ class Miner():
                 j = 0
                 for clist in candidate_lists:
                     rlist = list(map(lambda x : str(x), clist))
-                    preds = self.c_clause_handler.stats_and_predictions(rlist, self.c_clause_loader,  False, True)
+                    self.c_clause_handler.calculate_predictions(rlist, self.c_clause_loader)
+                    stats = self.c_clause_handler.get_statistics()
                     print(">>> ... batch #" + str(j) + " of " + str(batches))
-                    for i in range(len(preds[1])):
+                    for i in range(len(stats)):
                         rule = clist[i]
-                        (pred,cpred) = preds[1][i]
+                        (pred, cpred) = stats[i]
                         if cpred >= toptions["b.support"] and cpred / pred >= toptions["b.confidence"]:
                             rule.pred = pred
                             rule.cpred = cpred
                             self.rules.add_rule(rule)
                     j += 1
-                # exit()
             end = time.time()
             print(">>> elapsed time for materialization of " + str(self.rules.size()) + " b-rules: " + str(math.floor(end-start)) + "s") 
 
