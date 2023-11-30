@@ -145,25 +145,45 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
 
     int chunk = std::min(10000, std::max(1000, (target.getSize())/50));
 
-    int ctr=0;
-    #pragma omp parallel num_threads(num_thr)
-    {
-        QueryResults qResults(rank_topk, rank_discAtLeast);
-        qResults.setAggrFunc(rank_aggrFunc);
-        ManySet filter;
-        #pragma omp for collapse(2) schedule(dynamic)
-        for (int rel=0; rel<numRel; rel++){
-            for (int source=0; source<numNodes; source++){
-                int* begin;
-                int length;
-                dirIsTail ? target.getTforHR(source, rel, begin, length) : target.getHforTR(source, rel, begin, length);
-                // query exists
-                if (length>0){
-                    ctr+=1;
-                    if (verbose && ctr%chunk==0 && dirIsTail){
-                        std::cout<<"Calculated "<< chunk <<" tail queries..."<<std::endl;
-                    }else if (verbose && ctr%chunk==0){
-                        std::cout<<"Calculated "<< chunk <<" head queries..."<<std::endl;
+        auto& relRules = rules.getRelRules(relation);
+
+        
+        // parallize rule application for each query in target
+        #pragma omp parallel num_threads(num_thr)
+        {
+            QueryResults qResults(rank_topk, rank_discAtLeast);
+            ManySet filter;
+            #pragma omp for
+            for (int i = 0; i < keys.size(); ++i) {
+                auto entityToCands = srcToCand.find(keys[i]);
+                // this gives us a query, e.g. tail direction: relation(source,?)
+                // we apply only once per query
+                // entityToCands->second is a set with all the correct answers from target
+                int source = entityToCands->first;
+                // filtering for train and additionalFilter
+                if (rank_filterWtrain){
+                    Nodes* trainFilter = nullptr;
+                    trainFilter = (!dirIsTail) ? train.getHforTR(source, relation) : train.getTforHR(source, relation);
+                    if (trainFilter){
+                        filter.addSet(trainFilter);
+                    }   
+                    
+                }
+                // always filter with additionalFilter (can be empty)
+                Nodes* naddFilter = nullptr;
+                naddFilter = (!dirIsTail) ? addFilter.getHforTR(source, relation) : addFilter.getTforHR(source, relation);
+                if (naddFilter){
+                    filter.addSet(naddFilter);
+                }
+                // perform rule application
+                int ctr = 0;
+                int currSize = 0;
+                for (Rule* rule : relRules){
+                    ctr += 1;
+                    (rule->*predictHeadOrTail)(source, train, qResults, filter);
+                    currSize = qResults.size();
+                    if (rank_numPreselect>0 && currSize>=rank_numPreselect){
+                        break;
                     }
                     auto& relRules = rules.getRelRules(rel);
                     // filtering for train and additionalFilter

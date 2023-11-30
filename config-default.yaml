@@ -6,42 +6,30 @@
 ## BACKEND c_clause handler options ######################################
 
 # Example:
-# from c_clause import DataHandler, QAHandler
+# import c_clause
 # from clause.config.options import Options
 # opts = Options()
-# loader = DataHandler(opts.flatS("data_handler"))
-# qa = QAHandler(opts.flatS("qa_handler"))
+# loader = c_clause.DataHandler(opts.flatS("data_handler"))
+# qa = c_clause.QAHandler(opts.flatS("qa_handler"))
 
 
 # loads rulesets and datasets
 data_handler:
-  # Z rules
   use_zero_rules: True
-  z_weight: 0.1
-  # U_c rules
+  rule_zero_weight: 0.01
   use_u_c_rules: True
-  # B rules
   use_b_rules: True
-  b_max_branching_factor: -1 #-1 for off
-  # U_d rules
+  rule_b_max_branching_factor": -1 #-1 for off
   use_u_d_rules: True
-  d_weight: 0.01
-  d_max_branching_factor: -1 #-1 for off
-  # Uxxc rules
+  rule_u_d_weight: 0.01
   use_u_xxc_rules: True
-  # Uxxd rules
   use_u_xxd_rules: True
   ## laplace smoothing applied to all rules
-  ## confidence = num_correct_predictions / (num_unseen+num_predictions)
+  ## conf = num_correct_predictions / (num_unseen+num_predictions)
   rule_num_unseen: 5
 
 # calculates rankings based on the target set loaded into DataLoader
 ranking_handler:
-  # whether to cache the rules that predicted the query candidates,
-  # can be retrieved with handler.get_rules(bool, string:headOrTailRanking).
-  # Turn off for efficiency.
-  collect_rules: False
-  # select from "maxplus" / "noisyor"
   aggregation_function: "maxplus"
   num_preselect: -1 #-1 for off
   topk: 100
@@ -56,10 +44,6 @@ ranking_handler:
 # calculates answer candidates and scores based on 
 # questions (h, r, ?) and (?, r, t)
 qa_handler:
-  # same as ranking_handler; can be retrieved with handler.get_rules(bool)
-  # see documentation for data strucuture
-  collect_rules: False
-  # select from "maxplus" / "noisyor"
   aggregation_function: "maxplus"
   num_preselect: -1 #-1 for off
   topk: 100
@@ -75,25 +59,24 @@ qa_handler:
 rules_handler:
   # whether to store triple predictions 
   # and stats (num_pred, num_true)
-  # to obtained with handler.get_predictions(bool), handler.get_statistics()
+  # to obtained with handler.get_predictions(bool) , handler.get_statistics()
   collect_predictions: True
   collect_statistics: True
-  num_threads: -1 #-1 for ALL available threads
 
 # given input triples, calculates scores and can output all
 # predicting rules + groundings (explanations)
 prediction_handler:
   collect_explanations: False
-  # select from "maxplus" / "noisyor"
   aggregation_function: "maxplus"
   # for a given triple stop rule application if it was predicted by the
   # num_top_rules with the highest confidences
-  # set to -1 to not apply any stopping criterion, e.g., to apply all rules
   num_top_rules: 5 
   num_threads: -1 #-1 for ALL available threads
 
 
-## FRONTEND clause options ###############################################
+
+
+## FRONTEND clause options ################################################
 
 io:
   rule_format: "PyClause"
