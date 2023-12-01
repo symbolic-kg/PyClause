@@ -6,11 +6,11 @@
 ## BACKEND c_clause handler options ######################################
 
 # Example:
-# import c_clause
+# from c_clause import DataHandler, QAHandler
 # from clause.config.options import Options
 # opts = Options()
-# loader = c_clause.DataHandler(opts.flatS("data_handler"))
-# qa = c_clause.QAHandler(opts.flatS("qa_handler"))
+# loader = DataHandler(opts.flatS("data_handler"))
+# qa = QAHandler(opts.flatS("qa_handler"))
 
 
 # loads rulesets and datasets
