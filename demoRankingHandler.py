@@ -1,5 +1,5 @@
 import time
-import c_clause
+from c_clause import RankingHandler, DataHandler
 from clause.util.utils import get_base_dir
 from clause.config.options import Options
 
@@ -24,12 +24,12 @@ options.set("ranking_handler.disc_at_least", 100)
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()
-loader = c_clause.DataHandler(options.flatS("data_handler"))
+loader = DataHandler(options.flatS("data_handler"))
 loader.load_data(train, filter, target)
 loader.load_rules(rules)
 
 
-ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+ranker = RankingHandler(options.flatS("ranking_handler"))
 ranker.calculate_ranking(loader)
 ranker.write_ranking(ranking_file, loader)
 rankingtime = time.time()
