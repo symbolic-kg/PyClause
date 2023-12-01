@@ -19,7 +19,8 @@ void RulesHandler::setOptions(std::map<std::string, std::string> options){
 
     std::vector<OptionHandler> handlers = {
         {"collect_predictions", [this](std::string val) {this->setCollectPredictions(util::stringToBool(val));}},
-        {"collect_statistics", [this](std::string val) {this->setCollectStats(util::stringToBool(val));}}
+        {"collect_statistics", [this](std::string val) {this->setCollectStats(util::stringToBool(val));}},
+        {"num_threads", [this](std::string val) {this->setNumThr(std::stoi(val));}}
     };
 
     for (auto& handler : handlers) {
@@ -41,6 +42,14 @@ void RulesHandler::setCollectPredictions(bool ind){
 
 void RulesHandler::setCollectStats(bool ind){
     collectStats = ind;
+}
+
+void RulesHandler::setNumThr(int num){
+    if (num==-1){
+        num_thr = omp_get_max_threads();
+    }else{
+        num_thr = num;
+    }
 }
 
 
