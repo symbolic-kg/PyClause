@@ -15,14 +15,21 @@
 
 # loads rulesets and datasets
 data_handler:
+  # Z rules
   use_zero_rules: True
-  rule_zero_weight: 0.01
+  z_weight: 0.01
+  # U_c rules
   use_u_c_rules: True
+  # B rules
   use_b_rules: True
-  rule_b_max_branching_factor": -1 #-1 for off
+  b_max_branching_factor": -1 #-1 for off
+  # U_d rules
   use_u_d_rules: True
-  rule_u_d_weight: 0.01
+  d_weight: 0.01
+  d_max_branching_factor: -1 #-1 for off
+  # Uxxc rules
   use_u_xxc_rules: True
+  # Uxxd rules
   use_u_xxd_rules: True
   ## laplace smoothing applied to all rules
   ## confidence = num_correct_predictions / (num_unseen+num_predictions)
@@ -73,8 +80,6 @@ prediction_handler:
   # num_top_rules with the highest confidences
   num_top_rules: 5 
   num_threads: -1 #-1 for ALL available threads
-
-
 
 
 ## FRONTEND clause options ###############################################

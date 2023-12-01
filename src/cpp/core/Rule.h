@@ -300,7 +300,7 @@ public:
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 
-	int branchingFactor=-1;
+	int branchingFactor;
 
 
 	// predict triple and optionally tracks grounding

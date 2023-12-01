@@ -149,7 +149,7 @@ def test_uc_b_zero_ranking():
 
 
 
-    ranker = c_clause.RankingHandler(options)
+    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
     ranker.calculate_ranking(loader)
     ranker.write_ranking(ranking_path, loader)
 
@@ -220,7 +220,7 @@ def test_237_all_ranking():
     loader.load_rules(rules_path)
 
 
-    ranker = c_clause.RankingHandler(options)
+    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
     ranker.calculate_ranking(loader)
     ranker.write_ranking(ranking_path, loader)
 
@@ -261,6 +261,8 @@ def test_qa_handler():
 
     target = join_u(base_dir, join_u("data", "wnrr", "test.txt"))
     rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
+
+    options = Options()
 
     options.set("qa_handler.filter_w_train", False)
     loader = c_clause.DataHandler(options.flatS("data_handler"))
@@ -368,10 +370,9 @@ def test_triple_scoring_B_237():
     options.set("data_handler.use_u_d_rules", False)
     options.set("data_handler.use_u_xxc_rules", False)
     options.set("data_handler.use_u_xxd_rules", False)
-   
-    options.set("ranking_handler.disc_at_least", -1)
-    options.set("ranking_handler.topk", 1)
-    options.set("ranking_handler.num_preselect", 1)
+
+    options.set("ranking_handler.disc_at_least", 2)
+    options.set("ranking_handler.topk", 2)
 
     options.set("prediction_handler.collect_explanations", True)
     options.set("prediction_handler.num_top_rules", 1)
@@ -388,7 +389,7 @@ def test_triple_scoring_B_237():
     str_scores = scorer.get_scores(True)
 
 
-    ranker = c_clause.RankingHandler(options)
+    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
     ranker.calculate_ranking(loader)
 
     tails = ranker.get_ranking("tail", False)
@@ -499,32 +500,31 @@ def test_triple_scoring():
 
 
     options.set("ranking_handler.topk", 40000)
-
-    # both set to -1 to not apply any stopping critertion (otherwise scores might vary a bit)
     options.set("ranking_handler.disc_at_least", -1)
-    options.set("prediction_handler.num_top_rules", -1)
 
     options.set("prediction_handler.collect_explanations", True)
-    
+    options.set("prediction_handler.num_top_rules", 1)
 
 
     options.set("data_handler.use_u_xxd_rules", False)
     options.set("data_handler.use_u_xxc_rules", False)
     options.set("data_handler.use_zero_rules", False)
 
+    options.set("prediction_handler.num_top_rules", 1)
+
     loader = c_clause.DataHandler(options.flatS("data_handler"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
 
-    scorer = c_clause.PredictionHandler(options)
+    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
     scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
 
 
-    ranker = c_clause.RankingHandler(options)
+    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
     ranker.calculate_ranking(loader)
 
     tails = ranker.get_ranking("tail", False)
@@ -550,8 +550,8 @@ def test_triple_scoring():
 
 
     # now without the track grounding option
-    options["collect_explanations"] = "false"
-    scorer = c_clause.PredictionHandler(options)
+    options.set("prediction_handler.collect_explanations", False)
+    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
     scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
@@ -701,6 +701,15 @@ def test_explanation_tracking():
     target = join_u(base_dir, join_u("data", "wnrr", "test.txt"))
     rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
 
+    options = Options()
+    
+    options.set("prediction_handler.collect_explanations", True)
+
+
+    options.set("data_handler.use_u_xxd_rules", False)
+    options.set("data_handler.use_u_xxc_rules", False)
+    options.set("data_handler.use_zero_rules", False)
+
     num_top_rules = 10
 
 
@@ -711,7 +720,7 @@ def test_explanation_tracking():
     loader.load_rules(rules)
 
 
-    scorer = c_clause.PredictionHandler(options)
+    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
     scorer.calculate_scores("./data/wnrr/test.txt", loader)
 
     idx_scores = scorer.get_scores(False)
