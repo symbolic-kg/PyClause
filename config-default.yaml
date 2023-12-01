@@ -62,6 +62,7 @@ rules_handler:
   # to obtained with handler.get_predictions(bool), handler.get_statistics()
   collect_predictions: True
   collect_statistics: True
+  num_threads: -1 #-1 for ALL available threads
 
 # given input triples, calculates scores and can output all
 # predicting rules + groundings (explanations)
