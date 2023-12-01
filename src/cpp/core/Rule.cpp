@@ -204,9 +204,6 @@ void Rule::searchCurrTargetGroundings(
 
 // ***RuleB implementation*** 
 
-int RuleB::branchingFaktor=-1;
-int RuleB::discriminationBound=-1;
-
 RuleB::RuleB(std::vector<int>& relations, std::vector<bool>& directions) {
     if(relations.size() != (directions.size() + 1)) {
         throw std::invalid_argument("'Directions' size should be one less than 'relations' size in construction of RuleB");
@@ -339,7 +336,7 @@ void RuleB::searchCurrGroundings(
             }
         }
     }else{
-        if (RuleB::branchingFaktor>0 && length>RuleB::branchingFaktor){
+        if (branchingFactor>0 && length>branchingFactor){
             return;
         }
         for (int i=0; i<length; i++){
@@ -742,14 +739,13 @@ void RuleC::searchCurrGroundings(
 
 // ***RuleZ implementation*** 
 
-double RuleZ::zConfWeight = 1.0;
+
 
 RuleZ::RuleZ(int& relation, bool& leftC, int& constant) {
     this->relation=relation;
     this->targetRel=relation;
     this->leftC = leftC;
     this->constant = constant;
-    confWeight = RuleZ::zConfWeight;
 }
 
 std::string RuleZ::computeRuleString(Index* index){
@@ -844,9 +840,6 @@ void RuleZ::materialize(TripleStorage& triples, std::unordered_set<Triple>& pred
 // h(d,Y) <-- b1(A,B), b2(C,D), b3(Y,C)
 // leftC=true, relations=[h, b1, b2, b3], directions=[1,0,0]
 
-double RuleD::dConfWeight = 1;
-int RuleD::branchingFactor = -1;
-
 RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, int constant) {
 
     if(relations.size() != (directions.size() + 1)) {
@@ -860,8 +853,6 @@ RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& l
     this->targetRel=relations[0];
     this->leftC = leftC;
     this->constant = constant;
-    confWeight = RuleD::dConfWeight;
-
 
     // used for rules where leftC=false
     this->_relations = relations;
@@ -995,7 +986,7 @@ void RuleD::searchCurrGroundings(
             }
         }
     }else{
-        if (RuleD::branchingFactor>0 && length>RuleD::branchingFactor){
+        if (branchingFactor>0 && length>branchingFactor){
             return;
         }
         for (int i=0; i<length; i++){

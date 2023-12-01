@@ -181,6 +181,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
         if (createRuleZ){
             std::unique_ptr<RuleZ> rulez = std::make_unique<RuleZ>(relID, sym.leftC, sym.constant);
             rulez->setNumUnseen(num_unseen);
+            rulez->setConfWeight(ZconfWeight);
             return  std::move(rulez);
         }
         else{
@@ -379,7 +380,8 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
 
     if (ruleType=="RuleB" && createRuleB){
         std::unique_ptr<RuleB> ruleb = std::make_unique<RuleB>(relations, directions);
-        ruleb ->setNumUnseen(num_unseen);
+        ruleb->setNumUnseen(num_unseen);
+        ruleb->branchingFactor = BbranchingFactor;
         return std::move(ruleb); 
     } else if (ruleType=="RuleC" && createRuleC){
         std::unique_ptr<RuleC> rulec = std::make_unique<RuleC>(relations, directions, leftC, constants);
@@ -388,6 +390,8 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
     }else if(ruleType=="RuleD" && createRuleD){
         std::unique_ptr<RuleD> ruled = std::make_unique<RuleD>(relations, directions, leftC, constants[0]);
         ruled->setNumUnseen(num_unseen);
+        ruled->setConfWeight(DconfWeight);
+        ruled->branchingFactor = DbranchingFactor;
         return std::move(ruled);
     } else {
         return nullptr;
@@ -458,5 +462,25 @@ void RuleFactory::setCreateRuleXXc(bool ind){
 void RuleFactory::setNumUnseen(int val){
     num_unseen = val;
 }
+
+
+void RuleFactory::setBbranchingFactor(int val){
+    BbranchingFactor = val;
+}
+
+
+void RuleFactory::setDconfWeight(double val){
+    DconfWeight = val;
+}
+
+void RuleFactory::setDbranchingFactor(int val){
+    DbranchingFactor = val;
+}
+
+
+void RuleFactory::setZconfWeight(double val){
+    ZconfWeight = val;
+}
+
 
 

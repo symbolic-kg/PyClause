@@ -599,8 +599,8 @@ void testTripleScoring(){
     ruleFactory->setCreateRuleD(false);
     ruleFactory->setCreateRuleXXd(false);
     ruleFactory->setCreateRuleXXc(false);
-    RuleZ::zConfWeight = 0.01;
-    RuleD::dConfWeight = 0.1;
+    ruleFactory->setDconfWeight(0.1);
+    ruleFactory->setZconfWeight(0.01);
 
     std::string trainPath = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
     std::string filterPath = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt";
@@ -907,8 +907,8 @@ void timeRanking(){
     ruleFactory->setCreateRuleD(true);
     ruleFactory->setCreateRuleXXd(true);
     ruleFactory->setCreateRuleXXc(true);
-    RuleZ::zConfWeight = 0.01;
-    RuleD::dConfWeight = 0.1;
+    ruleFactory->setZconfWeight(0.01);
+    ruleFactory->setDconfWeight(0.1);
     // std::string trainPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt";
     // std::string filterPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt";
     // std::string targetPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt";

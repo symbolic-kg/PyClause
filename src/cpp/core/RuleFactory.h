@@ -32,15 +32,29 @@ public:
     void setCreateRuleXXc(bool ind);
     void setNumUnseen(int val);
 
+    void setBbranchingFactor(int val);
+    void setDbranchingFactor(int val);
+    void setDconfWeight(double val);
+    void setZconfWeight(double val);
 private:
     std::shared_ptr<Index> index;
 
     // ***Rule options***
     bool createRuleZ = true;
+    double ZconfWeight = 1.0;
+
     bool createRuleB = true;
+    int BbranchingFactor = -1;
+
     bool createRuleC = true;
+
     bool createRuleD = true;
+    double DconfWeight = 1.0;
+    int DbranchingFactor = -1;
+
+
     bool createRuleXXd = true;
+
     bool createRuleXXc = true;
 
     // laplace smoothing for rule confidence

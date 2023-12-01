@@ -158,12 +158,8 @@ public:
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 
-	// options used for enabling running on very large datasets
-	// if the rule predicts more this amount of new entities, skip the rule (it's expensive and it does not help
-	// in discriminating predictions
-	static int discriminationBound;
-	// if a nodes in the DFS opens more then specified value branches, go to the next node
-	static int branchingFaktor;
+
+	int branchingFactor = -1;
 
 	// predict triple and optionally tracks grounding
 	// uses searchCurrTargetGroundings()
@@ -277,8 +273,6 @@ public:
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 	double getConfidence(int nUnseen, bool exact);
-	// zero rules downweighting
-	static double zConfWeight;
 	std::string computeRuleString(Index* index);
 	// predict triple (grounding tracking returns empty vector)
 	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
@@ -300,14 +294,13 @@ class RuleD: public Rule
 {
 public:
 	RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& leftC, int constant);
-	static double dConfWeight;
-	static int branchingFactor;
-
 	void materialize(TripleStorage& triples, std::unordered_set<Triple>& preds);
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 	bool predictL1HeadQuery(int tail, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
+
+	int branchingFactor;
 
 
 	// predict triple and optionally tracks grounding

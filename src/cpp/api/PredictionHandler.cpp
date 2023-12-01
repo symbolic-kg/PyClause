@@ -23,8 +23,6 @@ void PredictionHandler::setOptions(std::map<std::string, std::string> options, A
         {"collect_explanations", [&scorer](std::string val) {scorer.setScoreCollectGroundings(util::stringToBool(val));}},
         {"num_top_rules", [&scorer](std::string val) {scorer.setScoreNumTopRules(std::stoi(val));}},
         {"num_threads", [&scorer](std::string val) {scorer.setNumThr(std::stoi(val));}},
-
-
     };
 
     for (auto& handler : handlers) {
