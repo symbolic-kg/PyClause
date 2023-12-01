@@ -1,7 +1,8 @@
 # Using https://github.com/github/gitignore/blob/master/Python.gitignore
 
 .vscode/
-
+pyproject.toml
+appveor.yaml
 
 conda.recipe
 local/*
