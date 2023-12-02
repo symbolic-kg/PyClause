@@ -118,19 +118,6 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
         predictHeadOrTail = &Rule::predictHeadQuery;
     }
 
-    typedef void (ApplicationHandler::*SortAndProcessPtr)(std::vector<std::pair<int,double>>&, QueryResults&, TripleStorage&);
-    SortAndProcessPtr sortAndProcess = nullptr;
-
-    if(rank_aggrFunc=="noisyor") {
-        sortAndProcess = &ApplicationHandler::sortAndProcessNoisy;
-    } else if (rank_aggrFunc=="maxplus") {
-        sortAndProcess = &ApplicationHandler::sortAndProcessMax;
-    }else{
-        throw std::runtime_error("Dont understand the aggregation function.");
-    }
-
-
-
     if (verbose && dirIsTail){
         std::cout<<"Calculating tail queries.."<<std::endl;
     }else if (verbose){
@@ -145,45 +132,24 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
 
     int chunk = std::min(10000, std::max(1000, (target.getSize())/50));
 
-        auto& relRules = rules.getRelRules(relation);
-
-        
-        // parallize rule application for each query in target
-        #pragma omp parallel num_threads(num_thr)
-        {
-            QueryResults qResults(rank_topk, rank_discAtLeast);
-            ManySet filter;
-            #pragma omp for
-            for (int i = 0; i < keys.size(); ++i) {
-                auto entityToCands = srcToCand.find(keys[i]);
-                // this gives us a query, e.g. tail direction: relation(source,?)
-                // we apply only once per query
-                // entityToCands->second is a set with all the correct answers from target
-                int source = entityToCands->first;
-                // filtering for train and additionalFilter
-                if (rank_filterWtrain){
-                    Nodes* trainFilter = nullptr;
-                    trainFilter = (!dirIsTail) ? train.getHforTR(source, relation) : train.getTforHR(source, relation);
-                    if (trainFilter){
-                        filter.addSet(trainFilter);
-                    }   
-                    
-                }
-                // always filter with additionalFilter (can be empty)
-                Nodes* naddFilter = nullptr;
-                naddFilter = (!dirIsTail) ? addFilter.getHforTR(source, relation) : addFilter.getTforHR(source, relation);
-                if (naddFilter){
-                    filter.addSet(naddFilter);
-                }
-                // perform rule application
-                int ctr = 0;
-                int currSize = 0;
-                for (Rule* rule : relRules){
-                    ctr += 1;
-                    (rule->*predictHeadOrTail)(source, train, qResults, filter);
-                    currSize = qResults.size();
-                    if (rank_numPreselect>0 && currSize>=rank_numPreselect){
-                        break;
+    int ctr=0;
+    #pragma omp parallel num_threads(num_thr)
+    {
+        QueryResults qResults(rank_topk, rank_discAtLeast);
+        ManySet filter;
+        #pragma omp for collapse(2) schedule(dynamic)
+        for (int rel=0; rel<numRel; rel++){
+            for (int source=0; source<numNodes; source++){
+                int* begin;
+                int length;
+                dirIsTail ? target.getTforHR(source, rel, begin, length) : target.getHforTR(source, rel, begin, length);
+                // query exists
+                if (length>0){
+                    ctr+=1;
+                    if (verbose && ctr%chunk==0 && dirIsTail){
+                        std::cout<<"Calculated "<< chunk <<" tail queries..."<<std::endl;
+                    }else if (verbose && ctr%chunk==0){
+                        std::cout<<"Calculated "<< chunk <<" head queries..."<<std::endl;
                     }
                     auto& relRules = rules.getRelRules(rel);
                     // filtering for train and additionalFilter
@@ -219,10 +185,6 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                             }
                         }
                     }
-                    
-                    std::vector<std::pair<int, double>> sortedCandScores;
-                    // tie handling, final processing, sorting
-                    (this->*sortAndProcess)(sortedCandScores, qResults, train);
 
                     #pragma omp critical
                     {   
@@ -234,27 +196,18 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                                 headQcandsRules[rel][source] = qResults.getCandRules();
                             }
                         }
+                    
                         if (performAggregation){
                                 auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
-                                writeResults[rel][source] = sortedCandScores;
+                                if (rank_aggrFunc=="maxplus"){
+                                    // tail/headQcandsConfs is filled here
+                                    scoreMaxPlus(qResults.getCandRules(), writeResults[rel][source], train);
+                                }
+                                else{
+                                    throw std::runtime_error("Aggregation function is not recognized in calculate ranking.");
+                                }
                         }
                     }
-
-                    // left here for reference for the vanilla approach to calculate max-plus 
-                    // together with this->scoreMaxPlus()
-                    // #pragma omp critical
-                    // {  
-                    //     if (performAggregation){
-                    //             auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
-                    //             if (rank_aggrFunc=="maxplus"){
-                    //                 // tail/headQcandsConfs is filled here
-                    //                 scoreMaxPlus(qResults.getCandRules(), writeResults[rel][source], train);
-                    //             }
-                    //             else{
-                    //                 throw std::runtime_error("Aggregation function is not recognized in calculate ranking.");
-                    //             }
-                    //     }
-                    // }
                     
                     qResults.clear();
                     filter.clear();
@@ -262,49 +215,6 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
             }
         } 
     } //pragma
-}
-
-void ApplicationHandler::sortAndProcessNoisy(std::vector<std::pair<int,double>>& candScoresToSort, QueryResults& qResults, TripleStorage& data){
-    //TODO add here noisy-or processing and tie handling
-
-
-   std::unordered_map<int, double>& candScores = qResults.getCandScores();
-   candScoresToSort.assign(candScores.begin(), candScores.end()); 
-
-   if (rank_tie_handling=="random"){
-     std::sort(
-        candScoresToSort.begin(),
-        candScoresToSort.end(), 
-        [](const std::pair<int, double>& a, const std::pair<int, double>& b) {
-            return a.second > b.second;
-        }
-     );
-   }else if (rank_tie_handling=="frequency"){
-      std::sort(
-        candScoresToSort.begin(),
-        candScoresToSort.end(), 
-        [&data](const std::pair<int, double>& a, const std::pair<int, double>& b) {
-            if (a.second!=b.second){
-                return a.second > b.second;
-            }else if(data.getFreq(a.first) != data.getFreq(b.first)) {
-                return data.getFreq(a.first) > data.getFreq(b.first);
-            }else{
-                return a.first<b.first;
-            }
-        }
-      );
-   }else{
-    throw std::runtime_error("Tie handling type not known. Please set to 'random' or 'frequency'");
-   }
-
-for (auto& pair: candScoresToSort){
-    pair.second = 1 - std::exp(-1*pair.second);
-}
-
-}
-
-void ApplicationHandler::sortAndProcessMax(std::vector<std::pair<int,double>>& candScoresToSort, QueryResults& qResults, TripleStorage& data){
-    scoreMaxPlus(qResults.getCandRules(), candScoresToSort, data);
 }
 
 // currently not used in the ranking process
