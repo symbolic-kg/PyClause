@@ -16,7 +16,6 @@ except Exception as e:
     print("QA test failed")
     num_tests +=1
     print(e)
-exit()
 try:
     test_uc_b_zero_ranking()
     count_true +=1

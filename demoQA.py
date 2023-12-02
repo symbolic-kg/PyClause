@@ -20,6 +20,7 @@ loader.load_rules(rules)
 options.set("qa_handler.collect_rules", True)
 qa_handler = c_clause.QAHandler(options.flatS("qa_handler"))
 
+qa_handler = c_clause.QAHandler(options.flatS("qa_handler"))
 
 
 ## string inputs mode
