@@ -29,7 +29,7 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
     {
         QueryResults tripleResults(1, 1);
         RuleGroundings ruleGroundings;   
-        #pragma omp for
+        #pragma omp for schedule(dynamic)
         for (int i=0; i<triples.size(); i++){
            
             if (verbose && i%1000==0 && i>0){

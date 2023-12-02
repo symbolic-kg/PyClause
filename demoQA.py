@@ -1,5 +1,6 @@
 import c_clause
 import numpy as np
+from clause.config.options import Options
 
 
 train = "./data/wnrr/train.txt"
@@ -9,34 +10,15 @@ target = "./data/wnrr/test.txt"
 rules = "./data/wnrr/anyburl-rules-c5-3600"
 
 
-options = {
-    # ranking options
-    "aggregation_function": "maxplus",
-    "num_preselect": "10000000",
-    "topk": "100",
-    "filter_w_train": "false",
-    "filter_w_target": "true",
-    "tie_handling": "frequency",
-    "disc_at_least":"100", ## -1 for off, must not be bigger than topk
-    # rule options 
-    "rule_b_max_branching_factor": "-1",
-    "use_zero_rules": "false",
-    "rule_zero_weight":"0.01",
-    "use_u_c_rules": "true",
-    "use_b_rules": "true",
-    "use_u_d_rules": "true",
-    "rule_u_d_weight":"0.01",
-    "use_u_xxc_rules": "true",
-    "use_u_xxd_rules": "true",
-}
+options = Options()
 
-loader = c_clause.DataHandler(options)
+loader = c_clause.DataHandler(options.flatS("data_handler"))
 loader.load_data(train, filter)
 loader.load_rules(rules)
 
 
 
-qa_handler = c_clause.QAHandler(options)
+qa_handler = c_clause.QAHandler(options.flatS("qa_handler"))
 
 
 ## string inputs mode

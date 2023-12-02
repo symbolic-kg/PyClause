@@ -92,7 +92,7 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
         TripleStorage& data = dHandler->getData();
         std::shared_ptr<Index> index = dHandler->getIndex();
 
-        #pragma omp for
+        #pragma omp for schedule(dynamic)
         for (int i=0; i<stringRules.size(); i++){
             std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(stringRules[i]);
             rule->setTrackInMaterialize(collectStats);
