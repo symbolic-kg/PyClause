@@ -95,6 +95,8 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 
 	relHeadToTails[relId][headNodeId].insert(tailNodeId);
 	relTailToHeads[relId][tailNodeId].insert(headNodeId);
+
+	size += 1;
 	
 }
 
@@ -104,6 +106,7 @@ void TripleStorage::add(std::string head, std::string relation, std::string tail
 // void TripleStorage::add(int head, int relation, int tail) {
 // 	relHeadToTails[relation][head].insert(tail);
 // 	relTailToHeads[relation][tail].insert(head);
+// size+= 1;
 // }
 
 // can only add idx'es that already exist
@@ -115,6 +118,8 @@ void TripleStorage::addIdx(int head, int relation, int tail) {
 
 	relHeadToTails[relation][head].insert(tail);
 	relTailToHeads[relation][tail].insert(head);
+
+	size += 1;
 	
 }
 
@@ -187,3 +192,6 @@ int TripleStorage::getFreq(int ent){
 	return entityFrequencies[ent];
 }
 
+int TripleStorage::getSize(){
+	return size;
+}

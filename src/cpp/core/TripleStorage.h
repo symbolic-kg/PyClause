@@ -40,11 +40,14 @@ public:
 	RelationalCSR* getCSR();
 	void calcEntityFreq();
 	int getFreq(int entity);
+	int getSize();
+	
 
 protected:
 
 private:
-  
+	// num triples
+	int size=0;
 	std::shared_ptr<Index> index;
 	RelNodeToNodes relHeadToTails;
 	RelNodeToNodes relTailToHeads;

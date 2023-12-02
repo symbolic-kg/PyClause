@@ -107,111 +107,107 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
     }else{
         predictHeadOrTail = &Rule::predictHeadQuery;
     }
+
+    if (verbose && dirIsTail){
+        std::cout<<"Calculating tail queries.."<<std::endl;
+    }else if (verbose){
+        std::cout<<"Calculating head queries.."<<std::endl;
+        
+    }
+
     
-    // tail query: predict tail given head; vice versa for head query
-    RelNodeToNodes& data =  (dirIsTail) ? target.getRelHeadToTails() : target.getRelTailToHeads();
-    // relations
-    for (const auto& relQueries : data) {
-        int relation = relQueries.first;
+    int numNodes = train.getIndex()->getNodeSize();
+    int numRel = train.getIndex()->getRelSize();
+    // size is num triples not queries 
 
-        if (verbose){
-            std::cout<<"Applying rules on relation "<<relation<<" for "<<dirIsTail<<" queries (1 is tail)..."<<std::endl;
-        }
-        // source to correct target entities
-        const NodeToNodes& srcToCand = relQueries.second;
-        
-        // collect keys for parallelization
-        // trading of space overhead for runtime (note that the maximal space overhead here is O(num_entities))
-        // alternatively you could iterate over all entities in the parallel section
-        // index based which would lead to many redundant lookups
-        // or you could use std::advance(headToTailquery, i) in an indexed-based for loop
-        // but this would reiterate over the map until i in each iteration
-        // lastly: simply parallelize for relations instead of queries
-        // but note that some relations can make up 30% of the data
-        std::vector<int> keys;
-        for (const auto& item : srcToCand) {
-            keys.push_back(item.first);
-        }
+    int chunk = std::min(10000, std::max(1000, (target.getSize())/50));
 
-        auto& relRules = rules.getRelRules(relation);
-
-        
-        // parallize rule application for each query in target
-        #pragma omp parallel num_threads(num_thr)
-        {
-            QueryResults qResults(rank_topk, rank_discAtLeast);
-            ManySet filter;
-            #pragma omp for
-            for (int i = 0; i < keys.size(); ++i) {
-                auto entityToCands = srcToCand.find(keys[i]);
-                // this gives us a query, e.g. tail direction: relation(source,?)
-                // we apply only once per query
-                // entityToCands->second is a set with all the correct answers from target
-                int source = entityToCands->first;
-                // filtering for train and additionalFilter
-                if (rank_filterWtrain){
-                    Nodes* trainFilter = nullptr;
-                    trainFilter = (!dirIsTail) ? train.getHforTR(source, relation) : train.getTforHR(source, relation);
-                    if (trainFilter){
-                        filter.addSet(trainFilter);
-                    }   
-                    
-                }
-                // always filter with additionalFilter (can be empty)
-                Nodes* naddFilter = nullptr;
-                naddFilter = (!dirIsTail) ? addFilter.getHforTR(source, relation) : addFilter.getTforHR(source, relation);
-                if (naddFilter){
-                    filter.addSet(naddFilter);
-                }
-                // perform rule application
-                int ctr = 0;
-                int currSize = 0;
-                for (Rule* rule : relRules){
-                    ctr += 1;
-                    (rule->*predictHeadOrTail)(source, train, qResults, filter);
-                    currSize = qResults.size();
-                    if (rank_numPreselect>0 && currSize>=rank_numPreselect){
-                        break;
+    int ctr=0;
+    #pragma omp parallel num_threads(num_thr)
+    {
+        QueryResults qResults(rank_topk, rank_discAtLeast);
+        ManySet filter;
+        #pragma omp for collapse(2) schedule(dynamic)
+        for (int rel=0; rel<numRel; rel++){
+            for (int source=0; source<numNodes; source++){
+                int* begin;
+                int length;
+                dirIsTail ? target.getTforHR(source, rel, begin, length) : target.getHforTR(source, rel, begin, length);
+                // query exists
+                if (length>0){
+                    ctr+=1;
+                    if (verbose && ctr%chunk==0 && dirIsTail){
+                        std::cout<<"Calculated "<< chunk <<" tail queries..."<<std::endl;
+                    }else if (verbose && ctr%chunk==0){
+                        std::cout<<"Calculated "<< chunk <<" head queries..."<<std::endl;
                     }
-                    // TODO possibly optimize
-                    // checking for discrimination after every rule had no noticeable overhead
-                    if (rank_discAtLeast>0 && currSize>=rank_topk){
-                        if (qResults.checkDiscrimination()){
+                    auto& relRules = rules.getRelRules(rel);
+                    // filtering for train and additionalFilter
+                    if (rank_filterWtrain){
+                        Nodes* trainFilter = nullptr;
+                        trainFilter = (!dirIsTail) ? train.getHforTR(source, rel) : train.getTforHR(source, rel);
+                        if (trainFilter){
+                            filter.addSet(trainFilter);
+                        }   
+                        
+                    }
+                    // always filter with additionalFilter (can be empty)
+                    Nodes* naddFilter = nullptr;
+                    naddFilter = (!dirIsTail) ? addFilter.getHforTR(source, rel) : addFilter.getTforHR(source, rel);
+                    if (naddFilter){
+                        filter.addSet(naddFilter);
+                    }
+                    // perform rule application
+                    int ctr = 0;
+                    int currSize = 0;
+                    for (Rule* rule : relRules){
+                        ctr += 1;
+                        (rule->*predictHeadOrTail)(source, train, qResults, filter);
+                        currSize = qResults.size();
+                        if (rank_numPreselect>0 && currSize>=rank_numPreselect){
                             break;
                         }
+                        // TODO possibly optimize
+                        // checking for discrimination after every rule had no noticeable overhead
+                        if (rank_discAtLeast>0 && currSize>=rank_topk){
+                            if (qResults.checkDiscrimination()){
+                                break;
+                            }
+                        }
                     }
-                }
 
-                #pragma omp critical
-                {   
-                    if (saveCandidateRules){
-                        // TODO when needed could prevent copy here by using shared pointer
-                        if (dirIsTail){
-                            tailQcandsRules[relation][source] = qResults.getCandRules();
-                        }else{
-                            headQcandsRules[relation][source] = qResults.getCandRules();
+                    #pragma omp critical
+                    {   
+                        if (saveCandidateRules){
+                            // TODO when needed could prevent copy here by using shared pointer
+                            if (dirIsTail){
+                                tailQcandsRules[rel][source] = qResults.getCandRules();
+                            }else{
+                                headQcandsRules[rel][source] = qResults.getCandRules();
+                            }
+                        }
+                    
+                        if (performAggregation){
+                                auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
+                                if (rank_aggrFunc=="maxplus"){
+                                    // tail/headQcandsConfs is filled here
+                                    scoreMaxPlus(qResults.getCandRules(), writeResults[rel][source], train);
+                                }
+                                else{
+                                    throw std::runtime_error("Aggregation function is not recognized in calculate ranking.");
+                                }
                         }
                     }
-                   
-                   if (performAggregation){
-                        auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
-                        if (rank_aggrFunc=="maxplus"){
-                            // tail/headQcandsConfs is filled here
-                            scoreMaxPlus(qResults.getCandRules(), writeResults[relation][source], train);
-                        }
-                        else{
-                            throw std::runtime_error("Aggregation function is not recognized in calculate ranking.");
-                        }
-                   }
+                    
+                    qResults.clear();
+                    filter.clear();
                 }
-                
-                qResults.clear();
-                filter.clear();
             }
-        }        
-    }
+        } 
+    } //pragma
 }
 
+// currently not used in the ranking process
 void ApplicationHandler::aggregateQueryResults(std::string direction, TripleStorage& train){
     auto& queryResults = (direction=="tail") ? tailQcandsRules : headQcandsRules;
     auto& writeResults = (direction=="tail") ? tailQcandsConfs : headQcandsConfs;
@@ -230,7 +226,7 @@ void ApplicationHandler::aggregateQueryResults(std::string direction, TripleStor
     }
 }
 
-// note this does not yet filter with target as ranking is performed query based
+// note this does not yet filter with target as ranking is performed query based; filtering with target only happens when writing the ranking
 void ApplicationHandler::makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter){
     if (rank_tie_handling=="frequency"){
         if (verbose){
