@@ -118,6 +118,13 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
 
 
 std::vector<std::vector<std::array<int, 3>>> RulesHandler::getIdxPredictions(){
+    if (!collectPredictions){
+        throw std::runtime_error(
+            "The handler has set rules_handler.collect_predictions=False. Please set the option to true before creating the handler."
+            );
+    }
+
+
     std::vector<std::vector<std::array<int, 3>>> out(predictions.size());
     for (int i=0; i<predictions.size(); i++){
         out[i] = std::vector<std::array<int,3>>(predictions[i].begin(), predictions[i].end());
@@ -127,6 +134,12 @@ std::vector<std::vector<std::array<int, 3>>> RulesHandler::getIdxPredictions(){
 
 
 std::vector<std::vector<std::array<std::string, 3>>> RulesHandler::getStrPredictions(){
+
+     if (!collectPredictions){
+        throw std::runtime_error(
+            "The handler has set rules_handler.collect_predictions=False. Please set the option to true before creating the handler."
+            );
+    }
 
     std::vector<std::vector<std::array<std::string, 3>>> out(predictions.size());
 
@@ -142,5 +155,10 @@ std::vector<std::vector<std::array<std::string, 3>>> RulesHandler::getStrPredict
 }
 
 std::vector<std::array<int,2>>& RulesHandler::getStats(){
+     if (!collectStats){
+        throw std::runtime_error(
+            "The handler has set rules_handler.collect_statistics=False. Please set the option to true before creating the handler."
+            );
+    }
     return stats;
 }
