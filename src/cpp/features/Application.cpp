@@ -408,6 +408,10 @@ void ApplicationHandler::setScoreCollectGroundings(bool ind){
     score_collectGr = ind;
 }
 
+bool ApplicationHandler::getScoreCollectGroundings(){
+    return score_collectGr;
+}
+
 void ApplicationHandler::setScoreNumTopRules(int num){
     score_numTopRules = num; 
 }

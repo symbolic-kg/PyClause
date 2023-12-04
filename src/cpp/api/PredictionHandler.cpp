@@ -92,6 +92,14 @@ std::vector<std::array<std::string, 4>> PredictionHandler::getStrScores(){
 }
 
 std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::string>>,  std::vector<std::vector<std::vector<std::vector<std::array<std::string,3>>>>>> PredictionHandler::getStrExplanations(){
+    if (!scorer.getScoreCollectGroundings()){
+        throw std::runtime_error(
+            "You have set 'prediction_handler.collect_explanation=False. Please set the option to true when you want to output explanations"
+        );
+    }
+
+    
+    
     std::vector<std::array<std::string, 3>> targets;
     std::vector<std::vector<std::string>> strRules;
     std::vector<std::vector<std::vector<std::vector<std::array<std::string,3>>>>> groundings;
@@ -99,6 +107,7 @@ std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::
 
     std::vector<std::pair<Triple, RuleGroundings>>& trGroundings = scorer.getTripleGroundings();
 
+    
 
     // for each target
     for (int i=0; i<trGroundings.size(); i++){
@@ -137,6 +146,12 @@ std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::
 
 
 std::tuple<std::vector<std::array<int,3>>, std::vector<std::vector<int>>,  std::vector<std::vector<std::vector<std::vector<std::array<int,3>>>>>> PredictionHandler::getIdxExplanations(){
+    if (!scorer.getScoreCollectGroundings()){
+        throw std::runtime_error(
+            "You have set 'prediction_handler.collect_explanation=False. Please set the option to true when you want to output explanations"
+        );
+    }
+
     std::vector<std::array<int, 3>> targets;
     std::vector<std::vector<int>> rulesIdxs;
     std::vector<std::vector<std::vector<std::vector<std::array<int,3>>>>> groundings;

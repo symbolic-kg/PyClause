@@ -54,6 +54,7 @@ public:
     // scoring
     void setScoreNumTopRules(int num);
     void setScoreCollectGroundings(bool ind);
+    bool getScoreCollectGroundings();
 
     //triple scoring
     void calculateTripleScores(std::vector<Triple> triples, TripleStorage& train, RuleStorage& rules);
