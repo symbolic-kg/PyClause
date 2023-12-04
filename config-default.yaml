@@ -22,7 +22,7 @@ data_handler:
   use_u_c_rules: True
   # B rules
   use_b_rules: True
-  b_max_branching_factor": -1 #-1 for off
+  b_max_branching_factor: -1 #-1 for off
   # U_d rules
   use_u_d_rules: True
   d_weight: 0.01
