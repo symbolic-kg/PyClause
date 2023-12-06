@@ -38,6 +38,7 @@ class Options():
        
 
         """
+        param_bad = False
         if "." in param:
             ktoken = param.split(".")
             o = self.options
@@ -54,18 +55,19 @@ class Options():
                     break
             if not param_bad:
                 if ktoken[-1] in o or prev_key == "raw":
-                    # print(">>> setting param " + str(param) + " = " + str(value))
+                    print(">>> setting param " + str(param) + " = " + str(value))
                     o[ktoken[-1]] = value
                 else:
                     param_bad = True
         else:
             if param in self.options:
                 self.options[param] = value
-                # print(">>> setting param " + str(param) + " = " + str(value))
+                print(">>> setting param " + str(param) + " = " + str(value))
             else:
                 param_bad = True
         if param_bad:
-            raise Exception(f"Trying to set key parameter {str(param)} in the options but the key does not exist.")
+            print(">>>error:  trying to set parameter " + str(param) + " in the configuration, this parameter that does not exist")
+            exit()
 
     
     def flat(self, key = None):
