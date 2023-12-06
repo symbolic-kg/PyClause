@@ -13,7 +13,7 @@ from clause.config.options import Options
 
 train = "./data/wnrr/train.txt"
 filter = "./data/wnrr/valid.txt"
-target = "./data/wnrr/test.txt"
+target = "./data/wnrr-sample/test-wnrr-small.txt"
 
 rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
 
@@ -33,8 +33,8 @@ ranker = RankingHandler(options.flatS("ranking_handler"))
 ranker.calculate_ranking(loader)
 ranker.write_ranking(ranking_file, loader)
 rankingtime = time.time()
-headRanking = ranker.get_ranking("head")
-tailRanking = ranker.get_ranking("tail")
+headRanking = ranker.get_ranking("head", False)
+tailRanking = ranker.get_ranking("tail", False)
 serializeTime = time.time()
 
 

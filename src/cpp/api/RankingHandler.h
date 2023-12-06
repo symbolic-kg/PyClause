@@ -22,8 +22,11 @@ public:
     void writeRanking(std::string writePath, std::shared_ptr<DataHandler> dHandler);
     void calculateRanking(std::shared_ptr<DataHandler> dHandler);
     std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> getRanking(std::string headOrTail);
+
+    std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::pair<std::string, double>>>> getStrRanking(std::string headOrTail);
 private:
     ApplicationHandler ranker;
+    std::shared_ptr<Index> index;
 };
 
 
