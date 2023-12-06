@@ -69,6 +69,8 @@ std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>
     auto idxRanking = (headOrTail == "head") ? ranker.getHeadQcandsConfs() : ranker.getTailQcandsConfs();
     if (!(headOrTail =="head") && !(headOrTail =="tail")){
         throw std::runtime_error("Please specify 'head' or 'tail' as first argument of getRanking");
+
+
     }
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::pair<std::string, double>>>> strRanking;
     for (const auto& outer_pair : idxRanking) {
@@ -83,108 +85,4 @@ std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>
         }
     }
     return strRanking;
- }
-
-
-std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::vector<int>>>> RankingHandler::getIdxRules(std::string headOrTail) {
-    if (!collectRules){
-        throw std::runtime_error("The handler option 'collect_rules' is set to false. Recreate the handler with the option set to true.");
-    }
-
-    std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::vector<Rule*>>>>& data = 
-     (headOrTail == "head") ? ranker.getHeadQcandsRules(): ranker.getTailQcandsRules();
-
-    if (!(headOrTail =="head") && !(headOrTail =="tail")){
-        throw std::runtime_error("Please specify 'head' or 'tail' as first argument of getRanking");
-    }
-
-    std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::vector<int>>>> convertedData;
-
-    // relations
-    for (const auto &outerPair : data) {
-        int outerKey = outerPair.first;
-        const auto &middleMap = outerPair.second;
-
-        // source entities
-        for (const auto &middlePair : middleMap) {
-            int middleKey = middlePair.first;
-            const auto &innerMap = middlePair.second;
-
-            // candidates + rules
-            for (const auto &innerPair : innerMap) {
-                int innerKey = innerPair.first;
-                const std::vector<Rule*>& rules = innerPair.second;
-                std::vector<int> ruleIds;
-                ruleIds.reserve(rules.size());
-
-                for (Rule* rule : rules) {
-                    if (rule != nullptr) {
-                        ruleIds.push_back(rule->getID());
-                    }else{
-                        throw std::runtime_error("Rule object does not exist. This should not happen and is an internal error.");
-                    }
-                }
-
-                convertedData[outerKey][middleKey][innerKey] = ruleIds;
-            }
-        }
-    }
-    return convertedData;
-}
-
-
-std::unordered_map<std::string,std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::string>>>> RankingHandler::getStrRules(std::string headOrTail) {
-    if (!collectRules){
-        throw std::runtime_error("The handler option 'collect_rules' is set to false. Recreate the handler with the option set to true.");
-    }
-
-    std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::vector<Rule*>>>>& data = 
-     (headOrTail == "head") ? ranker.getHeadQcandsRules(): ranker.getTailQcandsRules();
-
-    if (!(headOrTail =="head") && !(headOrTail =="tail")){
-        throw std::runtime_error("Please specify 'head' or 'tail' as first argument of getRanking");
-    }
-
-    std::unordered_map<std::string,std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::string>>>> convertedData;
-
-    // relations
-    for (const auto &outerPair : data) {
-        int outerKey = outerPair.first;
-        std::string rel = index->getStringOfRelId(outerKey);
-        const auto &middleMap = outerPair.second;
-
-        // source entities
-        for (const auto &middlePair : middleMap) {
-            int middleKey = middlePair.first;
-            std::string source = index->getStringOfNodeId(middleKey);
-            const auto &innerMap = middlePair.second;
-
-            // candidates + rules
-            for (const auto &innerPair : innerMap) {
-                int innerKey = innerPair.first;
-                std::string cand = index->getStringOfNodeId(innerKey);
-                const std::vector<Rule*>& rules = innerPair.second;
-                std::vector<std::string> ruleIds;
-                ruleIds.reserve(rules.size());
-
-                for (Rule* rule : rules) {
-                    if (rule != nullptr) {
-                        ruleIds.push_back(rule->computeRuleString(index.get()));
-                    }else{
-                        throw std::runtime_error("Rule object does not exist. This should not happen and is an internal error.");
-                    }
-                }
-                convertedData[rel][source][cand] = ruleIds;
-            }
-        }
-    }
-    return convertedData;
-}
-
-
-
-
-
- void RankingHandler::setCollectRules(bool ind){
-    collectRules = ind;
  }

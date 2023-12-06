@@ -52,7 +52,6 @@ PYBIND11_MODULE(c_clause, m) {
     py::class_<RankingHandler>(m, "RankingHandler") 
         .def(py::init<std::map<std::string, std::string>>())
         .def("calculate_ranking", &RankingHandler::calculateRanking)
-        .def("get_ranking", &RankingHandler::getRanking)
         .def("write_ranking", &RankingHandler::writeRanking)
          .def(
             "get_ranking",
@@ -61,16 +60,6 @@ PYBIND11_MODULE(c_clause, m) {
                     return py::cast(self.getStrRanking(headOrTail));
                 }else{
                     return py::cast(self.getRanking(headOrTail));
-                }
-            }
-        )
-         .def(
-            "get_rules",
-            [](RankingHandler& self, std::string headOrTail, bool return_strings)->py::object{
-                if (return_strings){
-                    return py::cast(self.getStrRules(headOrTail));
-                }else{
-                    return py::cast(self.getIdxRules(headOrTail));
                 }
             }
         )
