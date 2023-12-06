@@ -80,8 +80,6 @@ void QAHandler::calculate_answers(std::vector<std::pair<int, int>>& queries, std
     target.loadCSR();
     if (collectRules){
         ranker.setSaveCandidateRules(true);
-        // safety measure to bound lifetime of the dHandler which holds the RulesHandler with the rules to this object;
-        this->myDHandler = dHandler;
     }
     ranker.makeRanking(target, dHandler->getData(), dHandler->getRules(), dHandler->getFilter());
 
@@ -141,7 +139,7 @@ std::vector<std::vector<std::vector<int>>> QAHandler::getIdxRules(){
         out.push_back(std::vector<std::vector<int>>());
         for (int c=0; c<queryRules[q].size(); c++){
             out[q].push_back(std::vector<int>());
-            for (Rule*& r: queryRules[q][c]){
+            for (Rule*& r: queryRules[c][q]){
                 out[q][c].push_back(r->getID());
             }
         }
@@ -157,7 +155,7 @@ std::vector<std::vector<std::vector<std::string>>> QAHandler::getStrRules(){
         out.push_back(std::vector<std::vector<std::string>>());
         for (int c=0; c<queryRules[q].size(); c++){
             out[q].push_back(std::vector<std::string>());
-            for (Rule*& r: queryRules[q][c]){
+            for (Rule*& r: queryRules[c][q]){
                 out[q][c].push_back(r->computeRuleString(index.get()));
             }
         }
