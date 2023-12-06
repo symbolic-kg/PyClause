@@ -51,6 +51,10 @@ ranking_handler:
 # calculates answer candidates and scores based on 
 # questions (h, r, ?) and (?, r, t)
 qa_handler:
+  # whether to cache the rules that predicted the query candidates,
+  # can be retrieved with handler.get_rules(bool).
+  # Turn off for efficiency.
+  collect_rules: False
   aggregation_function: "maxplus"
   num_preselect: -1 #-1 for off
   topk: 100

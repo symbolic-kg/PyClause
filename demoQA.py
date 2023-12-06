@@ -17,8 +17,9 @@ loader.load_data(train, filter)
 loader.load_rules(rules)
 
 
-
+options.set("qa_handler.collect_rules", True)
 qa_handler = c_clause.QAHandler(options.flatS("qa_handler"))
+
 
 
 ## string inputs mode
@@ -37,6 +38,7 @@ queries = [("12184337","_hypernym"), ("12184337","_verb_group")]
 qa_handler.calculate_answers(queries, loader, "tail")
 as_string = True
 answers = qa_handler.get_answers(as_string)
+rules = qa_handler.get_rules(True)
 print(answers)
 
 

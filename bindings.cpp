@@ -70,6 +70,16 @@ PYBIND11_MODULE(c_clause, m) {
                 }
             }
         )
+        .def(
+            "get_rules",
+            [](QAHandler& self, bool return_strings)->py::object{
+                if (return_strings){
+                    return py::cast(self.getStrRules());
+                }else{
+                    return py::cast(self.getIdxRules());
+                }
+            }
+        )
         .def("set_options", &QAHandler::setOptions)
     ; //class end
 

@@ -1,15 +1,39 @@
 #include "QAHandler.h"
 
+#include "functional"
+
 
 QAHandler::QAHandler(std::map<std::string, std::string> options): BackendHandler(){
-    // parent constructor is called before
     setOptions(options);
     ranker.setVerbose(false);
+    setRankingOptions(options, ranker);
 }
 
 
 void QAHandler::setOptions(std::map<std::string, std::string> options){
-    setRankingOptions(options, ranker);
+    // register options for ranker
+
+     struct OptionHandler {
+        std::string name;
+        std::function<void(std::string)> setter;
+    };
+
+    ranker;
+
+    std::vector<OptionHandler> handlers = {
+        {"collect_rules", [this](std::string val) {this->setCollectRules(util::stringToBool(val));}},
+    };
+
+    for (auto& handler : handlers) {
+        auto opt = options.find(handler.name);
+        if (opt != options.end()) {
+            if (verbose){
+                std::cout<< "Setting option "<<handler.name<<" to: "<<opt->second<<std::endl;
+            }
+            handler.setter(opt->second);
+        }
+    }
+
 }
 
 
@@ -32,7 +56,6 @@ void QAHandler::calculate_answers(std::vector<std::pair<int, int>>& queries, std
     }
     if (!dHandler->getLoadedRules()){
         throw std::runtime_error("You must load rules before you can answer questions.");
-
     }
     answers.clear();
     answers.resize(queries.size());
@@ -55,15 +78,38 @@ void QAHandler::calculate_answers(std::vector<std::pair<int, int>>& queries, std
     }
     // note that loadCSR does not break anything for the other CSRs as we only allow already existing idx's (entities and relations)
     target.loadCSR();
+    if (collectRules){
+        ranker.setSaveCandidateRules(true);
+    }
     ranker.makeRanking(target, dHandler->getData(), dHandler->getRules(), dHandler->getFilter());
 
     // CandidateConfs is  std::vector<pair<int,double>>
     std::unordered_map<int, std::unordered_map<int, CandidateConfs>>& candConfs = isTailQuery ? ranker.getTailQcandsConfs() : ranker.getHeadQcandsConfs();
 
+    std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>* rules;
+    if (collectRules){
+        rules = isTailQuery ? &ranker.getTailQcandsRules() : &ranker.getHeadQcandsRules();
+        queryRules.resize(queries.size());
+    }
+
      for (int i=0; i<queries.size(); i++){
         std::pair<int,int>& query = queries[i];
         // access as candConfs[relation][sourceEntity]
         answers.at(i) = candConfs[query.second][query.first];
+        if (collectRules){
+            NodeToPredRules candRules = (*rules)[query.second][query.first];
+            //for every candidate
+            std::vector<std::vector<Rule*>> candIdRules;
+            for (auto& cand_: answers[i]){
+                std::vector<Rule*> idRules;
+                int cand = cand_.first;
+                for (Rule* r : candRules[cand]){
+                    idRules.push_back(r);
+                }
+                candIdRules.push_back(idRules);
+            }
+            queryRules.at(i) = candIdRules;
+        }
     }
 }
 
@@ -84,6 +130,45 @@ std::vector<std::vector<std::pair<std::string,double>>> QAHandler::getStrAnswers
 std::vector<std::vector<std::pair<int, double>>> QAHandler::getIdxAnswers(){
     return answers;
 }
+
+
+std::vector<std::vector<std::vector<int>>> QAHandler::getIdxRules(){
+    std::vector<std::vector<std::vector<int>>> out;
+
+    for (int q=0; q<queryRules.size(); q++){
+        out.push_back(std::vector<std::vector<int>>());
+        for (int c=0; c<queryRules[q].size(); c++){
+            out[q].push_back(std::vector<int>());
+            for (Rule*& r: queryRules[c][q]){
+                out[q][c].push_back(r->getID());
+            }
+        }
+    }
+    return out;
+
+}
+
+std::vector<std::vector<std::vector<std::string>>> QAHandler::getStrRules(){
+    std::vector<std::vector<std::vector<std::string>>> out;
+
+    for (int q=0; q<queryRules.size(); q++){
+        out.push_back(std::vector<std::vector<std::string>>());
+        for (int c=0; c<queryRules[q].size(); c++){
+            out[q].push_back(std::vector<std::string>());
+            for (Rule*& r: queryRules[c][q]){
+                out[q][c].push_back(r->computeRuleString(index.get()));
+            }
+        }
+    }
+    return out;
+}
+
+void QAHandler::setCollectRules(bool ind){
+    collectRules = ind;
+}
+
+
+
 
 
 
