@@ -4,9 +4,8 @@ sys.path.append(os.getcwd())
 
 from clause.data.triples import TripleSet
 
-from clause.rules.rules import RuleSet
-from clause.rules.ruleparser import RuleReader
-
+from clause.rules import RuleSet
+from clause.ruleparser import RuleReader
 
 
 if __name__ == '__main__':

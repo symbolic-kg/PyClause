@@ -31,7 +31,7 @@ if __name__ == '__main__':
     options = Options()
     # options = Options("config-my.yaml")
 
-    options.set("learning.mode", "anyburl")
+    options.set("learning.mode", "hybrid")
 
     # print(str(options.flat()))
 

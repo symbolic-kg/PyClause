@@ -329,9 +329,7 @@ class Miner():
             arule_path = anyburl_wrapper.learn(
                 self.triples.path,
                 anyburl_options['time'],
-                anyburl_options['b_length'], 
-                anyburl_options['support'],
-                anyburl_options['confidence'],
+                anyburl_options,
                 False
             )
             rules_b = RuleSet(self.triples.index)

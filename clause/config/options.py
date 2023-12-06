@@ -38,13 +38,36 @@ class Options():
        
 
         """
+        param_bad = False
         if "." in param:
             ktoken = param.split(".")
             o = self.options
-            for t in ktoken[:-1]: o = o[t]
-            o[ktoken[-1]] = value
-        else: 
-            self.options(param, value)
+            prev_key = None
+            for t in ktoken[:-1]:
+                prev_key = t
+                if t in o:
+                    if type(o[t]) == dict: o = o[t]
+                    else:
+                        param_bad = True
+                        break
+                else:
+                    param_bad = True
+                    break
+            if not param_bad:
+                if ktoken[-1] in o or prev_key == "raw":
+                    print(">>> setting param " + str(param) + " = " + str(value))
+                    o[ktoken[-1]] = value
+                else:
+                    param_bad = True
+        else:
+            if param in self.options:
+                self.options[param] = value
+                print(">>> setting param " + str(param) + " = " + str(value))
+            else:
+                param_bad = True
+        if param_bad:
+            print(">>>error:  trying to set parameter " + str(param) + " in the configuration, this parameter that does not exist")
+            exit()
 
     
     def flat(self, key = None):
