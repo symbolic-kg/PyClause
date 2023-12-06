@@ -35,6 +35,8 @@ private:
     std::vector<std::vector<std::vector<Rule*>>> queryRules;
     std::shared_ptr<Index> index;
 
+    std::shared_ptr<DataHandler> myDHandler;
+
     //setable options
     bool collectRules = false;
 };
