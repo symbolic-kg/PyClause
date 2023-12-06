@@ -51,6 +51,11 @@ void PredictionHandler::scoreTriples(std::vector<std::array<std::string, 3>> tri
         throw std::runtime_error("You must first load data and load rules with the loader before scoring triples.");
     }
 
+    if (scorer.getScoreCollectGroundings()){
+        // safety measure to bind the leftime of the rules (stored in RulesHandler of Dhandler) to the lifetime of this object
+        myDHandler = dHandler;
+    }
+
     scorer.clearAll();
     std::vector<Triple> idxTriples(triples.size());
     index = dHandler->getIndex();

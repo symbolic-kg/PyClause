@@ -29,13 +29,9 @@ class Options():
         """Overwrites an entry in the options.
 
         They key is specified in e.g. the format 'torm.rules.b'.
-        A value can be anything (that has a string representation). It is not possible to add
-        a new key hierarchy with this method. But new keys + values can be added on the level of
-        the lowest key of an existing hierarchy.
-         
-        Example: existing hierarchy in config-default.yaml "learning.anyburl.raw.THRESHOLD_CONFIDENCE": 0.0001
-        You can create new key, val by conf.set("learning.anyburl.raw.NEW_KEY", someVal).
-       
+        A value can be anything (that has a string representation). It is not possible to add new keys
+        that do not exist in the default options. An exception is the parent key "raw". Under this
+        key, new key, val pairs can be set. For instance, options.set("learning.amie.raw.notexistingkey", val).
 
         """
         param_bad = False
@@ -66,8 +62,7 @@ class Options():
             else:
                 param_bad = True
         if param_bad:
-            print(">>> error:  trying to set parameter " + str(param) + " in the configuration, this parameter that does not exist")
-            exit()
+            raise Exception(f"Trying to set key parameter {str(param)} in the options but the key does not exist.")
 
     
     def flat(self, key = None):
