@@ -138,17 +138,10 @@ std::vector<std::vector<std::vector<int>>> QAHandler::getIdxRules(){
     std::vector<std::vector<std::vector<int>>> out;
 
     for (int q=0; q<queryRules.size(); q++){
-        std::cout<<"say, i tried";
         out.push_back(std::vector<std::vector<int>>());
         for (int c=0; c<queryRules[q].size(); c++){
-            std::cout<<"i tried further"<<std::endl;
             out[q].push_back(std::vector<int>());
-            std::cout<<"This finished"<<std::endl;
             for (Rule*& r: queryRules[q][c]){
-                if (r){
-                    std::cout<<"yes";
-                }
-                 std::cout<<"i even tried hard"<<std::endl;
                 out[q][c].push_back(r->getID());
             }
         }
