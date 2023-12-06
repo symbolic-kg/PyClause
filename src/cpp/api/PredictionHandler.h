@@ -26,6 +26,7 @@ private:
     ApplicationHandler scorer;
     void setOptions(std::map<std::string, std::string> options, ApplicationHandler& scorer);
     std::shared_ptr<Index> index;
+    std::shared_ptr<DataHandler> myDHandler;
 };
 
 

@@ -38,7 +38,7 @@ queries = [("12184337","_hypernym"), ("12184337","_verb_group")]
 qa_handler.calculate_answers(queries, loader, "tail")
 as_string = True
 answers = qa_handler.get_answers(as_string)
-rules = qa_handler.get_rules(True)
+arules = qa_handler.get_rules(False)
 print(answers)
 
 
