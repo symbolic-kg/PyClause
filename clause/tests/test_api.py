@@ -780,6 +780,9 @@ def test_rules_collecting():
     rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
     target = join_u(base_dir, join_u("data", "wnrr-sample", "test-wnrr-small.txt"))
 
+    rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
+
+
     ranking_file = "./local/rankingFile.txt"
 
     options = Options()
@@ -821,7 +824,7 @@ def test_rules_collecting():
     ## load the data from this, form queries from every triple and pass them to the qa handler
     ## collected rules must be the same when retrived from ranking of the ranking handler
     triples = TripleSet(target)
-    triple_strings = triples.to_list()
+    triple_strings = [str(trip).split(" ") for trip in triples.triples]
 
     ## string queries
     tail_queries = [[trip[0], trip[1]] for trip in triple_strings]
