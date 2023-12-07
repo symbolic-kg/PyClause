@@ -19,14 +19,30 @@
 class RankingHandler: public BackendHandler{
 public:
     RankingHandler(std::map<std::string, std::string> options);
+    void setCollectRules(bool ind);
+    // exposed functions
     void writeRanking(std::string writePath, std::shared_ptr<DataHandler> dHandler);
     void calculateRanking(std::shared_ptr<DataHandler> dHandler);
     std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> getRanking(std::string headOrTail);
-
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::pair<std::string, double>>>> getStrRanking(std::string headOrTail);
+    
+   
+    //[rel][source][cand] --> vector to rule indices
+    // we have relation upfront to efficiently get relation-wise query rankings
+    std::unordered_map<int,std::unordered_map<int, std::unordered_map<int, std::vector<int>>>> getIdxRules(std::string headOrTail);
+    std::unordered_map<std::string,std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::string>>>> getStrRules(std::string headOrTail);
+
 private:
+    void setOptions(std::map<std::string, std::string> options);
     ApplicationHandler ranker;
     std::shared_ptr<Index> index;
+    std::shared_ptr<DataHandler> myDhandler;
+
+    //options
+    bool collectRules = false;
+
+   
+
 };
 
 
