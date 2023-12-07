@@ -8,6 +8,7 @@
 
 RankingHandler::RankingHandler(std::map<std::string, std::string> options): BackendHandler(){
     setRankingOptions(options, ranker);
+    setOptions(options);
 }
 
 
@@ -88,7 +89,9 @@ std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>
 
 
 std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::vector<int>>>> RankingHandler::getIdxRules(std::string headOrTail) {
-
+    if (!collectRules){
+        throw std::runtime_error("The handler option 'collect_rules' is set to false. Recreate the handler with the option set to true.");
+    }
 
     std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::vector<Rule*>>>>& data = 
      (headOrTail == "head") ? ranker.getHeadQcandsRules(): ranker.getTailQcandsRules();
@@ -133,7 +136,9 @@ std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::vec
 
 
 std::unordered_map<std::string,std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::string>>>> RankingHandler::getStrRules(std::string headOrTail) {
-
+    if (!collectRules){
+        throw std::runtime_error("The handler option 'collect_rules' is set to false. Recreate the handler with the option set to true.");
+    }
 
     std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::vector<Rule*>>>>& data = 
      (headOrTail == "head") ? ranker.getHeadQcandsRules(): ranker.getTailQcandsRules();

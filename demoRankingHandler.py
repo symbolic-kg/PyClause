@@ -13,7 +13,7 @@ from clause.config.options import Options
 
 train = "./data/wnrr/train.txt"
 filter = "./data/wnrr/valid.txt"
-target = "./data/wnrr-sample/test-wnrr-small.txt"
+target = "./data/wnrr/test.txt"
 
 rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
 
