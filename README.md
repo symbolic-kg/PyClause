@@ -86,13 +86,11 @@ h(X,X) <= b1(A,X)
 
 
 
-
 # Run tests (temporary)
+run ```pytest -s```.
 
+Data: [this](https://www.dropbox.com/scl/fi/75py3esgpsn6f370ap7q5/test-data.zip?rlkey=7i136d7d7194x2tvoxqsv0e36&dl=0) 
 
-Download [this](https://www.dropbox.com/scl/fi/75py3esgpsn6f370ap7q5/test-data.zip?rlkey=7i136d7d7194x2tvoxqsv0e36&dl=0), unpack, and put the folders into data/ <br>
-Then, from the base directory run
-```pytest -s```.
 
 
 
