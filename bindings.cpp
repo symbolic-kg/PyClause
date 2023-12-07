@@ -63,6 +63,16 @@ PYBIND11_MODULE(c_clause, m) {
                 }
             }
         )
+         .def(
+            "get_rules",
+            [](RankingHandler& self, std::string headOrTail, bool return_strings)->py::object{
+                if (return_strings){
+                    return py::cast(self.getStrRules(headOrTail));
+                }else{
+                    return py::cast(self.getIdxRules(headOrTail));
+                }
+            }
+        )
     ; //class end
 
     py::class_<QAHandler>(m, "QAHandler") 
