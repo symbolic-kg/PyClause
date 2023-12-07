@@ -392,8 +392,8 @@ def test_triple_scoring_B_237():
     ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
     ranker.calculate_ranking(loader)
 
-    tails = ranker.get_ranking("tail")
-    heads = ranker.get_ranking("head")
+    tails = ranker.get_ranking("tail", False)
+    heads = ranker.get_ranking("head", False)
 
     for i in range(len(idx_scores)):
         # same scores; string scores are rounded to 6 decimals in backend
@@ -514,8 +514,8 @@ def test_triple_scoring():
     ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
     ranker.calculate_ranking(loader)
 
-    tails = ranker.get_ranking("tail")
-    heads = ranker.get_ranking("head")
+    tails = ranker.get_ranking("tail", False)
+    heads = ranker.get_ranking("head", False)
 
     for i in range(len(idx_scores)):
         # same scores; string scores are rounded to 6 decimals in backend
