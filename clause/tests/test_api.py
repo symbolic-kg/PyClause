@@ -643,3 +643,149 @@ def test_explanation_tracking():
                     assert(relation_map[triple[1]] == idx_explanations[2][i][j][l][k][1])
                     assert(entity_map[triple[2]] == idx_explanations[2][i][j][l][k][2])
     print("Test for explanation consistency successful")
+
+
+def test_rules_collecting():
+    from c_clause import RankingHandler, DataHandler
+    from clause.util.utils import get_ab_dir, get_base_dir, join_u
+    from clause.config.options import Options
+    from c_clause import QAHandler, RankingHandler, PredictionHandler
+    from clause.data.triples import TripleSet
+    base_dir = get_base_dir()
+    train = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
+    filter = join_u(base_dir, join_u("data", "wnrr", "valid.txt"))
+    rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
+    target = join_u(base_dir, join_u("data", "wnrr-sample", "test-wnrr-small.txt"))
+
+    rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
+
+
+    ranking_file = "./local/rankingFile.txt"
+
+    options = Options()
+    options.set("ranking_handler.disc_at_least", 50)
+    options.set("ranking_handler.collect_rules", True)
+
+    options.set("qa_handler.disc_at_least", 50)
+    options.set("qa_handler.collect_rules", True)
+
+    loader = DataHandler(options.flatS("data_handler"))
+    loader.load_data(train, filter, target)
+    loader.load_rules(rules)
+
+
+    ranker = RankingHandler(options.flatS("ranking_handler"))
+    ranker.calculate_ranking(loader)
+
+
+    rule_index = loader.rule_index()
+    entity_map = loader.entity_map()
+    relation_map = loader.relation_map()
+
+
+    headRanking_idx = ranker.get_ranking("head", False)
+    tailRanking_idx = ranker.get_ranking("tail", False)
+
+    headRanking_str = ranker.get_ranking("head", True)
+    tailRanking_str = ranker.get_ranking("tail", True)
+
+
+
+    head_rules_ranker_str = ranker.get_rules("head", True)
+    tail_rules_ranker_str = ranker.get_rules("tail", True)
+
+    head_rules_ranker_idx = ranker.get_rules("head", False)
+    tail_rules_ranker_idx = ranker.get_rules("tail", False)
+
+
+    ## load the data from this, form queries from every triple and pass them to the qa handler
+    ## collected rules must be the same when retrived from ranking of the ranking handler
+    triples = TripleSet(target)
+    triple_strings = [str(trip).split(" ") for trip in triples.triples]
+
+    ## string queries
+    tail_queries = [[trip[0], trip[1]] for trip in triple_strings]
+    head_queries = [[trip[2], trip[1]] for trip in triple_strings]
+
+    qa = QAHandler(options.flatS("qa_handler"))
+
+    qa.calculate_answers(head_queries, loader, "head")
+    head_answers_str = qa.get_answers(True)
+    head_answers_idx = qa.get_answers(False)
+
+    head_rules_str = qa.get_rules(True)
+    head_rules_idx = qa.get_rules(False)
+
+
+    qa.calculate_answers(tail_queries, loader, "tail")
+    tail_answers_str = qa.get_answers(True)
+    tail_answers_idx = qa.get_answers(False)
+
+    tail_rules_str = qa.get_rules(True)
+    tail_rules_idx = qa.get_rules(False)
+
+
+    for i in range(len(tail_queries)):
+        source_str = tail_queries[i][0]
+        rel_str = tail_queries[i][1]
+
+        source_idx = entity_map[source_str]
+        rel_idx = relation_map[rel_str]
+
+        for c in range(len(tail_answers_idx[i])):
+            cand_idx = tail_answers_idx[i][c][0]
+            cand_str = tail_answers_str[i][c][0]
+
+            idx_rules = tail_rules_idx[i][c]
+            str_rules = tail_rules_str[i][c]
+
+            ## ranker has to have the exact same results
+            ## e.g. every candidate of the qa handler has also to be a candidate of the ranker
+            ranker_idx_rules = tail_rules_ranker_idx[rel_idx][source_idx][cand_idx]
+            ranker_str_rules = tail_rules_ranker_str[rel_str][source_str][cand_str]
+
+              # check that cand is also in ranking results
+            idx_ranking_cands = [cand[0] for cand in tailRanking_idx[rel_idx][source_idx]]
+            assert (cand_idx in idx_ranking_cands)
+            str_ranking_cands = [ cand[0] for cand in tailRanking_str[rel_str][source_str]]
+            assert(cand_str in str_ranking_cands)
+
+            # rules collected from qa and ranker must be same for the query
+            assert(idx_rules == ranker_idx_rules)
+            assert(str_rules==ranker_str_rules)
+            # check that the rule in idx format map back correctly to the strings of string rules
+            assert(rule_index[idx_rules[-1]] == str_rules[-1])
+        
+
+    for i in range(len(head_queries)):
+        source_str = head_queries[i][0]
+        rel_str = head_queries[i][1]
+
+        source_idx = entity_map[source_str]
+        rel_idx = relation_map[rel_str]
+
+        for c in range(len(head_answers_idx[i])):
+            cand_idx = head_answers_idx[i][c][0]
+            cand_str = head_answers_str[i][c][0]
+
+            idx_rules = head_rules_idx[i][c]
+            str_rules = head_rules_str[i][c]
+
+            ## ranker has to have the exact same results
+            ## e.g. every candidate of the qa handler has also to be a candidate of the ranker
+            ranker_idx_rules = head_rules_ranker_idx[rel_idx][source_idx][cand_idx]
+            ranker_str_rules = head_rules_ranker_str[rel_str][source_str][cand_str]
+
+            # check that cand is also in ranking results
+            idx_ranking_cands = [cand[0] for cand in headRanking_idx[rel_idx][source_idx]]
+            assert (cand_idx in idx_ranking_cands)
+            str_ranking_cands = [ cand[0] for cand in headRanking_str[rel_str][source_str]]
+            assert(cand_str in str_ranking_cands)
+
+            # rules collected from qa and ranker must be same for the query
+            assert(idx_rules == ranker_idx_rules)
+            assert(str_rules==ranker_str_rules)
+            # check that the rule in idx format map back correctly to the strings of string rules
+            assert(rule_index[idx_rules[-1]] == str_rules[-1])
+
+    print("Test of consistency of rule tracking between QA and Ranking successful.")
