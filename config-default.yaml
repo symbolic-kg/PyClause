@@ -37,6 +37,10 @@ data_handler:
 
 # calculates rankings based on the target set loaded into DataLoader
 ranking_handler:
+  # whether to cache the rules that predicted the query candidates,
+  # can be retrieved with handler.get_rules(bool, string:headOrTailRanking).
+  # Turn off for efficiency.
+  collect_rules: False
   aggregation_function: "maxplus"
   num_preselect: -1 #-1 for off
   topk: 100
@@ -51,9 +55,8 @@ ranking_handler:
 # calculates answer candidates and scores based on 
 # questions (h, r, ?) and (?, r, t)
 qa_handler:
-  # whether to cache the rules that predicted the query candidates,
-  # can be retrieved with handler.get_rules(bool).
-  # Turn off for efficiency.
+  # same as ranking_handler; can be retrieved with handler.get_rules(bool)
+  # see documentation for data strucuture
   collect_rules: False
   aggregation_function: "maxplus"
   num_preselect: -1 #-1 for off
