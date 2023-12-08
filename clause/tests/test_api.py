@@ -824,7 +824,7 @@ def test_rules_collecting():
     ## load the data from this, form queries from every triple and pass them to the qa handler
     ## collected rules must be the same when retrived from ranking of the ranking handler
     triples = TripleSet(target)
-    triple_strings = [str(trip).split(" ") for trip in triples.triples]
+    triple_strings = triples.to_list()
 
     ## string queries
     tail_queries = [[trip[0], trip[1]] for trip in triple_strings]
