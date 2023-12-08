@@ -200,6 +200,15 @@ class TripleSet:
          f.write(ts + "\n")
       f.close()
 
+   def to_list(self):
+      
+      """Outputs a list of string striples.
+
+       A string triple is a list or tuple with three string elements ["head", "relation", "tail"].
+
+      """
+      return [str(trip).split(" ") for trip in self.triples]
+
 
 class TripleIndex:
    """
