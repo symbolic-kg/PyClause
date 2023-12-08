@@ -33,23 +33,26 @@ void QueryResults::insertRule(int cand, Rule* rule){
         }
         // discriminates always all candidates of the first rule
         // assumes insertion order regarding rules
-        if (firstRule==rule || trackTo<discAtLeast){
+        if (firstRule==rule || ( discAtLeast>0 && trackTo<discAtLeast)){
             trackTo+=1;
         }
     }
     // update or insert
+    // known cand: always update
+    // new cand: -> only add and update when explicitly asked by !onlyUpdate
     if (!onlyUpdate || !newCand){
         candRules[cand].push_back(rule);
-    }
 
-    if (performAggregation){
-        if (aggregationFunction=="noisy-or"){
-            candScores[cand] += std::log(1-rule->getConfidence());
-        } else if (aggregationFunction=="maxplus"){
-            int n = candRules[cand].size();
-            // TODO simply threshold this
-            double mult = std::pow(0.001, n-1);
-            candScores[cand] += mult * rule->getConfidence();
+        // we added a new rule, update aggregation score
+        if (performAggregation){
+            if (aggregationFunction=="noisy-or"){
+                candScores[cand] += std::log(1-rule->getConfidence());
+            } else if (aggregationFunction=="maxplus"){
+                int n = candRules[cand].size();
+                // TODO simply threshold this
+                double mult = std::pow(0.001, n-1);
+                candScores[cand] += mult * rule->getConfidence();
+            }
         }
     }
 }

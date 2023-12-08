@@ -46,6 +46,12 @@ ranking_handler:
   topk: 100
   filter_w_train: True
   filter_w_target: True
+  # TODO add explanation and make less technical
+  # Note that disc_at_least = topk may be slower than disc_at_last = -1
+  # or even disc_at_least=10000 the reason is that for 10000 check_disc() check 
+  # immediately returns falls because track_to nevers reaches disc_at_least
+  # the recommended useage for this parameter is setting it to 10 or half of topk
+  # otherwise setting it to -1
   disc_at_least: 10 # -1 for off, must not be bigger than topk
   # choose between "random" / "frequency"
   tie_handling: "frequency"
