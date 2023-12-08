@@ -50,6 +50,21 @@ void QueryResults::insertRule(int cand, Rule* rule){
             }
         }
     }
+
+    if (performAggregation){
+        if (aggregationFunction=="noisy-or"){
+            candScores[cand] += std::log(1-rule->getConfidence());
+        } else if (aggregationFunction=="maxplus"){
+            int n = candRules[cand].size();
+            // TODO simply threshold this
+            double mult = std::pow(0.001, n-1);
+            candScores[cand] += mult * rule->getConfidence();
+        }
+    }
+}
+
+std::unordered_map<int,double>& QueryResults::getCandScores(){
+    return candScores;
 }
 
 std::unordered_map<int,double>& QueryResults::getCandScores(){

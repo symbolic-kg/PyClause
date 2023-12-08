@@ -959,7 +959,7 @@ void timeRanking(){
     //ranker.setNumThr(1);
 
     ranker.setTopK(100);
-    ranker.setDiscAtLeast(100000);
+    ranker.setDiscAtLeast(10);
 
 
 
@@ -981,6 +981,8 @@ void timeRanking(){
 
 
 int main(){
+    timeRanking();
+    return 0;   
     test_compute_strings();
     tests_groundings();
     tests();
