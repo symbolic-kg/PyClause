@@ -959,7 +959,7 @@ void timeRanking(){
     //ranker.setNumThr(1);
 
     ranker.setTopK(100);
-    ranker.setDiscAtLeast(10);
+    ranker.setDiscAtLeast(100000);
 
 
 

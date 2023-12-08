@@ -45,20 +45,14 @@ void QueryResults::insertRule(int cand, Rule* rule){
 
         // we added a new rule, update aggregation score
         if (performAggregation){
-            if (aggregationFunction=="noisyor"){
-                candScores[cand] += -std::log(1-rule->getConfidence());
+            if (aggregationFunction=="noisy-or"){
+                candScores[cand] += std::log(1-rule->getConfidence());
+            } else if (aggregationFunction=="maxplus"){
+                int n = candRules[cand].size();
+                // TODO simply threshold this
+                double mult = std::pow(0.001, n-1);
+                candScores[cand] += mult * rule->getConfidence();
             }
-        }
-    }
-
-    if (performAggregation){
-        if (aggregationFunction=="noisy-or"){
-            candScores[cand] += std::log(1-rule->getConfidence());
-        } else if (aggregationFunction=="maxplus"){
-            int n = candRules[cand].size();
-            // TODO simply threshold this
-            double mult = std::pow(0.001, n-1);
-            candScores[cand] += mult * rule->getConfidence();
         }
     }
 }

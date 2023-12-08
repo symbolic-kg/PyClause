@@ -187,12 +187,9 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                     }
 
                     std::unordered_map<int, double>& candScores = qResults.getCandScores();
-                    std::vector<std::pair<int, double>> sortedCandidates(candScores.begin(), candScores.end());
-                    std::sort(sortedCandidates.begin(), sortedCandidates.end(), 
-                        [](const std::pair<int, double>& a, const std::pair<int, double>& b) {
-                            return a.second < b.second;
-                        }
-                    );
+                    std::vector<std::pair<int, double>> sortedCandScores(candScores.begin(), candScores.end());
+                    // tie handling, final processing, sorting
+                    sortAndProcess(sortedCandScores, train);
 
                     #pragma omp critical
                     {   
@@ -204,36 +201,16 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                                 headQcandsRules[rel][source] = qResults.getCandRules();
                             }
                         }
-                    
                         if (performAggregation){
                                 auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
-                                if (rank_aggrFunc=="maxplus"){
-                                    // tail/headQcandsConfs is filled here
-                                    writeResults[rel][source] = sortedCandidates;
-                                }
-                                else if (rank_aggrFunc=="noisy-or"){
-                                    // 1-exp(sum)
-                                    
-                                }
-                                else {
-                                    throw std::runtime_error("Aggregation function is not recognized in calculate ranking.");
-
-
-                                }
+                                writeResults[rel][source] = sortedCandScores;
                         }
                     }
 
+                    // left here for reference for the vanilla approach to calculate max-plus 
+                    // together with this->scoreMaxPlus()
                     // #pragma omp critical
-                    // {   
-                    //     if (saveCandidateRules){
-                    //         // TODO when needed could prevent copy here by using shared pointer
-                    //         if (dirIsTail){
-                    //             tailQcandsRules[rel][source] = qResults.getCandRules();
-                    //         }else{
-                    //             headQcandsRules[rel][source] = qResults.getCandRules();
-                    //         }
-                    //     }
-                    
+                    // {  
                     //     if (performAggregation){
                     //             auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
                     //             if (rank_aggrFunc=="maxplus"){
@@ -252,6 +229,18 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
             }
         } 
     } //pragma
+}
+
+void ApplicationHandler::sortAndProcess(std::vector<std::pair<int,double>>& candScoresToSort, TripleStorage& data){
+    //TODO add here noisy-or processing and tie handling
+
+    std::sort(
+        candScoresToSort.begin(),
+        candScoresToSort.end(), 
+        [](const std::pair<int, double>& a, const std::pair<int, double>& b) {
+                return a.second > b.second;
+        }
+    );
 }
 
 // currently not used in the ranking process
