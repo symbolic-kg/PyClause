@@ -3,6 +3,7 @@
 
 #include "Types.h"
 
+
 #include <vector>
 #include <string>
 
@@ -25,6 +26,7 @@ public:
     void clear();
     std::vector<Rule*>& getRulesForCand(int cand);
     NodeToPredRules& getCandRules();
+    std::unordered_map<int, double>& getCandScores();
     std::vector<int>& getCandsOrdered();
     // checks if at least discAtLeast top candidates can be fully disciminated
     bool checkDiscrimination();
@@ -39,12 +41,18 @@ private:
     // tracks insertion order of candidates elements are candidate idx's
     std::vector<int> candidateOrder;
 
+    // aggregation scores
+    std::unordered_map<int, double> candScores;
+
     //**options**
     // maximal number of candidates to add modifies data storing
     int addTopK=-1;
     // the num of top candidates which at least have to be fully disciminated 
     // does not change data storing only affects this->discriminate()
     int discAtLeast=10;
+
+    bool performAggregation = true;
+    std::string aggregationFunction = "maxplus";
 
     //**internal**
     // we track at least discAtLeast rules for checking discimination number

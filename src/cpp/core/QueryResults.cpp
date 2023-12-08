@@ -1,6 +1,7 @@
 #include "QueryResults.h"
 #include <iostream>
-
+#include <cmath>
+#include "Rule.h"
 
 QueryResults::QueryResults(int addTopK, int discAtLeast){
     this->addTopK = addTopK;
@@ -40,15 +41,31 @@ void QueryResults::insertRule(int cand, Rule* rule){
     if (!onlyUpdate || !newCand){
         candRules[cand].push_back(rule);
     }
+
+    if (performAggregation){
+        if (aggregationFunction=="noisy-or"){
+            candScores[cand] += std::log(1-rule->getConfidence());
+        } else if (aggregationFunction=="maxplus"){
+            int n = candRules[cand].size();
+            // TODO simply threshold this
+            double mult = std::pow(0.001, n-1);
+            candScores[cand] += mult * rule->getConfidence();
+        }
+    }
+}
+
+std::unordered_map<int,double>& QueryResults::getCandScores(){
+    return candScores;
 }
 
 void QueryResults::clear(){
     candRules.clear();
     candidateOrder.clear();
     firstRule = nullptr;
-    currentRule=nullptr;
+    currentRule = nullptr;
     trackTo = 0;
     numDiscriminated = 0;
+    candScores.clear();
 }
 
 std::vector<int>& QueryResults::getCandsOrdered(){

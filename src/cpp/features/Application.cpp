@@ -176,6 +176,14 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                         }
                     }
 
+                    std::unordered_map<int, double>& candScores = qResults.getCandScores();
+                    std::vector<std::pair<int, double>> sortedCandidates(candScores.begin(), candScores.end());
+                    std::sort(sortedCandidates.begin(), sortedCandidates.end(), 
+                        [](const std::pair<int, double>& a, const std::pair<int, double>& b) {
+                            return a.second < b.second;
+                        }
+                    );
+
                     #pragma omp critical
                     {   
                         if (saveCandidateRules){
@@ -191,13 +199,42 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                                 auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
                                 if (rank_aggrFunc=="maxplus"){
                                     // tail/headQcandsConfs is filled here
-                                    scoreMaxPlus(qResults.getCandRules(), writeResults[rel][source], train);
+                                    writeResults[rel][source] = sortedCandidates;
                                 }
-                                else{
+                                else if (rank_aggrFunc=="noisy-or"){
+                                    // 1-exp(sum)
+                                    
+                                }
+                                else {
                                     throw std::runtime_error("Aggregation function is not recognized in calculate ranking.");
+
+
                                 }
                         }
                     }
+
+                    // #pragma omp critical
+                    // {   
+                    //     if (saveCandidateRules){
+                    //         // TODO when needed could prevent copy here by using shared pointer
+                    //         if (dirIsTail){
+                    //             tailQcandsRules[rel][source] = qResults.getCandRules();
+                    //         }else{
+                    //             headQcandsRules[rel][source] = qResults.getCandRules();
+                    //         }
+                    //     }
+                    
+                    //     if (performAggregation){
+                    //             auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
+                    //             if (rank_aggrFunc=="maxplus"){
+                    //                 // tail/headQcandsConfs is filled here
+                    //                 scoreMaxPlus(qResults.getCandRules(), writeResults[rel][source], train);
+                    //             }
+                    //             else{
+                    //                 throw std::runtime_error("Aggregation function is not recognized in calculate ranking.");
+                    //             }
+                    //     }
+                    // }
                     
                     qResults.clear();
                     filter.clear();
