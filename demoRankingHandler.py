@@ -5,22 +5,22 @@ from clause.config.options import Options
 
 
 
-train = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt"
-filter = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt"
-target = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt"
-rules = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600"
-ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/rankingFile.txt"
+# train = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt"
+# filter = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt"
+# target = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt"
+# rules = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600"
+# ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/rankingFile.txt"
 
-# train = "./data/wnrr/train.txt"
-# filter = "./data/wnrr/valid.txt"
-# target = "./data/wnrr/test.txt"
+train = "./data/wnrr/train.txt"
+filter = "./data/wnrr/valid.txt"
+target = "./data/wnrr/test.txt"
 
-# rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
+rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
 
 ranking_file = "./local/rankingFile.txt"
 
 options = Options()
-options.set("ranking_handler.disc_at_least", 10)
+options.set("ranking_handler.disc_at_least", 100)
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()

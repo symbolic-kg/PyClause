@@ -224,13 +224,32 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
 void ApplicationHandler::sortAndProcess(std::vector<std::pair<int,double>>& candScoresToSort, TripleStorage& data){
     //TODO add here noisy-or processing and tie handling
 
-    std::sort(
+   if (rank_tie_handling=="random"){
+     std::sort(
         candScoresToSort.begin(),
         candScoresToSort.end(), 
         [](const std::pair<int, double>& a, const std::pair<int, double>& b) {
-                return a.second > b.second;
+            return a.second > b.second;
         }
-    );
+     );
+   }else if (rank_tie_handling=="frequency"){
+      std::sort(
+        candScoresToSort.begin(),
+        candScoresToSort.end(), 
+        [&data](const std::pair<int, double>& a, const std::pair<int, double>& b) {
+            if (a.second!=b.second){
+                return a.second > b.second;
+            }else if(data.getFreq(a.first) != data.getFreq(b.first)) {
+                return data.getFreq(a.first) > data.getFreq(b.first);
+            }else{
+                return a.first<b.first;
+            }
+        }
+      );
+   }else{
+    throw std::runtime_error("Tie handling type not known. Please set to 'random' or 'frequency'");
+   }
+   
 }
 
 // currently not used in the ranking process
@@ -327,6 +346,7 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
     }
 }
 
+// reference implementation for a complete (but redundant) max-plus behavior
 void ApplicationHandler::scoreMaxPlus(
     const NodeToPredRules& candToRules, std::vector<std::pair<int, double>>& aggrCand, TripleStorage& train
      ){
