@@ -981,8 +981,6 @@ void timeRanking(){
 
 
 int main(){
-    timeRanking();
-    return 0;   
     test_compute_strings();
     tests_groundings();
     tests();

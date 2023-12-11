@@ -84,7 +84,7 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
             std::unordered_map<int, double>& candScores = tripleResults.getCandScores();
             std::vector<std::pair<int, double>> sortedCandScores(candScores.begin(), candScores.end());
             // tie handling, final processing, sorting
-            (this->*sortAndProcess)(sortedCandScores, tripleResults, train);
+            sortAndProcess(sortedCandScores, train);
 
             #pragma omp critical
             {  

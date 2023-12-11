@@ -370,9 +370,10 @@ def test_triple_scoring_B_237():
     options.set("data_handler.use_u_d_rules", False)
     options.set("data_handler.use_u_xxc_rules", False)
     options.set("data_handler.use_u_xxd_rules", False)
-
-    options.set("ranking_handler.disc_at_least", 2)
-    options.set("ranking_handler.topk", 2)
+   
+    options.set("ranking_handler.disc_at_least", -1)
+    options.set("ranking_handler.topk", 1)
+    options.set("ranking_handler.num_preselect", 1)
 
     options.set("prediction_handler.collect_explanations", True)
     options.set("prediction_handler.num_top_rules", 1)
@@ -500,17 +501,18 @@ def test_triple_scoring():
 
 
     options.set("ranking_handler.topk", 40000)
+
+    # both set to -1 to not apply any stopping critertion (otherwise scores might vary a bit)
     options.set("ranking_handler.disc_at_least", -1)
+    options.set("prediction_handler.num_top_rules", -1)
 
     options.set("prediction_handler.collect_explanations", True)
-    options.set("prediction_handler.num_top_rules", 1)
+    
 
 
     options.set("data_handler.use_u_xxd_rules", False)
     options.set("data_handler.use_u_xxc_rules", False)
     options.set("data_handler.use_zero_rules", False)
-
-    options.set("prediction_handler.num_top_rules", 1)
 
     loader = c_clause.DataHandler(options.flatS("data_handler"))
     loader.load_data(train, filter, target)
