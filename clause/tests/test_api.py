@@ -769,9 +769,6 @@ def test_rules_collecting():
     rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
     target = join_u(base_dir, join_u("data", "wnrr-sample", "test-wnrr-small.txt"))
 
-    rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
-
-
     ranking_file = "./local/rankingFile.txt"
 
     options = Options()
