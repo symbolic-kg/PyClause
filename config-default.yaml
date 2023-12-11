@@ -88,6 +88,7 @@ prediction_handler:
   aggregation_function: "maxplus"
   # for a given triple stop rule application if it was predicted by the
   # num_top_rules with the highest confidences
+  # set to -1 to not apply any stopping criterion, e.g., to apply all rules
   num_top_rules: 5 
   num_threads: -1 #-1 for ALL available threads
 
