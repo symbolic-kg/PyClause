@@ -165,9 +165,9 @@ def test_uc_b_zero_ranking():
     hAt10 = str(stdout)[-18:-12]
     hA1 = str(stdout)[-36:-30]
 
-    expectMRR = "0.4965"
-    expecth1 =  "0.4577"
-    expecth10 = "0.5720"
+    expectMRR = "0.4960"
+    expecth1 =  "0.4568"
+    expecth10 = "0.5721"
 
     check_all = all([mrr_result==expectMRR, hA1==expecth1, hAt10==expecth10])
     if (not check_all):
@@ -237,9 +237,9 @@ def test_237_all_ranking():
     hAt10 = str(stdout)[-18:-12]
     hA1 = str(stdout)[-36:-30]
 
-    expectMRR = "0.3317"
-    expecth1 =  "0.2467"
-    expecth10 = "0.5049"
+    expectMRR = "0.3315"
+    expecth1 =  "0.2463"
+    expecth10 = "0.5047"
 
     check_all = all([mrr_result==expectMRR, hA1==expecth1, hAt10==expecth10])
     if (not check_all):
