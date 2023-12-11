@@ -633,7 +633,14 @@ void testTripleScoring(){
     // Test correct handling of a triple that is not predicted by any of the rules 
     std::vector<Triple> triples = {{3707,7,3707}};
     ranker.setScoreCollectGroundings(true);
+    // you have to set disc_at least for ranking =-1 such that the ranker applies all rules
+    // likewise during scoring you have to set setScoreNumtop rules = -1 , such that the ranker applies all rules
+    ranker.setDiscAtLeast(-1);
+    ranker.setScoreNumTopRules(-1);
     ranker.calculateTripleScores(triples, train, rules);
+    ranker.setAggregationFunc("noisyor");
+    ranker.setTopK(100);
+    
 
     std::vector<std::array<double, 4>>& trScores = ranker.getTripleScores();
     std::vector<std::pair<Triple, RuleGroundings>>& trGroundings = ranker.getTripleGroundings();
@@ -647,15 +654,8 @@ void testTripleScoring(){
     }
     ranker.clearAll();
 
-
-
-
-
-    // test of the scores of predictTriples match the scores of a predicted triple from a ranking
-    ranker.setTopK(100);
-    ranker.setDiscAtLeast(100);
+    // test if the scores of predictTriples match the scores of a predicted triple from a ranking
     
-
     ranker.setSaveCandidateRules(true);
     ranker.makeRanking(target, train, rules, filter);
     std::unordered_map<int,std::unordered_map<int, CandidateConfs>>& candsConfs = ranker.getTailQcandsConfs();
@@ -693,7 +693,9 @@ void testTripleScoring(){
     for (int i=0; i<trScores.size(); i++){
         bool same = (trScores[i][3] == scores[i]);
         if (!same){
-            std::cout<<trScores[i][3]<<" "<<trScores[i][3]<<" "<<trScores[i][3]<<std::endl;
+            std::cout<<trScores[i][0]<<" "<<trScores[i][1]<<" "<<trScores[i][2]<<std::endl;
+            std::cout<<trScores[i][3]<<std::endl;
+            std::cout<<scores[i]<<std::endl;
             throw std::runtime_error("The score of this triple does not match its score from ranking.");
         }
     }
@@ -979,8 +981,6 @@ void timeRanking(){
 
 
 int main(){
-    timeRanking();
-    return 0;   
     test_compute_strings();
     tests_groundings();
     tests();
@@ -989,4 +989,5 @@ int main(){
     //checkRuntimes();
    
     return 0;
+    timeRanking();
 }

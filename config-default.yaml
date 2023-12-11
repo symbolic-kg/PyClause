@@ -41,6 +41,7 @@ ranking_handler:
   # can be retrieved with handler.get_rules(bool, string:headOrTailRanking).
   # Turn off for efficiency.
   collect_rules: False
+  # select from "maxplus" / "noisyor"
   aggregation_function: "maxplus"
   num_preselect: -1 #-1 for off
   topk: 100
@@ -58,6 +59,7 @@ qa_handler:
   # same as ranking_handler; can be retrieved with handler.get_rules(bool)
   # see documentation for data strucuture
   collect_rules: False
+  # select from "maxplus" / "noisyor"
   aggregation_function: "maxplus"
   num_preselect: -1 #-1 for off
   topk: 100
@@ -82,6 +84,7 @@ rules_handler:
 # predicting rules + groundings (explanations)
 prediction_handler:
   collect_explanations: False
+  # select from "maxplus" / "noisyor"
   aggregation_function: "maxplus"
   # for a given triple stop rule application if it was predicted by the
   # num_top_rules with the highest confidences

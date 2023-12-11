@@ -370,9 +370,10 @@ def test_triple_scoring_B_237():
     options.set("data_handler.use_u_d_rules", False)
     options.set("data_handler.use_u_xxc_rules", False)
     options.set("data_handler.use_u_xxd_rules", False)
-
-    options.set("ranking_handler.disc_at_least", 2)
-    options.set("ranking_handler.topk", 2)
+   
+    options.set("ranking_handler.disc_at_least", -1)
+    options.set("ranking_handler.topk", 1)
+    options.set("ranking_handler.num_preselect", 1)
 
     options.set("prediction_handler.collect_explanations", True)
     options.set("prediction_handler.num_top_rules", 1)
@@ -487,17 +488,18 @@ def test_triple_scoring():
 
 
     options.set("ranking_handler.topk", 40000)
+
+    # both set to -1 to not apply any stopping critertion (otherwise scores might vary a bit)
     options.set("ranking_handler.disc_at_least", -1)
+    options.set("prediction_handler.num_top_rules", -1)
 
     options.set("prediction_handler.collect_explanations", True)
-    options.set("prediction_handler.num_top_rules", 1)
+    
 
 
     options.set("data_handler.use_u_xxd_rules", False)
     options.set("data_handler.use_u_xxc_rules", False)
     options.set("data_handler.use_zero_rules", False)
-
-    options.set("prediction_handler.num_top_rules", 1)
 
     loader = c_clause.DataHandler(options.flatS("data_handler"))
     loader.load_data(train, filter, target)
@@ -563,7 +565,117 @@ def test_triple_scoring():
             head_ranking = dict(head_ranking)
             assert(idx_scores[i][3]==head_ranking[head])
 
-    print("Test Triple scoring successful.")      
+    print("Test Triple scoring successful.")
+
+
+def test_noisy_triple_scoring():
+    """
+    Test if the triple scores with string output match the idx version.
+    Also test if the candidate scores calculated under noisy or from query ranking match the triple scores.
+    
+    """
+
+
+    import c_clause
+    import numpy as np
+
+    base_dir = get_base_dir()
+    train = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
+    filter = join_u(base_dir, join_u("data", "wnrr", "valid.txt"))
+    rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
+    target = join_u(base_dir, join_u("data", "wnrr-sample", "test-wnrr-small.txt"))
+
+
+
+    options = Options()
+
+
+    options.set("ranking_handler.topk", 40000)
+
+    # both set to -1 to not apply any stopping critertion (otherwise scores might vary a bit)
+    options.set("ranking_handler.disc_at_least", -1)
+    options.set("prediction_handler.num_top_rules", -1)
+
+
+
+    options.set("ranking_handler.aggregation_function", "noisyor")
+    options.set("prediction_handler.aggregation_function", "noisyor")
+
+
+
+    options.set("prediction_handler.collect_explanations", True)
+    
+
+
+    options.set("data_handler.use_u_xxd_rules", False)
+    options.set("data_handler.use_u_xxc_rules", False)
+    options.set("data_handler.use_zero_rules", False)
+
+    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader.load_data(train, filter, target)
+    loader.load_rules(rules)
+
+
+    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer.calculate_scores(target, loader)
+
+    idx_scores = scorer.get_scores(False)
+    str_scores = scorer.get_scores(True)
+
+
+    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker.calculate_ranking(loader)
+
+    tails = ranker.get_ranking("tail", False)
+    heads = ranker.get_ranking("head", False)
+
+    for i in range(len(idx_scores)):
+        # same scores; string scores are rounded to 6 decimals in backend
+        assert(round(idx_scores[i][3], 6)==float(str_scores[i][3]))
+        head = idx_scores[i][0]
+        rel = idx_scores[i][1]
+        tail = idx_scores[i][2]
+
+        
+        # the score must match when calculated in a ranking from queries
+        if (idx_scores[i][3]!=0):
+            tail_ranking = tails[rel][head]
+            tail_ranking = dict(tail_ranking)
+            assert(idx_scores[i][3]==tail_ranking[tail])
+            
+            head_ranking = heads[rel][tail]
+            head_ranking = dict(head_ranking)
+            assert(idx_scores[i][3]==head_ranking[head])
+
+
+    # now without the track grounding option
+    options.set("prediction_handler.collect_explanations", False)
+    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer.calculate_scores(target, loader)
+
+    idx_scores = scorer.get_scores(False)
+    str_scores = scorer.get_scores(True)
+
+
+    for i in range(len(idx_scores)):
+        # same scores; string scores are rounded to 6 decimals in backend
+        assert(round(idx_scores[i][3], 6)==float(str_scores[i][3]))
+        head = idx_scores[i][0]
+        rel = idx_scores[i][1]
+        tail = idx_scores[i][2]
+
+        
+        # the score must match when calculated in a ranking from queries
+        if (idx_scores[i][3]!=0):
+            tail_ranking = tails[rel][head]
+            tail_ranking = dict(tail_ranking)
+            assert(idx_scores[i][3]==tail_ranking[tail])
+            
+            head_ranking = heads[rel][tail]
+            head_ranking = dict(head_ranking)
+            assert(idx_scores[i][3]==head_ranking[head])
+
+    print("Test Triple scoring successful.")            
 
 
 

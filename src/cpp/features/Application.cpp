@@ -66,22 +66,18 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
                 // }
 
             }
-            #pragma omp critical
-            {
-                        
-                // aggregation is performed on tripleResults that only holds one (tail) candidate
-                // for triple =head, rel, tail tripleResults holds the tail "candidate" for the triple
-                // note that tie handling has no effect, we are just aggregating one candidate
 
-                // the int represents the tail of the triple, vector is not necessary but we keep it simple here
-                // and use existing functionality
-                std::vector<std::pair<int, double>> score;
-                if (rank_aggrFunc=="maxplus"){
-                    scoreMaxPlus(tripleResults.getCandRules(), score, train);
-                }
+            // we actually only have on candidate but we still need to process
+            std::unordered_map<int, double>& candScores = tripleResults.getCandScores();
+            std::vector<std::pair<int, double>> sortedCandScores(candScores.begin(), candScores.end());
+            // tie handling, final processing, sorting
+            sortAndProcess(sortedCandScores, train);
+
+            #pragma omp critical
+            {  
                 double trScore = 0;
-                if (score.size()>0){
-                    trScore = score[0].second;
+                if (sortedCandScores.size()>0){
+                    trScore = sortedCandScores[0].second;
                 }
                 // for easy conversion later
                 tripleScores.at(i) = { (double) triple[0],  (double) triple[1], (double) triple[2], trScore};  
@@ -436,6 +432,9 @@ void ApplicationHandler::setFilterWtarget(bool ind){
     rank_filterWtarget = ind;
 }
 void ApplicationHandler::setAggregationFunc(std::string func){
+    if (!(func=="maxplus") && !(func=="noisyor")){
+        throw std::runtime_error("The aggregation function value is not known, select from 'noisyor' or 'maxplus' found value: " + func);
+    }
     rank_aggrFunc = func;
 }
 
