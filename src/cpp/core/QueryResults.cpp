@@ -45,8 +45,8 @@ void QueryResults::insertRule(int cand, Rule* rule){
 
         // we added a new rule, update aggregation score
         if (performAggregation){
-            if (aggregationFunction=="noisy-or"){
-                candScores[cand] += std::log(1-rule->getConfidence());
+            if (aggregationFunction=="noisyor"){
+                candScores[cand] += -std::log(1-rule->getConfidence());
             } else if (aggregationFunction=="maxplus"){
                 int n = candRules[cand].size();
                 double mult = 1;
@@ -126,4 +126,9 @@ bool QueryResults::checkDiscrimination(){
             numDiscriminated += 1;
         }
     }
+}
+
+
+void QueryResults::setAggrFunc(std::string name){
+    aggregationFunction = name;
 }

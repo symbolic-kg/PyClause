@@ -17,10 +17,11 @@ target = "./data/wnrr/test.txt"
 
 rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
 
-ranking_file = "./local/rankingFile.txt"
+ranking_file = "./local/rankingFileNoisy.txt"
 
 options = Options()
-options.set("ranking_handler.disc_at_least", 100)
+options.set("ranking_handler.disc_at_least", -1)
+options.set("ranking_handler.aggregation_function", "noisyor")
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()

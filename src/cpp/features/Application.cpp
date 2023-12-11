@@ -28,6 +28,7 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
     #pragma omp parallel num_threads(num_thr)
     {
         QueryResults tripleResults(1, 1);
+        tripleResults.setAggrFunc(rank_aggrFunc);
         RuleGroundings ruleGroundings;   
         #pragma omp for schedule(dynamic)
         for (int i=0; i<triples.size(); i++){
@@ -126,6 +127,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
     #pragma omp parallel num_threads(num_thr)
     {
         QueryResults qResults(rank_topk, rank_discAtLeast);
+        qResults.setAggrFunc(rank_aggrFunc);
         ManySet filter;
         #pragma omp for collapse(2) schedule(dynamic)
         for (int rel=0; rel<numRel; rel++){
@@ -248,6 +250,12 @@ void ApplicationHandler::sortAndProcess(std::vector<std::pair<int,double>>& cand
       );
    }else{
     throw std::runtime_error("Tie handling type not known. Please set to 'random' or 'frequency'");
+   }
+
+   if (rank_aggrFunc=="noisyor"){
+        for (auto& pair: candScoresToSort){
+         pair.second = 1 - std::exp(-1*pair.second);
+        }
    }
    
 }

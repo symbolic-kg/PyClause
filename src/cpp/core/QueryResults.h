@@ -31,6 +31,8 @@ public:
     // checks if at least discAtLeast top candidates can be fully disciminated
     bool checkDiscrimination();
 
+    void setAggrFunc(std::string name);
+
     
 
 
