@@ -461,7 +461,20 @@ def test_loader():
     loader.load_data(triples)
     assert len(loader.entity_map()) == 4
     assert len(loader.relation_map()) == 2
-
+    
+    # test behaviour of unseen entities (e, f in test, g in valid)
+    train = [["a", "r1", "b"], ["a", "r1", "c"], ["c", "r2", "d"]]
+    test = [["c", "r2", "b"], ["d", "r1", "a"], ["e", "r1", "f"]]
+    valid = [["g", "r1", "a"]]
+    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader.load_data(data=train, target=test)
+    assert len(loader.entity_map()) == 6
+    assert len(loader.relation_map()) == 2
+    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader.load_data(data=train, filter=valid, target=test)
+    assert len(loader.entity_map()) == 7
+    assert len(loader.relation_map()) == 2
+    
     print("Test for loading idx's successful")
 
 
