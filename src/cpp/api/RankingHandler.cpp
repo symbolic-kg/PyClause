@@ -19,9 +19,7 @@ void RankingHandler::setOptions(std::map<std::string, std::string> options){
         std::string name;
         std::function<void(std::string)> setter;
     };
-
-    ranker;
-
+    
     std::vector<OptionHandler> handlers = {
         {"collect_rules", [this](std::string val) {this->setCollectRules(util::stringToBool(val));}},
     };
