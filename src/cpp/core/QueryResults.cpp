@@ -47,15 +47,6 @@ void QueryResults::insertRule(int cand, Rule* rule){
         if (performAggregation){
             if (aggregationFunction=="noisyor"){
                 candScores[cand] += -std::log(1-rule->getConfidence());
-            } else if (aggregationFunction=="maxplus"){
-                int n = candRules[cand].size();
-                double mult = 1;
-                if (n<=2){
-                    mult = std::pow(0.001, n-1);
-                }else{
-                    mult = std::pow(0.005, n-1);
-                }
-                candScores[cand] += mult * rule->getConfidence();
             }
         }
     }

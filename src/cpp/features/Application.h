@@ -76,9 +76,6 @@ private:
     std::unordered_map<int,std::unordered_map<int, NodeToPredRules>> tailQcandsRules;
     std::unordered_map<int,std::unordered_map<int, CandidateConfs>> tailQcandsConfs;
 
-
-    void sortAndProcess(std::vector<std::pair<int,double>>& candScoresToSort, TripleStorage& data);
-
     // alternative version, prevents storing map twice but data access needs copying
 
     //struct QueryResults {

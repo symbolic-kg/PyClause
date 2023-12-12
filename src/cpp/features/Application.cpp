@@ -84,7 +84,7 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
             std::unordered_map<int, double>& candScores = tripleResults.getCandScores();
             std::vector<std::pair<int, double>> sortedCandScores(candScores.begin(), candScores.end());
             // tie handling, final processing, sorting
-            sortAndProcess(sortedCandScores, train);
+            (this->*sortAndProcess)(sortedCandScores, tripleResults, train);
 
             #pragma omp critical
             {  
@@ -117,6 +117,19 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
     }else{
         predictHeadOrTail = &Rule::predictHeadQuery;
     }
+
+    typedef void (ApplicationHandler::*SortAndProcessPtr)(std::vector<std::pair<int,double>>&, QueryResults&, TripleStorage&);
+    SortAndProcessPtr sortAndProcess = nullptr;
+
+    if(rank_aggrFunc=="noisyor") {
+        sortAndProcess = &ApplicationHandler::sortAndProcessNoisy;
+    } else if (rank_aggrFunc=="maxplus") {
+        sortAndProcess = &ApplicationHandler::sortAndProcessMax;
+    }else{
+        throw std::runtime_error("Dont understand the aggregation function.");
+    }
+
+
 
     if (verbose && dirIsTail){
         std::cout<<"Calculating tail queries.."<<std::endl;
@@ -186,11 +199,10 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                             }
                         }
                     }
-
-                    std::unordered_map<int, double>& candScores = qResults.getCandScores();
-                    std::vector<std::pair<int, double>> sortedCandScores(candScores.begin(), candScores.end());
+                    
+                    std::vector<std::pair<int, double>> sortedCandScores;
                     // tie handling, final processing, sorting
-                    sortAndProcess(sortedCandScores, train);
+                    (this->*sortAndProcess)(sortedCandScores, qResults, train);
 
                     #pragma omp critical
                     {   
@@ -232,8 +244,12 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
     } //pragma
 }
 
-void ApplicationHandler::sortAndProcess(std::vector<std::pair<int,double>>& candScoresToSort, TripleStorage& data){
+void ApplicationHandler::sortAndProcessNoisy(std::vector<std::pair<int,double>>& candScoresToSort, QueryResults& qResults, TripleStorage& data){
     //TODO add here noisy-or processing and tie handling
+
+
+   std::unordered_map<int, double>& candScores = qResults.getCandScores();
+   candScoresToSort.assign(candScores.begin(), candScores.end()); 
 
    if (rank_tie_handling=="random"){
      std::sort(
@@ -261,12 +277,14 @@ void ApplicationHandler::sortAndProcess(std::vector<std::pair<int,double>>& cand
     throw std::runtime_error("Tie handling type not known. Please set to 'random' or 'frequency'");
    }
 
-   if (rank_aggrFunc=="noisyor"){
-        for (auto& pair: candScoresToSort){
-         pair.second = 1 - std::exp(-1*pair.second);
-        }
-   }
-   
+for (auto& pair: candScoresToSort){
+    pair.second = 1 - std::exp(-1*pair.second);
+}
+
+}
+
+void ApplicationHandler::sortAndProcessMax(std::vector<std::pair<int,double>>& candScoresToSort, QueryResults& qResults, TripleStorage& data){
+    scoreMaxPlus(qResults.getCandRules(), candScoresToSort, data);
 }
 
 // currently not used in the ranking process
@@ -363,7 +381,6 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
     }
 }
 
-// reference implementation for a complete (but redundant) max-plus behavior
 void ApplicationHandler::scoreMaxPlus(
     const NodeToPredRules& candToRules, std::vector<std::pair<int, double>>& aggrCand, TripleStorage& train
      ){
