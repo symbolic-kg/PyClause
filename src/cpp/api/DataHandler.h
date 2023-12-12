@@ -19,7 +19,6 @@
 #include <array>
 #include <vector>
 #include <string>
-#include <optional>
 
 
 
@@ -29,7 +28,7 @@ public:
     DataHandler(std::map<std::string, std::string> options);
 
     template<class T>
-    void loadData(T data, std::optional<T> filter, std::optional<T> target);
+    void loadData(T data, T filter, T target);
 
     void loadRules(std::string rulePath);
     void loadRules(std::vector<std::string> ruleStrings);
@@ -71,7 +70,7 @@ private:
 };
 
 template<class T>
-void DataHandler::loadData(T data, std::optional<T> filter, std::optional<T> target){
+void DataHandler::loadData(T data, T filter, T target){
     if (typeid(data) == typeid(TripleSet) && index->getNodeSize()==0){
         throw std::runtime_error(
             "You have to set an index first with DataHandler.set_entity_index(list[string]) DataHandler._set_relation_index(list[string]) before loading idx data."
@@ -83,17 +82,17 @@ void DataHandler::loadData(T data, std::optional<T> filter, std::optional<T> tar
     if (this->loadedData){
         throw std::runtime_error("Please load the data only once or use a new data handler.");
     }
-    if (target.has_value()) {
-        this->target->read(target.value(), false);
+    if (target.size() > 0) {
+        this->target->read(target, false);
     }
-    if (filter.has_value()) {
-        this->filter->read(filter.value(), false);
+    if (filter.size() > 0) {
+        this->filter->read(filter, false);
     }
     this->data->read(data, true);
-    if (target.has_value()) {
+    if (target.size() > 0) {
         this->target->loadCSR();
     }
-    if (filter.has_value()) {
+    if (filter.size() > 0) {
         this->filter->loadCSR();
     }
     this->loadedData = true;
