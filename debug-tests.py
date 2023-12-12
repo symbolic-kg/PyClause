@@ -8,7 +8,20 @@ count_true = 0
 num_tests = 0
 
 """Used in development for fast debugging of tests."""
-
+try:
+    test_uc_b_zero_ranking()
+    count_true +=1
+    num_tests +=1
+except Exception as e:
+    num_tests+=1
+    print(e)
+try:
+    test_237_all_ranking()
+    count_true += 1
+    num_tests +=1
+except Exception as e:
+    num_tests +=1
+    print(e)
 try:
     test_noisy_triple_scoring()
     count_true += 1
@@ -23,20 +36,6 @@ try:
     num_tests +=1
 except Exception as e:
     print("Triple scoring test failed")
-    num_tests +=1
-    print(e)
-try:
-    test_uc_b_zero_ranking()
-    count_true +=1
-    num_tests +=1
-except Exception as e:
-    num_tests+=1
-    print(e)
-try:
-    test_237_all_ranking()
-    count_true += 1
-    num_tests +=1
-except Exception as e:
     num_tests +=1
     print(e)
 try:
