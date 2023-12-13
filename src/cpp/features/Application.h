@@ -141,6 +141,7 @@ private:
     // after how many of the top (conf) rules to stop scoring
     // if maxplus aggregation is chosen this is set to 1
     // might be changed in the future, currently maxplus outputs the max scores
+    // ALSO USED for ranking
     int score_numTopRules = -1;
 
     // for each scores triples the rules and groundings of the rules are collected

@@ -41,6 +41,7 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
     #pragma omp parallel num_threads(num_thr)
     {
         QueryResults tripleResults(1, 1);
+        // we dont need to set num_top_rules as the stopping is handled outside; there is only one "candidate"
         tripleResults.setAggrFunc(rank_aggrFunc);
         RuleGroundings ruleGroundings;   
         #pragma omp for schedule(dynamic)
@@ -150,6 +151,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
     {
         QueryResults qResults(rank_topk, rank_discAtLeast);
         qResults.setAggrFunc(rank_aggrFunc);
+        qResults.setNumTopRules(score_numTopRules);
         ManySet filter;
         #pragma omp for collapse(2) schedule(dynamic)
         for (int rel=0; rel<numRel; rel++){
@@ -193,13 +195,23 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                         }
                         // TODO possibly optimize
                         // checking for discrimination after every rule had no noticeable overhead
-                        if (rank_discAtLeast>0 && currSize>=rank_topk){
-                            if (qResults.checkDiscrimination()){
-                                break;
+                        if (currSize>=rank_topk){
+                            if (rank_discAtLeast>0){
+                                if (qResults.checkDiscrimination()){
+                                    break;
+                                }
+                            }
+                            if (score_numTopRules>0){
+                                if (qResults.checkNumTopRules()){
+                                    break;
+                                }
+
                             }
                         }
                     }
-                    
+
+
+
                     std::vector<std::pair<int, double>> sortedCandScores;
                     // tie handling, final processing, sorting
                     (this->*sortAndProcess)(sortedCandScores, qResults, train);

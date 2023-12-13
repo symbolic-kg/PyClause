@@ -24,7 +24,7 @@ void QueryResults::insertRule(int cand, Rule* rule){
     }
     auto it = candRules.find(cand);
     bool newCand = (it==candRules.end());
-    // new candidate
+    // new candidate, insert only when specified by !onlyUpdate
     if (newCand && !onlyUpdate ){
         candidateOrder.push_back(cand);
         // discrimination tracking
@@ -37,18 +37,18 @@ void QueryResults::insertRule(int cand, Rule* rule){
             trackTo+=1;
         }
     }
-    // update or insert
-    // known cand: always update
-    // new cand: -> only add and update when explicitly asked by !onlyUpdate
-    if (!onlyUpdate || !newCand){
-        candRules[cand].push_back(rule);
 
-        // we added a new rule, update aggregation score
-        if (performAggregation){
-            if (aggregationFunction=="noisyor"){
-                candScores[cand] += -std::log(1-rule->getConfidence());
+    // update 
+    if (num_top_rules<0 || (num_top_rules>0 && candRules[cand].size()<num_top_rules)){
+        // known cand: always update
+        // new cand: -> only add and update when explicitly asked by !onlyUpdate
+        if (!onlyUpdate || !newCand){
+            candRules[cand].push_back(rule);
+            // we added a new rule, update aggregation score
+            if (performAggregation && aggregationFunction=="noisyor" ){
+                    candScores[cand] += -std::log(1-rule->getConfidence());
             }
-        }
+         }
     }
 }
 
@@ -123,7 +123,30 @@ bool QueryResults::checkDiscrimination(){
     }
 }
 
+bool QueryResults::checkNumTopRules(){
+    // safety first
+    if (num_top_rules<0){
+        return false;
+    }
+
+    int numFinished = 0;
+    for (auto& cand: candidateOrder){
+        if (candRules[cand].size()>=num_top_rules){
+            numFinished += 1;
+        }
+        if (numFinished>=addTopK){
+            return true;
+        }
+    }
+    return false;
+}
+
 
 void QueryResults::setAggrFunc(std::string name){
     aggregationFunction = name;
+}
+
+
+void QueryResults::setNumTopRules(int num){
+    num_top_rules = num;
 }

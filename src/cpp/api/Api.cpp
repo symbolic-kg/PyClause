@@ -23,11 +23,12 @@ void BackendHandler::setRankingOptions(std::map<std::string, std::string> option
 
     std::vector<OptionHandler> handlers = {
         {"topk", [&ranker](std::string val) { ranker.setTopK(std::stoi(val)); }},
-        {"num_preselect", [&ranker](std::string val) { ranker.setNumPreselect(std::stoi(val)); }},
         {"aggregation_function", [&ranker](std::string val) { ranker.setAggregationFunc(val); }},
+        {"disc_at_least", [&ranker](std::string val) { ranker.setDiscAtLeast(std::stoi(val)); }},
+        {"num_preselect", [&ranker](std::string val) { ranker.setNumPreselect(std::stoi(val)); }},
+        {"num_top_rules", [&ranker](std::string val) {ranker.setScoreNumTopRules(std::stoi(val));}},
         {"filter_w_train", [&ranker](std::string val) { ranker.setFilterWTrain(util::stringToBool(val)); }},
         {"filter_w_target", [&ranker](std::string val) { ranker.setFilterWtarget(util::stringToBool(val)); }},
-        {"disc_at_least", [&ranker](std::string val) { ranker.setDiscAtLeast(std::stoi(val)); }},
         {"tie_handling", [&ranker](std::string val) { ranker.setTieHandling(val); }},
         {"num_threads", [&ranker](std::string val) { ranker.setNumThr(std::stoi(val)); }},
 

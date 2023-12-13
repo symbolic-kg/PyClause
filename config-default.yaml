@@ -31,8 +31,8 @@ data_handler:
   use_u_xxc_rules: True
   # Uxxd rules
   use_u_xxd_rules: True
-  ## laplace smoothing applied to all rules
-  ## confidence = num_correct_predictions / (num_unseen+num_predictions)
+  # laplace smoothing applied to all rules
+  # confidence = num_correct_predictions / (num_unseen+num_predictions)
   rule_num_unseen: 5
 
 # calculates rankings based on the target set loaded into DataLoader
@@ -41,13 +41,34 @@ ranking_handler:
   # can be retrieved with handler.get_rules(bool, string:headOrTailRanking).
   # Turn off for efficiency.
   collect_rules: False
+  # number of candidates to calculate
+  topk: 100
   # select from "maxplus" / "noisyor"
   aggregation_function: "maxplus"
+
+  ### stopping criteria for rule application
+
+  # stop rule application for a query if topk candidates are calculated AND at least disc_at_least
+  # candidates are fully discriminated, i.e, they are pairwise distinct in regard
+  # to their predicting rules
+  # recommended values: 10 or 20 under "maxplus" and topk=100
+  # recommended value: -1 under "noisyor"
+  disc_at_least: 10 # -1 for off, must not be bigger than topk
+
+  # stop rule application for a query as soon as num_preselect
+  # candidates are found; set to topk under maxplus to achieve max-aggregation
+  # scores very fast without getting a properly discriminated ranking
+  # recommended value: -1
   num_preselect: -1 #-1 for off
-  topk: 100
+
+  # stops rule application for every candidate of a query  if it was predicted by
+  # num_top_rules; can be used in conjunction with "noisyor" to achieve
+  # noisy-or top-h (https://arxiv.org/pdf/2309.00306.pdf)
+  # recommended values: -1 under "maxplus"; 5 under "noisyor"
+  num_top_rules: -1
+
   filter_w_train: True
   filter_w_target: True
-  disc_at_least: 10 # -1 for off, must not be bigger than topk
   # choose between "random" / "frequency"
   tie_handling: "frequency"
   # -1 for using ALL available threads
@@ -59,12 +80,18 @@ qa_handler:
   # same as ranking_handler; can be retrieved with handler.get_rules(bool)
   # see documentation for data strucuture
   collect_rules: False
+    # number of candidates to calculate
+  topk: 100
   # select from "maxplus" / "noisyor"
   aggregation_function: "maxplus"
-  num_preselect: -1 #-1 for off
-  topk: 100
-  filter_w_train: True
+
+  ### stopping criteria for rule application
+  # see ranking_handler for description
   disc_at_least: 10 # -1 for off, must not be bigger than topk
+  num_preselect: -1 #-1 for off
+  num_top_rules: -1
+
+  filter_w_train: True
   # choose between "random" / "frequency"
   tie_handling: "frequency"
   # -1 for using ALL available threads
@@ -80,16 +107,22 @@ rules_handler:
   collect_statistics: True
   num_threads: -1 #-1 for ALL available threads
 
-# given input triples, calculates scores and can output all
-# predicting rules + groundings (explanations)
+# given input triples, calculates triple scores and can output all
+# predicting rules + their groundings (explanations)
 prediction_handler:
   collect_explanations: False
   # select from "maxplus" / "noisyor"
+  # note that as we are not calculating candidate rankings; selecting maxplus simply
+  # results in "max-aggregation" scores
   aggregation_function: "maxplus"
   # for a given triple stop rule application if it was predicted by the
   # num_top_rules with the highest confidences
   # set to -1 to not apply any stopping criterion, e.g., to apply all rules
+  # if you want to only collect the best explanation for each triple, set to 1
+  # note that the noisyor score is influenced by this parameter
+  # and results in noisyor-top-h scores (https://arxiv.org/pdf/2309.00306.pdf)
   num_top_rules: 5 
+  
   num_threads: -1 #-1 for ALL available threads
 
 

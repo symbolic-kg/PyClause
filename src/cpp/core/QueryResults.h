@@ -31,7 +31,10 @@ public:
     // checks if at least discAtLeast top candidates can be fully disciminated
     bool checkDiscrimination();
 
+    bool checkNumTopRules();
+
     void setAggrFunc(std::string name);
+    void setNumTopRules(int num);
 
     
 
@@ -55,6 +58,9 @@ private:
 
     bool performAggregation = true;
     std::string aggregationFunction = "maxplus";
+    // stop updating a candiate if it was predicted already by num_top_rules
+    // -1 for off
+    int num_top_rules = -1;
 
     //**internal**
     // we track at least discAtLeast rules for checking discimination number
