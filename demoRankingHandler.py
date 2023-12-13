@@ -22,7 +22,8 @@ ranking_file = "./local/rankingFileNoisy.txt"
 options = Options()
 options.set("ranking_handler.disc_at_least", -1)
 options.set("ranking_handler.aggregation_function", "noisyor")
-options.set("ranking_handler.num_top_rules", 1)
+options.set("ranking_handler.num_top_rules", 3)
+
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()

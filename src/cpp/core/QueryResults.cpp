@@ -133,6 +133,8 @@ bool QueryResults::checkNumTopRules(){
     for (auto& cand: candidateOrder){
         if (candRules[cand].size()>=num_top_rules){
             numFinished += 1;
+        }else{
+            return false;
         }
         if (numFinished>=addTopK){
             return true;
