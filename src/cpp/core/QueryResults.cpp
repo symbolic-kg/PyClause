@@ -68,6 +68,7 @@ void QueryResults::clear(){
     trackTo = 0;
     numDiscriminated = 0;
     candScores.clear();
+    numTopRulesFinished = 0;
 }
 
 std::vector<int>& QueryResults::getCandsOrdered(){
@@ -129,16 +130,21 @@ bool QueryResults::checkNumTopRules(){
         return false;
     }
 
-    int numFinished = 0;
-    for (auto& cand: candidateOrder){
-        if (candRules[cand].size()>=num_top_rules){
-            numFinished += 1;
+    if (numTopRulesFinished>=addTopK){
+        return true;
+    } 
+
+    for (int i=numTopRulesFinished; i<addTopK; i++){
+
+        if(candRules[candidateOrder[i]].size()>=num_top_rules){
+            numTopRulesFinished += 1;
         }else{
             return false;
         }
-        if (numFinished>=addTopK){
+
+        if (numTopRulesFinished>=addTopK){
             return true;
-        }
+        } 
     }
     return false;
 }

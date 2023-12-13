@@ -68,6 +68,9 @@ private:
     int trackTo=0;
     int numDiscriminated=0;
 
+    // how many cands finished according to num_top_rules
+    int numTopRulesFinished=0;
+
     Rule* firstRule = nullptr;
     Rule* currentRule = nullptr;
 
