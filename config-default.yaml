@@ -44,7 +44,7 @@ ranking_handler:
   # number of candidates to calculate
   topk: 100
   # select from "maxplus" / "noisyor"
-  # maxplus scores of a will be of the highest predicting rule
+  # maxplus scores of a ranking will be of the highest predicting rule
   # candidate discrimination is based on comparing the sequences of predicting
   # rules confidences lexicographically
   # noisyor scores and ranking is based on sorting the noisy-or product  
