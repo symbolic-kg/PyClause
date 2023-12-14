@@ -688,7 +688,133 @@ def test_noisy_triple_scoring():
             head_ranking = dict(head_ranking)
             assert(idx_scores[i][3]==head_ranking[head])
 
-    print("Test Triple scoring successful.")            
+    print("Test Triple scoring successful.")
+
+
+def test_noisy_or():
+    """
+    Test if the triple scores with string output match the idx version.
+    Also test if the candidate scores calculated under noisy or from query ranking match the triple scores.
+    
+    """
+
+
+    import c_clause
+    import numpy as np
+
+    base_dir = get_base_dir()
+    train = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
+    rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
+
+    options = Options()
+    options.set("data_handler.use_u_xxd_rules", False)
+    options.set("data_handler.use_u_xxc_rules", False)
+    options.set("data_handler.use_zero_rules", False)
+
+    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader.load_data(train)
+    loader.load_rules(rules)
+
+
+    
+    options.set("qa_handler.topk", 300)
+    options.set("qa_handler.disc_at_least", -1)
+    options.set("qa_handler.aggregation_function", "noisyor")
+    options.set("qa_handler.num_top_rules", 5)
+    qa_5 = c_clause.QAHandler(options.flatS("qa_handler"))
+
+    options.set("qa_handler.num_top_rules", -1)
+    qa_ALL = c_clause.QAHandler(options.flatS("qa_handler"))
+
+    triples = [
+        #("04868748", "_hypernym", "04826235"),
+        #("01296462", "_derivationally_related_form", "00379422"),
+        ("00538571", "_synset_domain_topic_of", "06084469"),
+        #("01466543", "_derivationally_related_form", "06084469"),
+        #("04868748", "_hypernym", "04826235"),
+    ]
+    
+    head_queries = [ (tr[2], tr[1]) for tr in triples ]
+    tail_queries = [ (tr[0], tr[1]) for tr in triples ]
+
+
+    options.set("prediction_handler.aggregation_function", "noisyor")
+    options.set("prediction_handler.num_top_rules" , -1)
+    scorer_all = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+
+    options.set("prediction_handler.aggregation_function", "noisyor")
+    options.set("prediction_handler.num_top_rules" , 5)
+    scorer_5 = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+
+
+    scorer_all.calculate_scores(triples, loader)
+    scores_all = scorer_all.get_scores(False)
+
+    scorer_5.calculate_scores(triples, loader)
+    scores_5 = scorer_5.get_scores(False)
+
+
+
+    qa_5.calculate_answers(head_queries, loader, "head")
+    head_answers_5 = qa_5.get_answers(False)
+    qa_5.calculate_answers(tail_queries, loader, "tail")
+    tail_answers_5 = qa_5.get_answers(False)
+
+    qa_ALL.calculate_answers(head_queries, loader, "head")
+    head_answers_ALL = qa_ALL.get_answers(False)
+    qa_ALL.calculate_answers(tail_queries, loader, "tail")
+    tail_answers_ALL = qa_ALL.get_answers(False)
+
+    entity_map = loader.entity_map()
+
+
+    for i in range(len(scores_all)):
+
+        score_ALL = scores_all[i][3]
+        score_5 = scores_5[i][3]
+        assert(score_ALL>=score_5)
+
+        head_cand_ALL = dict(head_answers_ALL[i])
+        head_cand_5 = dict(head_answers_5[i])
+
+        tail_cand_ALL = dict(tail_answers_ALL[i])
+        tail_cand_5 = dict(tail_answers_5[i])
+
+        # every noisy-top5 cand must be a noisy-all cand
+        # and the score must not be bigger
+        for key in head_cand_5.keys():
+            assert(key in head_cand_ALL)
+            assert(head_cand_5[key]<=head_cand_ALL[key])
+        for key in tail_cand_5.keys():
+            assert(tail_cand_5[key]<=tail_cand_ALL[key])
+            assert(key in tail_cand_ALL)
+
+        # scores from triple scoring must match score of true cand from qa
+        if score_5>0:
+            assert(score_5 == tail_cand_5[entity_map[triples[i][2]]])
+            assert(score_5 == head_cand_5[entity_map[triples[i][0]]])
+        if score_ALL>0:
+            assert(score_ALL == tail_cand_ALL[entity_map[triples[i][2]]])
+            assert(score_ALL == head_cand_ALL[entity_map[triples[i][0]]])
+        else:
+            assert(score_ALL==score_5)
+    print("Test noisy-or successful.")
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    
+    
 
 
 
