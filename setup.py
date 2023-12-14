@@ -46,6 +46,7 @@ class BuildExt(build_ext):
       opts.append('-DVERSION_INFO="%s"' % self.distribution.get_version())
       opts.append(cpp_flag(self.compiler))
       opts.append('-fopenmp') # assumes openmp is supported
+      # opts.append("-w") # uncommment to suppress warnings
     elif ct == 'msvc':
       opts.append('/DVERSION_INFO=\\"%s\\"' % self.distribution.get_version())
       opts.append("/openmp")
