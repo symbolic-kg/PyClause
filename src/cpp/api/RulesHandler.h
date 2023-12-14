@@ -21,6 +21,7 @@
 #include <array>
 #include <map>
 #include <omp.h>
+#include <fstream>
 
 
 class RulesHandler: public BackendHandler{
@@ -34,7 +35,8 @@ public:
 
     // functions exposed to python
     // std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std::array<int,2>>>
-    void calcRulesPredictions(std::vector<std::string>& stringRules, std::shared_ptr<Loader> dHandler);
+    void calcRulesPredictions(std::vector<std::string>& stringRules, std::shared_ptr<DataHandler> dHandler);
+    void calcRulesPredictions(std::string& stringRules, std::shared_ptr<DataHandler> dHandler);
     std::vector<std::vector<std::array<int, 3>>> getIdxPredictions();
     std::vector<std::vector<std::array<std::string, 3>>> getStrPredictions();
     std::vector<std::array<int,2>>& getStats();

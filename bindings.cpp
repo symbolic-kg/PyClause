@@ -90,11 +90,19 @@ PYBIND11_MODULE(c_clause, m) {
     ; //class end
     // RulesHandler()
     py::class_<RulesHandler>(m, "RulesHandler") 
-        .def(py::init<std::map<std::string, std::string>>(),  py::arg("options"))
-        .def("set_options", &RulesHandler::setOptionsFrontend, py::arg("options"))
+        .def(py::init<std::map<std::string, std::string>>())
+        
         .def(
-            "calculate_predictions", &RulesHandler::calcRulesPredictions,
-            py::arg("rules"), py::arg("loader"),
+            "calculate_predictions", py::overload_cast<std::vector<std::string>&, std::shared_ptr<DataHandler>>(&RulesHandler::calcRulesPredictions),
+            R"pbdoc(
+                Given a list of string rules calculate predictions and rule statistics (num_pred, num_true_pred). 
+                Option parameters can specify if predictions are stored or if statistics are stored. If only statistics 
+                need to be computed, turn of collect_predictions parameter for efficiency.
+
+            )pbdoc" 
+        )
+        .def(
+            "calculate_predictions", py::overload_cast<std::string&, std::shared_ptr<DataHandler>>(&RulesHandler::calcRulesPredictions),
             R"pbdoc(
                 Given a list of string rules calculate predictions and rule statistics (num_pred, num_true_pred). 
                 Option parameters can specify if predictions are stored or if statistics are stored. If only statistics 

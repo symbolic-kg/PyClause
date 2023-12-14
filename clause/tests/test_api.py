@@ -56,6 +56,37 @@ def test_rules_handler():
         assert(entities[str_head] == idx_preds[4][i][0])
         assert(relations[str_rel] == idx_preds[4][i][1])
         assert(entities[str_tail] == idx_preds[4][i][2])
+        
+    ## Test loading rules from file (w and wo stats)
+    test_rules_path = join_u(base_dir, join_u("data", "test_rules.txt"))
+    with open(test_rules_path, "w") as outfile:
+        outfile.write("\n".join(rules_list))
+    handler = c_clause.RulesHandler(options)
+    handler.calculate_predictions(test_rules_path, loader)
+    str_preds = handler.get_predictions(True)
+    idx_preds = handler.get_predictions(False)
+    stats = handler.get_statistics()
+    assert(len(str_preds[0])==len(idx_preds[0])==16109==stats[0][0])
+    assert(len(str_preds[1])==len(idx_preds[1])==97==stats[1][0])
+    assert(len(str_preds[2])==len(idx_preds[2])==59==stats[2][0])
+    assert(len(str_preds[3])==len(idx_preds[3])==16106==stats[3][0])
+    assert(len(str_preds[4])==len(idx_preds[4])==83==stats[4][0])
+        
+    test_rules_w_stats_path = join_u(base_dir, join_u("data", "test_rules_w_stats.txt"))
+    rules_w_stats = [f"{stat[0]}\t{stat[1]}\t{stat[1] / stat[0]}\t{rule}" for stat, rule in zip(stats, rules_list)]
+    with open(test_rules_w_stats_path, "w") as outfile:
+        outfile.write("\n".join(rules_w_stats))
+    handler = c_clause.RulesHandler(options)
+    handler.calculate_predictions(test_rules_w_stats_path, loader)
+    str_preds = handler.get_predictions(True)
+    idx_preds = handler.get_predictions(False)
+    stats = handler.get_statistics()
+    assert(len(str_preds[0])==len(idx_preds[0])==16109==stats[0][0])
+    assert(len(str_preds[1])==len(idx_preds[1])==97==stats[1][0])
+    assert(len(str_preds[2])==len(idx_preds[2])==59==stats[2][0])
+    assert(len(str_preds[3])==len(idx_preds[3])==16106==stats[3][0])
+    assert(len(str_preds[4])==len(idx_preds[4])==83==stats[4][0])
+
     print("Testing RulesHandler successful")
 
 

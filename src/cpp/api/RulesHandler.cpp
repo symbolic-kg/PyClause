@@ -121,6 +121,34 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
     }
 }
 
+void RulesHandler::calcRulesPredictions(std::string& rulesPath, std::shared_ptr<DataHandler> dHandler){
+
+    std::vector<std::string> stringRules;
+    std::string line;
+	std::ifstream file(rulesPath);
+	if (file.is_open())
+	{
+		while (!util::safeGetline(file, line).eof())
+		{
+            std::vector<std::string> results = util::split(line, '\t');
+			if (results.size() == 4) {
+                // rules with stats
+                stringRules.push_back(results[3]);
+			} else if (results.size() == 1) {
+                stringRules.push_back(results[0]);
+            } else {
+				std::cout << "Unsupported Filetype, please make sure you have the following triple format {subject}{TAB}{predicate}{TAB}{object}" << std::endl;
+            }
+		}
+		file.close();
+	}
+	else {
+		std::cout << "Unable to open file " << rulesPath << std::endl;
+		exit(-1);
+	}
+
+    calcRulesPredictions(stringRules, dHandler);
+}
 
 std::vector<std::vector<std::array<int, 3>>> RulesHandler::getIdxPredictions(){
     if (!collectPredictions){
