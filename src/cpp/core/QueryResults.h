@@ -35,6 +35,7 @@ public:
 
     void setAggrFunc(std::string name);
     void setNumTopRules(int num);
+    void setPerformAggregation(bool ind);
 
     
 

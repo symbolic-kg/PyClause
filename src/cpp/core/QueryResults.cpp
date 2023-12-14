@@ -161,3 +161,7 @@ void QueryResults::setAggrFunc(std::string name){
 void QueryResults::setNumTopRules(int num){
     num_top_rules = num;
 }
+
+void QueryResults::setPerformAggregation(bool ind){
+    performAggregation = ind;
+}

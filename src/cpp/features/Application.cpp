@@ -150,6 +150,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
     #pragma omp parallel num_threads(num_thr)
     {
         QueryResults qResults(rank_topk, rank_discAtLeast);
+        qResults.setPerformAggregation(performAggregation);
         qResults.setAggrFunc(rank_aggrFunc);
         qResults.setNumTopRules(score_numTopRules);
         ManySet filter;
@@ -214,7 +215,10 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
 
                     std::vector<std::pair<int, double>> sortedCandScores;
                     // tie handling, final processing, sorting
-                    (this->*sortAndProcess)(sortedCandScores, qResults, train);
+                    if (performAggregation){
+                        (this->*sortAndProcess)(sortedCandScores, qResults, train);
+                    }
+                    
 
                     #pragma omp critical
                     {   
