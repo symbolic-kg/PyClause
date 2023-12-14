@@ -373,7 +373,7 @@ def test_triple_scoring_B_237():
    
     options.set("ranking_handler.disc_at_least", -1)
     options.set("ranking_handler.topk", 1)
-    options.set("ranking_handler.num_preselect", 1)
+    options.set("ranking_handler.hard_stop_at", 1)
 
     options.set("prediction_handler.collect_explanations", True)
     options.set("prediction_handler.num_top_rules", 1)
