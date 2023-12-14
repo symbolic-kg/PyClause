@@ -100,7 +100,7 @@ private:
 
     // preselection of candidates based on rules with the highest confidences
     // starting with the rule with higehest conf as soon as numPreselect cands are found we stop
-    int rank_numPreselect=1000000;
+    int rank_numPreselect=-1;
    
     // filter with train
     bool rank_filterWtrain=true;

@@ -3,7 +3,7 @@
 # ************************************************************************
  
 
-## BACKEND c_clause handler options ######################################
+## BACKEND c_clause handler options #######################################
 
 # Example:
 # from c_clause import DataHandler, QAHandler
@@ -38,31 +38,35 @@ data_handler:
 # calculates rankings based on the target set loaded into DataLoader
 ranking_handler:
   # whether to cache the rules that predicted the query candidates,
-  # can be retrieved with handler.get_rules(bool, string:headOrTailRanking).
-  # Turn off for efficiency.
+  # can be retrieved with handler.get_rules(bool, string:headOrTailRanking)
+  # turn off for efficiency.
   collect_rules: False
   # number of candidates to calculate
   topk: 100
   # select from "maxplus" / "noisyor"
+  # maxplus scores of a will be of the highest predicting rule
+  # candidate discrimination is based on comparing the sequences of predicting
+  # rules confidences lexicographically
+  # noisyor scores and ranking is based on sorting the noisy-or product  
   aggregation_function: "maxplus"
 
   ### stopping criteria for rule application
 
   # stop rule application for a query if topk candidates are calculated AND at least disc_at_least
-  # candidates are fully discriminated, i.e, they are pairwise distinct in regard
+  # of the best candidates are fully discriminated, i.e, they are pairwise distinct in regard
   # to their predicting rules
-  # recommended values: 10 or 20 under "maxplus" and topk=100
-  # recommended value: -1 under "noisyor"
+  # recommended values: 10 or 20 under topk=100
   disc_at_least: 10 # -1 for off, must not be bigger than topk
 
-  # stop rule application for a query as soon as num_preselect
-  # candidates are found; set to topk under maxplus to achieve max-aggregation
-  # scores very fast without getting a properly discriminated ranking
+  # stop rule application for a query as soon as hard_stop_at candidates
+  # are found (ignoring topk); set the value to topk under maxplus to achieve max-aggregation
+  # scores for all candidates very fast without getting a properly discriminated ranking
   # recommended value: -1
-  num_preselect: -1 #-1 for off
+  hard_stop_at: -1 #-1 for off
 
-  # stops rule application for every candidate of a query  if it was predicted by
-  # num_top_rules; can be used in conjunction with "noisyor" to achieve
+  # stops adding predicting rules to a candidate of a query if already num_top_rules
+  # predicted the candidate; if all candidates are predicted by num_top_rules, rule
+  # application is stopped; can be used in conjunction with "noisyor" to achieve
   # noisy-or top-h (https://arxiv.org/pdf/2309.00306.pdf)
   # recommended values: -1 under "maxplus"; 5 under "noisyor"
   num_top_rules: -1
@@ -88,7 +92,7 @@ qa_handler:
   ### stopping criteria for rule application
   # see ranking_handler for description
   disc_at_least: 10 # -1 for off, must not be bigger than topk
-  num_preselect: -1 #-1 for off
+  hard_stop_at: -1 #-1 for off
   num_top_rules: -1
 
   filter_w_train: True
