@@ -39,7 +39,7 @@ void QueryResults::insertRule(int cand, Rule* rule){
     }
 
     // update 
-    if (num_top_rules<0 || (num_top_rules>0 && candRules[cand].size()<num_top_rules)){
+    if (num_top_rules<0 || (!newCand && it->second.size() < num_top_rules)){
         // known cand: always update
         // new cand: -> only add and update when explicitly asked by !onlyUpdate
         if (!onlyUpdate || !newCand){
