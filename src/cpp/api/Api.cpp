@@ -40,8 +40,8 @@ void BackendHandler::setRankingOptions(std::map<std::string, std::string> option
     if (aggFunc != options.end() && numTopRules != options.end()) {
         if (aggFunc->second == "maxplus" && numTopRules->second != "-1") {
             std::cerr <<
-             "Warning: Aggregation function is set to 'maxplus' and 'num_top_rules' is not -1."
-             "Please only do this when you know what you are doing. Otherwise set num_top_rules to -1 ."
+             "Warning: Aggregation function is set to 'maxplus' and 'num_top_rules' is not -1. "
+             "Please only do this when you know what you are doing. Otherwise set num_top_rules to -1. "
              "Current value is " 
              << numTopRules->second << std::endl;
         }
