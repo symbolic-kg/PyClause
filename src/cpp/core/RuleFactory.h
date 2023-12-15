@@ -16,9 +16,11 @@ class RuleFactory
 {
 public:
     RuleFactory(std::shared_ptr<Index> index);
-    std::unique_ptr<Rule> parseAnytimeRule(std::string rule);
+    // if numPreds and numTrue given it will also check if the rule should based on the member constraints
+    // e.g. BminNumPreds
+    std::unique_ptr<Rule> parseAnytimeRule(std::string rule, int numPreds=-1, int numTrue=-1);
 
-    std::unique_ptr<Rule>parseUXXrule(std::vector<std::string> headBody);
+    std::unique_ptr<Rule>parseUXXrule(std::vector<std::string> headBody, int numPreds=-1, int numTrue=-1);
 
     void parseAtom(const std::string& input, strAtom& atom);
     void parseSymAtom(strAtom& inputAtom, symAtom& symA);
@@ -31,6 +33,10 @@ public:
     void setCreateRuleXXd(bool ind);
     void setCreateRuleXXc(bool ind);
     void setNumUnseen(int val, std::string type);
+
+    void setMinCorrect(int val, std::string type);
+    void setMinPred(int val, std::string type);
+    void setMinConf(double val, std::string type);
 
     void setBbranchingFactor(int val);
     void setDbranchingFactor(int val);
@@ -64,6 +70,28 @@ private:
 
     bool createRuleXXc = true;
     int XXCnumUnseen = 5;
+
+    int ZminCorrect = 2;
+    int BminCorrect = 2;
+    int CminCorrect = 2;
+    int DminCorrect = 2;
+    int XXDminCorrect = 2;
+    int XXCminCorrect = 2;
+
+    int ZminPreds = 2;
+    int BminPreds = 2;
+    int CminPreds = 2;
+    int DminPreds = 2;
+    int XXDminPreds = 2;
+    int XXCminPreds = 2;
+
+
+    double ZminConf = 0.0001;
+    double BminConf = 0.0001;
+    double CminConf = 0.0001;
+    double DminConf = 0.0001;
+    double XXDminConf = 0.0001;
+    double XXCminConf = 0.0001;
 };
 
 

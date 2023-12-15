@@ -14,7 +14,7 @@ RuleFactory::RuleFactory(std::shared_ptr<Index> index){
 
 
 
-std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody){
+std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody, int numPreds, int numTrue){
     // parse head
     strAtom headAtom;
     parseAtom(headBody[0], headAtom);
@@ -52,7 +52,17 @@ std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody
     if (symBodyAtom.containsConstant){
         if (createRuleXXc){
             std::unique_ptr<Rule> ruleXXc = std::make_unique<RuleXXc>(relations, directions, symBodyAtom.constant);
-            ruleXXc->setNumUnseen(XXCnumUnseen);      
+            ruleXXc->setNumUnseen(XXCnumUnseen);
+            if (numPreds>0 && XXCminPreds > numPreds){
+                return nullptr;
+            }
+            if (numTrue>0 && XXCminCorrect > numTrue){
+                return nullptr;
+            }
+            // doesnt matter which param we check
+            if (numTrue>0 && ((double) numTrue/ (double) numPreds) < XXCminConf){
+                return nullptr;
+            }      
             return std::move(ruleXXc);
         } else {
             return nullptr;
@@ -62,6 +72,16 @@ std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody
         if (createRuleXXd){
             std::unique_ptr<Rule> ruleXXd = std::make_unique<RuleXXd>(relations, directions);
             ruleXXd->setNumUnseen(XXDnumUnseen);
+            if (numPreds>0 && XXDminPreds > numPreds){
+                return nullptr;
+            }
+            if (numTrue>0 && XXDminCorrect > numTrue){
+                return nullptr;
+            }
+            // doesnt matter which param we check
+            if (numTrue>0 && ((double) numTrue/ (double) numPreds) < XXDminConf){
+                return nullptr;
+            }      
             return std::move(ruleXXd);
         }else{
             return nullptr;
@@ -70,7 +90,7 @@ std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody
 
 }
 
-std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
+std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPreds, int numTrue) {
     std::string ruleType;
     std::vector<std::string> headBody = util::splitString(rule, _cfg_prs_ruleSeparator);
     std::string headAtomStr = headBody[0];
@@ -152,6 +172,16 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
                     ruleXXc->setPredictHead(predictHead);
                     ruleXXc->setPredictTail(predictTail);
                     ruleXXc->setNumUnseen(XXCnumUnseen);
+                    if (numPreds>0 && XXCminPreds > numPreds){
+                        return nullptr;
+                    }
+                    if (numTrue>0 && XXCminCorrect > numTrue){
+                        return nullptr;
+                    }
+                    // doesnt matter which param we check
+                    if (numTrue>0 && ((double) numTrue/ (double) numPreds) < XXCminConf){
+                        return nullptr;
+                    }
                     return std::move(ruleXXc);
                 } else {
                       return nullptr;
@@ -163,6 +193,17 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
                     ruleXXd->setPredictHead(predictHead);
                     ruleXXd->setPredictTail(predictTail);
                     ruleXXd->setNumUnseen(XXDnumUnseen);
+
+                    if (numPreds>0 && XXDminPreds > numPreds){
+                        return nullptr;
+                    }
+                    if (numTrue>0 && XXDminCorrect > numTrue){
+                        return nullptr;
+                    }
+                    // doesnt matter which param we check
+                    if (numTrue>0 && ((double) numTrue/ (double) numPreds) < XXDminConf){
+                        return nullptr;
+                    }
                     return std::move(ruleXXd);
                 }else{
                     return nullptr;
@@ -182,6 +223,17 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
             std::unique_ptr<RuleZ> rulez = std::make_unique<RuleZ>(relID, sym.leftC, sym.constant);
             rulez->setNumUnseen(ZnumUnseen);
             rulez->setConfWeight(ZconfWeight);
+
+            if (numPreds>0 && ZminPreds > numPreds){
+                return nullptr;
+            }
+            if (numTrue>0 && ZminCorrect > numTrue){
+                return nullptr;
+            }
+            // doesnt matter which param we check
+            if (numTrue>0 && ((double) numTrue/ (double) numPreds) < ZminConf){
+                return nullptr;
+            }
             return  std::move(rulez);
         }
         else{
@@ -382,16 +434,53 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
         std::unique_ptr<RuleB> ruleb = std::make_unique<RuleB>(relations, directions);
         ruleb->setNumUnseen(BnumUnseen);
         ruleb->branchingFactor = BbranchingFactor;
+
+        if (numPreds>0 && BminPreds > numPreds){
+            return nullptr;
+        }
+        if (numTrue>0 && BminCorrect > numTrue){
+            return nullptr;
+        }
+        // doesnt matter which param we check
+        if (numTrue>0 && ((double) numTrue/ (double) numPreds) < BminConf){
+            return nullptr;
+        }
+
         return std::move(ruleb); 
+
     } else if (ruleType=="RuleC" && createRuleC){
         std::unique_ptr<RuleC> rulec = std::make_unique<RuleC>(relations, directions, leftC, constants);
         rulec->setNumUnseen(CnumUnseen);
+
+
+        if (numPreds>0 && CminPreds > numPreds){
+            return nullptr;
+        }
+        if (numTrue>0 && CminCorrect > numTrue){
+            return nullptr;
+        }
+        // doesnt matter which param we check
+        if (numTrue>0 && ((double) numTrue/ (double) numPreds) < CminConf){
+            return nullptr;
+        }
+
         return std::move(rulec);
     }else if(ruleType=="RuleD" && createRuleD){
         std::unique_ptr<RuleD> ruled = std::make_unique<RuleD>(relations, directions, leftC, constants[0]);
         ruled->setNumUnseen(DnumUnseen);
         ruled->setConfWeight(DconfWeight);
         ruled->branchingFactor = DbranchingFactor;
+
+        if (numPreds>0 && DminPreds > numPreds){
+            return nullptr;
+        }
+        if (numTrue>0 && DminCorrect > numTrue){
+            return nullptr;
+        }
+        // doesnt matter which param we check
+        if (numTrue>0 && ((double) numTrue/ (double) numPreds) < DminConf){
+            return nullptr;
+        }
         return std::move(ruled);
     } else {
         return nullptr;
@@ -493,6 +582,61 @@ void RuleFactory::setNumUnseen(int val, std::string type){
         DnumUnseen = val;
     }else{
        throw std::runtime_error("Did not recognize rule type in setting num_unseen: " + type );
+    }
+}
+
+
+void RuleFactory::setMinCorrect(int val, std::string type){
+    if (type=="z"){
+         ZminCorrect = val;
+    }else if(type=="b"){
+        BminCorrect= val;
+    }else if(type=="c"){
+        CminCorrect = val;
+    }else if(type=="xxd"){
+        XXDminCorrect = val;
+    }else if(type=="xxc"){
+        XXCminCorrect = val;
+    }else if (type=="d"){
+        DminCorrect = val;
+    }else{
+       throw std::runtime_error("Did not recognize rule type in setting min_correct: " + type );
+    }
+}
+
+void RuleFactory::setMinPred(int val, std::string type){
+    if (type=="z"){
+         ZminPreds = val;
+    }else if(type=="b"){
+        BminPreds = val;
+    }else if(type=="c"){
+        CminPreds = val;
+    }else if(type=="xxd"){
+        XXDminPreds = val;
+    }else if(type=="xxc"){
+        XXCminPreds = val;
+    }else if (type=="d"){
+        DminPreds = val;
+    }else{
+       throw std::runtime_error("Did not recognize rule type in setting min_preds: " + type );
+    }
+}
+
+void RuleFactory::setMinConf(double val, std::string type){
+    if (type=="z"){
+         ZminConf = val;
+    }else if(type=="b"){
+        BminConf = val;
+    }else if(type=="c"){
+        CminConf = val;
+    }else if(type=="xxd"){
+        XXDminConf = val;
+    }else if(type=="xxc"){
+        XXCminConf = val;
+    }else if (type=="d"){
+        DminConf = val;
+    }else{
+       throw std::runtime_error("Did not recognize rule type in setting min_preds: " + type );
     }
 }
 

@@ -78,24 +78,42 @@ void DataHandler::setRuleOptions(std::map<std::string, std::string> options, Rul
         {"load_zero_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleZ(util::stringToBool(val));}},
         {"z_weight", [&ruleFactory](std::string val) {ruleFactory.setZconfWeight(std::stod(val));}},
         {"z_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "z");}},
+        {"z_min_correct", [&ruleFactory](std::string val) {ruleFactory.setMinCorrect(std::stoi(val), "z");}},
+        {"z_min_preds", [&ruleFactory](std::string val) {ruleFactory.setMinPred(std::stoi(val), "z");}},
+        {"z_min_conf", [&ruleFactory](std::string val) {ruleFactory.setMinConf(std::stod(val), "z");}},
         // C
         {"load_u_c_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleC(util::stringToBool(val));}},
         {"c_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "c");}},
+        {"c_min_correct", [&ruleFactory](std::string val) {ruleFactory.setMinCorrect(std::stoi(val), "c");}},
+        {"c_min_preds", [&ruleFactory](std::string val) {ruleFactory.setMinPred(std::stoi(val), "c");}},
+        {"c_min_conf", [&ruleFactory](std::string val) {ruleFactory.setMinConf(std::stod(val), "c");}},
         // B
         {"load_b_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleB(util::stringToBool(val));}},
         {"b_max_branching_factor", [&ruleFactory](std::string val) {ruleFactory.setBbranchingFactor(std::stoi(val));}},
         {"b_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "b");}},
+        {"b_min_correct", [&ruleFactory](std::string val) {ruleFactory.setMinCorrect(std::stoi(val), "b");}},
+        {"b_min_preds", [&ruleFactory](std::string val) {ruleFactory.setMinPred(std::stoi(val), "b");}},
+        {"b_min_conf", [&ruleFactory](std::string val) {ruleFactory.setMinConf(std::stod(val), "b");}},
         // D
         {"load_u_d_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleD(util::stringToBool(val));}},
         {"d_weight", [&ruleFactory](std::string val) {ruleFactory.setDconfWeight(std::stod(val));}},
         {"d_max_branching_factor", [&ruleFactory](std::string val) {ruleFactory.setDbranchingFactor(std::stoi(val));}},
         {"d_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "d");}},
+        {"d_min_correct", [&ruleFactory](std::string val) {ruleFactory.setMinCorrect(std::stoi(val), "d");}},
+        {"d_min_preds", [&ruleFactory](std::string val) {ruleFactory.setMinPred(std::stoi(val), "d");}},
+        {"d_min_conf", [&ruleFactory](std::string val) {ruleFactory.setMinConf(std::stod(val), "d");}},
         // XXc
         {"load_u_xxc_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXc(util::stringToBool(val));}},
         {"xxc_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "xxc");}},
+        {"xxc_min_correct", [&ruleFactory](std::string val) {ruleFactory.setMinCorrect(std::stoi(val), "xxc");}},
+        {"xxc_min_preds", [&ruleFactory](std::string val) {ruleFactory.setMinPred(std::stoi(val), "xxc");}},
+        {"xxc_min_conf", [&ruleFactory](std::string val) {ruleFactory.setMinConf(std::stod(val), "xxc");}},
         // XXd
         {"load_u_xxd_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXd(util::stringToBool(val));}},
         {"xxd_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "xxd");}},
+        {"xxd_min_correct", [&ruleFactory](std::string val) {ruleFactory.setMinCorrect(std::stoi(val), "xxd");}},
+        {"xxd_min_preds", [&ruleFactory](std::string val) {ruleFactory.setMinPred(std::stoi(val), "xxd");}},
+        {"xxd_min_conf", [&ruleFactory](std::string val) {ruleFactory.setMinConf(std::stod(val), "xxd");}},
         
     };
 

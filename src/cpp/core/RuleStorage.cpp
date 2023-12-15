@@ -55,15 +55,20 @@ void RuleStorage::readAnyTimeFromVec(std::vector<std::string>& ruleStrings, bool
     std::cout<<"Loaded "<<currID<<" rules."<<std::endl;
 } 
 
+
 bool RuleStorage::addAnyTimeRule(std::string ruleLine, int id , bool exact){
     // expects a line: predicted\t cpredicted\tconf\trulestring
 	std::vector<std::string> splitline = util::split(ruleLine, '\t');
     std::string ruleString = splitline[3];
-    std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(ruleString);
+    if (splitline.size()!=4){
+        throw std::runtime_error("Could not parse this rule because of format: " + ruleLine);
+    }
+    int num_preds = std::stoi(splitline[0]);
+    int num_true = std::stoi(splitline[1]);
+    std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(ruleString, num_preds, num_true);
     if (rule){
         rule->setID(id);
-        rule->setStats(
-            std::stoi(splitline[0]), std::stoi(splitline[1]), exact);
+        rule->setStats(num_preds, num_true, exact);
         rule->setRuleString(ruleString);
         relToRules[rule->getTargetRel()].insert(&(*rule)); //same as insert(rule.get())
         rules.push_back(std::move(rule));
