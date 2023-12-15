@@ -17,17 +17,22 @@ RuleStorage::RuleStorage(std::shared_ptr<Index> index, std::shared_ptr<RuleFacto
 // reads format outputted by AnyBURL
 void RuleStorage::readAnyTimeFormat(std::string path, bool exact){
     int currID = 0;
+    int currLine = 0;
 	std::string line;
 	std::ifstream file(path);
+    if (verbose){
+        std::cout<<"Loading rules from " + path <<std::endl;
+    }
 	if (file.is_open()) {
 		while (!util::safeGetline(file, line).eof()){
-            if (currID%1000000==0 && verbose && currID>0){
-                std::cout<<"...read "<<currID<<" rules "<<std::endl;
+            if (currLine%1000000==0 && verbose && currLine>0){
+                std::cout<<"...parsed "<<currID<<" rules "<<std::endl;
             }
             bool added = addAnyTimeRule(line, currID, false);
             if (added){
                 currID += 1;
             }
+            currLine += 1;
         }
         std::cout<<"Loaded "<<currID<<" rules."<<std::endl;
     }else{
