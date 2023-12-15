@@ -9,31 +9,47 @@
 # from c_clause import DataHandler, QAHandler
 # from clause.config.options import Options
 # opts = Options()
-# opts.set("data_handler.use_zero_rules", False)
+# opts.set("data_handler.load_zero_rules", False)
+# opts.set("data_handler.b_min_support", 10)
 # loader = DataHandler(opts.flatS("data_handler"))
 # qa = QAHandler(opts.flatS("qa_handler"))
 
 
-##  DataHandler loads rulesets and datasets
+###  DataHandler loads rulesets and datasets
+###  the options can be used to filter/ignore some rules
 
 # 'r_num_unseen' option:
-# laplace smoothing applied to all rules for calculating confidence
-# conf = num_correct_predictions / (num_unseen+num_predictions)
+# laplace smoothing applied to rule type 'r' for calculating confidence
+# conf = support / (num_unseen+num_predictions)
+
+# 'r_min_support' option:
+#  dont load rules of type 'r' if they have a lower support as 'r_min_support'
+# 'r_min_preds' option: as above for the overall number of triple predicitions
+# 'r_min_confidence': as above; note: confidence here is without laplace smooting
 data_handler:
   ## Z rules
   load_zero_rules: True
   # weight that is multiplied with the confidence
   z_weight: 0.1
   z_num_unseen: 5
+  z_min_support: 2
+  z_min_preds: 2
+  z_min_conf: 0.0001
 
   ## U_c rules
   load_u_c_rules: True
   c_num_unseen: 5
+  c_min_support: 2
+  c_min_preds: 2
+  c_min_conf: 0.0001
 
   ## B rules
   load_b_rules: True
   b_max_branching_factor: -1 #-1 for off
   b_num_unseen: 5
+  b_min_support: 2
+  b_min_preds: 2
+  b_min_conf: 0.0001
 
   ##  U_d rules
   load_u_d_rules: True
@@ -41,14 +57,23 @@ data_handler:
   d_weight: 0.01
   d_max_branching_factor: -1 #-1 for off
   d_num_unseen: 5
+  d_min_support: 2
+  d_min_preds: 2
+  d_min_conf: 0.0001
 
   ## U_xxc rules
   load_u_xxc_rules: True
   xxc_num_unseen: 5
+  xxc_min_support: 2
+  xxc_min_preds: 2
+  xxc_min_conf: 0.0001
 
   ## U_xxd rules
   load_u_xxd_rules: True
   xxd_num_unseen: 5
+  xxd_min_support: 2
+  xxd_min_preds: 2
+  xxd_min_conf: 0.0001
 
 # calculates rankings based on the target set loaded into DataLoader
 ranking_handler:
