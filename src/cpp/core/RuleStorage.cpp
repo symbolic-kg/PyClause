@@ -26,7 +26,7 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool exact){
 	if (file.is_open()) {
 		while (!util::safeGetline(file, line).eof()){
             if (currLine%1000000==0 && verbose && currLine>0){
-                std::cout<<"...parsed "<<currID<<" rules "<<std::endl;
+                std::cout<<"...parsed "<<currLine<<" rules "<<std::endl;
             }
             bool added = addAnyTimeRule(line, currID, false);
             if (added){
