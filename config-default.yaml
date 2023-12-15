@@ -9,31 +9,46 @@
 # from c_clause import DataHandler, QAHandler
 # from clause.config.options import Options
 # opts = Options()
+# opts.set("data_handler.use_zero_rules", False)
 # loader = DataHandler(opts.flatS("data_handler"))
 # qa = QAHandler(opts.flatS("qa_handler"))
 
 
-# loads rulesets and datasets
+##  DataHandler loads rulesets and datasets
+
+# 'r_num_unseen' option:
+# laplace smoothing applied to all rules for calculating confidence
+# conf = num_correct_predictions / (num_unseen+num_predictions)
 data_handler:
-  # Z rules
-  use_zero_rules: True
+  ## Z rules
+  load_zero_rules: True
+  # weight that is multiplied with the confidence
   z_weight: 0.1
-  # U_c rules
-  use_u_c_rules: True
-  # B rules
-  use_b_rules: True
+  z_num_unseen: 5
+
+  ## U_c rules
+  load_u_c_rules: True
+  c_num_unseen: 5
+
+  ## B rules
+  load_b_rules: True
   b_max_branching_factor: -1 #-1 for off
-  # U_d rules
-  use_u_d_rules: True
+  b_num_unseen: 5
+
+  ##  U_d rules
+  load_u_d_rules: True
+  # weight that is multiplied with the confidence
   d_weight: 0.01
   d_max_branching_factor: -1 #-1 for off
-  # Uxxc rules
-  use_u_xxc_rules: True
-  # Uxxd rules
-  use_u_xxd_rules: True
-  # laplace smoothing applied to all rules
-  # confidence = num_correct_predictions / (num_unseen+num_predictions)
-  rule_num_unseen: 5
+  d_num_unseen: 5
+
+  ## U_xxc rules
+  load_u_xxc_rules: True
+  xxc_num_unseen: 5
+
+  ## U_xxd rules
+  load_u_xxd_rules: True
+  xxd_num_unseen: 5
 
 # calculates rankings based on the target set loaded into DataLoader
 ranking_handler:

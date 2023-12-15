@@ -23,13 +23,13 @@ options = {
     "num_threads": "-1", # -1 uses all threads, when you answer only a few queries on the fly per invocation, set a low number here
     "num_unseen": "5",
     # rule options 
-    "use_u_c_rules": "true",
+    "load_u_c_rules": "true",
     # shut off all other rules
-    "use_zero_rules": "false",
-    "use_b_rules": "false",
-    "use_u_d_rules": "false",
-    "use_u_xxc_rules": "false",
-    "use_u_xxd_rules": "false",
+    "load_zero_rules": "false",
+    "load_b_rules": "false",
+    "load_u_d_rules": "false",
+    "load_u_xxc_rules": "false",
+    "load_u_xxd_rules": "false",
 }
 
 # data/rules handler

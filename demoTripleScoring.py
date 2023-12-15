@@ -17,14 +17,14 @@ options = {
                                              # when tracked will be   
         # rule options 
         "rule_b_max_branching_factor": "-1",
-        "use_zero_rules": "false",
+        "load_zero_rules": "false",
         "rule_zero_weight":"0.01",
-        "use_u_c_rules": "true",
-        "use_b_rules": "true",
-        "use_u_d_rules": "true",
+        "load_u_c_rules": "true",
+        "load_b_rules": "true",
+        "load_u_d_rules": "true",
         "rule_u_d_weight":"0.01",
-        "use_u_xxc_rules": "false",
-        "use_u_xxd_rules": "false",
+        "load_u_xxc_rules": "false",
+        "load_u_xxd_rules": "false",
 }
 
 loader = c_clause.DataHandler(options)

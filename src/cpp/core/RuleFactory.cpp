@@ -52,7 +52,7 @@ std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody
     if (symBodyAtom.containsConstant){
         if (createRuleXXc){
             std::unique_ptr<Rule> ruleXXc = std::make_unique<RuleXXc>(relations, directions, symBodyAtom.constant);
-            ruleXXc->setNumUnseen(num_unseen);      
+            ruleXXc->setNumUnseen(XXCnumUnseen);      
             return std::move(ruleXXc);
         } else {
             return nullptr;
@@ -61,7 +61,7 @@ std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody
     }else{
         if (createRuleXXd){
             std::unique_ptr<Rule> ruleXXd = std::make_unique<RuleXXd>(relations, directions);
-            ruleXXd->setNumUnseen(num_unseen);
+            ruleXXd->setNumUnseen(XXDnumUnseen);
             return std::move(ruleXXd);
         }else{
             return nullptr;
@@ -151,7 +151,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
                     std::unique_ptr<Rule> ruleXXc = std::make_unique<RuleXXc>(relations, directions, symBodyAtom.constant);
                     ruleXXc->setPredictHead(predictHead);
                     ruleXXc->setPredictTail(predictTail);
-                    ruleXXc->setNumUnseen(num_unseen);
+                    ruleXXc->setNumUnseen(XXCnumUnseen);
                     return std::move(ruleXXc);
                 } else {
                       return nullptr;
@@ -162,7 +162,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
                     std::unique_ptr<Rule> ruleXXd = std::make_unique<RuleXXd>(relations, directions);
                     ruleXXd->setPredictHead(predictHead);
                     ruleXXd->setPredictTail(predictTail);
-                    ruleXXd->setNumUnseen(num_unseen);
+                    ruleXXd->setNumUnseen(XXDnumUnseen);
                     return std::move(ruleXXd);
                 }else{
                     return nullptr;
@@ -180,7 +180,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
         parseSymAtom(headAtom, sym);
         if (createRuleZ){
             std::unique_ptr<RuleZ> rulez = std::make_unique<RuleZ>(relID, sym.leftC, sym.constant);
-            rulez->setNumUnseen(num_unseen);
+            rulez->setNumUnseen(ZnumUnseen);
             rulez->setConfWeight(ZconfWeight);
             return  std::move(rulez);
         }
@@ -380,16 +380,16 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule) {
 
     if (ruleType=="RuleB" && createRuleB){
         std::unique_ptr<RuleB> ruleb = std::make_unique<RuleB>(relations, directions);
-        ruleb->setNumUnseen(num_unseen);
+        ruleb->setNumUnseen(BnumUnseen);
         ruleb->branchingFactor = BbranchingFactor;
         return std::move(ruleb); 
     } else if (ruleType=="RuleC" && createRuleC){
         std::unique_ptr<RuleC> rulec = std::make_unique<RuleC>(relations, directions, leftC, constants);
-        rulec->setNumUnseen(num_unseen);
+        rulec->setNumUnseen(CnumUnseen);
         return std::move(rulec);
     }else if(ruleType=="RuleD" && createRuleD){
         std::unique_ptr<RuleD> ruled = std::make_unique<RuleD>(relations, directions, leftC, constants[0]);
-        ruled->setNumUnseen(num_unseen);
+        ruled->setNumUnseen(DnumUnseen);
         ruled->setConfWeight(DconfWeight);
         ruled->branchingFactor = DbranchingFactor;
         return std::move(ruled);
@@ -459,11 +459,6 @@ void RuleFactory::setCreateRuleXXc(bool ind){
     createRuleXXc = ind;
 }
 
-void RuleFactory::setNumUnseen(int val){
-    num_unseen = val;
-}
-
-
 void RuleFactory::setBbranchingFactor(int val){
     BbranchingFactor = val;
 }
@@ -482,5 +477,23 @@ void RuleFactory::setZconfWeight(double val){
     ZconfWeight = val;
 }
 
+
+void RuleFactory::setNumUnseen(int val, std::string type){
+    if (type=="z"){
+         ZnumUnseen = val;
+    }else if(type=="b"){
+        BnumUnseen= val;
+    }else if(type=="c"){
+        CnumUnseen = val;
+    }else if(type=="xxd"){
+        XXDnumUnseen = val;
+    }else if(type=="xxc"){
+        XXCnumUnseen = val;
+    }else if (type=="d"){
+        DnumUnseen = val;
+    }else{
+       throw std::runtime_error("Did not recognize rule type in setting num_unseen: " + type );
+    }
+}
 
 

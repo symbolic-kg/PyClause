@@ -133,10 +133,10 @@ def test_uc_b_zero_ranking():
 
     options = Options()
 
-    options.set("data_handler.use_u_d_rules", False)
-    options.set("data_handler.use_u_d_rules", False)
-    options.set("data_handler.use_u_xxc_rules", False)
-    options.set("data_handler.use_u_xxd_rules", False)
+    options.set("data_handler.load_u_d_rules", False)
+    options.set("data_handler.load_u_d_rules", False)
+    options.set("data_handler.load_u_xxc_rules", False)
+    options.set("data_handler.load_u_xxd_rules", False)
 
     options.set("ranking_handler.disc_at_least", 100)
 
@@ -365,11 +365,11 @@ def test_triple_scoring_B_237():
 
     options = Options()
 
-    options.set("data_handler.use_zero_rules", False)
-    options.set("data_handler.use_u_c_rules", False)
-    options.set("data_handler.use_u_d_rules", False)
-    options.set("data_handler.use_u_xxc_rules", False)
-    options.set("data_handler.use_u_xxd_rules", False)
+    options.set("data_handler.load_zero_rules", False)
+    options.set("data_handler.load_u_c_rules", False)
+    options.set("data_handler.load_u_d_rules", False)
+    options.set("data_handler.load_u_xxc_rules", False)
+    options.set("data_handler.load_u_xxd_rules", False)
    
     options.set("ranking_handler.disc_at_least", -1)
     options.set("ranking_handler.topk", 1)
@@ -510,9 +510,9 @@ def test_triple_scoring():
     
 
 
-    options.set("data_handler.use_u_xxd_rules", False)
-    options.set("data_handler.use_u_xxc_rules", False)
-    options.set("data_handler.use_zero_rules", False)
+    options.set("data_handler.load_u_xxd_rules", False)
+    options.set("data_handler.load_u_xxc_rules", False)
+    options.set("data_handler.load_zero_rules", False)
 
     loader = c_clause.DataHandler(options.flatS("data_handler"))
     loader.load_data(train, filter, target)
@@ -620,9 +620,9 @@ def test_noisy_triple_scoring():
     
 
 
-    options.set("data_handler.use_u_xxd_rules", False)
-    options.set("data_handler.use_u_xxc_rules", False)
-    options.set("data_handler.use_zero_rules", False)
+    options.set("data_handler.load_u_xxd_rules", False)
+    options.set("data_handler.load_u_xxc_rules", False)
+    options.set("data_handler.load_zero_rules", False)
 
     loader = c_clause.DataHandler(options.flatS("data_handler"))
     loader.load_data(train, filter, target)
@@ -707,9 +707,9 @@ def test_noisy_or():
     rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
 
     options = Options()
-    options.set("data_handler.use_u_xxd_rules", False)
-    options.set("data_handler.use_u_xxc_rules", False)
-    options.set("data_handler.use_zero_rules", False)
+    options.set("data_handler.load_u_xxd_rules", False)
+    options.set("data_handler.load_u_xxc_rules", False)
+    options.set("data_handler.load_zero_rules", False)
 
     loader = c_clause.DataHandler(options.flatS("data_handler"))
     loader.load_data(train)
@@ -834,9 +834,9 @@ def test_explanation_tracking():
     options.set("prediction_handler.collect_explanations", True)
 
 
-    options.set("data_handler.use_u_xxd_rules", False)
-    options.set("data_handler.use_u_xxc_rules", False)
-    options.set("data_handler.use_zero_rules", False)
+    options.set("data_handler.load_u_xxd_rules", False)
+    options.set("data_handler.load_u_xxc_rules", False)
+    options.set("data_handler.load_zero_rules", False)
 
     num_top_rules = 10
 

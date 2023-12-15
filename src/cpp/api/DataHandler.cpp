@@ -75,22 +75,28 @@ void DataHandler::setRuleOptions(std::map<std::string, std::string> options, Rul
 
     std::vector<OptionHandler> handlers = {
         // Z
-        {"use_zero_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleZ(util::stringToBool(val));}},
+        {"load_zero_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleZ(util::stringToBool(val));}},
         {"z_weight", [&ruleFactory](std::string val) {ruleFactory.setZconfWeight(std::stod(val));}},
+        {"z_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "z");}},
         // C
-        {"use_u_c_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleC(util::stringToBool(val));}},
+        {"load_u_c_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleC(util::stringToBool(val));}},
+        {"c_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "c");}},
         // B
-        {"use_b_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleB(util::stringToBool(val));}},
+        {"load_b_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleB(util::stringToBool(val));}},
         {"b_max_branching_factor", [&ruleFactory](std::string val) {ruleFactory.setBbranchingFactor(std::stoi(val));}},
+        {"b_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "b");}},
         // D
-        {"use_u_d_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleD(util::stringToBool(val));}},
+        {"load_u_d_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleD(util::stringToBool(val));}},
         {"d_weight", [&ruleFactory](std::string val) {ruleFactory.setDconfWeight(std::stod(val));}},
         {"d_max_branching_factor", [&ruleFactory](std::string val) {ruleFactory.setDbranchingFactor(std::stoi(val));}},
+        {"d_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "d");}},
         // XXc
-        {"use_u_xxc_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXc(util::stringToBool(val));}},
+        {"load_u_xxc_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXc(util::stringToBool(val));}},
+        {"xxc_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "xxc");}},
         // XXd
-        {"use_u_xxd_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXd(util::stringToBool(val));}},
-        {"rule_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val));}}
+        {"load_u_xxd_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXd(util::stringToBool(val));}},
+        {"xxd_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "xxd");}},
+        
     };
 
     for (auto& handler : handlers) {
