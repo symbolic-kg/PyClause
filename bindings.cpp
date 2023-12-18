@@ -114,21 +114,30 @@ PYBIND11_MODULE(c_clause, m) {
     ; //class end
 
     py::class_<DataHandler,  std::shared_ptr<DataHandler>>(m, "DataHandler") 
-        .def(py::init<std::map<std::string, std::string>>())
-        .def("load_rules", py::overload_cast<std::string>(&DataHandler::loadRules))
-        .def("load_rules", py::overload_cast<std::vector<std::string>>(&DataHandler::loadRules))
-        .def("load_data", [](DataHandler &self, const std::string &data, const std::string &filter, const std::string &target) { return self.loadData<std::string>(data, filter, target); }, 
-           py::arg("data"), py::arg("filter") = "", py::arg("target") = "")
-        .def("load_data", [](DataHandler &self, const StringTripleSet &data, const StringTripleSet &filter, const StringTripleSet &target) { return self.loadData<StringTripleSet>(data, filter, target); }, 
-            py::arg("data"), py::arg("filter") = StringTripleSet(), py::arg("target") = StringTripleSet())
-        .def("load_data", [](DataHandler &self, const TripleSet &data, const TripleSet &filter, const TripleSet &target) { return self.loadData<TripleSet>(data, filter, target); }, 
-            py::arg("data"), py::arg("filter") = TripleSet(), py::arg("target") = TripleSet())
+        .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
+        .def("load_rules", py::overload_cast<std::string>(&DataHandler::loadRules), py::arg("rules"))
+        .def("load_rules", py::overload_cast<std::vector<std::string>>(&DataHandler::loadRules), py::arg("rules"))
+        .def(
+            "load_data",
+            [](DataHandler &self, const std::string &data, const std::string &filter, const std::string &target) { return self.loadData<std::string>(data, filter, target); }, 
+            py::arg("data"), py::arg("filter") = "", py::arg("target") = ""
+        )
+        .def(
+            "load_data",
+            [](DataHandler &self, const StringTripleSet &data, const StringTripleSet &filter, const StringTripleSet &target) { return self.loadData<StringTripleSet>(data, filter, target); }, 
+            py::arg("data"), py::arg("filter") = StringTripleSet(), py::arg("target") = StringTripleSet()
+        )
+        .def(
+            "load_data",
+            [](DataHandler &self, const TripleSet &data, const TripleSet &filter, const TripleSet &target) { return self.loadData<TripleSet>(data, filter, target); }, 
+            py::arg("data"), py::arg("filter") = TripleSet(), py::arg("target") = TripleSet()
+        )
         .def("entity_map", &DataHandler::getNodeToIdx)
         .def("relation_map", &DataHandler::getRelationToIdx)
-        .def("replace_ent_tokens", &DataHandler::subsEntityStrings)
-        .def("replace_rel_tokens", &DataHandler::subsRelationStrings)
-        .def("set_entity_index",  &DataHandler::setNodeIndex)
-        .def("set_relation_index",  &DataHandler::setRelIndex)
+        .def("replace_ent_tokens", &DataHandler::subsEntityStrings, py::arg("new_tokens"))
+        .def("replace_rel_tokens", &DataHandler::subsRelationStrings, py::arg("new_tokens"))
+        .def("set_entity_index",  &DataHandler::setNodeIndex, py::arg("index"))
+        .def("set_relation_index",  &DataHandler::setRelIndex, py::arg("index"))
         .def("rule_index",  &DataHandler::getRuleIdx)
     ; // class end
 
