@@ -15,7 +15,7 @@ options = {
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()
-loader = c_clause.DataHandler(options)
+loader = c_clause.Loader(options)
 loader.load_data(data)
 
 

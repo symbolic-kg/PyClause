@@ -53,7 +53,7 @@ void RulesHandler::setNumThr(int num){
 }
 
 
-void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, std::shared_ptr<DataHandler> dHandler){
+void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, std::shared_ptr<Loader> dHandler){
 
     index = dHandler->getIndex();
     predictions.clear();

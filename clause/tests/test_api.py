@@ -19,7 +19,7 @@ def test_rules_handler():
     "collect_predictions": "true"
     }
 
-    loader = c_clause.DataHandler(options)
+    loader = c_clause.Loader(options)
     loader.load_data(data)
 
     entities = loader.entity_map()
@@ -78,13 +78,13 @@ def test_rule_loading():
 
     options = {}
 
-    loader = c_clause.DataHandler(options)
+    loader = c_clause.Loader(options)
     loader.load_data(train_path)
     ## serialize rules from frontend
     loader.load_rules([rule.get_serialization() for rule in rules.rules])
 
 
-    loader2 = c_clause.DataHandler(options)
+    loader2 = c_clause.Loader(options)
     loader2.load_data(train_path)
     ## load rules from disk
     loader2.load_rules(rules_path)
@@ -133,15 +133,15 @@ def test_uc_b_zero_ranking():
 
     options = Options()
 
-    options.set("data_handler.load_u_d_rules", False)
-    options.set("data_handler.load_u_d_rules", False)
-    options.set("data_handler.load_u_xxc_rules", False)
-    options.set("data_handler.load_u_xxd_rules", False)
+    options.set("loader.load_u_d_rules", False)
+    options.set("loader.load_u_d_rules", False)
+    options.set("loader.load_u_xxc_rules", False)
+    options.set("loader.load_u_xxd_rules", False)
 
     options.set("ranking_handler.disc_at_least", 100)
 
 
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.set_entity_index(["mustnotbreakanything"])
     loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_data(train_path, filter_path, test_path)
@@ -213,7 +213,7 @@ def test_237_all_ranking():
     options = Options()
 
 
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.set_entity_index(["mustnotbreakanything"])
     loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_data(train_path, filter_path, test_path)
@@ -265,7 +265,7 @@ def test_qa_handler():
     options = Options()
 
     options.set("qa_handler.filter_w_train", False)
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.load_data(train, filter)
     loader.load_rules(rules)
 
@@ -365,11 +365,11 @@ def test_triple_scoring_B_237():
 
     options = Options()
 
-    options.set("data_handler.load_zero_rules", False)
-    options.set("data_handler.load_u_c_rules", False)
-    options.set("data_handler.load_u_d_rules", False)
-    options.set("data_handler.load_u_xxc_rules", False)
-    options.set("data_handler.load_u_xxd_rules", False)
+    options.set("loader.load_zero_rules", False)
+    options.set("loader.load_u_c_rules", False)
+    options.set("loader.load_u_d_rules", False)
+    options.set("loader.load_u_xxc_rules", False)
+    options.set("loader.load_u_xxd_rules", False)
    
     options.set("ranking_handler.disc_at_least", -1)
     options.set("ranking_handler.topk", 1)
@@ -378,7 +378,7 @@ def test_triple_scoring_B_237():
     options.set("prediction_handler.collect_explanations", True)
     options.set("prediction_handler.num_top_rules", 1)
 
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
@@ -438,7 +438,7 @@ def test_loader():
     entity_index = [str(i) for i in range(num_ent)]
     relation_index = [str(j) for j in range(num_rel)]
     
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.set_entity_index(entity_index)
     loader.set_relation_index(relation_index)
 
@@ -456,7 +456,7 @@ def test_loader():
         assert int(key) == val
         assert val < num_rel
     
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     triples = [["a", "r1", "b"], ["a", "r1", "c"], ["c", "r2", "d"]]
     loader.load_data(triples)
     assert len(loader.entity_map()) == 4
@@ -466,11 +466,11 @@ def test_loader():
     train = [["a", "r1", "b"], ["a", "r1", "c"], ["c", "r2", "d"]]
     test = [["c", "r2", "b"], ["d", "r1", "a"], ["e", "r1", "f"]]
     valid = [["g", "r1", "a"]]
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.load_data(data=train, target=test)
     assert len(loader.entity_map()) == 6
     assert len(loader.relation_map()) == 2
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.load_data(data=train, filter=valid, target=test)
     assert len(loader.entity_map()) == 7
     assert len(loader.relation_map()) == 2
@@ -510,11 +510,11 @@ def test_triple_scoring():
     
 
 
-    options.set("data_handler.load_u_xxd_rules", False)
-    options.set("data_handler.load_u_xxc_rules", False)
-    options.set("data_handler.load_zero_rules", False)
+    options.set("loader.load_u_xxd_rules", False)
+    options.set("loader.load_u_xxc_rules", False)
+    options.set("loader.load_zero_rules", False)
 
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
@@ -620,11 +620,11 @@ def test_noisy_triple_scoring():
     
 
 
-    options.set("data_handler.load_u_xxd_rules", False)
-    options.set("data_handler.load_u_xxc_rules", False)
-    options.set("data_handler.load_zero_rules", False)
+    options.set("loader.load_u_xxd_rules", False)
+    options.set("loader.load_u_xxc_rules", False)
+    options.set("loader.load_zero_rules", False)
 
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
@@ -707,11 +707,11 @@ def test_noisy_or():
     rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
 
     options = Options()
-    options.set("data_handler.load_u_xxd_rules", False)
-    options.set("data_handler.load_u_xxc_rules", False)
-    options.set("data_handler.load_zero_rules", False)
+    options.set("loader.load_u_xxd_rules", False)
+    options.set("loader.load_u_xxc_rules", False)
+    options.set("loader.load_zero_rules", False)
 
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.load_data(train)
     loader.load_rules(rules)
 
@@ -834,16 +834,16 @@ def test_explanation_tracking():
     options.set("prediction_handler.collect_explanations", True)
 
 
-    options.set("data_handler.load_u_xxd_rules", False)
-    options.set("data_handler.load_u_xxc_rules", False)
-    options.set("data_handler.load_zero_rules", False)
+    options.set("loader.load_u_xxd_rules", False)
+    options.set("loader.load_u_xxc_rules", False)
+    options.set("loader.load_zero_rules", False)
 
     num_top_rules = 10
 
 
     options.set("prediction_handler.num_top_rules", num_top_rules)
 
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
@@ -897,7 +897,7 @@ def test_explanation_tracking():
 
 
 def test_rules_collecting():
-    from c_clause import RankingHandler, DataHandler
+    from c_clause import RankingHandler, Loader
     from clause.util.utils import get_ab_dir, get_base_dir, join_u
     from clause.config.options import Options
     from c_clause import QAHandler, RankingHandler, PredictionHandler
@@ -917,7 +917,7 @@ def test_rules_collecting():
     options.set("qa_handler.disc_at_least", 50)
     options.set("qa_handler.collect_rules", True)
 
-    loader = DataHandler(options.flatS("data_handler"))
+    loader = Loader(options.flatS("loader"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 

@@ -1,5 +1,5 @@
-#ifndef DATAHANDLER_H
-#define DATAHANDLER_H
+#ifndef LOADER_H
+#define LOADER_H
 
 
 #include "Api.h"
@@ -23,9 +23,9 @@
 
 
 // Handles Rules and Triples
-class DataHandler{
+class Loader{
 public:
-    DataHandler(std::map<std::string, std::string> options);
+    Loader(std::map<std::string, std::string> options);
 
     template<class T>
     void loadData(T data, T filter, T target);
@@ -70,10 +70,10 @@ private:
 };
 
 template<class T>
-void DataHandler::loadData(T data, T filter, T target){
+void Loader::loadData(T data, T filter, T target){
     if (typeid(data) == typeid(TripleSet) && index->getNodeSize()==0){
         throw std::runtime_error(
-            "You have to set an index first with DataHandler.set_entity_index(list[string]) DataHandler._set_relation_index(list[string]) before loading idx data."
+            "You have to set an index first with Loader.set_entity_index(list[string]) Loader._set_relation_index(list[string]) before loading idx data."
         );
     }
     if (this->verbose){

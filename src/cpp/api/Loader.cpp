@@ -1,10 +1,10 @@
-#include "DataHandler.h"
+#include "Loader.h"
 
 #include <functional>
 #include <vector>
 
 
- DataHandler::DataHandler(std::map<std::string, std::string> options){
+ Loader::Loader(std::map<std::string, std::string> options){
     index = std::make_shared<Index>();
     data = std::make_unique<TripleStorage>(index);
     target = std::make_unique<TripleStorage>(index);
@@ -14,21 +14,21 @@
     rules = std::make_unique<RuleStorage>(index, ruleFactory);
  }
 
-bool DataHandler::getLoadedData(){
+bool Loader::getLoadedData(){
     return loadedData;
 }
 
-bool DataHandler::getLoadedRules(){
+bool Loader::getLoadedRules(){
     return loadedRules;
 }
 
 
-void DataHandler::setOptions(std::map<std::string, std::string> options){
+void Loader::setOptions(std::map<std::string, std::string> options){
     setRuleOptions(options, *ruleFactory);
 }
 
 
-void DataHandler::loadRules(std::string path){
+void Loader::loadRules(std::string path){
     if (!loadedData){
          throw std::runtime_error("Please load the data first with the the Handlers load data functionality.");
     }
@@ -37,7 +37,7 @@ void DataHandler::loadRules(std::string path){
 }
 
 
-void DataHandler::loadRules(std::vector<std::string> ruleStrings){
+void Loader::loadRules(std::vector<std::string> ruleStrings){
     if (!loadedData){
          throw std::runtime_error("Please load the data first with the the Handlers load data functionality.");
     }
@@ -46,25 +46,25 @@ void DataHandler::loadRules(std::vector<std::string> ruleStrings){
 }
 
 
-std::unordered_map<std::string, int>& DataHandler::getNodeToIdx(){
+std::unordered_map<std::string, int>& Loader::getNodeToIdx(){
     return index->getNodeToIdx();
 }
-std::unordered_map<std::string, int>& DataHandler::getRelationToIdx(){
+std::unordered_map<std::string, int>& Loader::getRelationToIdx(){
     return index->getRelationToIdx();
 }
 
 
-void DataHandler::subsEntityStrings(std::map<std::string, std::string>& newNames){
+void Loader::subsEntityStrings(std::map<std::string, std::string>& newNames){
         index->subsEntityStrings(newNames);
 
     }
-void DataHandler::subsRelationStrings(std::map<std::string, std::string>& newNames){
+void Loader::subsRelationStrings(std::map<std::string, std::string>& newNames){
         index->subsRelationStrings(newNames);
     }
 
 
 
-void DataHandler::setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory){
+void Loader::setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory){
     
 
     // rule options:  individual rule options and options of which rules to use
@@ -128,7 +128,7 @@ void DataHandler::setRuleOptions(std::map<std::string, std::string> options, Rul
     }
 }
 
-std::vector<std::string> DataHandler::getRuleIdx(){
+std::vector<std::string> Loader::getRuleIdx(){
     if (!loadedRules){
         throw std::runtime_error("You cannot obtain a rule index before you loaded rules into the laoder.");
     }
@@ -145,31 +145,31 @@ std::vector<std::string> DataHandler::getRuleIdx(){
 }
 
 
-TripleStorage& DataHandler::getData(){
+TripleStorage& Loader::getData(){
     return *data;
 }
-TripleStorage& DataHandler::getFilter(){
+TripleStorage& Loader::getFilter(){
     return *filter;
 }
-TripleStorage& DataHandler::getTarget(){
+TripleStorage& Loader::getTarget(){
     return *target;
 
 }
-RuleStorage& DataHandler::getRules(){
+RuleStorage& Loader::getRules(){
     return *rules;
 }
 
-RuleFactory& DataHandler::getRuleFactory(){
+RuleFactory& Loader::getRuleFactory(){
     return *ruleFactory;
 }
 
 
-std::shared_ptr<Index> DataHandler::getIndex(){
+std::shared_ptr<Index> Loader::getIndex(){
     return index;
 }
 
 // loads a file with tab separated string (token) triples
-std::unique_ptr<std::vector<Triple>> DataHandler::loadTriplesToVec(std::string path){
+std::unique_ptr<std::vector<Triple>> Loader::loadTriplesToVec(std::string path){
 
     auto triples = std::make_unique<std::vector<Triple>>();
 
@@ -206,14 +206,14 @@ std::unique_ptr<std::vector<Triple>> DataHandler::loadTriplesToVec(std::string p
 }
 
 
-void DataHandler::setNodeIndex(std::vector<std::string>& idxToNode){
+void Loader::setNodeIndex(std::vector<std::string>& idxToNode){
     if (loadedData){
         throw std::runtime_error("You can only set an entity index before you loaded data.");
     }
         index->setNodeIndex(idxToNode);
 
 }
-void DataHandler::setRelIndex(std::vector<std::string>& idxToRel){
+void Loader::setRelIndex(std::vector<std::string>& idxToRel){
     if (loadedData){
         throw std::runtime_error("You can only set a relation index before you loaded data.");
     }

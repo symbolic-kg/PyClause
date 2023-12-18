@@ -6,16 +6,16 @@
 ## BACKEND c_clause handler options #######################################
 
 # Example:
-# from c_clause import DataHandler, QAHandler
+# from c_clause import Loader, QAHandler
 # from clause.config.options import Options
 # opts = Options()
-# opts.set("data_handler.load_zero_rules", False)
-# opts.set("data_handler.b_min_support", 10)
-# loader = DataHandler(opts.flatS("data_handler"))
+# opts.set("loader.load_zero_rules", False)
+# opts.set("loader.b_min_support", 10)
+# loader = Loader(opts.flatS("loader"))
 # qa = QAHandler(opts.flatS("qa_handler"))
 
 
-###  DataHandler loads rulesets and datasets
+###  Loader loads rulesets and datasets
 ###  the options can be used to filter/ignore some rules
 
 # 'r_num_unseen' option:
@@ -26,7 +26,7 @@
 #  dont load rules of type 'r' if they have a lower support as 'r_min_support'
 # 'r_min_preds' option: as above for the overall number of triple predicitions
 # 'r_min_confidence': as above; note: confidence here is without laplace smooting
-data_handler:
+loader:
   ## Z rules
   load_zero_rules: True
   # weight that is multiplied with the confidence

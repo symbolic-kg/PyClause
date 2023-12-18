@@ -2,7 +2,7 @@
 #define RANKING_HANDLER_H
 
 #include "Api.h"
-#include "DataHandler.h"
+#include "Loader.h"
 #include "../core/Index.h"
 #include "../core/TripleStorage.h"
 #include "../core/Rule.h"
@@ -21,8 +21,8 @@ public:
     RankingHandler(std::map<std::string, std::string> options);
     void setCollectRules(bool ind);
     // exposed functions
-    void writeRanking(std::string writePath, std::shared_ptr<DataHandler> dHandler);
-    void calculateRanking(std::shared_ptr<DataHandler> dHandler);
+    void writeRanking(std::string writePath, std::shared_ptr<Loader> dHandler);
+    void calculateRanking(std::shared_ptr<Loader> dHandler);
     std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> getRanking(std::string headOrTail);
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::pair<std::string, double>>>> getStrRanking(std::string headOrTail);
     
@@ -36,7 +36,7 @@ private:
     void setOptions(std::map<std::string, std::string> options);
     ApplicationHandler ranker;
     std::shared_ptr<Index> index;
-    std::shared_ptr<DataHandler> myDhandler;
+    std::shared_ptr<Loader> myDhandler;
 
     //options
     bool collectRules = false;

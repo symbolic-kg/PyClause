@@ -1,4 +1,4 @@
-from c_clause import PredictionHandler, DataHandler
+from c_clause import PredictionHandler, Loader
 import numpy as np
 
 train = "./data/wnrr/train.txt"
@@ -27,7 +27,7 @@ options = {
         "load_u_xxd_rules": "false",
 }
 
-loader = DataHandler(options)
+loader = Loader(options)
 loader.load_data(data=train, filter=filter, target=target)
 loader.load_rules(rules)
 

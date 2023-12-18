@@ -46,7 +46,7 @@ options = {
     "tie_handling": "frequency"
 }
 
-loader = c_clause.DataHandler(options)
+loader = c_clause.Loader(options)
 loader.load_data(train, filter)
 loader.load_rules(rules)
 loader.replace_ent_tokens(entity_names)

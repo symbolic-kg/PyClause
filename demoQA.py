@@ -1,5 +1,5 @@
 import c_clause
-from c_clause import QAHandler, DataHandler
+from c_clause import QAHandler, Loader
 import numpy as np
 from clause.config.options import Options
 
@@ -13,7 +13,7 @@ rules = "./data/wnrr/anyburl-rules-c5-3600"
 
 options = Options()
 
-loader = DataHandler(options.flatS("data_handler"))
+loader = Loader(options.flatS("loader"))
 loader.load_data(train, filter)
 loader.load_rules(rules)
 

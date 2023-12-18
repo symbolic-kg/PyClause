@@ -33,7 +33,7 @@ options = {
 }
 
 # data/rules handler
-loader = c_clause.DataHandler(options)
+loader = c_clause.Loader(options)
 # ensure the backend uses our idx->str maps for entities and relations
 # given we want to insert arrays and not strings later
 ent_idx = list_from_idx_file(entity_idx)

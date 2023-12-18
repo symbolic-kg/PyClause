@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # change on specific parameter of the default setting
     options.set("ranking_handler.disc_at_least", 50)
 
-    loader = c_clause.DataHandler(options.flatS("data_handler"))
+    loader = c_clause.Loader(options.flatS("loader"))
     loader.load_data(path_train, path_valid, path_test)
     loader.load_rules(path_rules_input)
 

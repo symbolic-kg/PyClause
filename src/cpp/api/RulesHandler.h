@@ -13,7 +13,7 @@
 #include "../core/Util.hpp"
 #include "../core/Types.h"
 #include "Api.h"
-#include "DataHandler.h"
+#include "Loader.h"
 #include "../core/Types.h"
 
 #include <string>
@@ -33,7 +33,7 @@ public:
 
     // functions exposed to python
     // std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std::array<int,2>>>
-    void calcRulesPredictions(std::vector<std::string>& stringRules, std::shared_ptr<DataHandler> dHandler);
+    void calcRulesPredictions(std::vector<std::string>& stringRules, std::shared_ptr<Loader> dHandler);
     std::vector<std::vector<std::array<int, 3>>> getIdxPredictions();
     std::vector<std::vector<std::array<std::string, 3>>> getStrPredictions();
     std::vector<std::array<int,2>>& getStats();

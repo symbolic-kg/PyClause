@@ -4,7 +4,7 @@
 #include "src/cpp/api/RulesHandler.h"
 #include "src/cpp/api/RankingHandler.h"
 #include "src/cpp/api/QAHandler.h"
-#include "src/cpp/api/DataHandler.h"
+#include "src/cpp/api/Loader.h"
 #include "src/cpp/api/PredictionHandler.h"
 #include "src/cpp/core/Types.h"
 #include <string>
@@ -54,12 +54,12 @@ PYBIND11_MODULE(c_clause, m) {
         .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
         .def(
             "calculate_answers",
-             py::overload_cast<std::vector<std::pair<int, int>>&, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers),
+             py::overload_cast<std::vector<std::pair<int, int>>&, std::shared_ptr<Loader>, std::string>(&QAHandler::calculate_answers),
              py::arg("queries"), py::arg("loader"), py::arg("direction")   
         )
         .def(
             "calculate_answers",
-            py::overload_cast<std::vector<std::pair<std::string, std::string>>&, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers),
+            py::overload_cast<std::vector<std::pair<std::string, std::string>>&, std::shared_ptr<Loader>, std::string>(&QAHandler::calculate_answers),
             py::arg("queries"), py::arg("loader"), py::arg("direction") 
         )
         .def(
@@ -113,32 +113,32 @@ PYBIND11_MODULE(c_clause, m) {
         .def("get_statistics", &RulesHandler::getStats)
     ; //class end
 
-    py::class_<DataHandler,  std::shared_ptr<DataHandler>>(m, "DataHandler") 
+    py::class_<Loader,  std::shared_ptr<Loader>>(m, "Loader") 
         .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
-        .def("load_rules", py::overload_cast<std::string>(&DataHandler::loadRules), py::arg("rules"))
-        .def("load_rules", py::overload_cast<std::vector<std::string>>(&DataHandler::loadRules), py::arg("rules"))
+        .def("load_rules", py::overload_cast<std::string>(&Loader::loadRules), py::arg("rules"))
+        .def("load_rules", py::overload_cast<std::vector<std::string>>(&Loader::loadRules), py::arg("rules"))
         .def(
             "load_data",
-            [](DataHandler &self, const std::string &data, const std::string &filter, const std::string &target) { return self.loadData<std::string>(data, filter, target); }, 
+            [](Loader &self, const std::string &data, const std::string &filter, const std::string &target) { return self.loadData<std::string>(data, filter, target); }, 
             py::arg("data"), py::arg("filter") = "", py::arg("target") = ""
         )
         .def(
             "load_data",
-            [](DataHandler &self, const StringTripleSet &data, const StringTripleSet &filter, const StringTripleSet &target) { return self.loadData<StringTripleSet>(data, filter, target); }, 
+            [](Loader &self, const StringTripleSet &data, const StringTripleSet &filter, const StringTripleSet &target) { return self.loadData<StringTripleSet>(data, filter, target); }, 
             py::arg("data"), py::arg("filter") = StringTripleSet(), py::arg("target") = StringTripleSet()
         )
         .def(
             "load_data",
-            [](DataHandler &self, const TripleSet &data, const TripleSet &filter, const TripleSet &target) { return self.loadData<TripleSet>(data, filter, target); }, 
+            [](Loader &self, const TripleSet &data, const TripleSet &filter, const TripleSet &target) { return self.loadData<TripleSet>(data, filter, target); }, 
             py::arg("data"), py::arg("filter") = TripleSet(), py::arg("target") = TripleSet()
         )
-        .def("entity_map", &DataHandler::getNodeToIdx)
-        .def("relation_map", &DataHandler::getRelationToIdx)
-        .def("replace_ent_tokens", &DataHandler::subsEntityStrings, py::arg("new_tokens"))
-        .def("replace_rel_tokens", &DataHandler::subsRelationStrings, py::arg("new_tokens"))
-        .def("set_entity_index",  &DataHandler::setNodeIndex, py::arg("index"))
-        .def("set_relation_index",  &DataHandler::setRelIndex, py::arg("index"))
-        .def("rule_index",  &DataHandler::getRuleIdx)
+        .def("entity_map", &Loader::getNodeToIdx)
+        .def("relation_map", &Loader::getRelationToIdx)
+        .def("replace_ent_tokens", &Loader::subsEntityStrings, py::arg("new_tokens"))
+        .def("replace_rel_tokens", &Loader::subsRelationStrings, py::arg("new_tokens"))
+        .def("set_entity_index",  &Loader::setNodeIndex, py::arg("index"))
+        .def("set_relation_index",  &Loader::setRelIndex, py::arg("index"))
+        .def("rule_index",  &Loader::getRuleIdx)
     ; // class end
 
     // PredictionHandler()
@@ -146,7 +146,7 @@ PYBIND11_MODULE(c_clause, m) {
         .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
         .def(
             "calculate_scores",
-            py::overload_cast<std::string, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples),
+            py::overload_cast<std::string, std::shared_ptr<Loader>>(&PredictionHandler::scoreTriples),
             py::arg("triples"), py::arg("loader"), 
             R"pbdoc(
                     Takes as input np.array/list of idx's or a list of string/token triples (tuples or lists)
@@ -156,12 +156,12 @@ PYBIND11_MODULE(c_clause, m) {
         ) 
         .def(
             "calculate_scores",
-            py::overload_cast<std::vector<std::array<int,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples),
+            py::overload_cast<std::vector<std::array<int,3>>, std::shared_ptr<Loader>>(&PredictionHandler::scoreTriples),
             py::arg("triples"), py::arg("loader")
         )
         .def(
             "calculate_scores",
-             py::overload_cast<std::vector<std::array<std::string,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples),
+             py::overload_cast<std::vector<std::array<std::string,3>>, std::shared_ptr<Loader>>(&PredictionHandler::scoreTriples),
              py::arg("triples"), py::arg("loader")
         )
         

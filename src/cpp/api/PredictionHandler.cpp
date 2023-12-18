@@ -36,7 +36,7 @@ void PredictionHandler::setOptions(std::map<std::string, std::string> options, A
     }
 }
 
-void PredictionHandler::scoreTriples(std::vector<std::array<int, 3>> triples,  std::shared_ptr<DataHandler> dHandler){
+void PredictionHandler::scoreTriples(std::vector<std::array<int, 3>> triples,  std::shared_ptr<Loader> dHandler){
     if (!dHandler->getLoadedData() || !dHandler->getLoadedRules()){
         throw std::runtime_error("You must first load data and load rules with the loader before scoring triples.");
     }
@@ -46,7 +46,7 @@ void PredictionHandler::scoreTriples(std::vector<std::array<int, 3>> triples,  s
 }
 
 
-void PredictionHandler::scoreTriples(std::vector<std::array<std::string, 3>> triples,  std::shared_ptr<DataHandler> dHandler){
+void PredictionHandler::scoreTriples(std::vector<std::array<std::string, 3>> triples,  std::shared_ptr<Loader> dHandler){
     if (!dHandler->getLoadedData() || !dHandler->getLoadedRules()){
         throw std::runtime_error("You must first load data and load rules with the loader before scoring triples.");
     }
@@ -69,7 +69,7 @@ void PredictionHandler::scoreTriples(std::vector<std::array<std::string, 3>> tri
 }
 
 
-void PredictionHandler::scoreTriples(std::string path,  std::shared_ptr<DataHandler> dHandler){
+void PredictionHandler::scoreTriples(std::string path,  std::shared_ptr<Loader> dHandler){
     std::unique_ptr<std::vector<Triple>> triples;
     triples = dHandler->loadTriplesToVec(path);
     scorer.clearAll();
