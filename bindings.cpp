@@ -49,9 +49,17 @@ PYBIND11_MODULE(c_clause, m) {
     ; //class end
     // QAHandler()
     py::class_<QAHandler>(m, "QAHandler") 
-        .def(py::init<std::map<std::string, std::string>>())
-        .def("calculate_answers", py::overload_cast<std::vector<std::pair<int, int>>&, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers))
-        .def("calculate_answers", py::overload_cast<std::vector<std::pair<std::string, std::string>>&, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers))
+        .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
+        .def(
+            "calculate_answers",
+             py::overload_cast<std::vector<std::pair<int, int>>&, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers),
+             py::arg("queries"), py::arg("loader"), py::arg("direction")   
+        )
+        .def(
+            "calculate_answers",
+            py::overload_cast<std::vector<std::pair<std::string, std::string>>&, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers),
+            py::arg("queries"), py::arg("loader"), py::arg("direction") 
+        )
         .def(
             "get_answers",
             [](QAHandler& self, bool return_strings)->py::object{
@@ -60,7 +68,8 @@ PYBIND11_MODULE(c_clause, m) {
                 }else{
                     return py::cast(self.getIdxAnswers());
                 }
-            }
+            },
+            py::arg("as_string")
         )
         .def(
             "get_rules",
@@ -70,15 +79,17 @@ PYBIND11_MODULE(c_clause, m) {
                 }else{
                     return py::cast(self.getIdxRules());
                 }
-            }
+            },
+            py::arg("as_string")
         )
         .def("set_options", &QAHandler::setOptions)
     ; //class end
     // RulesHandler()
     py::class_<RulesHandler>(m, "RulesHandler") 
-        .def(py::init<std::map<std::string, std::string>>())
+        .def(py::init<std::map<std::string, std::string>>(),  py::arg("options"))
         .def(
             "calculate_predictions", &RulesHandler::calcRulesPredictions,
+            py::arg("rules"), py::arg("loader"),
             R"pbdoc(
                 Given a list of string rules calculate predictions and rule statistics (num_pred, num_true_pred). 
                 Option parameters can specify if predictions are stored or if statistics are stored. If only statistics 
@@ -94,7 +105,8 @@ PYBIND11_MODULE(c_clause, m) {
                         }else{
                             return py::cast(self.getIdxPredictions());
                         }
-                    }
+                    },
+            py::arg("as_string")
         )        
         .def("get_statistics", &RulesHandler::getStats)
     ; //class end

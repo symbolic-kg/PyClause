@@ -27,16 +27,16 @@ rules_list = [
     "_hypernym(X,06355894) <= _synset_domain_topic_of(X,A), _synset_domain_topic_of(06355894,A)",
 ]
 
-handler = c_clause.RulesHandler(options)
+handler = c_clause.RulesHandler(options=options)
 
-handler.calculate_predictions(rules_list, loader)
+handler.calculate_predictions(rules=rules_list, loader=loader)
 
 # for each rule get string predictions
-print(handler.get_predictions(True))
+print(handler.get_predictions(as_string=True))
 
 
 # for each rule get idx predictions
-print(handler.get_predictions(False))
+print(handler.get_predictions(as_string=False))
 
 
 

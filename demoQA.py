@@ -1,4 +1,5 @@
 import c_clause
+from c_clause import QAHandler, DataHandler
 import numpy as np
 from clause.config.options import Options
 
@@ -12,13 +13,13 @@ rules = "./data/wnrr/anyburl-rules-c5-3600"
 
 options = Options()
 
-loader = c_clause.DataHandler(options.flatS("data_handler"))
+loader = DataHandler(options.flatS("data_handler"))
 loader.load_data(train, filter)
 loader.load_rules(rules)
 
 
 options.set("qa_handler.collect_rules", True)
-qa_handler = c_clause.QAHandler(options.flatS("qa_handler"))
+qa_handler = QAHandler(options=options.flatS("qa_handler"))
 
 
 
@@ -35,10 +36,10 @@ queries = [("12184337","_hypernym"), ("12184337","_verb_group")]
 ## output: list[list[tuple[string,float]]] 
 ## e.g. output[0] contains a list with the answers for the first query
 ## note that output[i] does not have same length as output[k] as different queries have different amounts of answers
-qa_handler.calculate_answers(queries, loader, "tail")
+qa_handler.calculate_answers(queries=queries, loader=loader, direction="tail")
 as_string = True
-answers = qa_handler.get_answers(as_string)
-rules = qa_handler.get_rules(False)
+answers = qa_handler.get_answers(as_string=as_string)
+rules = qa_handler.get_rules(as_string=False)
 print(answers)
 print(rules)
 
