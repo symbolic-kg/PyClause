@@ -26,12 +26,12 @@ options.set("ranking_handler.num_top_rules", -1)
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()
-loader = Loader(options=options.flatS("loader"))
+loader = Loader(options=options.get("loader"))
 loader.load_data(data=train, filter=filter, target=target)
 loader.load_rules(rules=rules)
 
 
-ranker = RankingHandler(options=options.flatS("ranking_handler"))
+ranker = RankingHandler(options=options.get("ranking_handler"))
 ranker.calculate_ranking(loader=loader)
 ranker.write_ranking(path=ranking_file, loader=loader)
 rankingtime = time.time()

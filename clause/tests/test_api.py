@@ -141,7 +141,7 @@ def test_uc_b_zero_ranking():
     options.set("ranking_handler.disc_at_least", 100)
 
 
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.set_entity_index(["mustnotbreakanything"])
     loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_data(train_path, filter_path, test_path)
@@ -149,7 +149,7 @@ def test_uc_b_zero_ranking():
 
 
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
     ranker.write_ranking(ranking_path, loader)
 
@@ -213,14 +213,14 @@ def test_237_all_ranking():
     options = Options()
 
 
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.set_entity_index(["mustnotbreakanything"])
     loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_data(train_path, filter_path, test_path)
     loader.load_rules(rules_path)
 
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
     ranker.write_ranking(ranking_path, loader)
 
@@ -265,12 +265,12 @@ def test_qa_handler():
     options = Options()
 
     options.set("qa_handler.filter_w_train", False)
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.load_data(train, filter)
     loader.load_rules(rules)
 
 
-    qa_handler = c_clause.QAHandler(options.flatS("qa_handler"))
+    qa_handler = c_clause.QAHandler(options.get("qa_handler"))
 
     ent_map = loader.entity_map()
     rel_map = loader.relation_map()
@@ -296,7 +296,7 @@ def test_qa_handler():
 
     ## after not filtering with train the true answer from train must not be contained
     options.set("qa_handler.filter_w_train", True)
-    qa_handler = c_clause.QAHandler(options.flatS("qa_handler"))
+    qa_handler = c_clause.QAHandler(options.get("qa_handler"))
 
     qa_handler.calculate_answers([(t_q_source, t_q_rel)], loader, "tail")
     t_answers_str = qa_handler.get_answers(True)
@@ -316,7 +316,7 @@ def test_qa_handler():
 
         
     options.set("qa_handler.filter_w_train", False)    
-    qa_handler = c_clause.QAHandler(options.flatS("qa_handler"))
+    qa_handler = c_clause.QAHandler(options.get("qa_handler"))
     h_q_source = "01051956"
     h_q_rel = "_also_see"
     h_q_answer_in_train = "00941990"
@@ -333,7 +333,7 @@ def test_qa_handler():
 
 
     options.set("qa_handler.filter_w_train", True)    
-    qa_handler = c_clause.QAHandler(options.flatS("qa_handler"))
+    qa_handler = c_clause.QAHandler(options.get("qa_handler"))
 
     qa_handler.calculate_answers([[ent_map[h_q_source], rel_map[h_q_rel]]], loader, "head")
     answers_str = qa_handler.get_answers(True)
@@ -378,11 +378,11 @@ def test_triple_scoring_B_237():
     options.set("prediction_handler.collect_explanations", True)
     options.set("prediction_handler.num_top_rules", 1)
 
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
-    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer = c_clause.PredictionHandler(options.get("prediction_handler"))
     print(target)
     scorer.calculate_scores(target, loader)
 
@@ -390,7 +390,7 @@ def test_triple_scoring_B_237():
     str_scores = scorer.get_scores(True)
 
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
 
     tails = ranker.get_ranking("tail", False)
@@ -438,7 +438,7 @@ def test_loader():
     entity_index = [str(i) for i in range(num_ent)]
     relation_index = [str(j) for j in range(num_rel)]
     
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.set_entity_index(entity_index)
     loader.set_relation_index(relation_index)
 
@@ -456,7 +456,7 @@ def test_loader():
         assert int(key) == val
         assert val < num_rel
     
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     triples = [["a", "r1", "b"], ["a", "r1", "c"], ["c", "r2", "d"]]
     loader.load_data(triples)
     assert len(loader.entity_map()) == 4
@@ -466,11 +466,11 @@ def test_loader():
     train = [["a", "r1", "b"], ["a", "r1", "c"], ["c", "r2", "d"]]
     test = [["c", "r2", "b"], ["d", "r1", "a"], ["e", "r1", "f"]]
     valid = [["g", "r1", "a"]]
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.load_data(data=train, target=test)
     assert len(loader.entity_map()) == 6
     assert len(loader.relation_map()) == 2
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.load_data(data=train, filter=valid, target=test)
     assert len(loader.entity_map()) == 7
     assert len(loader.relation_map()) == 2
@@ -514,19 +514,19 @@ def test_triple_scoring():
     options.set("loader.load_u_xxc_rules", False)
     options.set("loader.load_zero_rules", False)
 
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
 
-    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer = c_clause.PredictionHandler(options.get("prediction_handler"))
     scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
 
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
 
     tails = ranker.get_ranking("tail", False)
@@ -553,7 +553,7 @@ def test_triple_scoring():
 
     # now without the track grounding option
     options.set("prediction_handler.collect_explanations", False)
-    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer = c_clause.PredictionHandler(options.get("prediction_handler"))
     scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
@@ -624,19 +624,19 @@ def test_noisy_triple_scoring():
     options.set("loader.load_u_xxc_rules", False)
     options.set("loader.load_zero_rules", False)
 
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
 
-    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer = c_clause.PredictionHandler(options.get("prediction_handler"))
     scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
 
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
 
     tails = ranker.get_ranking("tail", False)
@@ -663,7 +663,7 @@ def test_noisy_triple_scoring():
 
     # now without the track grounding option
     options.set("prediction_handler.collect_explanations", False)
-    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer = c_clause.PredictionHandler(options.get("prediction_handler"))
     scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
@@ -711,7 +711,7 @@ def test_noisy_or():
     options.set("loader.load_u_xxc_rules", False)
     options.set("loader.load_zero_rules", False)
 
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.load_data(train)
     loader.load_rules(rules)
 
@@ -721,10 +721,10 @@ def test_noisy_or():
     options.set("qa_handler.disc_at_least", -1)
     options.set("qa_handler.aggregation_function", "noisyor")
     options.set("qa_handler.num_top_rules", 5)
-    qa_5 = c_clause.QAHandler(options.flatS("qa_handler"))
+    qa_5 = c_clause.QAHandler(options.get("qa_handler"))
 
     options.set("qa_handler.num_top_rules", -1)
-    qa_ALL = c_clause.QAHandler(options.flatS("qa_handler"))
+    qa_ALL = c_clause.QAHandler(options.get("qa_handler"))
 
     triples = [
         #("04868748", "_hypernym", "04826235"),
@@ -740,11 +740,11 @@ def test_noisy_or():
 
     options.set("prediction_handler.aggregation_function", "noisyor")
     options.set("prediction_handler.num_top_rules" , -1)
-    scorer_all = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer_all = c_clause.PredictionHandler(options.get("prediction_handler"))
 
     options.set("prediction_handler.aggregation_function", "noisyor")
     options.set("prediction_handler.num_top_rules" , 5)
-    scorer_5 = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer_5 = c_clause.PredictionHandler(options.get("prediction_handler"))
 
 
     scorer_all.calculate_scores(triples, loader)
@@ -843,12 +843,12 @@ def test_explanation_tracking():
 
     options.set("prediction_handler.num_top_rules", num_top_rules)
 
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
 
-    scorer = c_clause.PredictionHandler(options.flatS("prediction_handler"))
+    scorer = c_clause.PredictionHandler(options.get("prediction_handler"))
     scorer.calculate_scores("./data/wnrr/test.txt", loader)
 
     idx_scores = scorer.get_scores(False)
@@ -917,12 +917,12 @@ def test_rules_collecting():
     options.set("qa_handler.disc_at_least", 50)
     options.set("qa_handler.collect_rules", True)
 
-    loader = Loader(options.flatS("loader"))
+    loader = Loader(options.get("loader"))
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
 
-    ranker = RankingHandler(options.flatS("ranking_handler"))
+    ranker = RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
 
 
@@ -955,7 +955,7 @@ def test_rules_collecting():
     tail_queries = [[trip[0], trip[1]] for trip in triple_strings]
     head_queries = [[trip[2], trip[1]] for trip in triple_strings]
 
-    qa = QAHandler(options.flatS("qa_handler"))
+    qa = QAHandler(options.get("qa_handler"))
 
     qa.calculate_answers(head_queries, loader, "head")
     head_answers_str = qa.get_answers(True)

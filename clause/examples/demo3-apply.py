@@ -27,10 +27,10 @@ if __name__ == "__main__":
     # change on specific parameter of the default setting
     options.set("ranking_handler.disc_at_least", 50)
 
-    loader = c_clause.Loader(options.flatS("loader"))
+    loader = c_clause.Loader(options.get("loader"))
     loader.load_data(path_train, path_valid, path_test)
     loader.load_rules(path_rules_input)
 
-    ranker = c_clause.RankingHandler(options.flatS("ranking_handler"))
+    ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
     ranker.write_ranking(path_preds_output, loader)

@@ -11,8 +11,8 @@
 # opts = Options()
 # opts.set("loader.load_zero_rules", False)
 # opts.set("loader.b_min_support", 10)
-# loader = Loader(opts.flatS("loader"))
-# qa = QAHandler(opts.flatS("qa_handler"))
+# loader = Loader(opts.get("loader"))
+# qa = QAHandler(opts.get("qa_handler"))
 
 
 ###  Loader loads rulesets and datasets

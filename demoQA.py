@@ -13,13 +13,13 @@ rules = "./data/wnrr/anyburl-rules-c5-3600"
 
 options = Options()
 
-loader = Loader(options.flatS("loader"))
+loader = Loader(options.get("loader"))
 loader.load_data(train, filter)
 loader.load_rules(rules)
 
 
 options.set("qa_handler.collect_rules", True)
-qa_handler = QAHandler(options=options.flatS("qa_handler"))
+qa_handler = QAHandler(options=options.get("qa_handler"))
 
 
 
