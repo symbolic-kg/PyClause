@@ -218,8 +218,6 @@ void Loader::setRelIndex(std::vector<std::string>& idxToRel){
         throw std::runtime_error("You can only set a relation index before you loaded data.");
     }
     index->setRelIndex(idxToRel);
-
-
 }
 
 

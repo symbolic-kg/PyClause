@@ -5,9 +5,7 @@ import yaml
 class Options():
 
     def __init__(self, path_config_extra=None):
-        """
-        Creates an option onject that contains all parameters in their default value.
-        """
+        """Creates an option onject that contains all parameters in their default value."""
         self.options = {}
         with open('config-default.yaml', 'r') as file:
             self.options  = yaml.safe_load(file)
@@ -66,8 +64,8 @@ class Options():
 
     
     def flat(self, key = None):
-        """
-        Returns a flat dictionary representation of the dictionary referred to by the given key.
+        """Returns a flat dictionary representation (or value) of the dictionary referred to by the given key.
+        
         All nested / structured keys below that key are mapped to strings as e.g. 'torm.rules.b'.
         If a key is not specified all options are returned in the flat dictionary representation.
         """
@@ -79,17 +77,35 @@ class Options():
             ktoken = key.split(".")
             o = self.options
             for t in ktoken: o = o[t]
-            d =  flatdict.FlatDict(o, delimiter='.')
-            fd = dict(d)
-            return fd
+            try:
+                d =  flatdict.FlatDict(o, delimiter='.')
+                fd = dict(d)
+                return fd
+            except:
+                return o
     
     def flatS(self, key = None):
-        """
-        Returns a flat dictionary representation of the dictionary referred to by the given key,
-        where all values are converted to string. All nested / structured keys below that key are mapped to strings
+        """Returns a flat dictionary representation (or value) of the dictionary referred to by the given key,
+        where all values are converted to strings.
+         
+        All nested / structured keys below that key are mapped to strings
         as e.g. 'torm.rules.b'. If a key is not specified all options are returned in the flat dictionary representation.
         """
         fd = self.flat(key)
-        for k in fd.keys(): fd[k] = str(fd[k])
-        return fd
+        try:
+            for k in fd.keys(): fd[k] = str(fd[k])
+            return fd
+        except:
+            return fd
 
+    def get(self, key, as_string=True):
+        """Returns a flat dictionary or a value for a given key.
+            Args:
+            key: The key for which to retrieve the value.
+            as_string (bool): If True, returns the value as a string (needed for backend options);
+            otherwise, the type is preserved.
+        """
+        if as_string:
+            return self.flatS(key)
+        else:
+            return self.flat(key)
