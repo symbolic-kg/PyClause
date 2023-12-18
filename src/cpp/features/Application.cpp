@@ -340,7 +340,9 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
     Index* index = target.getIndex();
     RelNodeToNodes& data = target.getRelTailToHeads();
     std::ofstream file(filepath);
-
+    if (!file.is_open()) {
+        throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + filepath );
+    }
     for (auto& relQueries: data){
         int relation = relQueries.first;
         for (auto& srcTocands: relQueries.second){
