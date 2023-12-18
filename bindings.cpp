@@ -23,10 +23,10 @@ PYBIND11_MODULE(c_clause, m) {
 
     // RankingHandler()
     py::class_<RankingHandler>(m, "RankingHandler") 
-        .def(py::init<std::map<std::string, std::string>>())
-        .def("calculate_ranking", &RankingHandler::calculateRanking)
-        .def("write_ranking", &RankingHandler::writeRanking)
-         .def(
+        .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
+        .def("calculate_ranking", &RankingHandler::calculateRanking, py::arg("loader"))
+        .def("write_ranking", &RankingHandler::writeRanking, py::arg("path"), py::arg("loader"))
+        .def(
             "get_ranking",
             [](RankingHandler& self, std::string headOrTail, bool return_strings)->py::object{
                 if (return_strings){
@@ -34,7 +34,8 @@ PYBIND11_MODULE(c_clause, m) {
                 }else{
                     return py::cast(self.getRanking(headOrTail));
                 }
-            }
+            },
+            py::arg("direction"), py::arg("as_string")
         )
          .def(
             "get_rules",
@@ -44,7 +45,8 @@ PYBIND11_MODULE(c_clause, m) {
                 }else{
                     return py::cast(self.getIdxRules(headOrTail));
                 }
-            }
+            },
+            py::arg("direction"), py::arg("as_string")
         )
     ; //class end
     // QAHandler()

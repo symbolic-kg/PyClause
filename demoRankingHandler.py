@@ -31,12 +31,12 @@ loader.load_data(train, filter, target)
 loader.load_rules(rules)
 
 
-ranker = RankingHandler(options.flatS("ranking_handler"))
-ranker.calculate_ranking(loader)
-ranker.write_ranking(ranking_file, loader)
+ranker = RankingHandler(options=options.flatS("ranking_handler"))
+ranker.calculate_ranking(loader=loader)
+ranker.write_ranking(path=ranking_file, loader=loader)
 rankingtime = time.time()
-headRanking = ranker.get_ranking("head", False)
-tailRanking = ranker.get_ranking("tail", False)
+headRanking = ranker.get_ranking(direction="head", as_string=False)
+tailRanking = ranker.get_ranking(direction="tail", as_string=False)
 serializeTime = time.time()
 
 
