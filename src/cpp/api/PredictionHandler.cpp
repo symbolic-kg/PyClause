@@ -60,10 +60,19 @@ void PredictionHandler::scoreTriples(std::vector<std::array<std::string, 3>> tri
     std::vector<Triple> idxTriples(triples.size());
     index = dHandler->getIndex();
     for (int i=0; i<triples.size(); i++){
-       int head = index->getIdOfNodestring(triples[i][0]);
-       int rel = index->getIdOfRelationstring(triples[i][1]);
-       int tail = index->getIdOfNodestring(triples[i][2]);
-       idxTriples.at(i) = {head, rel , tail};
+       try {
+            int head = index->getIdOfNodestring(triples[i][0]);
+            int rel = index->getIdOfRelationstring(triples[i][1]);
+            int tail = index->getIdOfNodestring(triples[i][2]);
+            idxTriples.at(i) = {head, rel , tail};
+       } catch(const std::exception& e){
+            throw std::runtime_error(
+                "An entity or relation in a triple is not known, i.e., not loaded with the data"
+                "You can only calculate scores for triples where all elements are known: "
+                + triples[i][0] + " " + triples[i][1] +  " " + triples[i][2]
+            );
+       }
+
     }
     scorer.calculateTripleScores(idxTriples, dHandler->getData(), dHandler->getRules());
 }

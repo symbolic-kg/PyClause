@@ -44,7 +44,17 @@ void QAHandler::calculate_answers(std::vector<std::pair<std::string, std::string
     // like this we need later only optimize the idx version of calculate_answers
     index = dHandler->getIndex();
     for (int i=0; i<queries.size(); i++){
-        intQueries.at(i) = std::make_pair(index->getIdOfNodestring(queries[i].first), index->getIdOfRelationstring(queries[i].second));
+        try {
+            intQueries.at(i) = std::make_pair(index->getIdOfNodestring(queries[i].first), index->getIdOfRelationstring(queries[i].second));
+        }
+        catch(const std::exception& e){
+            throw std::runtime_error(
+                "An entity or relation in a query is not known, i.e., not loaded with the data"
+                "You can only calculate answers for queries where all elements are known: "
+                + queries[i].first + " " + queries[i].second
+            );
+       }
+
     }
     calculate_answers(intQueries, dHandler, headOrTail);
 }
