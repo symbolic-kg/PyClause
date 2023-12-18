@@ -120,27 +120,39 @@ PYBIND11_MODULE(c_clause, m) {
 
     // PredictionHandler()
     py::class_<PredictionHandler>(m, "PredictionHandler") 
-        .def(py::init<std::map<std::string, std::string>>())
-        .def("calculate_scores", py::overload_cast<std::string, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples),
-               R"pbdoc(
+        .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
+        .def(
+            "calculate_scores",
+            py::overload_cast<std::string, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples),
+            py::arg("triples"), py::arg("loader"), 
+            R"pbdoc(
                     Takes as input np.array/list of idx's or a list of string/token triples (tuples or lists)
                     or a path to a file containing tab separarated string/token triples. Entities and relation tokens must
                     be known, e.g., they must have be loaded in some triples in the DataLoader.
                 )pbdoc"
-            ) 
-        .def("calculate_scores", py::overload_cast<std::vector<std::array<int,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples))
-        .def("calculate_scores", py::overload_cast<std::vector<std::array<std::string,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples))
+        ) 
+        .def(
+            "calculate_scores",
+            py::overload_cast<std::vector<std::array<int,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples),
+            py::arg("triples"), py::arg("loader")
+        )
+        .def(
+            "calculate_scores",
+             py::overload_cast<std::vector<std::array<std::string,3>>, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples),
+             py::arg("triples"), py::arg("loader")
+        )
+        
         .def(
             "get_scores",
             [](PredictionHandler& self, bool return_strings)->py::object{
                         if (return_strings){
-                            return py::cast(self.getStrScores()); //TODO kinda spooky why this works, getStrScores is no python function binding
+                            return py::cast(self.getStrScores());
                         }else{
                             return py::cast(self.getIdxScores());
                         }
-                    }
+                    },
+            py::arg("as_string")   
         )
-        .def("get_explanations", &PredictionHandler::getStrExplanations)
         .def(
             "get_explanations",
             [](PredictionHandler& self, bool return_strings)->py::object{
@@ -149,7 +161,8 @@ PYBIND11_MODULE(c_clause, m) {
                         }else{
                             return py::cast(self.getIdxExplanations());
                         }
-                    }
+                    },
+            py::arg("as_string")
         )        
     ; // class end
 }
