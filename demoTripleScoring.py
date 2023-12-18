@@ -1,4 +1,4 @@
-import c_clause
+from c_clause import PredictionHandler, DataHandler
 import numpy as np
 
 train = "./data/wnrr/train.txt"
@@ -27,27 +27,27 @@ options = {
         "load_u_xxd_rules": "false",
 }
 
-loader = c_clause.DataHandler(options)
-loader.load_data(train, filter, target)
+loader = DataHandler(options)
+loader.load_data(data=train, filter=filter, target=target)
 loader.load_rules(rules)
 
 
-scorer = c_clause.PredictionHandler(options)
+scorer = PredictionHandler(options=options)
 ## you can also input np.array with idx's or list of string triples
-scorer.calculate_scores("./data/wnrr/test.txt", loader)
+scorer.calculate_scores(triples="./data/wnrr/test.txt", loader=loader)
 
 ## false --> idx's are returned (set index if you want your own)
-idx_scores = scorer.get_scores(False)
+idx_scores = scorer.get_scores(as_string=False)
 ## true --> strings are returned
-str_scores = scorer.get_scores(True)
+str_scores = scorer.get_scores(as_string=True)
 
 ## true,false as above
 ## explanation is a tuple with 3 elements
 ## 0: list of target (input) triples
 ## 1: list of list of rules (at position i, a list of rules that predicted target i)
 ## 2: list of list of list of groundings (at position [i][j] a list of groundings that ground rule j predicting target i)
-idx_explanations = scorer.get_explanations(False)
-str_explanations = scorer.get_explanations(True)
+idx_explanations = scorer.get_explanations(as_string=False)
+str_explanations = scorer.get_explanations(as_string=True)
 
 # list of triples 
 targets = idx_explanations[0]
@@ -61,9 +61,6 @@ groundings = idx_explanations[2]
 explanations = str_explanations
 ## list of string rules rule_idx[i] gives back rule string of rule i
 rule_idx = loader.rule_index()
-
-entity_map = loader.entity_map()
-relation_map = loader.relation_map()
 
 for i in range(len(explanations[0])):
     print("-----------------------------------------------")
