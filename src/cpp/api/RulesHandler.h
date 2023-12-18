@@ -41,7 +41,7 @@ public:
     std::vector<std::vector<std::array<std::string, 3>>> getStrPredictions();
     std::vector<std::array<int,2>>& getStats();
 
-    void writeRulesPredictions(std::string& outputPath);
+    void writeRulesPredictions(std::string& outputPath, bool flat, bool strings);
     void writeStats(std::string& outputPath);
 
     void setNumThr(int num);

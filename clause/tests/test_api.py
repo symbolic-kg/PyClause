@@ -97,12 +97,40 @@ def test_rules_handler():
         assert len(rule) == 4
     
     test_rules_preds_output = join_u(base_dir, join_u("data", "test_rules_preds_output.txt"))
-    handler.write_predictions(test_rules_preds_output)
+    # write int flat
+    handler.write_predictions(test_rules_preds_output, flat=True, strings=False)
     with open(test_rules_preds_output, "r") as infile:
         predictions = [x.strip().split("\t") for x in infile.readlines()]
     assert len(predictions) == 32453
     for prediction in predictions:
         assert len(prediction) == 3
+        
+    # write string flat
+    handler.write_predictions(test_rules_preds_output, flat=True, strings=True)
+    with open(test_rules_preds_output, "r") as infile:
+        predictions = [x.strip().split("\t") for x in infile.readlines()]
+    assert len(predictions) == 32453
+    for prediction in predictions:
+        assert len(prediction) == 3
+        
+
+        
+    # write int json
+    test_rules_preds_output = join_u(base_dir, join_u("data", "test_rules_preds_output.json"))
+    handler.write_predictions(test_rules_preds_output, flat=False, strings=False)
+    with open(test_rules_preds_output, "r") as infile:
+        import json
+        # check if valid json is test enough for now
+        predictions = json.load(infile)
+    assert len(predictions) == 5
+        
+    # write string json
+    handler.write_predictions(test_rules_preds_output, flat=False, strings=True)
+    with open(test_rules_preds_output, "r") as infile:
+        import json
+        # check if valid json is test enough for now
+        predictions = json.load(infile)
+    assert len(predictions) == 5
 
     print("Testing RulesHandler successful")
 

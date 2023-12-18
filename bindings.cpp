@@ -121,7 +121,7 @@ PYBIND11_MODULE(c_clause, m) {
                     },
             py::arg("as_string")
         )        
-        .def("write_predictions", &RulesHandler::writeRulesPredictions, py::arg("output_path"))
+        .def("write_predictions", &RulesHandler::writeRulesPredictions, py::arg("output_path"), py::arg("flat") = true, py::arg("strings") = true)
         .def("get_statistics", &RulesHandler::getStats)
         .def("write_statistics", &RulesHandler::writeStats, py::arg("output_path"))
 

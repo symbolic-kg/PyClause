@@ -149,13 +149,11 @@ void RulesHandler::calcRulesPredictions(std::string& rulesPath, std::shared_ptr<
     calcRulesPredictions(stringRules, dHandler);
 }
 
-void RulesHandler::writeRulesPredictions(std::string& outputPath){
+void RulesHandler::writeRulesPredictions(std::string& outputPath, bool flat, bool strings){
     if (this->predictions.size() == 0){
         throw std::runtime_error(
             "There are no statistics. Please calculate statistics using calcRulesPredictions first."
         );
-
-
     }
 
     std::ofstream file(outputPath);
@@ -163,19 +161,47 @@ void RulesHandler::writeRulesPredictions(std::string& outputPath){
         throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + outputPath);
     }
 
-    std::vector<std::vector<std::array<std::string, 3>>> std_predictions = this->getStrPredictions();
-    std::set<std::tuple<std::string, std::string, std::string>> setOfTriples; 
-    for (auto& triple_set : std_predictions){
-        for (auto& triple : triple_set){
-            std::tuple<std::string, std::string, std::string> triple_tuple = std::make_tuple(triple[0], triple[1], triple[2]);
-            setOfTriples.insert(triple_tuple); 
+
+    if (flat) {
+        // filter triple duplicates
+        std::vector<std::vector<std::array<int, 3>>> std_predictions = this->getIdxPredictions();
+        std::set<std::tuple<int, int, int>> setOfTriples; 
+        for (auto& triple_set : std_predictions){
+            for (auto& triple : triple_set){
+                std::tuple<int, int, int> triple_tuple = std::make_tuple(triple[0], triple[1], triple[2]);
+                setOfTriples.insert(triple_tuple); 
+            }
+        } 
+        for (auto triple : setOfTriples){
+            std::string head = strings ? index->getStringOfNodeId(std::get<0>(triple)) : std::to_string(std::get<0>(triple));
+            std::string rel = strings ? index->getStringOfRelId(std::get<1>(triple)) : std::to_string(std::get<1>(triple));
+            std::string tail = strings ? index->getStringOfNodeId(std::get<2>(triple)) : std::to_string(std::get<2>(triple));
+            file << head << "\t" << rel << "\t" << tail << std::endl;
         }
-    }
-    for (auto triple : setOfTriples){
-        file << std::get<0>(triple) << "\t" << std::get<1>(triple) << "\t" << std::get<2>(triple) << std::endl;
+    } else {
+        file << "{";
+        for (int idx = 0; idx < this->predictions.size(); idx++){
+            file << "\"" << this->rules[idx] << "\": [" ;
+
+            auto itr = this->predictions[idx].begin();
+            for (; itr != this->predictions[idx].end(); itr++){
+                Triple triple = *itr;
+                std::string head = strings ? "\"" + index->getStringOfNodeId(triple[0]) + "\"" : std::to_string(triple[0]);
+                std::string rel = strings ? "\"" + index->getStringOfRelId(triple[1]) + "\"" : std::to_string(triple[1]);
+                std::string tail = strings ? "\"" + index->getStringOfNodeId(triple[2]) + "\"" : std::to_string(triple[2]);
+                file << "[" << head << "," << rel << "," << tail << "]";
+                if (std::next(itr) != this->predictions[idx].end()) {
+                    file << ",";
+                }
+            }
+            file << "]";
+            if (idx < this->predictions.size() -1) {
+                file << ",";
+            }
+        }
+        file << "}";
     }
     file.close();
-
 }
 
 void RulesHandler::writeStats(std::string& outputPath){
