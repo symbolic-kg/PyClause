@@ -1,4 +1,4 @@
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
 import sys, re
@@ -75,4 +75,5 @@ setup(
   install_requires = ['pybind11>=2.2.0', 'numpy>=1.21.6', 'flatdict', 'pyyaml'],
   cmdclass         = {'build_ext': BuildExt},
   zip_safe         = False,
+  packages         = find_packages()
 )
