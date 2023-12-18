@@ -35,11 +35,14 @@ public:
 
     // functions exposed to python
     // std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std::array<int,2>>>
-    void calcRulesPredictions(std::vector<std::string>& stringRules, std::shared_ptr<DataHandler> dHandler);
-    void calcRulesPredictions(std::string& stringRules, std::shared_ptr<DataHandler> dHandler);
+    void calcRulesPredictions(std::vector<std::string>& stringRules, std::shared_ptr<Loader> dHandler);
+    void calcRulesPredictions(std::string& rulesPath, std::shared_ptr<Loader> dHandler);
     std::vector<std::vector<std::array<int, 3>>> getIdxPredictions();
     std::vector<std::vector<std::array<std::string, 3>>> getStrPredictions();
     std::vector<std::array<int,2>>& getStats();
+
+    void writeRulesPredictions(std::string& outputPath);
+    void writeStats(std::string& outputPath);
 
     void setNumThr(int num);
 

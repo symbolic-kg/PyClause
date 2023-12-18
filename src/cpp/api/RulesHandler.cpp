@@ -80,8 +80,7 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
         ruleFactory->setCreateRuleZ(true);
     }
     
-
-    rules.resize(stringRules.size());
+    this->rules = stringRules;
 
 
     if (collectPredictions){
@@ -148,6 +147,53 @@ void RulesHandler::calcRulesPredictions(std::string& rulesPath, std::shared_ptr<
 	}
 
     calcRulesPredictions(stringRules, dHandler);
+}
+
+void RulesHandler::writeRulesPredictions(std::string& outputPath){
+    if (this->predictions.size() == 0){
+        throw std::runtime_error(
+            "There are no statistics. Please calculate statistics using calcRulesPredictions first."
+        );
+
+
+    }
+
+    std::ofstream file(outputPath);
+    if (!file.is_open()) {
+        throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + outputPath);
+    }
+
+    std::vector<std::vector<std::array<std::string, 3>>> std_predictions = this->getStrPredictions();
+    std::set<std::tuple<std::string, std::string, std::string>> setOfTriples; 
+    for (auto& triple_set : std_predictions){
+        for (auto& triple : triple_set){
+            std::tuple<std::string, std::string, std::string> triple_tuple = std::make_tuple(triple[0], triple[1], triple[2]);
+            setOfTriples.insert(triple_tuple); 
+        }
+    }
+    for (auto triple : setOfTriples){
+        file << std::get<0>(triple) << "\t" << std::get<1>(triple) << "\t" << std::get<2>(triple) << std::endl;
+    }
+    file.close();
+
+}
+
+void RulesHandler::writeStats(std::string& outputPath){
+    if (this->stats.size() == 0){
+        throw std::runtime_error(
+            "There are no statistics. Please calculate statistics using calcRulesPredictions first."
+        );
+    }
+
+    std::ofstream file(outputPath);
+    if (!file.is_open()) {
+        throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + outputPath);
+    }
+
+    for (int idx = 0; idx < this->rules.size(); idx++){
+        file << this->stats[idx][0] << "\t" << this->stats[idx][1] << "\t" << (float)this->stats[idx][1] / (float)this->stats[idx][0] << "\t" << this->rules[idx] << std::endl;
+    }
+    file.close();
 }
 
 std::vector<std::vector<std::array<int, 3>>> RulesHandler::getIdxPredictions(){

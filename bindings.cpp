@@ -121,7 +121,10 @@ PYBIND11_MODULE(c_clause, m) {
                     },
             py::arg("as_string")
         )        
+        .def("write_predictions", &RulesHandler::writeRulesPredictions, py::arg("output_path"))
         .def("get_statistics", &RulesHandler::getStats)
+        .def("write_statistics", &RulesHandler::writeStats, py::arg("output_path"))
+
     ; //class end
 
     py::class_<Loader,  std::shared_ptr<Loader>>(m, "Loader") 

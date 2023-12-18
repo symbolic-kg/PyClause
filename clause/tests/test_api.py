@@ -86,6 +86,23 @@ def test_rules_handler():
     assert(len(str_preds[2])==len(idx_preds[2])==59==stats[2][0])
     assert(len(str_preds[3])==len(idx_preds[3])==16106==stats[3][0])
     assert(len(str_preds[4])==len(idx_preds[4])==83==stats[4][0])
+    
+    
+    test_rules_stats_output = join_u(base_dir, join_u("data", "test_rules_stats_output.txt"))
+    handler.write_statistics(test_rules_stats_output)
+    with open(test_rules_stats_output, "r") as infile:
+        rules = [x.strip().split("\t") for x in infile.readlines()]
+    assert len(rules) == 5
+    for rule in rules:
+        assert len(rule) == 4
+    
+    test_rules_preds_output = join_u(base_dir, join_u("data", "test_rules_preds_output.txt"))
+    handler.write_predictions(test_rules_preds_output)
+    with open(test_rules_preds_output, "r") as infile:
+        predictions = [x.strip().split("\t") for x in infile.readlines()]
+    assert len(predictions) == 32453
+    for prediction in predictions:
+        assert len(prediction) == 3
 
     print("Testing RulesHandler successful")
 

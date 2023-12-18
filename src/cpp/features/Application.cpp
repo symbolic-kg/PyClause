@@ -397,6 +397,7 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
             }
         }
     }
+    file.close();
 }
 
 void ApplicationHandler::scoreMaxPlus(
