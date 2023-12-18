@@ -1,5 +1,6 @@
 import flatdict
 import yaml
+from clause.util.utils import join_u, get_base_dir
 
 
 class Options():
@@ -7,7 +8,8 @@ class Options():
     def __init__(self, path_config_extra=None):
         """Creates an option onject that contains all parameters in their default value."""
         self.options = {}
-        with open('config-default.yaml', 'r') as file:
+        default_path = join_u(get_base_dir(),'config-default.yaml')
+        with open(default_path, 'r') as file:
             self.options  = yaml.safe_load(file)
 
         if path_config_extra != None:
