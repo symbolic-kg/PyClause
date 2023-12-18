@@ -96,7 +96,7 @@ class Options():
             for k in fd.keys(): fd[k] = str(fd[k])
             return fd
         except:
-            return fd
+            return str(fd)
 
     def get(self, key, as_string=True):
         """Returns a flat dictionary or a value for a given key.
