@@ -10,44 +10,18 @@
 #include <string>
 #include <array>
 
-// *Example* 
-int add(int i, int j) {
-    return i + j;
-}
+
+// **********************************************************************
+// ***************** c_clause Python API ********************************
+// **********************************************************************
+
 
 namespace py = pybind11;
 
-
-//***PyClause backend bindings + examples *****
 PYBIND11_MODULE(c_clause, m) {
+    // ***exposed backend functions that are usable in the frontend***
 
-    //** example bindings **
-    m.doc() = R"pbdoc(
-        Pybind11 example plugin
-        -----------------------
-
-        .. currentmodule:: python_example
-
-        .. autosummary::
-           :toctree: _generate
-
-           add
-           subtract
-    )pbdoc";
-
-    m.def("add", &add, R"pbdoc(
-        Add two numbers
-
-        Some other explanation about the add function.
-    )pbdoc");
-
-    m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
-        Subtract two numbers
-
-        Some other explanation about the subtract function.
-    )pbdoc");
-
-    // **backend bindings**
+    // RankingHandler()
     py::class_<RankingHandler>(m, "RankingHandler") 
         .def(py::init<std::map<std::string, std::string>>())
         .def("calculate_ranking", &RankingHandler::calculateRanking)
@@ -73,7 +47,7 @@ PYBIND11_MODULE(c_clause, m) {
             }
         )
     ; //class end
-
+    // QAHandler()
     py::class_<QAHandler>(m, "QAHandler") 
         .def(py::init<std::map<std::string, std::string>>())
         .def("calculate_answers", py::overload_cast<std::vector<std::pair<int, int>>&, std::shared_ptr<DataHandler>, std::string>(&QAHandler::calculate_answers))
@@ -100,7 +74,7 @@ PYBIND11_MODULE(c_clause, m) {
         )
         .def("set_options", &QAHandler::setOptions)
     ; //class end
-
+    // RulesHandler()
     py::class_<RulesHandler>(m, "RulesHandler") 
         .def(py::init<std::map<std::string, std::string>>())
         .def(
@@ -144,7 +118,7 @@ PYBIND11_MODULE(c_clause, m) {
         .def("rule_index",  &DataHandler::getRuleIdx)
     ; // class end
 
-
+    // PredictionHandler()
     py::class_<PredictionHandler>(m, "PredictionHandler") 
         .def(py::init<std::map<std::string, std::string>>())
         .def("calculate_scores", py::overload_cast<std::string, std::shared_ptr<DataHandler>>(&PredictionHandler::scoreTriples),
