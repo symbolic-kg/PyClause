@@ -111,16 +111,11 @@ void QAHandler::calculate_answers(std::vector<std::pair<int, int>>& queries, std
         if (collectRules){
             NodeToPredRules candRules = (*rules)[query.second][query.first];
             //for every candidate
-            std::vector<std::vector<Rule*>> candIdRules;
+            std::vector<std::vector<Rule*>> candOrderRules;
             for (auto& cand_: answers[i]){
-                std::vector<Rule*> idRules;
-                int cand = cand_.first;
-                for (Rule* r : candRules[cand]){
-                    idRules.push_back(r);
-                }
-                candIdRules.push_back(idRules);
+                candOrderRules.push_back(candRules[cand_.first]);
             }
-            queryRules.at(i) = candIdRules;
+            queryRules.at(i) = candOrderRules;
         }
     }
 }
