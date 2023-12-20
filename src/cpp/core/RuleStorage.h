@@ -21,6 +21,7 @@ public:
     bool addAnyTimeRule(std::string ruleLine, int id, bool exact);
     std::vector<std::unique_ptr<Rule>>& getRules();
     std::set<Rule*, compareRule>& getRelRules(int relation);
+    void clearAll();
     
 
 private:

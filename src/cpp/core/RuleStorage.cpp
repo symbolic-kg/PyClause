@@ -88,3 +88,8 @@ std::set<Rule*, compareRule>&  RuleStorage::getRelRules(int relation){
 std::vector<std::unique_ptr<Rule>>& RuleStorage::getRules(){
     return rules;
  }
+
+void RuleStorage::clearAll(){
+    rules.clear();
+    relToRules.clear();
+}

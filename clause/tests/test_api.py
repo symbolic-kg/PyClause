@@ -47,7 +47,6 @@ def test_rules_handler():
     assert(len(str_preds[3])==len(idx_preds[3])==16106==stats[3][0])
     assert(len(str_preds[4])==len(idx_preds[4])==83==stats[4][0])
 
-
     ## Pick one rule and check that the idx map back to the correct tokens
 
     for i in range(len(idx_preds[4])):
@@ -68,7 +67,6 @@ def test_rule_loading():
     base_dir = get_base_dir()
     train_path = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
     rules_path = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
-
 
     # load an anyburl ruleset with frontend
     triples = TripleSet(train_path)
@@ -94,8 +92,6 @@ def test_rule_loading():
 
     assert(index1==index2)
         
-
-
     print("Test for rule loading successful.")
 
 
@@ -114,9 +110,7 @@ def test_uc_b_zero_ranking():
     if not path.isdir(testing_dir):
         os.mkdir(testing_dir)
 
-
     ranking_path = join_u(testing_dir, "test-ranking")
-
 
     conf_path = join_u(testing_dir, "testing-conf")
 
@@ -140,14 +134,20 @@ def test_uc_b_zero_ranking():
 
     options.set("ranking_handler.disc_at_least", 100)
 
-
     loader = c_clause.Loader(options.get("loader"))
+    # only before data is loaded
     loader.set_entity_index(["mustnotbreakanything"])
     loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_data(train_path, filter_path, test_path)
+
+    # load rules twice to test interferance
+    options.set("loader.load_b_rules", False)
+    loader.set_options(options.get("loader"))
     loader.load_rules(rules_path)
 
-
+    options.set("loader.load_b_rules", True)
+    loader.set_options(options.get("loader"))
+    loader.load_rules(rules_path)
 
     ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
@@ -173,7 +173,6 @@ def test_uc_b_zero_ranking():
     if (not check_all):
         raise Exception(f"Expected test ranking results are {[expecth1, expecth10, expectMRR]} but i found {[hA1, hAt10, mrr_result]}")
         
-
     print(f"Test ranking of u_c, B and zero rules was successful expected: {[expecth1, expecth10, expectMRR]}")
     print(f"Calculated {[hA1, hAt10, mrr_result]}")
 
@@ -193,9 +192,7 @@ def test_237_all_ranking():
     if not path.isdir(testing_dir):
         os.mkdir(testing_dir)
 
-
     ranking_path = join_u(testing_dir, "test-ranking")
-
 
     conf_path = join_u(testing_dir, "testing-conf")
 
@@ -212,18 +209,15 @@ def test_237_all_ranking():
 
     options = Options()
 
-
     loader = c_clause.Loader(options.get("loader"))
     loader.set_entity_index(["mustnotbreakanything"])
     loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_data(train_path, filter_path, test_path)
     loader.load_rules(rules_path)
 
-
     ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
     ranker.write_ranking(ranking_path, loader)
-
 
     p = Popen(
         f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Eval {conf_path}",
@@ -245,7 +239,6 @@ def test_237_all_ranking():
     if (not check_all):
         raise Exception(f"Expected test ranking results are {[expecth1, expecth10, expectMRR]} but i found {[hA1, hAt10, mrr_result]}")
         
-
     print(f"Test ranking on Fb15k-237 was successful expected: {[expecth1, expecth10, expectMRR]}")
     print(f"Calculated {[hA1, hAt10, mrr_result]}")
 
@@ -269,13 +262,10 @@ def test_qa_handler():
     loader.load_data(train, filter)
     loader.load_rules(rules)
 
-
     qa_handler = c_clause.QAHandler(options.get("qa_handler"))
 
     ent_map = loader.entity_map()
     rel_map = loader.relation_map()
-
-        
 
     # tail query example where we know that one true answer is in train 
     t_q_source = "00037919"
@@ -321,16 +311,13 @@ def test_qa_handler():
     h_q_rel = "_also_see"
     h_q_answer_in_train = "00941990"
 
-
     # the one true answer from train is in the answers
     qa_handler.calculate_answers([[h_q_source, h_q_rel]], loader, "head")
     answers_str = qa_handler.get_answers(True)
     answers_idx = qa_handler.get_answers(False)
 
-
     assert(1==sum(np.array(answers_str[0])[:,0]==h_q_answer_in_train))
     assert (1==sum(np.array(answers_idx[0])[:,0]==ent_map[h_q_answer_in_train]))
-
 
     options.set("qa_handler.filter_w_train", True)    
     qa_handler = c_clause.QAHandler(options.get("qa_handler"))
@@ -354,14 +341,12 @@ def test_triple_scoring_B_237():
     import c_clause
     import numpy as np
 
-
     base_dir = get_base_dir()
     train = join_u(base_dir, join_u("data", "fb15k-237", "train.txt"))
     filter = join_u(base_dir, join_u("data", "fb15k-237", "valid.txt"))
 
     target = join_u(base_dir, join_u("data", "fb15k-237", "test.txt"))
     rules = join_u(base_dir, join_u("data", "fb15k-237", "anyburl-rules-c3-3600"))
-
 
     options = Options()
 
@@ -434,7 +419,6 @@ def test_loader():
     num_ent = 10
     num_rel = 5
 
-
     entity_index = [str(i) for i in range(num_ent)]
     relation_index = [str(j) for j in range(num_rel)]
     
@@ -484,8 +468,6 @@ def test_triple_scoring():
     Also test if the candidate scores calculated from query ranking match the triple scores.
     
     """
-
-
     import c_clause
     import numpy as np
 
@@ -495,21 +477,15 @@ def test_triple_scoring():
     rules = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
     target = join_u(base_dir, join_u("data", "wnrr-sample", "test-wnrr-small.txt"))
 
-
-
     options = Options()
-
-
     options.set("ranking_handler.topk", 40000)
 
     # both set to -1 to not apply any stopping critertion (otherwise scores might vary a bit)
     options.set("ranking_handler.disc_at_least", -1)
-    options.set("prediction_handler.num_top_rules", -1)
 
+    options.set("prediction_handler.num_top_rules", -1)
     options.set("prediction_handler.collect_explanations", True)
     
-
-
     options.set("loader.load_u_xxd_rules", False)
     options.set("loader.load_u_xxc_rules", False)
     options.set("loader.load_zero_rules", False)
@@ -799,23 +775,6 @@ def test_noisy_or():
         else:
             assert(score_ALL==score_5)
     print("Test noisy-or successful.")
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-    
-    
-
 
 
 def test_explanation_tracking():

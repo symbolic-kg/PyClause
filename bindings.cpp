@@ -139,6 +139,7 @@ PYBIND11_MODULE(c_clause, m) {
         .def("set_entity_index",  &Loader::setNodeIndex, py::arg("index"))
         .def("set_relation_index",  &Loader::setRelIndex, py::arg("index"))
         .def("rule_index",  &Loader::getRuleIdx)
+        .def("set_options", &Loader::setOptions, py::arg("options"))
     ; // class end
 
     // PredictionHandler()

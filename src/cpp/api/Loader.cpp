@@ -29,6 +29,7 @@ void Loader::setOptions(std::map<std::string, std::string> options){
 
 
 void Loader::loadRules(std::string path){
+    rules->clearAll();
     if (!loadedData){
          throw std::runtime_error("Please load the data first with the the Handlers load data functionality.");
     }
@@ -38,6 +39,7 @@ void Loader::loadRules(std::string path){
 
 
 void Loader::loadRules(std::vector<std::string> ruleStrings){
+    rules->clearAll();
     if (!loadedData){
          throw std::runtime_error("Please load the data first with the the Handlers load data functionality.");
     }
