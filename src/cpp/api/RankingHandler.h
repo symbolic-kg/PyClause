@@ -32,8 +32,10 @@ public:
     std::unordered_map<int,std::unordered_map<int, std::unordered_map<int, std::vector<int>>>> getIdxRules(std::string headOrTail);
     std::unordered_map<std::string,std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::string>>>> getStrRules(std::string headOrTail);
 
-private:
     void setOptions(std::map<std::string, std::string> options);
+    void setOptionsFrontend(std::map<std::string, std::string> options);
+private:
+    
     ApplicationHandler ranker;
     std::shared_ptr<Index> index;
     std::shared_ptr<Loader> myDhandler;

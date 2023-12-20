@@ -30,6 +30,7 @@ public:
     void setCollectPredictions(bool ind);
     void setCollectStats(bool ind);
     void setOptions(std::map<std::string, std::string> options);
+    void setOptionsFrontend(std::map<std::string, std::string> options);
 
     // functions exposed to python
     // std::pair<std::vector<std::vector<std::array<std::string, 2>>>, std::vector<std::array<int,2>>>

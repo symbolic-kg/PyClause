@@ -26,6 +26,7 @@ PYBIND11_MODULE(c_clause, m) {
         .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
         .def("calculate_ranking", &RankingHandler::calculateRanking, py::arg("loader"))
         .def("write_ranking", &RankingHandler::writeRanking, py::arg("path"), py::arg("loader"))
+        .def("set_options", &RankingHandler::setOptionsFrontend, py::arg("options"))
         .def(
             "get_ranking",
             [](RankingHandler& self, std::string headOrTail, bool return_strings)->py::object{
@@ -52,6 +53,7 @@ PYBIND11_MODULE(c_clause, m) {
     // QAHandler()
     py::class_<QAHandler>(m, "QAHandler") 
         .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
+        .def("set_options", &QAHandler::setOptionsFrontend, py::arg("options"))
         .def(
             "calculate_answers",
              py::overload_cast<std::vector<std::pair<int, int>>&, std::shared_ptr<Loader>, std::string>(&QAHandler::calculate_answers),
@@ -89,6 +91,7 @@ PYBIND11_MODULE(c_clause, m) {
     // RulesHandler()
     py::class_<RulesHandler>(m, "RulesHandler") 
         .def(py::init<std::map<std::string, std::string>>(),  py::arg("options"))
+        .def("set_options", &RulesHandler::setOptionsFrontend, py::arg("options"))
         .def(
             "calculate_predictions", &RulesHandler::calcRulesPredictions,
             py::arg("rules"), py::arg("loader"),
@@ -145,6 +148,7 @@ PYBIND11_MODULE(c_clause, m) {
     // PredictionHandler()
     py::class_<PredictionHandler>(m, "PredictionHandler") 
         .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
+        .def("set_options", &PredictionHandler::setOptionsFrontend, py::arg("options"))
         .def(
             "calculate_scores",
             py::overload_cast<std::string, std::shared_ptr<Loader>>(&PredictionHandler::scoreTriples),

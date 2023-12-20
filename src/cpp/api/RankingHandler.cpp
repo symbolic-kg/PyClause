@@ -35,6 +35,11 @@ void RankingHandler::setOptions(std::map<std::string, std::string> options){
     }
 }
 
+void RankingHandler::setOptionsFrontend(std::map<std::string, std::string> options){
+    setRankingOptions(options, ranker);
+    setOptions(options);
+}
+
 
 void RankingHandler::calculateRanking(std::shared_ptr<Loader> dHandler){
     index = dHandler->getIndex();

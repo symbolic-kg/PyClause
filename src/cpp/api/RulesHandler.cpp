@@ -35,6 +35,11 @@ void RulesHandler::setOptions(std::map<std::string, std::string> options){
 }
 
 
+void RulesHandler::setOptionsFrontend(std::map<std::string, std::string> options){
+    setOptions(options);
+}
+
+
 void RulesHandler::setCollectPredictions(bool ind){
     collectPredictions = ind;
 }

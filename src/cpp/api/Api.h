@@ -19,14 +19,13 @@
 class BackendHandler{
 public:
     BackendHandler();
+    virtual void setOptionsFrontend(std::map<std::string, std::string> options) = 0;
 
 private:
 protected:
     void setRankingOptions(std::map<std::string, std::string> options, ApplicationHandler& ranker);
-
     //general 
     bool verbose = true;    
-
 };
 
 

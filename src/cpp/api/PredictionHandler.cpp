@@ -4,14 +4,14 @@
 #include "../core/Types.h"
 
 PredictionHandler::PredictionHandler(std::map<std::string, std::string> options){
-
     setOptions(options, scorer);    
+}
 
+void PredictionHandler::setOptionsFrontend(std::map<std::string, std::string> options){
+    setOptions(options, scorer); 
 }
 
 void PredictionHandler::setOptions(std::map<std::string, std::string> options, ApplicationHandler& scorer){
-
-    // register options for ranker
 
      struct OptionHandler {
         std::string name;
@@ -52,7 +52,7 @@ void PredictionHandler::scoreTriples(std::vector<std::array<std::string, 3>> tri
     }
 
     if (scorer.getScoreCollectGroundings()){
-        // safety measure to bind the leftime of the rules (stored in RulesHandler of Dhandler) to the lifetime of this object
+        // safety measure to bind the leftime of the rules (stored in RulesHandler of Loader) to the lifetime of this object
         myDHandler = dHandler;
     }
 

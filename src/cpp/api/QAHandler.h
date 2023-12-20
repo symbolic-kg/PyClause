@@ -20,8 +20,9 @@ public:
 
 
     
-    //reset /set options TODO probably remove from binding
     void setOptions(std::map<std::string, std::string> options);
+    void setOptionsFrontend(std::map<std::string, std::string> options);
+    
 
     void setCollectRules(bool ind);
 

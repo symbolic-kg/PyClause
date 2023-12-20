@@ -9,6 +9,11 @@ QAHandler::QAHandler(std::map<std::string, std::string> options): BackendHandler
     setRankingOptions(options, ranker);
 }
 
+void QAHandler::setOptionsFrontend(std::map<std::string, std::string> options){
+    setOptions(options);
+    setRankingOptions(options, ranker);
+}
+
 
 void QAHandler::setOptions(std::map<std::string, std::string> options){
     // register options for ranker
