@@ -38,6 +38,22 @@ class Triple:
       if self.hashcode == None:
          self.hashcode = self.sub + self.rel + self.obj
       return self.hashcode
+   
+
+   # how wrote the following three functions? I doubt that they work ...
+   # maybe they should bre removed?
+   # the index works differntly, see above
+   #
+   #def get_head_token(self):
+   #   return self.index[self.sub]
+   
+   #def get_tail_token(self):
+   #   return self.index[self.obj]
+
+   #def get_relation_token(self):
+   #   return self.index[self.rel]
+
+
 
 
 class TripleSet:
@@ -165,11 +181,17 @@ class TripleSet:
 
    def is_known(self, sub, rel, obj):
       '''
-      Used to check in constant time if a triple exists within the dataset, i.e. if the triple is known.
+      Used to check in constant time if a triple (index format) exists within the dataset, i.e. if the triple is known.
       '''
       if sub in self.sub_rel_2_obj and rel in self.sub_rel_2_obj[sub] and obj in self.sub_rel_2_obj[sub][rel]:
          return True
       return False
+
+   def is_true(self, sub_token, rel_token, obj_token):
+      '''
+      Used to check in constant time if a triple (token forrmat) exists within the dataset, i.e. if the triple is known.
+      '''
+      return self.is_known(self.index.to2id[sub_token], self.index.to2id[rel_token], self.index.to2id[obj_token])
    
    def get_1to1_score(self, rel):
       '''
