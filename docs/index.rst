@@ -1,15 +1,59 @@
-.. PyClause documentation master file, created by
-   sphinx-quickstart on Tue Jan  2 15:21:15 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
-Welcome to PyClause's documentation!
-====================================
+PyClause: Rule Handling for Knowledge Graphs
+============================================
+
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :hidden:
+   :caption: Start
+   
+   start/installation
+   start/quickstart
+   start/overview
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Data Handling
+   
+   data/loading
+   
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Features
+   
+   feature/learning
+   feature/triple_classification
+   feature/triple_explanations
+   feature/query_answering
+   feature/ranking_generation
+   feature/rule_materialization
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Special Topics
+   
+   advanced/rules_from_predictions
+   advanced/idx_vs_string
+   advanced/entity_relation_names
+   advanced/evaluation
+   
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Reference Manual
+
+   reference
+   
+
+
+
+Hello this is the start and here will be a feature overview.
 
 
 Indices and tables
