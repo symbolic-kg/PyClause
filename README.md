@@ -1,6 +1,13 @@
 PyClause
 ==============
 
+# Documentation
+Documentation of library and features [here](https://pyclause.readthedocs.io/en/latest/index.html) .
+All usable options [here](config-default.yaml) 
+
+
+
+
 # Installation
 
 

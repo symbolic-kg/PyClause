@@ -53,12 +53,7 @@ PyClause: Rule Handling for Knowledge Graphs
 
 
 
-Hello this is the start and here will be a feature overview.
+PyClause is a library for using rules in a simply but efficient way.
 
+Feature overview here.
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
