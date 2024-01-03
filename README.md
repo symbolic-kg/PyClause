@@ -1,19 +1,55 @@
 PyClause
 ==============
+PyClause is a library for easy and efficient usage and learning of symbolic rules for knowledge graphs.
 
 # Documentation
-Documentation of library and features [here](https://pyclause.readthedocs.io/en/latest/index.html) .
+Documentation of library and features [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
 All usable options [here](config-default.yaml) 
 
 
-
-
 # Installation
-
-
 git clone https://github.com/Nzteb/PyClause \
 cd PyClause \
 pip install -e .
+
+# Quickstart
+```python
+from c_clause import QAHandler, Loader
+from clause.config.options import Options
+
+# define a knowledge graph
+# alternatively specify file path or use indices
+data = [
+    ("anna", "livesIn", "london"),
+    ("anna", "learns", "english"),
+    ("bernd", "speaks", "french")
+]
+
+# define rules, or specify file path
+# num_predictions \t support \t rule string
+rules = [
+    "20" + "\t"  + "10"  + "\t" + "0.5" + "\t" + "speaks(X,Y) <= learns(X,Y)",
+    "40" + "\t"  + "35"  + "\t" + "0.875" + "\t" + "speaks(X,english) <= livesIn(X,london)",
+]
+
+# define options, handlers and load data
+opts = Options()
+opts.set("qa_handler.aggregation_function", "noisyor")
+
+loader = Loader(options=opts.get("loader"))
+loader.load_data(data)
+loader.load_rules(rules)
+qa = QAHandler(options=opts.get("qa_handler"))
+
+# define query: (anna, speaks, ?) 
+query = [("anna", "speaks")]
+qa.calculate_answers(queries=query, loader=loader, direction="tail")
+
+# outputs [("english", 0.8667 )] 
+print(qa.get_answers(as_string=True)[0])
+
+
+```
 
 
 # Entity and Relation Representation
