@@ -1,16 +1,7 @@
-import time
-
 from clause.config import options
 
-# import re
-
+import time
 from random import sample
-
-
-
-from multiprocessing import Array
-
-
 
 class Rule:
 
