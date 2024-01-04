@@ -50,7 +50,7 @@ qa = QAHandler(options=opts.get("qa_handler"))
 # define query: (anna, speaks, ?), alternatively use idx's
 queries = [("anna", "speaks")]
 qa.calculate_answers(queries=queries, loader=loader, direction="tail")
-# outputs [("english", 0.8667 )] 
+# outputs [("english", 0.867 )] 
 print(qa.get_answers(as_string=True)[0])
 
 # define query: (?, speaks, english), alternatively use idx's
