@@ -17,42 +17,47 @@ pip install -e .
 from c_clause import QAHandler, Loader
 from clause.config.options import Options
 
+# ***Example for Query Answering***
+
 # define a knowledge graph
-# alternatively specify file path or use indices
+# alternatively, specify file path or use indices
 data = [
     ("anna", "livesIn", "london"),
     ("anna", "learns", "english"),
     ("bernd", "speaks", "french")
 ]
-
 # define rules, or specify file path
-# num_predictions \t support \t rule string
-
-stats = [
-    (20, 10, 0.5),
-]
-
 rules = [
-    "20" + "\t"  + "10"  + "\t" + "0.5" + "\t" + "speaks(X,Y) <= learns(X,Y)",
-    "40" + "\t"  + "35"  + "\t" + "0.875" + "\t" + "speaks(X,english) <= livesIn(X,london)",
+     "speaks(X,Y) <= learns(X,Y)",
+     "speaks(X,english) <= livesIn(X,london)",
+     "speaks(X,english) <= speaks(X,A)"
 ]
-
+# define rule stats: num_preds, support
+stats = [
+    [20, 10],
+    [40, 35],
+    [50, 5],
+]
 # define options, handlers and load data
 opts = Options()
 opts.set("qa_handler.aggregation_function", "noisyor")
 
 loader = Loader(options=opts.get("loader"))
 loader.load_data(data)
-loader.load_rules(rules)
+loader.load_rules(rules=rules, stats=stats)
+
 qa = QAHandler(options=opts.get("qa_handler"))
-
-# define query: (anna, speaks, ?) 
-query = [("anna", "speaks")]
-qa.calculate_answers(queries=query, loader=loader, direction="tail")
-
+# define query: (anna, speaks, ?), alternatively use idx's
+queries = [("anna", "speaks")]
+qa.calculate_answers(queries=queries, loader=loader, direction="tail")
 # outputs [("english", 0.8667 )] 
 print(qa.get_answers(as_string=True)[0])
 
+# define query: (?, speaks, english), alternatively use idx's
+queries = [("english", "speaks")]
+qa.calculate_answers(queries=queries, loader=loader, direction="head")
+# outputs [('anna', 0.867), ('bernd', 0.001)] 
+print(qa.get_answers(as_string=True)[0])
 
 ```
 
