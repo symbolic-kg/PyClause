@@ -27,6 +27,11 @@ data = [
 
 # define rules, or specify file path
 # num_predictions \t support \t rule string
+
+stats = [
+    (20, 10, 0.5),
+]
+
 rules = [
     "20" + "\t"  + "10"  + "\t" + "0.5" + "\t" + "speaks(X,Y) <= learns(X,Y)",
     "40" + "\t"  + "35"  + "\t" + "0.875" + "\t" + "speaks(X,english) <= livesIn(X,london)",

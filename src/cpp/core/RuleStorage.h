@@ -16,9 +16,13 @@ public:
     // expects a file with lines val\tval\t\val\trulestring
     //if sampled the first 3 values in a ruleset refer to sampled values
     void readAnyTimeFormat(std::string path, bool exact); 
-    void readAnyTimeFromVec(std::vector<std::string>& stringLines, bool exact); 
+    void readAnyTimeFromVec(std::vector<std::string>& stringLines, bool exact);
+    void readAnyTimeFromVecs(std::vector<std::string>& ruleStrings, std::vector<std::pair<int,int>> stats, bool exact); 
 
-    bool addAnyTimeRule(std::string ruleLine, int id, bool exact);
+    // ruleLine is num_pred /t support /t conf /t ruleString
+    bool addAnyTimeRuleLine(std::string ruleLine, int id, bool exact);
+
+    bool addAnyTimeRuleWithStats(std::string ruleString, int id, int numPred, int numTrue, bool exact);
     std::vector<std::unique_ptr<Rule>>& getRules();
     std::set<Rule*, compareRule>& getRelRules(int relation);
     void clearAll();

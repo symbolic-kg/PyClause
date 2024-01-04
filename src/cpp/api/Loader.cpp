@@ -47,6 +47,18 @@ void Loader::loadRules(std::vector<std::string> ruleStrings){
     loadedRules = true;
 }
 
+void Loader::loadRules(std::vector<std::string> ruleStrings, std::vector<std::pair<int,int>> ruleStats){
+    rules->clearAll();
+     if (!loadedData){
+         throw std::runtime_error("Please load the data first with the the Handlers load data functionality.");
+    }
+    rules->readAnyTimeFromVecs(ruleStrings, ruleStats, false);
+    loadedRules = true;
+
+
+
+}
+
 
 std::unordered_map<std::string, int>& Loader::getNodeToIdx(){
     return index->getNodeToIdx();

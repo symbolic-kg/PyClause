@@ -31,7 +31,8 @@ public:
     void loadData(T data, T filter, T target);
 
     void loadRules(std::string rulePath);
-    void loadRules(std::vector<std::string> ruleStrings);
+    void loadRules(std::vector<std::string> ruleStatsStrings);
+    void loadRules(std::vector<std::string> ruleStrings, std::vector<std::pair<int,int>> ruleStats);
     
     std::unordered_map<std::string, int>& getNodeToIdx();
 	std::unordered_map<std::string, int>& getRelationToIdx();
