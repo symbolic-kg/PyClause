@@ -97,8 +97,7 @@ PYBIND11_MODULE(c_clause, m) {
             R"pbdoc(
                 Given a list of string rules calculate predictions and rule statistics (num_pred, num_true_pred). 
                 Option parameters can specify if predictions are stored or if statistics are stored. If only statistics 
-                need to be computed, turn of collect_predictions parameter for efficiency.
-
+                need to be computed, turn off collect_predictions option for efficiency.
             )pbdoc" 
         )
         .def(
@@ -106,8 +105,7 @@ PYBIND11_MODULE(c_clause, m) {
             R"pbdoc(
                 Given a list of string rules calculate predictions and rule statistics (num_pred, num_true_pred). 
                 Option parameters can specify if predictions are stored or if statistics are stored. If only statistics 
-                need to be computed, turn of collect_predictions parameter for efficiency.
-
+                need to be computed, turn off collect_predictions option for efficiency.
             )pbdoc" 
         )
         .def(
@@ -121,9 +119,9 @@ PYBIND11_MODULE(c_clause, m) {
                     },
             py::arg("as_string")
         )        
-        .def("write_predictions", &RulesHandler::writeRulesPredictions, py::arg("output_path"), py::arg("flat") = true, py::arg("strings") = true)
+        .def("write_predictions", &RulesHandler::writeRulesPredictions, py::arg("path"), py::arg("flat") = true, py::arg("as_string") = true)
         .def("get_statistics", &RulesHandler::getStats)
-        .def("write_statistics", &RulesHandler::writeStats, py::arg("output_path"))
+        .def("write_statistics", &RulesHandler::writeStats, py::arg("path"))
 
     ; //class end
 

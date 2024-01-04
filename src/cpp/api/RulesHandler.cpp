@@ -136,7 +136,11 @@ void RulesHandler::calcRulesPredictions(std::string& rulesPath, std::shared_ptr<
 			} else if (results.size() == 1) {
                 stringRules.push_back(results[0]);
             } else {
-				std::cout << "Unsupported Filetype, please make sure you have the following triple format {subject}{TAB}{predicate}{TAB}{object}" << std::endl;
+				std::cout << 
+                    "Unsupported Filetype, please make sure that every line either \
+                    contains a properly formatted rule string or num_pred\tsupport\tconf\truleString" 
+                << std::endl;
+                exit(-1);
             }
 		}
 		file.close();
@@ -150,12 +154,12 @@ void RulesHandler::calcRulesPredictions(std::string& rulesPath, std::shared_ptr<
 }
 
 void RulesHandler::writeRulesPredictions(std::string& outputPath, bool flat, bool strings){
-    if (this->predictions.size() == 0){
+    if (this->predictions.size() == 0 && !collectPredictions){
         throw std::runtime_error(
-            "There are no statistics. Please calculate statistics using calcRulesPredictions first."
+            "Please use option collect_predictions and calculate predictions using calculate_predictions() first."
         );
     }
-
+    
     std::ofstream file(outputPath);
     if (!file.is_open()) {
         throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + outputPath);
@@ -205,9 +209,9 @@ void RulesHandler::writeRulesPredictions(std::string& outputPath, bool flat, boo
 }
 
 void RulesHandler::writeStats(std::string& outputPath){
-    if (this->stats.size() == 0){
+    if (this->stats.size() == 0 && !collectStats){
         throw std::runtime_error(
-            "There are no statistics. Please calculate statistics using calcRulesPredictions first."
+            "There are no statistics. Please use optios collect_statistics and calculate using calculate_predictions() first."
         );
     }
 

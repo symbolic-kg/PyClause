@@ -56,9 +56,12 @@ def test_rules_handler():
         assert(entities[str_head] == idx_preds[4][i][0])
         assert(relations[str_rel] == idx_preds[4][i][1])
         assert(entities[str_tail] == idx_preds[4][i][2])
+    
+    if not os.path.exists(join_u("local", "testing")):
+        os.makedirs(join_u("local", "testing"))
         
     ## Test loading rules from file (w and wo stats)
-    test_rules_path = join_u(base_dir, join_u("data", "test_rules.txt"))
+    test_rules_path = join_u(base_dir, join_u("local", "testing", "test_rules.txt"))
     with open(test_rules_path, "w") as outfile:
         outfile.write("\n".join(rules_list))
     handler = c_clause.RulesHandler(options)
@@ -72,7 +75,7 @@ def test_rules_handler():
     assert(len(str_preds[3])==len(idx_preds[3])==16106==stats[3][0])
     assert(len(str_preds[4])==len(idx_preds[4])==83==stats[4][0])
         
-    test_rules_w_stats_path = join_u(base_dir, join_u("data", "test_rules_w_stats.txt"))
+    test_rules_w_stats_path = join_u(base_dir, join_u("local", "testing", "test_rules_w_stats.txt"))
     rules_w_stats = [f"{stat[0]}\t{stat[1]}\t{stat[1] / stat[0]}\t{rule}" for stat, rule in zip(stats, rules_list)]
     with open(test_rules_w_stats_path, "w") as outfile:
         outfile.write("\n".join(rules_w_stats))
@@ -88,7 +91,7 @@ def test_rules_handler():
     assert(len(str_preds[4])==len(idx_preds[4])==83==stats[4][0])
     
     
-    test_rules_stats_output = join_u(base_dir, join_u("data", "test_rules_stats_output.txt"))
+    test_rules_stats_output = join_u(base_dir, join_u("local", "testing", "test_rules_stats_output.txt"))
     handler.write_statistics(test_rules_stats_output)
     with open(test_rules_stats_output, "r") as infile:
         rules = [x.strip().split("\t") for x in infile.readlines()]
@@ -96,9 +99,9 @@ def test_rules_handler():
     for rule in rules:
         assert len(rule) == 4
     
-    test_rules_preds_output = join_u(base_dir, join_u("data", "test_rules_preds_output.txt"))
+    test_rules_preds_output = join_u(base_dir, join_u("local", "testing",  "test_rules_preds_output.txt"))
     # write int flat
-    handler.write_predictions(test_rules_preds_output, flat=True, strings=False)
+    handler.write_predictions(test_rules_preds_output, flat=True, as_string=False)
     with open(test_rules_preds_output, "r") as infile:
         predictions = [x.strip().split("\t") for x in infile.readlines()]
     assert len(predictions) == 32453
@@ -106,7 +109,7 @@ def test_rules_handler():
         assert len(prediction) == 3
         
     # write string flat
-    handler.write_predictions(test_rules_preds_output, flat=True, strings=True)
+    handler.write_predictions(test_rules_preds_output, flat=True, as_string=True)
     with open(test_rules_preds_output, "r") as infile:
         predictions = [x.strip().split("\t") for x in infile.readlines()]
     assert len(predictions) == 32453
@@ -116,8 +119,8 @@ def test_rules_handler():
 
         
     # write int json
-    test_rules_preds_output = join_u(base_dir, join_u("data", "test_rules_preds_output.json"))
-    handler.write_predictions(test_rules_preds_output, flat=False, strings=False)
+    test_rules_preds_output = join_u(base_dir, join_u("local", "testing", "test_rules_preds_output.json"))
+    handler.write_predictions(test_rules_preds_output, flat=False, as_string=False)
     with open(test_rules_preds_output, "r") as infile:
         import json
         # check if valid json is test enough for now
@@ -125,7 +128,7 @@ def test_rules_handler():
     assert len(predictions) == 5
         
     # write string json
-    handler.write_predictions(test_rules_preds_output, flat=False, strings=True)
+    handler.write_predictions(test_rules_preds_output, flat=False, as_string=True)
     with open(test_rules_preds_output, "r") as infile:
         import json
         # check if valid json is test enough for now
