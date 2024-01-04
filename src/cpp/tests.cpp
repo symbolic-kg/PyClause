@@ -17,7 +17,7 @@
 void tests(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
   
-    std::string dataPath = "/home/patrick/Desktop/kge/data/wnrr/train.txt";
+    std::string dataPath = "./data/wnrr/train.txt";
     TripleStorage data(index);
     data.read(dataPath);
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
@@ -27,7 +27,7 @@ void tests(){
     ruleB->materialize(data, triplePreds);
     size_t size = triplePreds.size();
     
-    if (!size==83){
+    if (size!=83){
         throw std::runtime_error("Test 1 for B-rule failed.");
     }
 
@@ -286,7 +286,7 @@ void tests(){
 
     // *** FB15k-237 Uxx rules ***
     std::shared_ptr<Index> index237 = std::make_shared<Index>();
-    std::string dataPath237 = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt";
+    std::string dataPath237 = "./data/fb15k-237/train.txt";
     std::shared_ptr<RuleFactory> ruleFactory237 = std::make_shared<RuleFactory>(index237);
     TripleStorage data237(index237);
     data237.read(dataPath237);
@@ -346,7 +346,7 @@ void tests(){
 void tests_groundings(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
   
-    std::string dataPath = "/home/patrick/Desktop/kge/data/wnrr/train.txt";
+    std::string dataPath = "./data/wnrr/train.txt";
     TripleStorage data(index);
     data.read(dataPath);
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
@@ -602,9 +602,9 @@ void testTripleScoring(){
     ruleFactory->setDconfWeight(0.1);
     ruleFactory->setZconfWeight(0.01);
 
-    std::string trainPath = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
-    std::string filterPath = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt";
-    std::string targetPath = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt";
+    std::string trainPath = "./data/wnrr/train.txt";
+    std::string filterPath = "./data/wnrr/valid.txt";
+    std::string targetPath = "./data/wnrr/test.txt";
    
     //test
     TripleStorage target(index);
@@ -623,7 +623,7 @@ void testTripleScoring(){
     filter.loadCSR();
 
 
-    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
+    std::string rulePath = "./data/wnrr/anyburl-rules-c5-3600";
     RuleStorage rules(index, ruleFactory);
     rules.readAnyTimeFormat(rulePath, true); 
 
@@ -704,10 +704,9 @@ void testTripleScoring(){
     std::cout<<"All apply predictTriples tests passed"<<std::endl;
 }
 
-
 void test_compute_strings(){
     std::shared_ptr<Index> index = std::make_shared<Index>();
-    std::string dataPath = "/home/patrick/Desktop/kge/data/wnrr/train.txt";
+    std::string dataPath = "./data/wnrr/train.txt";
     TripleStorage data(index);
     data.read(dataPath, true);
     std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
@@ -730,7 +729,6 @@ void test_compute_strings(){
     }
 
     // test RuleC compute string
-
 
     ruleStr = "_hypernym(X,00732746) <= _synset_domain_topic_of(X,A), _derivationally_related_form(A,10225219)";
     std::unique_ptr<Rule> ruleC = ruleFactory->parseAnytimeRule(ruleStr);
@@ -843,9 +841,7 @@ void test_compute_strings(){
         throw std::runtime_error("Test 16 for compute D rule string failed.");
     }
 
-
     // XX rules
-
     ruleStr = "_member_meronym(X,X) <= _derivationally_related_form(10225219,X)";
     std::unique_ptr<Rule>ruleXX = ruleFactory->parseAnytimeRule(ruleStr);
     computeStr = ruleXX->computeRuleString(index.get());
@@ -895,99 +891,10 @@ void test_compute_strings(){
 
 }
 
-    
-
-
-void timeRanking(){
-
-    auto start = std::chrono::high_resolution_clock::now();
-    std::shared_ptr<Index> index = std::make_shared<Index>();
-    std::shared_ptr<RuleFactory> ruleFactory = std::make_shared<RuleFactory>(index);
-    ruleFactory->setCreateRuleB(true);
-    ruleFactory->setCreateRuleZ(true);
-    ruleFactory->setCreateRuleC(true);
-    ruleFactory->setCreateRuleD(true);
-    ruleFactory->setCreateRuleXXd(true);
-    ruleFactory->setCreateRuleXXc(true);
-    ruleFactory->setZconfWeight(0.01);
-    ruleFactory->setDconfWeight(0.1);
-    // std::string trainPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt";
-    // std::string filterPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt";
-    // std::string targetPath = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt";
-
-
-    std::string trainPath = "/home/patrick/Desktop/PyClause/data/wnrr/train.txt";
-    std::string filterPath = "/home/patrick/Desktop/PyClause/data/wnrr/valid.txt";
-    std::string targetPath = "/home/patrick/Desktop/PyClause/data/wnrr/test.txt";
-   
-    //test
-    TripleStorage target(index);
-    target.read(targetPath, false);
-    //valid 
-    TripleStorage filter(index);
-    filter.read(filterPath, false);
-    std::cout<<"data loaded. \n";
-
-    //train
-    TripleStorage train(index);
-    train.read(trainPath,false);
-
-    target.loadCSR();
-    train.loadCSR();
-    filter.loadCSR();
-
-
-    // //683 258 0.37774524158125916 /location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)
-    // std::unique_ptr<Rule> ruleXXd = ruleFactory->parseAnytimeRule("/location/hud_county_place/place(me_myself_i,Y) <= /people/person/place_of_birth(A,Y)");
-    // std::string node = "/m/09c7w0";
-    // QueryResults preds;
-    // //ruleXXd->predictHeadQuery(index->getIdOfNodestring(node), train, preds);
-    // std::set<Triple> predictions;
-    // ruleXXd->setTrackInMaterialize(true);
-    // predictions = ruleXXd->materialize(train);
-    // //TODO: test
-    
-
-
-    //std::string rulePath = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600";
-    std::string rulePath = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600";
-    RuleStorage rules(index, ruleFactory);
-    rules.readAnyTimeFormat(rulePath, true); 
-
-    ApplicationHandler ranker;
-
-    //ranker.setNumThr(1);
-
-    ranker.setTopK(100);
-    ranker.setDiscAtLeast(100000);
-
-
-
-    ranker.makeRanking(target, train, rules, filter);
-
-    std::string rankingFile = "/home/patrick/Desktop/PyClause/local/debug/rankingFile10.txt";
-
-    ranker.writeRanking(target, rankingFile);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration<double>(stop - start);
-    std::cout << "Overall Execution time: " << duration.count() << " seconds." << std::endl;
-
-
-   
-
-
-
-}
-
-
 int main(){
     test_compute_strings();
     tests_groundings();
     tests();
     testTripleScoring();
-   
-    //checkRuntimes();
-   
     return 0;
-    timeRanking();
 }

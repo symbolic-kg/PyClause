@@ -7,6 +7,7 @@
 #include "src/cpp/api/Loader.h"
 #include "src/cpp/api/PredictionHandler.h"
 #include "src/cpp/core/Types.h"
+#include "src/cpp/tests.h"
 #include <string>
 #include <array>
 
@@ -207,6 +208,12 @@ PYBIND11_MODULE(c_clause, m) {
             py::arg("as_string")
         )        
     ; // class end
+
+    // backend tests
+    m.def("_test_compute_strings", &test_compute_strings);
+    m.def("_tests_groundings", &tests_groundings);
+    m.def("_tests_rules", &tests);
+    m.def("_test_scoring", &testTripleScoring);
 }
 
 
