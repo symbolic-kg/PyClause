@@ -122,7 +122,7 @@ PYBIND11_MODULE(c_clause, m) {
         .def("load_rules", py::overload_cast<std::vector<std::string>>(&Loader::loadRules), py::arg("rules"))
         .def(
             "load_rules",
-            py::overload_cast<std::vector<std::string>, std::vector<std::pair<int,int>>(&Loader::loadRules),
+            py::overload_cast<std::vector<std::string>, std::vector<std::pair<int,int>>>(&Loader::loadRules),
             py::arg("rules"), py::arg("stats")
         )
         .def(
