@@ -1,2 +1,2 @@
 sphinx_rtd_theme
-git+https://github.com/Nzteb/PyClause.git
+git+https://github.com/symbolic-kg/PyClause.git
