@@ -219,7 +219,7 @@ def test_uc_b_zero_ranking():
     loader.set_relation_index(["mustnotbreaktoo"])
     loader.load_data(train_path, filter_path, test_path)
 
-    # load rules twice to test interferance
+    # load rules twice to test interference
     options.set("loader.load_b_rules", False)
     loader.set_options(options.get("loader"))
     loader.load_rules(rules_path)

@@ -1,6 +1,5 @@
 import sys
 import os
-sys.path.append(os.getcwd())
 
 from clause.learning.miner import Miner
 from clause.data.triples import TripleSet
