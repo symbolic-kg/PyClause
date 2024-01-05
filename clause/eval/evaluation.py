@@ -275,6 +275,15 @@ if __name__ == '__main__':
 
     print("MRR: " + str(hits.get_mrr()))
 
+    # next steps: 
+    # 1) check and/or integrate filtering
+    # 2) check correctness of numbers via an anyburl comparison
+    # 3) think about the hits.reset vs always generate and return a new object
+    # 4) write nice piece of code that allows you to compute tail and head specific mrr for each relation of fb237 for the top 10 relations
+    # 5) talk to patrick w.r.t integration of his stuff (forgot what he wanted ...)
+        # rabking constrcutor fpr patrick ranking
+        # add testset to read from file ranking constructor
+
 
 
 
