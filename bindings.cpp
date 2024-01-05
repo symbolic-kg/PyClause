@@ -171,7 +171,7 @@ PYBIND11_MODULE(c_clause, m) {
             R"pbdoc(
                     Takes as input np.array/list of idx's or a list of string/token triples (tuples or lists)
                     or a path to a file containing tab separarated string/token triples. Entities and relation tokens must
-                    be known, e.g., they must have be loaded in some triples in the DataLoader.
+                    be known, e.g., they must have be loaded in some triples in the Loader.
                 )pbdoc"
         ) 
         .def(
