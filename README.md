@@ -2,17 +2,30 @@ PyClause
 ==============
 PyClause is a library for easy and efficient usage and learning of symbolic rules for knowledge graphs.
 
-# Documentation
+## Documentation
 Documentation of library and features [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
 All usable options [here](config-default.yaml) 
 
 
-# Installation
+## Installation
+PyClause only uses a few lightweight Python dependencies. We recommend using a fresh conda environment with Python 3.6+.
+You must also have installed a c++(14) compiler. Installation is tested under Ubuntu and Windows.
+
+### Option 1: For running examples and using our data directories / Working with the code
+```
 git clone https://github.com/Nzteb/PyClause \
 cd PyClause \
 pip install -e .
+```
 
-# Quickstart
+### Option 2: Installing as a package
+```
+
+```
+
+
+
+## Quickstart
 ```python
 from c_clause import QAHandler, Loader
 from clause.config.options import Options
@@ -62,14 +75,14 @@ print(qa.get_answers(as_string=True)[0])
 ```
 
 
-# Entity and Relation Representation
+## Entity and Relation Representation
 
 All definitions hold independently for entities and relations. <br>
 <strong>Tokens:</strong> The strings that describe entities/relations in the data files such as train.txt. In some repositories these are termed 'Identifier'. <br>
 <strong>Idx's:</strong> Integers internally used. Tokens are mapped to Idx's by e.g. an entity_map or relation_map <br>
 <strong>Names:</strong> Optional additional strings that describe entities and relations in a human understandable way. <br>
 
-# Supported rule types
+## Supported rule types
 
 Let ```h, b1, b2, b3``` be relation token strings. <br>
 Let ```X A B C D E F G H .. Y``` be variables <br>
