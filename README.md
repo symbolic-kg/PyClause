@@ -11,7 +11,7 @@ All usable options [here](config-default.yaml)
 PyClause only uses a few lightweight Python dependencies. We recommend using a fresh conda environment with Python 3.6+.
 You must also have installed a c++(14) compiler. Installation is tested under Ubuntu and Windows.
 
-### 1): Install from codebase
+### 1) Install from codebase
 For running our examples and using our data directories or working with the code
 ```
 git clone https://github.com/Nzteb/PyClause
