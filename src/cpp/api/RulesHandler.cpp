@@ -120,7 +120,7 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
     }
 }
 
-void RulesHandler::calcRulesPredictions(std::string& rulesPath, std::shared_ptr<DataHandler> dHandler){
+void RulesHandler::calcRulesPredictions(std::string& rulesPath, std::shared_ptr<Loader> dHandler){
 
     std::vector<std::string> stringRules;
     std::string line;

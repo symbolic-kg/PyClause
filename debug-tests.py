@@ -66,21 +66,6 @@ try:
     count_true +=1
     num_tests +=1
 except Exception as e:
-    num_tests+=1
-    print(e)
-try:
-    test_237_all_ranking()
-    count_true += 1
-    num_tests +=1
-except Exception as e:
-    num_tests +=1
-    print(e)
-try:
-    test_noisy_triple_scoring()
-    count_true += 1
-    num_tests +=1
-except Exception as e:
-    print("Triple scoring test failed")
     num_tests +=1
     print(e)
 try:

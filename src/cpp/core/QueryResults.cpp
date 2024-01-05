@@ -59,10 +59,6 @@ std::unordered_map<int,double>& QueryResults::getCandScores(){
     return candScores;
 }
 
-std::unordered_map<int,double>& QueryResults::getCandScores(){
-    return candScores;
-}
-
 void QueryResults::clear(){
     candRules.clear();
     candidateOrder.clear();

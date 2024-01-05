@@ -1,6 +1,9 @@
 #include "Loader.h"
 
 #include <functional>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 #include <vector>
 
 

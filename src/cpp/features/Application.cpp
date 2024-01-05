@@ -103,9 +103,6 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
             ruleGroundings.clear();
         }
     }
-    tripleResults.clear();
-    ruleGroundings.clear();
-   }
 }
 
 void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter, bool dirIsTail){
