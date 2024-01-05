@@ -13,8 +13,8 @@ You must also have installed a c++(14) compiler. Installation is tested under Ub
 
 ### Option 1: For running examples and using our data directories / Working with the code
 ```
-git clone https://github.com/Nzteb/PyClause \
-cd PyClause \
+git clone https://github.com/Nzteb/PyClause
+cd PyClause
 pip install -e .
 ```
 
