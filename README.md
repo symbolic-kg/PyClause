@@ -24,7 +24,7 @@ For using PyClause in your own Python project and as a dependency <br>
 install:
 
 ```
-pip install git+https://https://github.com/symbolic-kg/PyClause.git
+pip install git+https://github.com/symbolic-kg/PyClause.git
 ```
 
 as dependency:
@@ -33,7 +33,7 @@ as dependency:
 
 setup(
   name                  = "MyProject",
-  install_requires      = ["git+https://https://github.com/symbolic-kg/PyClause.git"]
+  install_requires      = ["git+https://github.com/symbolic-kg/PyClause.git"]
   python_requires       = ">=3.7"
 )
 
@@ -42,6 +42,7 @@ setup(
 
 
 ## Quickstart
+After installing PyClause run the following code from anywhere.
 ```python
 from c_clause import QAHandler, Loader
 from clause.config.options import Options
