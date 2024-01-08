@@ -20,7 +20,7 @@ pip install -e .
 ```
 
 ### 2) Install as a package
-For using PyClause in your own Python project and as a dependency 
+For using PyClause in your own Python project and as a dependency <br>
 install:
 
 ```
