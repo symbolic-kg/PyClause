@@ -1,5 +1,6 @@
 import os
 from os import path
+import importlib.resources as pkg_resources
 
 
 def join_u(*paths):
@@ -13,6 +14,16 @@ def get_base_dir():
     for i in range(3):
         abs_path = path.dirname(abs_path)
     return abs_path.replace(os.sep, '/')
+
+
+def get_config_default_dir():
+    package = 'clause'
+    resource = 'config-default.yaml'
+    try:
+        with pkg_resources.path(package, resource) as p:
+            return str(p)
+    except:
+        return join_u(get_base_dir(), resource)  
 
 
 def get_ab_dir():

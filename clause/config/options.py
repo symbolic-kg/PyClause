@@ -1,14 +1,15 @@
 import flatdict
 import yaml
-from clause.util.utils import join_u, get_base_dir
+
+from clause.util.utils import get_config_default_dir
 
 
 class Options():
 
     def __init__(self, path_config_extra=None):
-        """Creates an option onject that contains all parameters in their default value."""
+        """Creates an option object that contains all parameters in their default value."""
         self.options = {}
-        default_path = join_u(get_base_dir(),'config-default.yaml')
+        default_path = get_config_default_dir()
         with open(default_path, 'r') as file:
             self.options  = yaml.safe_load(file)
 
@@ -18,9 +19,6 @@ class Options():
                 print(">>> using options in " + path_config_extra + " to overwrite some default options")
                 options_extra  = yaml.safe_load(file)
 
-            # note that the following code won't work correctly, in the case of nested dictionaries
-            # self.options.update(options_extra)
-            # instead, we have to go his more complicated way ... 
             options_extra_flat = dict(flatdict.FlatDict(options_extra, delimiter='.'))
             for param in options_extra_flat:
                 self.set(param, options_extra_flat[param])

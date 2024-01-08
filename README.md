@@ -19,7 +19,7 @@ cd PyClause
 pip install -e .
 ```
 
-### 2) Installing as a package
+### 2) Install as a package
 
 ```
 
@@ -35,7 +35,7 @@ from clause.config.options import Options
 # ***Example for Query Answering***
 
 # define a knowledge graph
-# alternatively, specify file path or use indices
+# alternatively, specify file path or use arrays + indices
 data = [
     ("anna", "livesIn", "london"),
     ("anna", "learns", "english"),
@@ -62,13 +62,13 @@ loader.load_data(data)
 loader.load_rules(rules=rules, stats=stats)
 
 qa = QAHandler(options=opts.get("qa_handler"))
-# define query: (anna, speaks, ?), alternatively use idx's
+# define query: (anna, speaks, ?); alternatively, use indices
 queries = [("anna", "speaks")]
 qa.calculate_answers(queries=queries, loader=loader, direction="tail")
 # outputs [("english", 0.867 )] 
 print(qa.get_answers(as_string=True)[0])
 
-# define query: (?, speaks, english), alternatively use idx's
+# define query: (?, speaks, english); alternatively, use indices
 queries = [("english", "speaks")]
 qa.calculate_answers(queries=queries, loader=loader, direction="head")
 # outputs [('anna', 0.867), ('bernd', 0.001)] 
