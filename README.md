@@ -3,8 +3,8 @@ PyClause
 PyClause is a library for easy and efficient usage and learning of symbolic rules for knowledge graphs.
 
 ## Documentation
-Documentation of library and features [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
-All usable options [here](config-default.yaml) 
+Documentation of library and features can be found [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
+All usable default options for the configuration files can be found [here](clause/config-default.yaml) 
 
 
 ## Installation
@@ -14,14 +14,26 @@ You must also have installed a c++(14) compiler. Installation is tested under Ub
 ### 1) Install from codebase
 For running our examples and using our data directories or working with the code
 ```
-git clone https://github.com/Nzteb/PyClause
+git clone https://github.com/symbolic-kg/PyClause
 cd PyClause
 pip install -e .
 ```
 
 ### 2) Install as a package
+For using PyClause in your own Python project and as a dependency 
 
 ```
+pip install git+https://https://github.com/symbolic-kg/PyClause.git
+
+
+## as a python requirement
+## in setup.py
+
+setup(
+  name                  = "MyProject",
+  install_requires      = ["git+https://https://github.com/symbolic-kg/PyClause.git", "some other package"]
+  python_requires       = ">=3.7"
+)
 
 ```
 
