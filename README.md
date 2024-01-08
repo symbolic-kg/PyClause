@@ -21,17 +21,19 @@ pip install -e .
 
 ### 2) Install as a package
 For using PyClause in your own Python project and as a dependency 
+install:
 
 ```
 pip install git+https://https://github.com/symbolic-kg/PyClause.git
+```
 
-
-## as a python requirement
+as dependency:
+```
 ## in setup.py
 
 setup(
   name                  = "MyProject",
-  install_requires      = ["git+https://https://github.com/symbolic-kg/PyClause.git", "some other package"]
+  install_requires      = ["git+https://https://github.com/symbolic-kg/PyClause.git"]
   python_requires       = ">=3.7"
 )
 
