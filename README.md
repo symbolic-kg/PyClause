@@ -20,7 +20,7 @@ pip install -e .
 ```
 
 ### 2) Install as a package
-For using PyClause in your own Python project and as a dependency. When running our examples you have to set your own correct paths to data and rule files. <br>
+For using PyClause in your own Python project and as a dependency. When running our examples, you have to set your own correct paths to data and rule files. <br>
 install:
 
 ```
@@ -42,7 +42,7 @@ setup(
 
 
 ## Quickstart
-After installing PyClause run the following code from anywhere.
+After installing PyClause with any of the two options run the following code from anywhere.
 ```python
 from c_clause import QAHandler, Loader
 from clause.config.options import Options

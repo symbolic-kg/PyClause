@@ -3,6 +3,7 @@ import os
 
 from clause.learning.miner import Miner
 from clause.data.triples import TripleSet
+from clause.util.utils import get_base_dir
 
 from clause.config.options import Options
 
@@ -12,11 +13,11 @@ from clause.config.options import Options
 
 if __name__ == '__main__':
 
-    path_train = "data/wnrr/train.txt"
-    path_valid = "data/wnrr/valid.txt"
-    path_test  = "data/wnrr/test.txt"
+    path_train = f"{get_base_dir()}/data/wnrr/train.txt"
+    path_valid = f"{get_base_dir()}/data/wnrr/valid.txt"
+    path_test  = f"{get_base_dir()}/data/wnrr/test.txt"
 
-    path_rules_output = "local/rules-wn18rr-anyburl.txt"
+    path_rules_output = f"{get_base_dir()}/local/rules-wn18rr-anyburl.txt"
 
 
     # load a triple set from a file and display some meta info about it

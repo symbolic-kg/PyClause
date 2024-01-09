@@ -1,14 +1,16 @@
 import c_clause
+from clause.util.utils import get_base_dir
 
 
-entity_names_f = './data/wnrr/entity_strings.txt'
+
+entity_names_f = f"{get_base_dir()}/data/wnrr/entity_strings.txt"
 
 
-train = "./data/wnrr/train.txt"
-filter = "./data/wnrr/valid.txt"
-target = "./data/wnrr/test.txt"
+train = f"{get_base_dir()}/data/wnrr/train.txt"
+filter = f"{get_base_dir()}/data/wnrr/valid.txt"
+target = f"{get_base_dir()}/data/wnrr/test.txt"
 
-rules = "./data/wnrr/anyburl-rules-c5-3600"
+rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
 
 
 entity_names = {}
@@ -17,12 +19,6 @@ with open(entity_names_f, 'r') as file:
         key, value = line.strip().split('\t')
         entity_names[key] = value
 
-
-train = "./data/wnrr/train.txt"
-filter = "./data/wnrr/valid.txt"
-target = "./data/wnrr/test.txt"
-
-rules = "./data/wnrr/anyburl-rules-c5-3600"
 
 
 options = {

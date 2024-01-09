@@ -1,10 +1,12 @@
 from c_clause import PredictionHandler, Loader
+from clause.util.utils import get_base_dir
 import numpy as np
 
-train = "./data/wnrr/train.txt"
-filter = "./data/wnrr/valid.txt"
-target = "./data/wnrr/test.txt"
-rules = "./data/wnrr/anyburl-rules-c5-3600"
+train = f"{get_base_dir()}/data/wnrr/train.txt"
+filter = f"{get_base_dir()}/data/wnrr/valid.txt"
+target = f"{get_base_dir()}/data/wnrr/test.txt"
+
+rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
 
 num_top_rules = 10
 
@@ -34,7 +36,7 @@ loader.load_rules(rules)
 
 scorer = PredictionHandler(options=options)
 ## you can also input np.array with idx's or list of string triples
-scorer.calculate_scores(triples="./data/wnrr/test.txt", loader=loader)
+scorer.calculate_scores(triples=f"{get_base_dir()}/data/wnrr/test.txt", loader=loader)
 
 ## false --> idx's are returned (set index if you want your own)
 idx_scores = scorer.get_scores(as_string=False)

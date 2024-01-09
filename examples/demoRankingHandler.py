@@ -3,21 +3,13 @@ from c_clause import RankingHandler, Loader
 from clause.util.utils import get_base_dir
 from clause.config.options import Options
 
+train = f"{get_base_dir()}/data/wnrr/train.txt"
+filter = f"{get_base_dir()}/data/wnrr/valid.txt"
+target = f"{get_base_dir()}/data/wnrr/test.txt"
 
+rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
 
-# train = "/home/patrick/Desktop/PyClause/data/fb15k-237/train.txt"
-# filter = "/home/patrick/Desktop/PyClause/data/fb15k-237/valid.txt"
-# target = "/home/patrick/Desktop/PyClause/data/fb15k-237/test.txt"
-# rules = "/home/patrick/Desktop/PyClause/data/fb15k-237/anyburl-rules-c3-3600"
-# ranking_file = "/home/patrick/Desktop/PyClause/data/fb15k-237/rankingFile.txt"
-
-train = "./data/wnrr/train.txt"
-filter = "./data/wnrr/valid.txt"
-target = "./data/wnrr/test.txt"
-
-rules = "/home/patrick/Desktop/PyClause/data/wnrr/anyburl-rules-c5-3600"
-
-ranking_file = "./local/rankingFileNoisy.txt"
+ranking_file = f"{get_base_dir()}/local/ranking-file.txt"
 
 options = Options()
 options.set("ranking_handler.disc_at_least", 10)

@@ -3,8 +3,8 @@ import c_clause
 from clause.util.utils import get_base_dir
 
 
+data = f"{get_base_dir()}/data/wnrr/train.txt"
 
-data = "./data/wnrr/train.txt"
 
 options = {
     "collect_statistics": "true",

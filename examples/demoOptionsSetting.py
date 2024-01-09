@@ -1,12 +1,13 @@
 from c_clause import PredictionHandler, Loader
 from clause.config.options import Options
+from clause.util.utils import get_base_dir
 
 
-train = "./data/wnrr/train.txt"
-filter = "./data/wnrr/valid.txt"
-target = "./data/wnrr/test.txt"
+train = f"{get_base_dir()}/data/wnrr/train.txt"
+filter = f"{get_base_dir()}/data/wnrr/valid.txt"
+target = f"{get_base_dir()}/data/wnrr/test.txt"
 
-rules = "./data/wnrr/anyburl-rules-c5-3600"
+rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
 
 
 options = Options()

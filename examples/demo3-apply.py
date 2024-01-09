@@ -1,25 +1,20 @@
-import sys
-import os
-sys.path.append(os.getcwd())
-
 
 import c_clause
 
 from clause.config.options import Options
+from clause.util.utils import get_base_dir
 
 
 
 
 if __name__ == "__main__":
 
+    path_train = f"{get_base_dir()}/data/wnrr/train.txt"
+    path_valid = f"{get_base_dir()}/data/wnrr/valid.txt"
+    path_test = f"{get_base_dir()}/data/wnrr/test.txt"
 
-    path_train = "data/wnrr/train.txt"
-    path_valid = "data/wnrr/valid.txt"
-    path_test  = "data/wnrr/test.txt"
-
-    path_rules_input = "local/rules-wn18rr-anyburl.txt"
-
-    path_preds_output = "local/preds-wn18rr-anyburl.txt"
+    path_rules_input = f"{get_base_dir()}/local/rules-wn18rr-anyburl.txt"
+    path_preds_output = f"{get_base_dir()}/local/preds-wn18rr-anyburl.txt"
 
 
 

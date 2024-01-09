@@ -1,8 +1,5 @@
-import sys
-import os
-sys.path.append(os.getcwd())
-
 from clause.data.triples import TripleSet
+from clause.util.utils import get_base_dir
 
 if __name__ == '__main__':
 
@@ -11,12 +8,12 @@ if __name__ == '__main__':
     # this seems to be a simpler and robust way to circumvent problems with datasets that use strange nameing schemes
 
 
-    # TAKE CARE: For running this you need to speciy the correct paths to a the yago dataset, which is not
-    # delivered with the PyClause release
+    # TAKE CARE: For running this you need to ensure that the data is present
 
-    path_train = "E:/exp/data/yago/train.txt"
-    path_valid = "E:/exp/data/yago/valid.txt"
-    path_test  = "E:/exp/data/yago/test.txt"
+    path_train = f"{get_base_dir()}/data/yago/train.txt"
+    path_valid = f"{get_base_dir()}/data/yago/valid.txt"
+    path_test = f"{get_base_dir()}/data/yago/test.txt"
+
 
     # in case of some special encoding (or issues with windows default coding) set encoding explicitly here
     train = TripleSet(path_train, encod="utf-8")

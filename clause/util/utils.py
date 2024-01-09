@@ -1,5 +1,6 @@
 import os
 from os import path
+import sys
 import importlib.resources as pkg_resources
 
 
@@ -13,6 +14,12 @@ def get_base_dir():
     abs_path = path.abspath(__file__)
     for i in range(3):
         abs_path = path.dirname(abs_path)
+    if "site-packages" in abs_path:
+        print(
+            "It seems PyClause is installed as a package; \
+            get_base_dir() is only valid when installed in editable mode with pip install -e .",
+            file=sys.stderr
+        )
     return abs_path.replace(os.sep, '/')
 
 
