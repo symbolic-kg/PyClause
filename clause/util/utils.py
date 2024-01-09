@@ -36,24 +36,24 @@ def get_config_default_dir():
 
 def get_ab_dir():
     """Returns file path to AnyBURL binary"""
-    package = "clause"
+    package = "clause.bin"
     resource = "AnyBURL-23-1.jar"
     try:
         with pkg_resources.path(package, resource) as p:
             return str(p)
     except:
-        return join_u(get_package_dir(), resource)
+        return join_u(get_package_dir(), "bin", resource)
 
 
 def get_amie_dir():
     """Returns file path to AMIE binary"""
-    package = "clause"
+    package = "clause.bin"
     resource = "AMIE-dev.jar"
     try:
         with pkg_resources.path(package, resource) as p:
             return str(p)
     except:
-        return join_u(get_package_dir(), resource)
+        return join_u(get_package_dir(), "bin", resource)
 
 
 def list_from_idx_file(filename):

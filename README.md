@@ -20,7 +20,7 @@ pip install -e .
 ```
 
 ### 2) Install as a package
-For using PyClause in your own Python project and as a dependency <br>
+For using PyClause in your own Python project and as a dependency. When running our examples you have to set your own correct paths to data and rule files. <br>
 install:
 
 ```

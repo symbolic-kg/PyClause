@@ -75,7 +75,6 @@ setup(
   cmdclass              = {"build_ext": BuildExt},
   zip_safe              = False,
   packages              = find_packages(),
-  package_data          = {"clause": ["config-default.yaml", "AMIE-dev.jar", "AnyBURL-23-1.jar"]},
-  include_package_data  = True,
+  package_data          = {"clause": ["config-default.yaml"], "clause.bin": ["AMIE-dev.jar", "AnyBURL-23-1.jar"]},
   python_requires       = ">=3.7"
 )
