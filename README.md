@@ -8,8 +8,8 @@ All usable default options for the configuration files can be found [here](claus
 
 
 ## Installation
-PyClause only uses a few lightweight Python dependencies. We recommend using a fresh conda environment with Python 3.6+.
-You must also have installed a c++(14) compiler. Installation is tested under Ubuntu and Windows.
+PyClause only uses a few lightweight Python dependencies. We recommend using a fresh conda environment with Python 3.7+.
+You also need to have a c++(14) compiler installed. Installation is tested under Ubuntu and Windows.
 
 ### 1) Install from codebase
 For running our examples and using our data directories or working with the code
