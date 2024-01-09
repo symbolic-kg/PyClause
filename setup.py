@@ -1,4 +1,4 @@
-from setuptools import setup, Extension, find_packages
+from setuptools import setup, Extension, find_packages, find_namespace_packages
 from setuptools.command.build_ext import build_ext
 
 import setuptools
@@ -74,7 +74,7 @@ setup(
   install_requires      = ["pybind11>=2.2.0", "numpy", "flatdict", "pyyaml"],
   cmdclass              = {"build_ext": BuildExt},
   zip_safe              = False,
-  packages              = find_packages(),
+  packages              = find_namespace_packages(),
   package_data          = {"clause": ["config-default.yaml"], "clause.bin": ["AMIE-dev.jar", "AnyBURL-23-1.jar"]},
   python_requires       = ">=3.7"
 )
