@@ -16,8 +16,8 @@ def get_base_dir():
         abs_path = path.dirname(abs_path)
     if "site-packages" in abs_path:
         print(
-            "It seems PyClause is installed as a package; \
-            get_base_dir() is only valid when installed in editable mode with pip install -e .",
+            "It seems PyClause is installed as a package;"
+            " get_base_dir() is only valid when installed in editable mode with pip install -e .",
             file=sys.stderr
         )
     return abs_path.replace(os.sep, '/')
