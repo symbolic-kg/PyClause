@@ -37,7 +37,7 @@ loader.load_rules(rules)
 
 scorer = PredictionHandler(options=options)
 ## you can also input np.array with idx's or list of string triples
-triples = [["02233096","_member_meronym","02233338"], ["08621598","_hypernym","08620061"], ["12400489","_hypernym","12651821"] ]
+triples = [["02233096","_member_meronym","02233338"], ["08621598","_hypernym","08620061"], ["12400489","_hypernym","12651821"], ["12400489","_hypernym","12400489"] ]
 
 scorer.calculate_scores(triples=triples, loader=loader)
 
@@ -89,3 +89,8 @@ scorer.write_explanations(path="local/groundings_idx.jsonl", as_string=False)
 
 # list of dicts
 idx_exp = read_jsonl("local/groundings_idx.jsonl")
+
+
+scorer.write_scores(path="local/scores_str.txt", as_string=True)
+
+scorer.write_scores(path="local/scores_idx.txt", as_string=False)

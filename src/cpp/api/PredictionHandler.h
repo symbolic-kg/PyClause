@@ -16,6 +16,7 @@ public:
     void scoreTriples(std::vector<std::array<std::string, 3>> triples,  std::shared_ptr<Loader> dHandler);
     void scoreTriples(std::string pathToTriples,  std::shared_ptr<Loader> dHandler);
     void writeExplanations(std::string& path, bool asString);
+    void writeScores(std::string& path, bool asString);
 
     std::vector<std::array<double, 4>> getIdxScores();
     std::vector<std::array<std::string, 4>> getStrScores();

@@ -87,9 +87,11 @@ void PredictionHandler::scoreTriples(std::string path,  std::shared_ptr<Loader> 
     scorer.calculateTripleScores(*triples, dHandler->getData(), dHandler->getRules());
 }
 
+
 std::vector<std::array<double, 4 >> PredictionHandler::getIdxScores(){
     return scorer.getTripleScores();
 }
+
 
 std::vector<std::array<std::string, 4>> PredictionHandler::getStrScores(){
     std::vector<std::array<double, 4>>& scores = scorer.getTripleScores();
@@ -105,6 +107,37 @@ std::vector<std::array<std::string, 4>> PredictionHandler::getStrScores(){
     }
     return out;
 }
+
+
+void PredictionHandler::writeScores(std::string& path, bool asString){
+    std::vector<std::array<double, 4>>& scores = scorer.getTripleScores();
+
+    std::ofstream file(path);
+    if (!file.is_open()) {
+        throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + path);
+    }
+
+    for (int i=0; i<scores.size(); i++){
+
+ 
+
+        int ihead = static_cast<int>(scores[i][0]);
+        int irel = static_cast<int>(scores[i][1]);
+        int itail = static_cast<int>(scores[i][2]);
+
+        std::string head = asString ? index->getStringOfNodeId(ihead) : std::to_string(ihead);
+        std::string rel = asString ? index->getStringOfRelId(irel)   : std::to_string(irel);
+        std::string tail = asString ? index->getStringOfNodeId(itail) : std::to_string(itail);
+        std::string score = std::to_string(scores[i][3]);
+
+        file << head + "\t" + rel + "\t" + tail + "\t" + score;
+
+        if (i<scores.size()-1){
+            file<<"\n";
+        }
+    }
+}
+
 
 std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::string>>,  std::vector<std::vector<std::vector<std::vector<std::array<std::string,3>>>>>> PredictionHandler::getStrExplanations(){
     if (!scorer.getScoreCollectGroundings()){
@@ -268,6 +301,7 @@ void PredictionHandler::writeExplanations(std::string& outputPath, bool asString
             file<<"\n";
         }
     }
+    file.close();
 }
 
 // groundings for one rule: list of groundings; where a grounding is a list of triples
