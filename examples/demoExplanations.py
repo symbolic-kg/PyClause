@@ -82,10 +82,10 @@ for i in range(len(explanations[0])):
 
 scorer.write_explanations(path="local/groundings_str.jsonl", as_string=True)
 
+#list of dicts
 str_exp = read_jsonl("local/groundings_str.jsonl")
 
 scorer.write_explanations(path="local/groundings_idx.jsonl", as_string=False)
 
+# list of dicts
 idx_exp = read_jsonl("local/groundings_idx.jsonl")
-
-print("debug")
