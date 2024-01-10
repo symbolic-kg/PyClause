@@ -3,9 +3,20 @@ from os import path
 import sys
 import importlib.resources as pkg_resources
 
+def read_jsonl(path):
+    """Reads a json-line file and return a list of dicts"""
+    import json
+    with open(path, "r") as infile:
+        out = []
+        # check if valid jsonl is test enough for now
+        for line in infile:
+            out_line = json.loads(line)
+            out.append(out_line)
+    return out
+
 
 def join_u(*paths):
-    """prevents no \\ escaping and writing dysfunctional paths to config files"""
+    """Prevents no \\ escaping and writing dysfunctional paths to config files for windows"""
     join = path.join(*paths)
     return join.replace(os.sep, '/')
 

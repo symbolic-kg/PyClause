@@ -1,5 +1,6 @@
 from c_clause import PredictionHandler, Loader
-from clause.util.utils import get_base_dir
+from clause.util.utils import get_base_dir, read_jsonl
+
 import numpy as np
 
 train = f"{get_base_dir()}/data/wnrr/train.txt"
@@ -8,7 +9,7 @@ target = f"{get_base_dir()}/data/wnrr/test.txt"
 
 rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
 
-num_top_rules = 10
+num_top_rules = 2
 
 options = {
         # scoring/ranking options
@@ -36,7 +37,9 @@ loader.load_rules(rules)
 
 scorer = PredictionHandler(options=options)
 ## you can also input np.array with idx's or list of string triples
-scorer.calculate_scores(triples=f"{get_base_dir()}/data/wnrr/test.txt", loader=loader)
+triples = [["02233096","_member_meronym","02233338"], ["08621598","_hypernym","08620061"], ["12400489","_hypernym","12651821"] ]
+
+scorer.calculate_scores(triples=triples, loader=loader)
 
 ## false --> idx's are returned (set index if you want your own)
 idx_scores = scorer.get_scores(as_string=False)
@@ -77,4 +80,12 @@ for i in range(len(explanations[0])):
             ## each grounding is a list of triples where a triple is a list
             print(grounding)
 
-scorer.write_explanations(path="local/groundings.jsonl", as_string=True)
+scorer.write_explanations(path="local/groundings_str.jsonl", as_string=True)
+
+str_exp = read_jsonl("local/groundings_str.jsonl")
+
+scorer.write_explanations(path="local/groundings_idx.jsonl", as_string=False)
+
+idx_exp = read_jsonl("local/groundings_idx.jsonl")
+
+print("debug")

@@ -1,4 +1,5 @@
 #include <functional>
+#include <fstream>
 
 #include "PredictionHandler.h"
 #include "../core/Types.h"
@@ -191,6 +192,110 @@ std::tuple<std::vector<std::array<int,3>>, std::vector<std::vector<int>>,  std::
         rulesIdxs.push_back(rulesPerTarget);
     }
     return std::make_tuple(targets, rulesIdxs, groundings);
+}
+
+void PredictionHandler::writeExplanations(std::string& outputPath, bool asString){
+    if (!scorer.getScoreCollectGroundings()){
+        throw std::runtime_error(
+            "You have set 'prediction_handler.collect_explanation=False. Please set the option to true when you want to output explanations"
+        );
+    }
+
+    std::ofstream file(outputPath);
+    if (!file.is_open()) {
+        throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + outputPath);
+    }
+
+    std::vector<std::pair<Triple, RuleGroundings>>& trGroundings = scorer.getTripleGroundings();
+
+
+    // for each target
+    for (int i=0; i<trGroundings.size(); i++){
+        file << "{";
+        std::pair<Triple, RuleGroundings>& el = trGroundings[i];
+        Triple triple = el.first;
+
+
+        std::string head = asString ? "\"" + index->getStringOfNodeId(triple[0]) + "\"" : std::to_string(triple[0]);
+        std::string rel = asString ? "\"" + index->getStringOfRelId(triple[1]) + "\"" : std::to_string(triple[1]);
+        std::string tail = asString ? "\"" + index->getStringOfNodeId(triple[2]) + "\"" : std::to_string(triple[2]);
+
+        file <<"\"target\":";
+        file<<"[" + head + "," + rel + "," + tail + "]" + ",";
+
+
+        RuleGroundings& elGroundings = el.second;
+        std::vector<Rule*> rulesPerTarget;
+        std::vector<std::vector<std::vector<std::array<int, 3>>>> expPerTarget;
+        // for every rule + groundings that predicted the target
+        for (auto& pair: elGroundings){
+            Rule* rule = pair.first;
+            rulesPerTarget.push_back(rule);
+            // groundings for the rule
+            std::vector<std::vector<Triple>>& explanations = pair.second;
+            expPerTarget.push_back(explanations);
+        }
+
+        file<<"\"rules\":[";
+        // rules
+        for (int j=0; j<rulesPerTarget.size(); j++){
+            if (asString){
+                file<< "\"" + rulesPerTarget[j]->computeRuleString(index.get()) + "\"";
+            } else {
+                file<< "\"" + std::to_string(rulesPerTarget[j]->getID()) + "\"";
+            }
+
+            if (j<rulesPerTarget.size()-1){
+                file<<",";
+            }
+        }
+
+        file<<"],";
+
+        // groundings
+        file<<"\"groundings\":[";
+        for (int j=0; j<rulesPerTarget.size(); j++){
+          file<<groundingsToString(expPerTarget[j], asString);
+          if (j<rulesPerTarget.size()-1){
+            file<<",";
+          }
+        }
+        file<<"]";
+
+        file<<"}";
+
+        if (i<trGroundings.size()-1){
+            file<<"\n";
+        }
+    }
+}
+
+// groundings for one rule: list of groundings; where a grounding is a list of triples
+std::string PredictionHandler::groundingsToString(std::vector<std::vector<Triple>> groundings, bool asString){
+     std::string json = "["; 
+
+    for (size_t i = 0; i < groundings.size(); ++i) {
+        json += "[";
+
+        for (size_t j = 0; j < groundings[i].size(); ++j) {
+            std::string head = asString ? "\"" + index->getStringOfNodeId(groundings[i][j][0]) + "\"" : std::to_string(groundings[i][j][0]);
+            std::string rel = asString ? "\"" + index->getStringOfRelId(groundings[i][j][1]) + "\"" : std::to_string(groundings[i][j][1]);
+            std::string tail = asString ? "\"" + index->getStringOfNodeId(groundings[i][j][2]) + "\"" : std::to_string(groundings[i][j][2]);
+
+            json += "[" + head + "," + rel + "," + tail + "]";
+
+            if (j < groundings[i].size() - 1) {
+                json += ", "; // separate triples of one grounding with a comma
+            }
+        }
+        json += "]"; // end of one grounding
+
+        if (i < groundings.size() - 1) {
+            json += ", "; // grounding separation
+        }
+    }
+    json += "]"; 
+    return json;
 }
 
 

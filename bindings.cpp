@@ -208,7 +208,8 @@ PYBIND11_MODULE(c_clause, m) {
                         }
                     },
             py::arg("as_string")
-        )        
+        )    
+        .def("write_explanations", &PredictionHandler::writeExplanations, py::arg("path"), py::arg("as_string"))    
     ; // class end
 
     // backend tests
