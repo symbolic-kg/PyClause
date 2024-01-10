@@ -111,9 +111,6 @@ std::tuple<std::vector<std::array<std::string,3>>, std::vector<std::vector<std::
             "You have set 'prediction_handler.collect_explanation=False. Please set the option to true when you want to output explanations"
         );
     }
-
-    
-    
     std::vector<std::array<std::string, 3>> targets;
     std::vector<std::vector<std::string>> strRules;
     std::vector<std::vector<std::vector<std::vector<std::array<std::string,3>>>>> groundings;
