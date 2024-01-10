@@ -153,6 +153,7 @@ void RulesHandler::calcRulesPredictions(std::string& rulesPath, std::shared_ptr<
     calcRulesPredictions(stringRules, dHandler);
 }
 
+// writes JSON LINES format (every line is a json); allows easy scrolling through data and easy loading data
 void RulesHandler::writeRulesPredictions(std::string& outputPath, bool flat, bool strings){
     if (this->predictions.size() == 0 && !collectPredictions){
         throw std::runtime_error(
@@ -183,8 +184,9 @@ void RulesHandler::writeRulesPredictions(std::string& outputPath, bool flat, boo
             file << head << "\t" << rel << "\t" << tail << std::endl;
         }
     } else {
-        file << "{";
+        
         for (int idx = 0; idx < this->predictions.size(); idx++){
+            file << "{";
             file << "\"" << this->rules[idx] << "\": [" ;
 
             auto itr = this->predictions[idx].begin();
@@ -199,11 +201,12 @@ void RulesHandler::writeRulesPredictions(std::string& outputPath, bool flat, boo
                 }
             }
             file << "]";
+            file << "}";
             if (idx < this->predictions.size() -1) {
-                file << ",";
+                file << "\n";
             }
         }
-        file << "}";
+        
     }
     file.close();
 }

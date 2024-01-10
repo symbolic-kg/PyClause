@@ -44,6 +44,8 @@ print(handler.get_predictions(as_string=False))
 print("Statistics")
 print(handler.get_statistics())
 
+handler.write_predictions("local/out.jsonl", False, True )
+
 
 
 

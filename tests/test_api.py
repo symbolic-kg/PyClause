@@ -122,17 +122,23 @@ def test_rules_handler():
     test_rules_preds_output = join_u(base_dir, join_u("local", "testing", "test_rules_preds_output.json"))
     handler.write_predictions(test_rules_preds_output, flat=False, as_string=False)
     with open(test_rules_preds_output, "r") as infile:
+        # list of dicts each dict corresponds to one rule
+        predictions = []
         import json
-        # check if valid json is test enough for now
-        predictions = json.load(infile)
+        # check if valid jsonl is test enough for now
+        for line in infile:
+            prediction = json.loads(line)
+            predictions.append(prediction)
     assert len(predictions) == 5
         
     # write string json
     handler.write_predictions(test_rules_preds_output, flat=False, as_string=True)
     with open(test_rules_preds_output, "r") as infile:
+        predictions = []
         import json
-        # check if valid json is test enough for now
-        predictions = json.load(infile)
+        for line in infile:
+            prediction = json.loads(line)
+            predictions.append(prediction)
     assert len(predictions) == 5
 
     print("Testing RulesHandler successful")
