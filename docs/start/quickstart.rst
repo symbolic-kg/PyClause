@@ -3,6 +3,8 @@ Quickstart
 ==========
 
 .. code-block:: python
+   :linenos:
+
    from c_clause import QAHandler, Loader
    from clause.config.options import Options
 
