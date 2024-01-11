@@ -1,3 +1,10 @@
+<p align="left">
+  <img src="https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png" width="100" height="100">
+  <h1>Application and Learning of Symbolic Rules for Knowledge Graphs </h1>
+</p>
+
+
+
 PyClause
 ==============
 PyClause is a library for easy and efficient usage and learning of symbolic rules for knowledge graphs.
@@ -38,8 +45,6 @@ setup(
 )
 
 ```
-
-
 
 ## Quickstart
 After installing PyClause with any of the two options run the following code from anywhere.
