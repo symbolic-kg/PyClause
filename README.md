@@ -170,7 +170,7 @@ h(X,X) <= b1(A,X)
 
 
 
-# Run tests (temporary)
+## Run tests (temporary)
 
 
 Download [this](https://www.dropbox.com/scl/fi/75py3esgpsn6f370ap7q5/test-data.zip?rlkey=7i136d7d7194x2tvoxqsv0e36&dl=0), unpack, and put the folders into data/ <br>
@@ -178,4 +178,12 @@ Then, from the base directory run
 ```pytest -s```.
 
 
+## Colophon
 
+Have you spotted it? <br>
+
+ <img src="PyClause-begriffsschrift-transparent.png" width="214" height="75" style="margin-right: 10px;">
+
+The PyClause logo is a reminiscence of Freges Begriffsschrift, which has been published in the year 1879. Even though Frege is not well known in computer science, in his book Begriffsschrift he developed a calculus using an uncommon notation, which is essentially second-order logic with identity (an extension of first-order logic). <br>
+
+The blue lines in the logo are Freges way to express an implication. If we would write A at the end of the first line and B at the end of the second line, this would correspond to a logical rule A <= B, which can again be understood as a clause with a positive and a negative literal. The round dint at the beginning is Freges way to express universal quantification. For more details we refer to the Wikipedia article or the book from 1879 entitled Begriffsschrift.
