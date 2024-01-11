@@ -1,6 +1,6 @@
-<p align="left">
-  <img align="left" src="https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png" width="214" height="75">
-  <h1>Rule Handling for Knowledge Graphs </h1>
+<p align="left" style="line-height:75px">
+  <img src="https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png" width="214" height="75" style="margin-right: 10px;">
+  <span style="vertical-align: middle; display:inline-block;">Rule Handling for Knowledge Graphs</span>
 </p>
 
 PyClause is a library for easy and efficient usage and learning of symbolic rules for knowledge graphs.
