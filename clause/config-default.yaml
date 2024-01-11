@@ -26,32 +26,34 @@
 #  dont load rules of type 'r' if they have a lower support as 'r_min_support'
 # 'r_min_preds' option: as above for the overall number of triple predicitions
 # 'r_min_confidence': as above; note: confidence here is without laplace smooting
+# 'r_max_length' option: as above; length refers to the number of body atoms
 loader:
-  ## Z rules
-  load_zero_rules: True
-  # weight that is multiplied with the confidence
-  z_weight: 0.1
-  z_num_unseen: 5
-  z_min_support: 2
-  z_min_preds: 2
-  z_min_conf: 0.0001
-
-  ## U_c rules
-  load_u_c_rules: True
-  c_num_unseen: 5
-  c_min_support: 2
-  c_min_preds: 2
-  c_min_conf: 0.0001
 
   ## B rules
+  # parsable example: "h(X,Y) <= b1(A,X), b2(A,Y)"
   load_b_rules: True
   b_max_branching_factor: -1 #-1 for off
   b_num_unseen: 5
   b_min_support: 2
   b_min_preds: 2
   b_min_conf: 0.0001
+  b_max_length: 5
+ 
+  ## U_c rules
+  # parsable examples (c and d being entities in the graph):
+  # "h(X,c) <= b1(X,d)"
+  # "h(c,Y) <= b1(Y,A), b2(d,A)" 
+  load_u_c_rules: True
+  c_num_unseen: 5
+  c_min_support: 2
+  c_min_preds: 2
+  c_min_conf: 0.0001
+  c_max_length: 1
 
   ##  U_d rules
+  # parsable examples (c being an entity in the graph):
+  # "h(X,c) <= b1(A,X), b2(A,B)" 
+  # "h(X,c) <= b1(X,A)"
   load_u_d_rules: True
   # weight that is multiplied with the confidence
   d_weight: 0.01
@@ -60,8 +62,23 @@ loader:
   d_min_support: 2
   d_min_preds: 2
   d_min_conf: 0.0001
+  d_max_length: 1
+
+  ## Z rules
+  # parsable example (c being an entity in the graph): "h(X,c) <="
+  # can only be used for qa or ranking not for triple scoring
+  # has always length 1
+  load_zero_rules: True
+  # weight that is multiplied with the confidence
+  z_weight: 0.1
+  z_num_unseen: 5
+  z_min_support: 2
+  z_min_preds: 2
+  z_min_conf: 0.0001
 
   ## U_xxc rules
+  # parsable example: "h(X,X) <= b1(X,c)" (c being an entity in the graph)
+  # has always length 1
   load_u_xxc_rules: True
   xxc_num_unseen: 5
   xxc_min_support: 2
@@ -69,11 +86,14 @@ loader:
   xxc_min_conf: 0.0001
 
   ## U_xxd rules
+  # parsable example: "h(X,X) <= b1(X,A)"
+  # has always length 1
   load_u_xxd_rules: True
   xxd_num_unseen: 5
   xxd_min_support: 2
   xxd_min_preds: 2
   xxd_min_conf: 0.0001
+
 
 # calculates rankings based on the target set loaded into DataLoader
 ranking_handler:

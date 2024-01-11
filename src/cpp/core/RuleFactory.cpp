@@ -431,6 +431,11 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
     } 
 
     if (ruleType=="RuleB" && createRuleB){
+
+        if (BmaxLength>0 && directions.size()>BmaxLength){
+            return nullptr;
+        }
+
         std::unique_ptr<RuleB> ruleb = std::make_unique<RuleB>(relations, directions);
         ruleb->setNumUnseen(BnumUnseen);
         ruleb->branchingFactor = BbranchingFactor;
@@ -449,9 +454,13 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
         return std::move(ruleb); 
 
     } else if (ruleType=="RuleC" && createRuleC){
+
+        if (CmaxLength>0 && directions.size()>CmaxLength){
+            return nullptr;
+        }
+
         std::unique_ptr<RuleC> rulec = std::make_unique<RuleC>(relations, directions, leftC, constants);
         rulec->setNumUnseen(CnumUnseen);
-
 
         if (numPreds>0 && CminPreds > numPreds){
             return nullptr;
@@ -466,6 +475,11 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
 
         return std::move(rulec);
     }else if(ruleType=="RuleD" && createRuleD){
+
+        if (DmaxLength>0 && directions.size()>DmaxLength){
+            return nullptr;
+        }
+
         std::unique_ptr<RuleD> ruled = std::make_unique<RuleD>(relations, directions, leftC, constants[0]);
         ruled->setNumUnseen(DnumUnseen);
         ruled->setConfWeight(DconfWeight);
@@ -564,6 +578,18 @@ void RuleFactory::setDbranchingFactor(int val){
 
 void RuleFactory::setZconfWeight(double val){
     ZconfWeight = val;
+}
+
+void RuleFactory::setCmaxLength(int val){
+    CmaxLength = val;
+}
+
+void RuleFactory::setBmaxLength(int val){
+    BmaxLength = val;
+}
+
+void RuleFactory::setDmaxLength(int val){
+    DmaxLength = val;
 }
 
 

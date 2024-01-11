@@ -104,6 +104,7 @@ void Loader::setRuleOptions(std::map<std::string, std::string> options, RuleFact
         {"c_min_support", [&ruleFactory](std::string val) {ruleFactory.setMinCorrect(std::stoi(val), "c");}},
         {"c_min_preds", [&ruleFactory](std::string val) {ruleFactory.setMinPred(std::stoi(val), "c");}},
         {"c_min_conf", [&ruleFactory](std::string val) {ruleFactory.setMinConf(std::stod(val), "c");}},
+        {"c_max_length", [&ruleFactory](std::string val) {ruleFactory.setCmaxLength(std::stoi(val));}},
         // B
         {"load_b_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleB(util::stringToBool(val));}},
         {"b_max_branching_factor", [&ruleFactory](std::string val) {ruleFactory.setBbranchingFactor(std::stoi(val));}},
@@ -111,6 +112,7 @@ void Loader::setRuleOptions(std::map<std::string, std::string> options, RuleFact
         {"b_min_support", [&ruleFactory](std::string val) {ruleFactory.setMinCorrect(std::stoi(val), "b");}},
         {"b_min_preds", [&ruleFactory](std::string val) {ruleFactory.setMinPred(std::stoi(val), "b");}},
         {"b_min_conf", [&ruleFactory](std::string val) {ruleFactory.setMinConf(std::stod(val), "b");}},
+        {"b_max_length", [&ruleFactory](std::string val) {ruleFactory.setBmaxLength(std::stoi(val));}},
         // D
         {"load_u_d_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleD(util::stringToBool(val));}},
         {"d_weight", [&ruleFactory](std::string val) {ruleFactory.setDconfWeight(std::stod(val));}},
@@ -119,6 +121,7 @@ void Loader::setRuleOptions(std::map<std::string, std::string> options, RuleFact
         {"d_min_support", [&ruleFactory](std::string val) {ruleFactory.setMinCorrect(std::stoi(val), "d");}},
         {"d_min_preds", [&ruleFactory](std::string val) {ruleFactory.setMinPred(std::stoi(val), "d");}},
         {"d_min_conf", [&ruleFactory](std::string val) {ruleFactory.setMinConf(std::stod(val), "d");}},
+        {"d_max_length", [&ruleFactory](std::string val) {ruleFactory.setDmaxLength(std::stoi(val));}},
         // XXc
         {"load_u_xxc_rules", [&ruleFactory](std::string val) {ruleFactory.setCreateRuleXXc(util::stringToBool(val));}},
         {"xxc_num_unseen", [&ruleFactory](std::string val) {ruleFactory.setNumUnseen(std::stoi(val), "xxc");}},

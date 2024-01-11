@@ -43,6 +43,10 @@ public:
     void setDconfWeight(double val);
     void setZconfWeight(double val);
 
+    void setBmaxLength(int val);
+    void setCmaxLength(int val);
+    void setDmaxLength(int val);
+
 private:
     std::shared_ptr<Index> index;
 
@@ -84,6 +88,10 @@ private:
     int DminPreds = 2;
     int XXDminPreds = 2;
     int XXCminPreds = 2;
+
+    int BmaxLength = -1;
+    int CmaxLength = -1;
+    int DmaxLength = -1;
 
 
     double ZminConf = 0.0001;
