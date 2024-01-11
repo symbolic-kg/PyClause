@@ -4,7 +4,7 @@ from clause.util.utils import get_base_dir
 
 
 train = f"{get_base_dir()}/data/wnrr/train.txt"
-filter = f"{get_base_dir()}/data/wnrr/valid.txt"
+filter_set = f"{get_base_dir()}/data/wnrr/valid.txt"
 target = f"{get_base_dir()}/data/wnrr/test.txt"
 
 rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
@@ -13,7 +13,7 @@ rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
 options = Options()
 
 loader = Loader(options.get("loader"))
-loader.load_data(train, filter)
+loader.load_data(train, filter_set)
 loader.load_rules(rules)
 
 

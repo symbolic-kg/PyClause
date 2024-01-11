@@ -4,7 +4,7 @@ from clause.util.utils import get_base_dir, read_jsonl
 import numpy as np
 
 train = f"{get_base_dir()}/data/wnrr/train.txt"
-filter = f"{get_base_dir()}/data/wnrr/valid.txt"
+filter_set = f"{get_base_dir()}/data/wnrr/valid.txt"
 target = f"{get_base_dir()}/data/wnrr/test.txt"
 
 rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
@@ -31,7 +31,7 @@ options = {
 }
 
 loader = Loader(options)
-loader.load_data(data=train, filter=filter, target=target)
+loader.load_data(data=train, filter=filter_set, target=target)
 loader.load_rules(rules)
 
 

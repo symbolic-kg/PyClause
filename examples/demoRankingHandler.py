@@ -4,7 +4,7 @@ from clause.util.utils import get_base_dir
 from clause.config.options import Options
 
 train = f"{get_base_dir()}/data/wnrr/train.txt"
-filter = f"{get_base_dir()}/data/wnrr/valid.txt"
+filter_set = f"{get_base_dir()}/data/wnrr/valid.txt"
 target = f"{get_base_dir()}/data/wnrr/test.txt"
 
 rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
@@ -19,7 +19,7 @@ options.set("ranking_handler.num_top_rules", -1)
 #### Calculate a ranking and serialize / use in python
 start = time.time()
 loader = Loader(options=options.get("loader"))
-loader.load_data(data=train, filter=filter, target=target)
+loader.load_data(data=train, filter=filter_set, target=target)
 loader.load_rules(rules=rules)
 
 

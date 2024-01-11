@@ -7,7 +7,7 @@ entity_names_f = f"{get_base_dir()}/data/wnrr/entity_strings.txt"
 
 
 train = f"{get_base_dir()}/data/wnrr/train.txt"
-filter = f"{get_base_dir()}/data/wnrr/valid.txt"
+filter_set = f"{get_base_dir()}/data/wnrr/valid.txt"
 target = f"{get_base_dir()}/data/wnrr/test.txt"
 
 rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
@@ -43,7 +43,7 @@ options = {
 }
 
 loader = c_clause.Loader(options)
-loader.load_data(train, filter)
+loader.load_data(train, filter_set)
 loader.load_rules(rules)
 loader.replace_ent_tokens(entity_names)
 
