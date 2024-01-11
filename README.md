@@ -1,6 +1,6 @@
 <p align="left">
-  <img src="https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png" width="100" height="100">
-  <h1>Application and Learning of Symbolic Rules for Knowledge Graphs </h1>
+  <img src="https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png" width="285" height="100">
+  <h1>Symbolic Rule Handling for Knowledge Graphs </h1>
 </p>
 
 
