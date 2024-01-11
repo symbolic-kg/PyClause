@@ -34,9 +34,9 @@ as dependency:
 ## in setup.py
 
 setup(
-  name              = "MyProject",
-  install_requires  = ["PyClause @ git+https://github.com/symbolic-kg/PyClause.git#egg=PyClause"],
-  python_requires   = ">=3.7"
+  name             = "MyProject",
+  install_requires = ["PyClause @ git+https://github.com/symbolic-kg/PyClause.git#egg=PyClause"],
+  python_requires  = ">=3.7"
 )
 
 ```
