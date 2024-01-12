@@ -1,5 +1,5 @@
 
-# <img src="https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png" width="210" height="55" style="margin-right: 10px;" alt="PyClause">
+# <img src="https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png" width="210" height="60" style="margin-right: 10px;" alt="PyClause">
 
 
 PyClause is a library for easy and efficient usage and learning of symbolic rules for knowledge graphs.
