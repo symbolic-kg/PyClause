@@ -6,7 +6,7 @@ PyClause is a library for easy and efficient usage and learning of symbolic rule
 
 ## Documentation
 Documentation of library and features can be found [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
-All usable default options for the configuration files can be found [here](clause/config-default.yaml) 
+All usable default options for the configuration files can be found in [clause/config-default.yaml](clause/config-default.yaml) 
 
 
 ## Installation
