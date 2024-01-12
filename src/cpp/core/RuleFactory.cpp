@@ -523,19 +523,27 @@ void RuleFactory::parseAtom(const std::string& input, strAtom& atom) {
         atom[1] = split[0];
         atom[2] = split[1];
     // assumes that one slot is a variable; and one slot is an entity that contains even "," or "(", ")"     
-    }else if (split.size()==3){
-        if (split[2].length()==1){
-            atom[1] = split[0] + "," + split[1];
-            atom[2] = split[2];
+    }else{
+        if (split.back().length()==1){
+            atom[2] = split.back();
+            for (int i=0; i<split.size()-1; i ++){
+                atom[1] += split[i];
+                if (i<split.size()-2){
+                    atom[1] += ",";
+                }
+
+            }
         } else if (split[0].size()==1){
             atom[1] = split[0];
-            atom[2] = split[1] + "," +  split[2];
+            for (int i=1; i<split.size(); i++){
+                atom[2] += split[i];
+                if (i<split.size()-1){
+                    atom[2] += ",";
+                }
+            }
         } else{
             throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
         }
-
-    } else {
-        throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
     }
 }
 
