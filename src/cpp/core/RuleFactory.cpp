@@ -261,7 +261,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
 
     
     // *** BRule ***
-    if (headAtom[1][0]==firstVar && headAtom[2][0]==lastVar){
+    if (headAtom[1][0]==firstVar && headAtom[2][0]==lastVar && headAtom[1].length()==1 && headAtom[2].length()==1){
         ruleType = "RuleB";
         for (int i=0; i<length; i++){
             relations.push_back(index->getIdOfRelationstring(bodyAtoms[i][0]));
@@ -273,7 +273,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
             } else if (bodyAtoms[i][1][0]==second && bodyAtoms[i][2][0]==first) {
                 directions.push_back(false);
             } else {
-                throw std::runtime_error("Encountered a Brule that I dont understand in parsing.");
+                throw std::runtime_error("Encountered a Brule that I dont understand in parsing. " + rule);
             }
         }
     }else{
@@ -509,19 +509,33 @@ void RuleFactory::parseAtom(const std::string& input, strAtom& atom) {
     if (!std::getline(stream, atom[0], '(')) {
         throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
     }
-    // assign head
-    if (!std::getline(stream, atom[1], ',')) {
-        throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
-    }
-    //assign tail, parse until LAST occurence of ")"; allows entities in yago such as "ent (player)"
 
-    std::string lastPart;
-    std::getline(stream, lastPart);
-    int last_paren_pos = lastPart.find_last_of(')');
-    if (last_paren_pos == std::string::npos) {
+    std::string currentStr;
+    std::getline(stream, currentStr);
+    int last_par_pos = currentStr.find_last_of(')');
+    if (last_par_pos == std::string::npos) {
         throw std::runtime_error("Error when parsing string in parseAtom: no closing parenthesis found in input:" + input);
+    }
+    currentStr = currentStr.substr(0, last_par_pos);
+
+    std::vector<std::string> split = util::splitString(currentStr, ",");
+    if (split.size()==2){
+        atom[1] = split[0];
+        atom[2] = split[1];
+    // assumes that one slot is a variable; and one slot is an entity that contains even "," or "(", ")"     
+    }else if (split.size()==3){
+        if (split[2].length()==1){
+            atom[1] = split[0] + "," + split[1];
+            atom[2] = split[2];
+        } else if (split[0].size()==1){
+            atom[1] = split[0];
+            atom[2] = split[1] + "," +  split[2];
+        } else{
+            throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
+        }
+
     } else {
-        atom[2] = lastPart.substr(0, last_paren_pos);
+        throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
     }
 }
 
