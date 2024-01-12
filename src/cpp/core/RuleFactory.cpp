@@ -514,11 +514,14 @@ void RuleFactory::parseAtom(const std::string& input, strAtom& atom) {
         throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
     }
     //assign tail, parse until LAST occurence of ")"; allows entities in yago such as "ent (player)"
-    int last_paren_pos = input.find_last_of(')');
+
+    std::string lastPart;
+    std::getline(stream, lastPart);
+    int last_paren_pos = lastPart.find_last_of(')');
     if (last_paren_pos == std::string::npos) {
         throw std::runtime_error("Error when parsing string in parseAtom: no closing parenthesis found in input:" + input);
     } else {
-        atom[2] = input.substr(0, last_paren_pos);
+        atom[2] = lastPart.substr(0, last_paren_pos);
     }
 }
 
