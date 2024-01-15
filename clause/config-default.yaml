@@ -66,7 +66,7 @@ loader:
 
   ## Z rules
   # parsable example (c being an entity in the graph): "h(X,c) <="
-  # can only be used for qa or ranking not for triple scoring
+  # can only be used for qa or ranking not for PredictionHandler
   # has always length 1
   load_zero_rules: True
   # weight that is multiplied with the confidence
