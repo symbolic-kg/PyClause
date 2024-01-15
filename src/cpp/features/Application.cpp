@@ -48,7 +48,7 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
         for (int i=0; i<triples.size(); i++){
            
             if (verbose && i%1000==0 && i>0){
-                std::cout<<"Scored 1000 triples..."<<std::endl;
+                std::cout<<"Scored "<<(i/1000) * 1000<<"triples..."<<std::endl;
             }
             Triple triple = triples[i];
             int head = triple[0];
@@ -161,9 +161,9 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 if (length>0){
                     ctr+=1;
                     if (verbose && ctr%chunk==0 && dirIsTail){
-                        std::cout<<"Calculated "<< chunk <<" tail queries..."<<std::endl;
+                        std::cout<<"Calculated "<< (ctr/chunk) * chunk <<" tail queries..."<<std::endl;
                     }else if (verbose && ctr%chunk==0){
-                        std::cout<<"Calculated "<< chunk <<" head queries..."<<std::endl;
+                        std::cout<<"Calculated "<< (ctr/chunk) * chunk <<" head queries..."<<std::endl;
                     }
                     auto& relRules = rules.getRelRules(rel);
                     // filtering for train and additionalFilter
