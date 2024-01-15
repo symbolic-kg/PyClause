@@ -94,7 +94,9 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
 
     int outEvery = std::max(3, numRules/10);
 
-
+    if (verbose){
+        std::cout<<"Starting materialization of "<<numRules<< " rules."<<std::endl;
+    }
 
     #pragma omp parallel num_threads(num_thr)
     {
@@ -103,7 +105,7 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
 
         #pragma omp for schedule(dynamic)
         for (int i=0; i<numRules; i++){
-            if (i>0 && i%outEvery==0){
+            if (i>0 && verbose && i%outEvery==0){
                 std::cout<<"Materialized rule " << i << " from " << numRules << " ..."<<std::endl;
             }
             std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(stringRules[i]);
