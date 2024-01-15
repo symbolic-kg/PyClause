@@ -48,7 +48,7 @@ void ApplicationHandler::calculateTripleScores(std::vector<Triple> triples, Trip
         for (int i=0; i<triples.size(); i++){
            
             if (verbose && i%1000==0 && i>0){
-                std::cout<<"Scored "<<(i/1000) * 1000<<"triples..."<<std::endl;
+                std::cout<<"Scored "<<(i/1000) * 1000<<" triples..."<<std::endl;
             }
             Triple triple = triples[i];
             int head = triple[0];

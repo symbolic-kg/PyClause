@@ -82,6 +82,7 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
     
     this->rules = stringRules;
 
+    int numRules = rules.size();
 
     if (collectPredictions){
         predictions.resize(stringRules.size());
@@ -91,13 +92,20 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
         stats.resize(stringRules.size());
     }
 
+    int outEvery = std::max(3, numRules/10);
+
+
+
     #pragma omp parallel num_threads(num_thr)
     {
         TripleStorage& data = dHandler->getData();
         std::shared_ptr<Index> index = dHandler->getIndex();
 
         #pragma omp for schedule(dynamic)
-        for (int i=0; i<stringRules.size(); i++){
+        for (int i=0; i<numRules; i++){
+            if (i>0 && i%outEvery==0){
+                std::cout<<"Materialized rule " << i << " from " << numRules << " ..."<<std::endl;
+            }
             std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(stringRules[i]);
             rule->setTrackInMaterialize(collectStats);
             if (!rule){
