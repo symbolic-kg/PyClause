@@ -26,6 +26,22 @@ class Hits():
         self.hits_ad_n_head_filtered = [0] * self.ATKMAX
         self.counter_head = 0
         self.counter_head_covered = 0
+    
+    def add_filter_set(self, tripleset):
+        self.filter_sets.append(tripleset)
+
+   
+    
+    def compute_scores(self, ranking, triples, head_direction = True, tail_direction = False):
+        self.init()
+        for triple in triples:
+            if head_direction:
+                cands = ranking.get_head_candidates(str(triple))
+                self.evaluate_head(cands, str(triple))
+            if tail_direction:
+                cands = ranking.get_tail_candidates(str(triple))
+                self.evaluate_tail(cands, str(triple))
+        
 
     def get_mrr(self):
         """
@@ -73,6 +89,7 @@ class Hits():
         return mrr
 
     def get_hits_at_k(self, k):
+        k = k -1
         return (self.hits_ad_n_head_filtered[k] + self.hits_ad_n_tail_filtered[k]) / (self.counter_head + self.counter_tail)
 
     def evaluate_head(self, candidates, triple):
@@ -188,15 +205,27 @@ class CompletionResult():
                 k -= 1
                 if k == 0: return
 
+    def add_head_candidate_with_confidence(self, cc):
+        self.head_results.append(cc[0])
+        self.head_confidences.append(cc[1])
+
+    def add_tail_candidate_with_confidence(self, cc):
+        self.tail_results.append(cc[0])
+        self.tail_confidences.append(cc[1])
+
+
 class Ranking():
 
-    def __init__(self, name, filepath, contains_confidences = True, k = 100):
 
-        self.name = name
+
+    def __init__(self, filepath = None, contains_confidences = True, k = 100):
+        self.hits = Hits()
         self.filepath = filepath
         self.contains_confidences = contains_confidences
         self.k = k
         self.results = {}
+        if filepath == None:
+            return
         counter = 0
         stepsize = 100000 
         f = open(self.filepath, "r")
@@ -222,6 +251,46 @@ class Ranking():
             line = line.replace('\t', ' ')
             self.results[line.strip()] = cr
         f.close()
+
+    def convert_handler_ranking(self, head_ranking, tail_ranking, testset, target_triples = None):
+        """
+        This function converts the internal rankings computed by PyClause into a ranking
+        that can be evaluted using the standard evaluatiobn protooll in the filtered version.
+        The interla rankings are usually filtered against valid and train. The additioal
+        filtering against the testset is done in this method.
+
+        This function takes as arguments a head and a tail ranking and a testset.
+        It is possible to additionally set a list of traget_triples. If this parameter is not set,
+        then the triples from the testset are used as target_triples. The traget_triples are used as
+        evaluation queries for which the ranking is generated. They are usually a subset or all of the triples of the testset.
+        
+        The head or the tail ranking can be set to None. In this case empty lists of predictions for the
+        head/tail cases are created within the ranking.
+        """
+        if target_triples == None: target_triples = testset.triples
+        for triple in target_triples:
+            s = triple.get_head_token()
+            r = triple.get_relation_token()
+            o = triple.get_tail_token()
+            # print(str(triple) + " r=" + r)
+            cr = CompletionResult(str(triple))
+            self.results[str(triple)] = cr
+            if not head_ranking == None:
+                if r in head_ranking:
+                    if o in head_ranking[r]:
+                        for cc in head_ranking[r][o]:
+                            cr.add_head_candidate_with_confidence(cc)
+            if not tail_ranking == None:
+                if r in tail_ranking:
+                    if s in tail_ranking[r]:
+                        for cc in tail_ranking[r][s]:
+                            cr.add_tail_candidate_with_confidence(cc)
+
+    def add_filter_set(self, tripleset):
+            self.hits.add_filter_set(tripleset)
+
+    def compute_scores(self, triples, head_direction = True, tail_direction = True):
+        self.hits.compute_scores(self, triples, head_direction, tail_direction)
 
     def get_results_from_line(self, rline):
         if not self.contains_confidences:
@@ -255,23 +324,20 @@ class Ranking():
 
 
 
-def compute_scores(ranking, triples, hits, head_direction = True, tail_direction = False):
-    for triple in triples:
-        if head_direction:
-            cands = ranking.get_head_candidates(str(triple))
-            hits.evaluate_head(cands, str(triple))
-        if tail_direction:
-            cands = ranking.get_tail_candidates(str(triple))
-            hits.evaluate_tail(cands, str(triple))
+
 
 
 
 if __name__ == '__main__':
 
-    ranking = Ranking("AnyBURL ranking", "local/anyburl-rules-c5-3600-analysis/pyclause-fix6/preds-ALL")
+    ranking = Ranking("local/anyburl-rules-c5-3600-analysis/pyclause-fix6/preds-ALL")
+
+
     testset = TripleSet("data/wnrr/test.txt")
     hits = Hits()
-    compute_scores(ranking, testset.triples, hits, True, True)
+
+
+    hits.compute_scores(ranking, testset.triples, True, True)
 
     print("MRR: " + str(hits.get_mrr()))
 

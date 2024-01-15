@@ -31,12 +31,12 @@ if __name__ == '__main__':
     options = Options()
     # options = Options("config-my.yaml")
 
-    options.set("learning.mode", "hybrid")
+    options.set("learning.mode", "amie")
 
     # print(str(options.flat()))
 
     # options.set("learning.anyburl.b_length", 1)
-    # options.set("learning.anyburl.time", 30)
+    options.set("learning.anyburl.time", 30)
 
     #options.set("learning.torm.b.length", 1)
     #options.set("learning.torm.uc.support", 2)
