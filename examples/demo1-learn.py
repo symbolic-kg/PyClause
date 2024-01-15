@@ -1,11 +1,11 @@
 import sys
 import os
 
-from clause.learning.miner import Miner
+from clause import Miner
 from clause.data.triples import TripleSet
 from clause.util.utils import get_base_dir
 
-from clause.config.options import Options
+from clause import Options
 
 
 
