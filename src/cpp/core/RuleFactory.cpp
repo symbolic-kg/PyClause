@@ -104,7 +104,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
 
 
     // Uxx d or c rule h(X,X) <- body
-    if (headAtom[1][0]==_cfg_prs_anyTimeVars[0] && headAtom[2][0] == _cfg_prs_anyTimeVars[0]){
+    if (headAtom[1][0]==_cfg_prs_anyTimeVars[0] && headAtom[2][0] == _cfg_prs_anyTimeVars[0] && headAtom[1].length()==1 && headAtom[2].length()==1){
         return parseUXXrule(headBody);
     }
 
@@ -509,7 +509,6 @@ void RuleFactory::parseAtom(const std::string& input, strAtom& atom) {
     if (!std::getline(stream, atom[0], '(')) {
         throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
     }
-
     std::string currentStr;
     std::getline(stream, currentStr);
     int last_par_pos = currentStr.find_last_of(')');
