@@ -103,6 +103,10 @@ void Loader::loadData(T data, T filter, T target){
         this->filter->loadCSR();
     }
     this->loadedData = true;
+
+    if (verbose){
+        std::cout<<"Loaded triples."<<std::endl;
+    }
 };
 
 #endif
