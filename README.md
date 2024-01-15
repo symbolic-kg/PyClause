@@ -46,7 +46,7 @@ setup(
 After installing PyClause with any of the two options, run the following code from anywhere.
 ```python
 from c_clause import QAHandler, Loader
-from clause.config.options import Options
+from clause import Options
 
 # ***Example for Query Answering***
 

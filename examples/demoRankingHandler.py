@@ -1,7 +1,7 @@
 import time
 from c_clause import RankingHandler, Loader
 from clause.util.utils import get_base_dir
-from clause.config.options import Options
+from clause import Options
 
 train = f"{get_base_dir()}/data/wnrr/train.txt"
 filter_set = f"{get_base_dir()}/data/wnrr/valid.txt"

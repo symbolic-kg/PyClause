@@ -1,12 +1,16 @@
-
 Quickstart
 ==========
+
+After installing PyClause with either method you should be able to import the ``clause`` and ``c_clause`` packages.
+
+Run the following code from anywhere, it shows an example of answering the queries **"Anna speaks ? (what)"** and **"? (who) speaks English"** after a small KG and ruleset is loaded.
+
 
 .. code-block:: python
    :linenos:
 
    from c_clause import QAHandler, Loader
-   from clause.config.options import Options
+   from clause import Options
 
    # ***Example for Query Answering***
 

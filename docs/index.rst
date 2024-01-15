@@ -1,16 +1,18 @@
 
-PyClause: Rule Handling for Knowledge Graphs
-============================================
+PyClause: Symbolic Rules for Knowledge Graphs
+=============================================
+Welcome to the documentation of PyClause. PyClause allows you to use and learn symbolic rules (clauses) in a simple yet efficient manner by using Python.
+All usable options are well documented and can be stored in user defined configuration files. 
 
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Start
-   
+
+   start/overview
    start/installation
    start/quickstart
-   start/overview
 
 .. toctree::
    :maxdepth: 2
@@ -31,6 +33,7 @@ PyClause: Rule Handling for Knowledge Graphs
    feature/query_answering
    feature/ranking_generation
    feature/rule_materialization
+   feature/rule_confidence
 
 .. toctree::
    :maxdepth: 2
@@ -52,8 +55,4 @@ PyClause: Rule Handling for Knowledge Graphs
    
 
 
-
-PyClause is a library for using rules in a simply but efficient way.
-
-Feature overview here.
 

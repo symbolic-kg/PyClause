@@ -1,3 +1,3 @@
 
-Rule Confidences and Materialization
-====================================
+Rule Materialization
+====================
