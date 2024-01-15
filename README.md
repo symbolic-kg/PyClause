@@ -10,8 +10,9 @@ All usable default options for the configuration files can be found in [clause/c
 
 
 ## Installation
-PyClause only uses a few lightweight Python dependencies. We recommend using a fresh conda environment with Python 3.7+.
-You also need to have a c++(14) compiler installed. Installation is tested under Ubuntu and Windows.
+PyClause only uses a few lightweight Python dependencies and runs under Windows and Linux systems. Linux users need to have a c++ (14) compiler installed. Windows users need to have C++ build tools installed. PyClause requires Microsoft Visual C++ 14.0 or newer. <br>
+
+We recommend using a fresh Conda environment with Python 3.7+. 
 
 ### 1) Install from codebase
 For running our examples and using our data directories or working with the code
