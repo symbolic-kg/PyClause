@@ -38,9 +38,17 @@ The workflow of PyClause allows to:
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Data Handling
+   :caption: Conceptual
+
+   conceptual/rules
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Preparation
    
    data/loading
+   data/config
    
 
 .. toctree::
