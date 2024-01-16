@@ -1,8 +1,29 @@
 
 PyClause: Symbolic Rules for Knowledge Graphs
 =============================================
-Welcome to the documentation of PyClause. PyClause allows you to use and learn symbolic rules (clauses) in a simple yet efficient manner by using Python.
-All usable options are well documented and can be stored in user defined configuration files. 
+Welcome to the documentation of PyClause. PyClause allows you to use and learn symbolic rules (clauses) in a simple yet efficient manner by using Python. All usable options are well documented and can be stored in user defined configuration files. 
+
+
+Feature Overview
+================
+
+By exclusively using Python, with PyClause you can:
+
+- Learn rules with **AMIE**, **AnyBURL**, or our custom mining module **Torm** (``clause.Miner``)
+- Calculate explanations for a given triple prediction (``c_clause.PredictionHandler``)
+- Calculate query answering on the fly (``c_clause.QAHandler``)
+- Perform triple scoring/classification on the fly (``c_clause.PredictionHandler``)
+- Materialize input rules and calculate rule confidences/precision (``c_clause.RulesHandler``)
+- Calculate ranking files for knowledge graph completion (``c_clause.RankingHandler``)
+- Retrieve the target rules that predicted triples or candidates with ``c_clause.QAHandler``, ``c_clause.PredictionHandler`` or ``c_clause.RankingHandler``
+- Evaluate ranking files for knowledge graph completion
+
+The workflow of PyClause allows to:
+
+- load data KGs and rules solely from Python and serialize the results back to Python
+- load data KGs and rules from disk and write back the results to disk for efficiency
+- handle KG data as indexes, e.g., from numpy arrays, or with string names for the generation of readable examples
+- work with and store userd defined configuration files, based on an extensive `default-configuration file <https://github.com/symbolic-kg/PyClause/blob/master/clause/config-default.yaml>`_
 
 
 .. toctree::
@@ -10,7 +31,7 @@ All usable options are well documented and can be stored in user defined configu
    :hidden:
    :caption: Start
 
-   start/overview
+   Overview<self>
    start/installation
    start/quickstart
 
