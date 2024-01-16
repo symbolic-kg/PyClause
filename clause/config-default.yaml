@@ -20,7 +20,7 @@
 
 # 'r_num_unseen' option:
 # laplace smoothing applied to rule type 'r' for calculating confidence
-# conf = support / (num_unseen+num_predictions)
+# conf = support / (num_unseen+num_body_groundings)
 
 # 'r_min_support' option:
 #  dont load rules of type 'r' if they have a lower support as 'r_min_support'
