@@ -4,33 +4,27 @@ sys.path.append(os.getcwd())
 
 from clause.data.triples import TripleSet
 
+
+
 class Hits():
     """
     Used to compute MRR and Hits@k metrics.
     """
 
     def __init__(self):
-        self.filter_sets = [] # triples sets used for filtering
-        self.ATKMAX = 100 # might not be required in the python version
+        self.ATKMAX = 500 # might not be required in the python version
         self.init()
 
 
     def init(self):
         self.tail_ranks = []
         self.hits_ad_n_tail = [0] * self.ATKMAX
-        self.hits_ad_n_tail_filtered = [0] * self.ATKMAX
         self.counter_tail = 0
         self.counter_tail_covered = 0
         self.head_ranks = []
         self.hits_ad_n_head = [0] * self.ATKMAX
-        self.hits_ad_n_head_filtered = [0] * self.ATKMAX
         self.counter_head = 0
-        self.counter_head_covered = 0
-    
-    def add_filter_set(self, tripleset):
-        self.filter_sets.append(tripleset)
-
-   
+        self.counter_head_covered = 0   
     
     def compute_scores(self, ranking, triples, head_direction = True, tail_direction = False):
         self.init()
@@ -45,14 +39,14 @@ class Hits():
 
     def get_mrr(self):
         """
-        Computes and returns the filtered MRR.
+        Computes and returns the MRR.
         """
         mrr = 0.0
         hk = 0.0
         hk_prev = 0.0
         hk_diff = 0.0
         for k in range(self.ATKMAX):
-            hk = (self.hits_ad_n_head_filtered[k] + self.hits_ad_n_tail_filtered[k]) / (self.counter_head + self.counter_tail)
+            hk = (self.hits_ad_n_head[k] + self.hits_ad_n_tail[k]) / (self.counter_head + self.counter_tail)
             hk_diff = hk - hk_prev
             mrr += hk_diff * (1.0 / (k+1))
             hk_prev = hk
@@ -60,14 +54,14 @@ class Hits():
     
     def get_mrr_head(self):
         """
-        Computes and returns the filtered head MRR.
+        Computes and returns the head MRR.
         """
         mrr = 0.0
         hk = 0.0
         hk_prev = 0.0
         hk_diff = 0.0
         for k in range(self.ATKMAX):
-            hk = self.hits_ad_n_head_filtered[k] / self.counter_head
+            hk = self.hits_ad_n_head[k] / self.counter_head
             hk_diff = hk - hk_prev
             mrr += hk_diff * (1.0 / (k+1))
             hk_prev = hk
@@ -75,14 +69,14 @@ class Hits():
     
     def get_mrr_head(self):
         """
-        Computes and returns the filtered tail MRR.
+        Computes and returns the tail MRR.
         """
         mrr = 0.0
         hk = 0.0
         hk_prev = 0.0
         hk_diff = 0.0
         for k in range(self.ATKMAX):
-            hk = self.hits_ad_n_tail_filtered[k] / self.counter_tail
+            hk = self.hits_ad_n_tail[k] / self.counter_tail
             hk_diff = hk - hk_prev
             mrr += hk_diff * (1.0 / (k+1))
             hk_prev = hk
@@ -90,30 +84,22 @@ class Hits():
 
     def get_hits_at_k(self, k):
         k = k -1
-        return (self.hits_ad_n_head_filtered[k] + self.hits_ad_n_tail_filtered[k]) / (self.counter_head + self.counter_tail)
+        return (self.hits_ad_n_head[k] + self.hits_ad_n_tail[k]) / (self.counter_head + self.counter_tail)
 
     def evaluate_head(self, candidates, triple):
         (t_head, t_relation, t_tail) = triple.split()
         foundAt = -1
         self.counter_head += 1
         if len(candidates) > 0: self.counter_head_covered += 1
-        filterCount = 0
         for rank in range(len(candidates)):
-            if rank < self.ATKMAX:
-                candidate = candidates[rank]
-                if candidate == t_head:
-                    for index in range(rank, rank - filterCount + self.ATKMAX):
-                        # print("i=" + str(index))
-                        if index < self.ATKMAX:
-                            self.hits_ad_n_head[index] += 1
-                            self.hits_ad_n_head_filtered[index - filterCount] += 1
-                    foundAt = rank + 1
-                    break
-                else:
-                    for filterSet in self.filter_sets:
-                        if filterSet.is_true(candidate, t_relation, t_tail):
-                            filterCount += 1
-                            break
+            candidate = candidates[rank]
+            if candidate == t_head:
+                for index in range(rank, rank + self.ATKMAX):
+                    # print("i=" + str(index))
+                    if index < self.ATKMAX:
+                        self.hits_ad_n_head[index] += 1
+                foundAt = rank + 1
+                break
         counter = 0
         ranked = False
         for candidate in candidates:
@@ -132,22 +118,14 @@ class Hits():
         foundAt = -1
         self.counter_tail += 1
         if len(candidates) > 0: self.counter_tail_covered += 1
-        filterCount = 0
         for rank in range(len(candidates)):
-            if rank < self.ATKMAX:
-                candidate = candidates[rank]
-                if candidate == t_tail:
-                    for index in range(rank, rank - filterCount + self.ATKMAX):
-                        if index < self.ATKMAX:
-                            self.hits_ad_n_tail[index] += 1
-                            self.hits_ad_n_tail_filtered[index - filterCount] += 1
-                    foundAt = rank + 1
-                    break
-                else:
-                    for filterSet in self.filter_sets:
-                        if filterSet.is_true(t_head, t_relation, candidate):
-                            filterCount += 1
-                            break
+            candidate = candidates[rank]
+            if candidate == t_tail:
+                for index in range(rank, rank + self.ATKMAX):
+                    if index < self.ATKMAX:
+                        self.hits_ad_n_tail[index] += 1
+                foundAt = rank + 1
+                break
         counter = 0
         ranked = False
         for candidate in candidates:
@@ -169,6 +147,23 @@ class CompletionResult():
         self.tail_results = []
         self.head_confidences = []
         self.tail_confidences = []
+
+    def __str__(self):
+        i = 0
+        rep_head = "Heads: "
+        for candidate in self.head_results:
+            confidence = self.head_confidences[i]
+            rep_head += candidate + "\t" + str(confidence) + "\t"
+            i += 1
+        i = 0
+        rep_tail = "Tails: "
+        for candidate in self.tail_results:
+            confidence = self.tail_confidences[i]
+            rep_tail += candidate + "\t" + str(confidence) + "\t"
+            i += 1
+        return rep_head + "\n" + rep_tail
+
+
 
     def add_head_results(self, heads, k = 0):
         if k > 0:
@@ -216,8 +211,6 @@ class CompletionResult():
 
 class Ranking():
 
-
-
     def __init__(self, filepath = None, contains_confidences = True, k = 100):
         self.hits = Hits()
         self.filepath = filepath
@@ -255,9 +248,9 @@ class Ranking():
     def convert_handler_ranking(self, head_ranking, tail_ranking, testset, target_triples = None):
         """
         This function converts the internal rankings computed by PyClause into a ranking
-        that can be evaluted using the standard evaluatiobn protooll in the filtered version.
-        The interla rankings are usually filtered against valid and train. The additioal
-        filtering against the testset is done in this method.
+        that can be evaluted using the standard evaluatiobn protocol.
+        It is assumed that the rankings of the ranking handler are already filtered against valid and train.
+        The additional filtering against the testset is done in this method.
 
         This function takes as arguments a head and a tail ranking and a testset.
         It is possible to additionally set a list of traget_triples. If this parameter is not set,
@@ -278,13 +271,32 @@ class Ranking():
             if not head_ranking == None:
                 if r in head_ranking:
                     if o in head_ranking[r]:
+                        count = 0
                         for cc in head_ranking[r][o]:
-                            cr.add_head_candidate_with_confidence(cc)
+                            if cc[0] == s or not testset.is_true(cc[0],r,o):
+                                cr.add_head_candidate_with_confidence(cc)
+                                count += 1
+                                if count == self.k: break
             if not tail_ranking == None:
                 if r in tail_ranking:
                     if s in tail_ranking[r]:
+                        count = 0
                         for cc in tail_ranking[r][s]:
-                            cr.add_tail_candidate_with_confidence(cc)
+                            if cc[0] == o or not testset.is_true(s,r,cc[0]):
+                                cr.add_tail_candidate_with_confidence(cc)
+                                count += 1
+                                if count == self.k: break
+
+
+    def write(self, filepath):
+        f = open(filepath, "w")
+        for triple in self.results:
+            f.write(triple)
+            f.write("\n")
+            cr = self.results[triple]
+            f.write(str(cr))
+            f.write("\n")
+        f.close()
 
     def add_filter_set(self, tripleset):
             self.hits.add_filter_set(tripleset)
@@ -320,40 +332,27 @@ class Ranking():
             return self.results[triple].tail_results
         else:
             return []
+    
+    def diff(self, other):
+        """
+        This diff has been written for checking the correctness
+        of the conversion from internal to python ranking.
+        It point to the first difference between self and
+        other (another ranking).
 
-
-
-
-
-
-
-
-if __name__ == '__main__':
-
-    ranking = Ranking("local/anyburl-rules-c5-3600-analysis/pyclause-fix6/preds-ALL")
-
-
-    testset = TripleSet("data/wnrr/test.txt")
-    hits = Hits()
-
-
-    hits.compute_scores(ranking, testset.triples, True, True)
-
-    print("MRR: " + str(hits.get_mrr()))
-
-    # next steps: 
-    # 1) check and/or integrate filtering
-    # 2) check correctness of numbers via an anyburl comparison
-    # 3) think about the hits.reset vs always generate and return a new object
-    # 4) write nice piece of code that allows you to compute tail and head specific mrr for each relation of fb237 for the top 10 relations
-    # 5) talk to patrick w.r.t integration of his stuff (forgot what he wanted ...)
-        # rabking constrcutor fpr patrick ranking
-        # add testset to read from file ranking constructor
-
-
-
-
-
-
-
-
+        This method might be extended later.
+        """
+        for triple in self.results:
+            cr_self = self.results[triple]
+            if not triple in other.results:
+                print(">>> found " + triple + " self, that is not in other")
+                return
+            cr_other = other.results[triple]
+            if len(cr_self.head_results) != len(cr_other.head_results):
+                print(">>> (" + triple + ") head candidates: self=" + str(len(cr_self.head_results)) + " other=" +  str(len(cr_other.head_results)))
+            if len(cr_self.tail_results) != len(cr_other.tail_results):
+                print(">>> (" + triple + ") tail candidates: self=" + str(len(cr_self.tail_results)) + " other=" +  str(len(cr_other.tail_results)))
+        for triple in other.results:
+            if not triple in self.results:
+                print(">>> found " + triple + " other, that is not in self")
+                return
