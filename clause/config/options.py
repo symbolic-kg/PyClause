@@ -116,7 +116,7 @@ class Options():
 
 
     def _dict_diff(self, diff_dict, default_dict):
-        """Rerturns a dict that contains all subdics and items that are different in diff_dict from default_dict"""
+        """Rerturns a dict that contains all subdics and items that are different in diff_dict from default_dict."""
         diff = {}
         for key in diff_dict:
             if key not in default_dict:
@@ -129,10 +129,12 @@ class Options():
                 diff[key] = diff_dict[key]
         return diff
 
+
     def write(self, file_path):
+        """Writes user specified options to yaml file (ignores unchanged default options)."""
         diff = self._dict_diff(copy.deepcopy(self.options), copy.deepcopy(self.default_options))
         yaml.dump(diff)
-        with open(file_path, 'w') as file:
-            yaml.safe_dump(diff, file, default_flow_style=False)
+        with open(file_path, 'w') as f:
+            yaml.safe_dump(diff, f, default_flow_style=False)
      
 
