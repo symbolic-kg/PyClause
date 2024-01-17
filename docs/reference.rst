@@ -2,6 +2,8 @@
 Reference
 =========
 
+c_clause Handlers
+~~~~~~~~~~~~~~~~~
 
 .. autoclass:: c_clause.Loader
    :members:
@@ -18,3 +20,10 @@ Reference
 .. autoclass:: c_clause.PredictionHandler
    :members:
 
+
+Rule Learning
+~~~~~~~~~~~~~
+
+.. autoclass:: clause.Miner
+   :members:
+   :undoc-members:

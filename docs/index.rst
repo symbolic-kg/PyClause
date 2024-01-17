@@ -23,7 +23,7 @@ The workflow of PyClause allows to:
 - load data KGs and rules solely from Python and serialize the results back to Python
 - load data KGs and rules from disk and write back the results to disk for efficiency
 - handle KG data and inputs as indexes, e.g., from numpy arrays, or with string names for the generation of readable examples
-- work with and store userd defined configuration files, based on an extensive `default-configuration file <https://github.com/symbolic-kg/PyClause/blob/master/clause/config-default.yaml>`_
+- work with and store userd defined configuration files, based on a `default-configuration file <https://github.com/symbolic-kg/PyClause/blob/master/clause/config-default.yaml>`_
 
 
 .. toctree::
