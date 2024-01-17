@@ -47,8 +47,9 @@ The workflow of PyClause allows to:
    :hidden:
    :caption: Preparation
    
-   data/loading
    data/config
+   data/loading
+   
    
 
 .. toctree::

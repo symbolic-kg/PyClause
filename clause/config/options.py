@@ -1,5 +1,6 @@
 import flatdict
 import yaml
+import copy
 
 from clause.util.utils import get_config_default_dir
 
@@ -9,9 +10,11 @@ class Options():
     def __init__(self, path_config_extra=None):
         """Creates an option object that contains all parameters in their default value."""
         self.options = {}
+        self.default_options = {}
         default_path = get_config_default_dir()
         with open(default_path, 'r') as file:
             self.options  = yaml.safe_load(file)
+            self.default_options = copy.deepcopy(self.options)
 
         if path_config_extra != None:
             options_extra = {}
@@ -22,6 +25,7 @@ class Options():
             options_extra_flat = dict(flatdict.FlatDict(options_extra, delimiter='.'))
             for param in options_extra_flat:
                 self.set(param, options_extra_flat[param])
+    
 
     def set(self, param, value):
         """Overwrites an entry in the options.
@@ -109,3 +113,26 @@ class Options():
             return self.flatS(key)
         else:
             return self.flat(key)
+
+
+    def _dict_diff(self, diff_dict, default_dict):
+        """Rerturns a dict that contains all subdics and items that are different in diff_dict from default_dict"""
+        diff = {}
+        for key in diff_dict:
+            if key not in default_dict:
+                diff[key] = diff_dict[key]
+            elif isinstance(diff_dict[key], dict) and isinstance(default_dict[key], dict):
+                nested_diff = self._dict_diff(diff_dict[key], default_dict[key])
+                if nested_diff: 
+                    diff[key] = nested_diff
+            elif diff_dict[key] != default_dict[key]:
+                diff[key] = diff_dict[key]
+        return diff
+
+    def write(self, file_path):
+        diff = self._dict_diff(copy.deepcopy(self.options), copy.deepcopy(self.default_options))
+        yaml.dump(diff)
+        with open(file_path, 'w') as file:
+            yaml.safe_dump(diff, file, default_flow_style=False)
+     
+

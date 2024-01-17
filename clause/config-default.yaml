@@ -3,7 +3,7 @@
 # ************************************************************************
  
 
-## BACKEND c_clause handler options #######################################
+## c_clause handler options #############################################
 
 # Example:
 # from c_clause import Loader, QAHandler
@@ -192,7 +192,7 @@ prediction_handler:
   num_threads: -1 #-1 for ALL available threads
 
 
-## FRONTEND clause options ###############################################
+## clause options ############################################################
 
 io:
   rule_format: "PyClause"
