@@ -5,7 +5,7 @@
 #include "src/c_clause/api/RankingHandler.h"
 #include "src/c_clause/api/QAHandler.h"
 #include "src/c_clause/api/Loader.h"
-#include "src/c_clause/cpp/api/PredictionHandler.h"
+#include "src/c_clause/api/PredictionHandler.h"
 #include "src/c_clause/core/Types.h"
 #include "src/c_clause/tests.h"
 #include <string>
