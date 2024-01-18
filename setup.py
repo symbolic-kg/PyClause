@@ -74,7 +74,7 @@ setup(
   install_requires      = ["pybind11>=2.2.0", "numpy", "flatdict", "pyyaml"],
   cmdclass              = {"build_ext": BuildExt},
   zip_safe              = False,
-  packages              = find_namespace_packages(),
+  packages              = find_namespace_packages(include=["clause.*"]),
   package_data          = {"clause": ["config-default.yaml"], "clause.bin": ["AMIE-dev.jar", "AnyBURL-23-1.jar"]},
   python_requires       = ">=3.7"
 )
