@@ -13,11 +13,11 @@ from clause import Options
 
 if __name__ == '__main__':
 
-    path_train = f"{get_base_dir()}/data/wnrr/train.txt"
-    path_valid = f"{get_base_dir()}/data/wnrr/valid.txt"
-    path_test  = f"{get_base_dir()}/data/wnrr/test.txt"
+    path_train = f"./data/wnrr/train.txt"
+    path_valid = f"./data/wnrr/valid.txt"
+    path_test  = f"./data/wnrr/test.txt"
 
-    path_rules_output = f"{get_base_dir()}/local/rules-wn18rr-anyburl.txt"
+    path_rules_output = f"./local/rules-wn18rr-anyburl.txt"
 
 
     # load a triple set from a file and display some meta info about it

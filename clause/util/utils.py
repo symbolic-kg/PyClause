@@ -22,15 +22,18 @@ def join_u(*paths):
 
 
 def get_base_dir():
+    """Only use this for code examples, never for implementation."""
     abs_path = path.abspath(__file__)
     for i in range(3):
         abs_path = path.dirname(abs_path)
     if "site-packages" in abs_path:
         print(
             "It seems PyClause is installed as a package;"
-            " get_base_dir() is only valid when installed in editable mode with pip install -e .",
+            " get_base_dir() is only valid when installed in editable mode with pip install -e ."
+            " I will output your current directory.",
             file=sys.stderr
         )
+        return ("./")
     return abs_path.replace(os.sep, '/')
 
 

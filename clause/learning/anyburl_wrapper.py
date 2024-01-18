@@ -12,8 +12,8 @@ from subprocess import CalledProcessError, Popen, PIPE
 
 def learn(train_path, time, options, all_rules, path_rules_output = None):
 
-    base_dir = get_base_dir()
-    learn_dir = join_u(base_dir, join_u("local", "anyburl-learn"))
+    base_dir = "."
+    learn_dir = join_u(base_dir, "anyburl-learn")
 
     if not path.isdir(learn_dir):
         os.mkdir(learn_dir)
@@ -64,9 +64,3 @@ def learn(train_path, time, options, all_rules, path_rules_output = None):
         raise CalledProcessError(p.returncode, p.args)
     
     return rule_path + "-" + str(time)
-
-
-if __name__ == '__main__':
-    base_dir = get_base_dir()
-    train_path = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
-    learn(train_path, 30, 3, 5, 0.001)
