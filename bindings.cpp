@@ -1,13 +1,13 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "c_clause/cpp/api/Api.h"
-#include "c_clause/cpp/api/RulesHandler.h"
-#include "c_clause/cpp/api/RankingHandler.h"
-#include "c_clause/cpp/api/QAHandler.h"
-#include "c_clause/cpp/api/Loader.h"
-#include "c_clause/cpp/api/PredictionHandler.h"
-#include "c_clause/cpp/core/Types.h"
-#include "c_clause/cpp/tests.h"
+#include "src/c_clause/api/Api.h"
+#include "src/c_clause/api/RulesHandler.h"
+#include "src/c_clause/api/RankingHandler.h"
+#include "src/c_clause/api/QAHandler.h"
+#include "src/c_clause/api/Loader.h"
+#include "src/c_clause/cpp/api/PredictionHandler.h"
+#include "src/c_clause/core/Types.h"
+#include "src/c_clause/tests.h"
 #include <string>
 #include <array>
 
