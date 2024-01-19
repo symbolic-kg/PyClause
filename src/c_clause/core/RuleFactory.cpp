@@ -13,8 +13,100 @@ RuleFactory::RuleFactory(std::shared_ptr<Index> index){
 }
 
 
+std::unique_ptr<Rule> RuleFactory::parseUcRule(std::vector<std::string> headBody, int numPreds, int numTrue){
+    // parse head
+    strAtom headAtom;
+    parseAtom(headBody[0], headAtom);
+
+    size_t length = headBody.size()-1;
+
+    if (CmaxLength>0 && length>CmaxLength){
+            return nullptr;
+    }
+
+    if (numPreds>0 && CminPreds > numPreds){
+            return nullptr;
+        }
+    if (numTrue>0 && CminCorrect > numTrue){
+            return nullptr;
+    }
+    // doesnt matter which param we check
+    if (numTrue>0 && ((double) numTrue/ (double) numPreds) < CminConf){
+            return nullptr;
+    }
+
+    // set head relation
+    int relID = index->getIdOfRelationstring(headAtom[0]);
+
+    // data to fill
+    std::vector<int> relations = {relID};
+    std::vector<bool> directions; 
+    std::array<int, 2> constants;
+
+
+    symAtom checkHeadAtom;
+    parseSymAtom(headAtom, checkHeadAtom);
+    if (!checkHeadAtom.containsConstant){
+        throw std::runtime_error("Expected constant in head of a U_c rule but did not get one.");
+    }
+    // assign head constant
+    constants[0] = checkHeadAtom.constant;
+    bool leftC = checkHeadAtom.leftC;
+
+    std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], _cfg_prs_atomSeparator);
+    
+    for (int i=0; i<length; i++){
+        strAtom bodyAtom;
+        parseAtom(bodyAtomsStr[i], bodyAtom);
+        relations.push_back(index->getIdOfRelationstring(bodyAtom[0]));
+        if (i<length-1){
+            char second = _cfg_prs_anyTimeVars[i+1];
+            if (bodyAtom[1][0] == second){
+                directions.push_back(false);
+            }else{
+                directions.push_back(true);
+            }
+        // last atom contains constant
+        }else{
+            symAtom lastAtom;
+            parseSymAtom(bodyAtom, lastAtom);
+            if (!lastAtom.containsConstant){
+                throw std::runtime_error("Expected a constant in last atom of a c rule but did not get one.");
+            }
+            constants[1] = lastAtom.constant;
+            // in the AnyBURL represention the constants always belongs to the back variable in
+            // XABCD..Y  !leftC
+            //or
+            //YABCD..X leftC
+            if (lastAtom.leftC){
+                directions.push_back(false);
+            }else{
+                directions.push_back(true);
+            }
+        }
+    }
+
+    if (leftC){
+        // for the internal vector representation
+        std::reverse(relations.begin()+1, relations.end());
+        std::reverse(directions.begin(), directions.end());
+        directions.flip();
+    }
+
+
+    std::unique_ptr<RuleC> rulec = std::make_unique<RuleC>(relations, directions, leftC, constants);
+    rulec->setNumUnseen(CnumUnseen);
+    return std::move(rulec);
+
+}
+
+
 
 std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody, int numPreds, int numTrue){
+    if(!createRuleXXd){
+        return nullptr;
+    }
+
     // parse head
     strAtom headAtom;
     parseAtom(headBody[0], headAtom);
@@ -429,7 +521,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
             }
         }
     } 
-
+    // create rules
     if (ruleType=="RuleB" && createRuleB){
 
         if (BmaxLength>0 && directions.size()>BmaxLength){
