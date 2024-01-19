@@ -13,6 +13,76 @@ RuleFactory::RuleFactory(std::shared_ptr<Index> index){
 }
 
 
+std::unique_ptr<Rule> RuleFactory::parseUdRule(std::vector<std::string> headBody, int numPreds, int numTrue){
+    // parse head
+    strAtom headAtom;
+    parseAtom(headBody[0], headAtom);
+
+    if (!createRuleD){
+        return nullptr;
+    }
+    if (numPreds>0 && DminPreds > numPreds){
+            return nullptr;
+        }
+    if (numTrue>0 && DminCorrect > numTrue){
+            return nullptr;
+    }
+    // doesnt matter which param we check
+    if (numTrue>0 && ((double) numTrue/ (double) numPreds) < DminConf){
+            return nullptr;
+    }
+
+    // set head relation
+    int relID = index->getIdOfRelationstring(headAtom[0]);
+
+    // data to fill
+    std::vector<int> relations = {relID};
+    std::vector<bool> directions; 
+
+
+    symAtom checkHeadAtom;
+    parseSymAtom(headAtom, checkHeadAtom);
+    if (!checkHeadAtom.containsConstant){
+        throw std::runtime_error("Expected constant in head of a U_d rule but did not get one.");
+    }
+    // assign head constant
+    int headConstants = checkHeadAtom.constant;
+    bool leftC = checkHeadAtom.leftC;
+
+    std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], _cfg_prs_atomSeparator);
+
+    size_t length = bodyAtomsStr.size();
+
+    if (DmaxLength>0 && length>DmaxLength){
+            return nullptr;
+    }
+    
+    for (int i=0; i<length; i++){
+        strAtom bodyAtom;
+        parseAtom(bodyAtomsStr[i], bodyAtom);
+        relations.push_back(index->getIdOfRelationstring(bodyAtom[0]));
+      
+        char second = _cfg_prs_anyTimeVars[i+1];
+        if (bodyAtom[1][0] == second){
+            directions.push_back(false);
+        }else{
+            directions.push_back(true);
+        }
+    }
+
+    if (leftC){
+        // for the internal vector representation
+        std::reverse(relations.begin()+1, relations.end());
+        std::reverse(directions.begin(), directions.end());
+        directions.flip();
+    }
+
+    std::unique_ptr<RuleD> ruled = std::make_unique<RuleD>(relations, directions, leftC, headConstants);
+    ruled->setNumUnseen(DnumUnseen);
+    return std::move(ruled);
+}
+
+
 std::unique_ptr<Rule> RuleFactory::parseUcRule(std::vector<std::string> headBody, int numPreds, int numTrue){
     // parse head
     strAtom headAtom;
@@ -96,13 +166,10 @@ std::unique_ptr<Rule> RuleFactory::parseUcRule(std::vector<std::string> headBody
         directions.flip();
     }
 
-
     std::unique_ptr<RuleC> rulec = std::make_unique<RuleC>(relations, directions, leftC, constants);
     rulec->setNumUnseen(CnumUnseen);
     return std::move(rulec);
-
 }
-
 
 
 std::unique_ptr<Rule>RuleFactory::parseUXXrule(std::vector<std::string> headBody, int numPreds, int numTrue){
@@ -389,76 +456,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
         // *** RuleD (U_d -rule) ***
         if (!bodyHasConst){
             ruleType = "RuleD";
-            symAtom checkHeadAtom;
-            parseSymAtom(headAtom, checkHeadAtom);
-            if (!checkHeadAtom.containsConstant){
-                throw std::runtime_error("Expected a head constant but didnt get one in parsing.");
-            }
-            // assign head constant
-            constants[0] = checkHeadAtom.constant;
-            leftC = checkHeadAtom.leftC;
-
-            if (length==1){
-                relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-                if (!leftC && firstVar==bodyAtoms[0][1][0]){
-                    directions.push_back(true);
-                }else if(!leftC && firstVar==bodyAtoms[0][2][0]){
-                    directions.push_back(false);
-                } else if (leftC && lastVar == bodyAtoms[0][2][0]){
-                    directions.push_back(true);
-                }else if (leftC && lastVar == bodyAtoms[0][1][0]){
-                    directions.push_back(false);
-                } else {
-                    std::runtime_error("Could not parse D-rule: " + rule);
-                }
-            } else if (length==2){
-                // the anyburl string rule representation deviates from our representation
-                // anyburl (the input here) e.g. : h(c,Y) <-- someRel(A,Y) , otherRel(B,A)
-                // our representation would be: h(c,Y) <-- otherRel(A,B), someRel(B,Y)
-                // note (!!) not only the atoms are flipped also A and B are flipped!
-                // so to get the first body atom we need to take the second body atom of the rule
-                if (leftC){
-                    relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
-                    relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-                // normal order
-                }else{
-                    relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-                    relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
-                }
-               
-                //our first body atom; second atom of anyburl; leftC no X appears
-                if (leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[2]){
-                    directions.push_back(true);
-                }else if (leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[1]){
-                    directions.push_back(false);
-                // for not leftC anyburls first atom is also our first atom
-                } else if (!leftC && firstVar == bodyAtoms[0][1][0]) {
-                    directions.push_back(true);
-                } else if (!leftC && firstVar == bodyAtoms[0][2][0]) {
-                    directions.push_back(false);
-                }
-                else {
-                    std::runtime_error("Could not parse D-rule: " + rule);
-                }
-
-                //our second body atom
-                if (leftC && bodyAtoms[0][1][0]==_cfg_prs_anyTimeVars[1]){
-                    directions.push_back(true);
-                } else if (leftC && bodyAtoms[0][1][0]==lastVar){
-                    directions.push_back(false);
-                } else if (!leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[1]){
-                    directions.push_back(true);
-                } else if (!leftC && bodyAtoms[1][1][0]==_cfg_prs_anyTimeVars[2]){
-                    directions.push_back(false);
-                } else {
-                     std::runtime_error("Could not parse D-rule: " + rule);
-                }
-
-
-            }else{
-                std::runtime_error("Cannot parse longer AnyBURL U_d rules");
-                
-            }
+            return parseUdRule(headBody, numPreds, numTrue);
         }else{
             ruleType = "RuleC";
             return parseUcRule(headBody, numPreds, numTrue);

@@ -125,7 +125,7 @@ h(X,c) <= b1(A,X), b2(A,d)
 h(c,Y) <= b1(Y,A), b2(d,A)
 h(c,Y) <= b1(A,Y), b2(A,d)
 
-h(c,Y) <= b1(A,Y), b2(A,B), b3(A,d)
+h(c,Y) <= b1(A,Y), b2(A,B), b3(B,d)
 ```
 
 
@@ -140,7 +140,7 @@ h(X,c) <= b1(A,X), b2(A,B)
 h(c,Y) <= b1(Y,A), b2(B,A)
 h(c,Y) <= b1(A,Y), b2(A,B)
 
-h(c,Y) <= b1(A,Y), b2(A,B), b3(A,C)
+h(c,Y) <= b1(A,Y), b2(A,B), b3(B,C)
 ```
 
 

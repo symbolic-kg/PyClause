@@ -22,6 +22,7 @@ public:
 
     std::unique_ptr<Rule> parseUXXrule(std::vector<std::string> headBody, int numPreds=-1, int numTrue=-1);
     std::unique_ptr<Rule> parseUcRule(std::vector<std::string> headBody, int numPreds=-1, int numTrue=-1);
+    std::unique_ptr<Rule> parseUdRule(std::vector<std::string> headBody, int numPreds=-1, int numTrue=-1);
 
     void parseAtom(const std::string& input, strAtom& atom);
     void parseSymAtom(strAtom& inputAtom, symAtom& symA);
