@@ -81,6 +81,7 @@ PYBIND11_MODULE(c_clause, m) {
             },
             py::arg("as_string")
         )
+        .def("write_answers", &QAHandler::writeAnswers, py::arg("path"), py::arg("as_string") = true)
         .def(
             "get_rules",
             [](QAHandler& self, bool return_strings)->py::object{
@@ -92,6 +93,7 @@ PYBIND11_MODULE(c_clause, m) {
             },
             py::arg("as_string")
         )
+        .def("write_rules", &QAHandler::writeRules, py::arg("path"), py::arg("as_string") = true)
         .def("set_options", &QAHandler::setOptions)
     ; //class end
     // RulesHandler()

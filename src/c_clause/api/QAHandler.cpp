@@ -65,6 +65,9 @@ void QAHandler::calculate_answers(std::vector<std::pair<std::string, std::string
 
 
 void QAHandler::calculate_answers(std::vector<std::pair<int, int>>& queries, std::shared_ptr<Loader> dHandler, std::string headOrTail){
+
+    this->queries = queries; // cache queries
+
     if (!dHandler->getLoadedData()){
         throw std::runtime_error("You must load data before you can answer questions.");
     }
@@ -175,6 +178,45 @@ std::vector<std::vector<std::pair<int, double>>> QAHandler::getIdxAnswers(){
 }
 
 
+void QAHandler::writeAnswers(std::string outputPath, bool strings){
+    std::vector<std::vector<std::pair<int, double>>> answers = getIdxAnswers();
+
+    if (this->queries.size() == 0){
+        throw std::runtime_error(
+            "Please calculate answers using calculate_answers() first."
+        );
+    }
+    
+    std::ofstream file(outputPath);
+    if (!file.is_open()) {
+        throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + outputPath);
+    }
+
+    for (int idx = 0; idx < this->queries.size(); idx++){
+        
+        std::string source = strings ? "\"" + index->getStringOfNodeId(this->queries[idx].first) + "\"" : std::to_string(this->queries[idx].first);
+        std::string rel = strings ? "\"" + index->getStringOfRelId(this->queries[idx].second) + "\"" : std::to_string(this->queries[idx].second);
+        
+        // Collect answers and scores
+        std::string answers = "";
+        std::string scores = "";
+        auto itr = this->answers[idx].begin();
+        for (; itr != this->answers[idx].end(); itr++){
+            answers += strings ? "\"" + index->getStringOfNodeId(itr->first) + "\"" : std::to_string(itr->first);
+            scores += std::to_string(itr->second);
+            if (std::next(itr) != this->answers[idx].end()) {
+                answers += ",";
+                scores += ",";
+            }
+        }
+        
+        // Write row
+        file << "{\"query\": [" << source << "," << rel << "], \"answers\": [" << answers << "], \"scores\": [" << scores << "]}" << std::endl;
+    }
+    file.close();
+}
+
+
 std::vector<std::vector<std::vector<int>>> QAHandler::getIdxRules(){
     std::vector<std::vector<std::vector<int>>> out;
 
@@ -204,6 +246,59 @@ std::vector<std::vector<std::vector<std::string>>> QAHandler::getStrRules(){
         }
     }
     return out;
+}
+
+
+void QAHandler::writeRules(std::string outputPath, bool strings){
+
+    if (this->queries.size() == 0 || !collectRules){
+        throw std::runtime_error(
+            "Please calculate answers using calculate_answers() and set in the options qa_handler.collect_rules to true first."
+        );
+    }
+    
+    std::ofstream file(outputPath);
+    if (!file.is_open()) {
+        throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + outputPath);
+    }
+
+    for (int idx = 0; idx < this->queries.size(); idx++){
+        
+        std::string source = strings ? "\"" + index->getStringOfNodeId(this->queries[idx].first) + "\"" : std::to_string(this->queries[idx].first);
+        std::string rel = strings ? "\"" + index->getStringOfRelId(this->queries[idx].second) + "\"" : std::to_string(this->queries[idx].second);
+        
+        // Collect answers and scores
+        std::string answers = "";
+        auto itr = this->answers[idx].begin();
+        for (; itr != this->answers[idx].end(); itr++){
+            answers += strings ? "\"" + index->getStringOfNodeId(itr->first) + "\"" : std::to_string(itr->first);
+            if (std::next(itr) != this->answers[idx].end()) {
+                answers += ",";
+            }
+        }
+
+        std::string rules = "";
+        for (int rs_ix = 0; rs_ix < queryRules[idx].size(); rs_ix++){
+            std::string ruleset = "[";
+            for (int r_ix = 0; r_ix < queryRules[idx][rs_ix].size(); r_ix++){
+               ruleset += strings ? "\"" + queryRules[idx][rs_ix][r_ix]->computeRuleString(index.get()) + "\"" : std::to_string(queryRules[idx][rs_ix][r_ix]->getID());
+               if (r_ix < queryRules[idx][rs_ix].size()-1){
+                    ruleset += ",";
+               }
+            }
+            ruleset += "]";
+
+            // add ruleset list to rules list
+            rules += ruleset;
+            if (rs_ix < queryRules[idx].size()-1){
+                rules += ",";
+            }
+        }
+        
+        // Write row
+        file << "{\"query\": [" << source << "," << rel << "], \"answers\": [" << answers << "], \"rules\": [" << rules << "]}" << std::endl;
+    }
+    file.close();
 }
 
 void QAHandler::setCollectRules(bool ind){
