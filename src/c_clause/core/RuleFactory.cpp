@@ -79,6 +79,8 @@ std::unique_ptr<Rule> RuleFactory::parseUdRule(std::vector<std::string> headBody
 
     std::unique_ptr<RuleD> ruled = std::make_unique<RuleD>(relations, directions, leftC, headConstants);
     ruled->setNumUnseen(DnumUnseen);
+    ruled->setConfWeight(DconfWeight);
+    ruled->branchingFactor = DbranchingFactor;
     return std::move(ruled);
 }
 
