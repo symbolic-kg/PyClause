@@ -442,11 +442,6 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
         }
     }else{
      // *** U_c, U_d rule ***
-        if (length>2){
-            std::cout<<"Cannot parse U_c, U_d rule with length larger than 2, skipping.";
-            return nullptr;
-        }
-
         bool bodyHasConst = false;
         symAtom checkBodyAtom;
         for (strAtom& atom: bodyAtoms){
@@ -491,32 +486,11 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
     } else if (ruleType=="RuleC" && createRuleC){
         throw std::runtime_error("Should not reach this in create rule C");
     }else if(ruleType=="RuleD" && createRuleD){
-
-        if (DmaxLength>0 && directions.size()>DmaxLength){
-            return nullptr;
-        }
-
-        std::unique_ptr<RuleD> ruled = std::make_unique<RuleD>(relations, directions, leftC, constants[0]);
-        ruled->setNumUnseen(DnumUnseen);
-        ruled->setConfWeight(DconfWeight);
-        ruled->branchingFactor = DbranchingFactor;
-
-        if (numPreds>0 && DminPreds > numPreds){
-            return nullptr;
-        }
-        if (numTrue>0 && DminCorrect > numTrue){
-            return nullptr;
-        }
-        // doesnt matter which param we check
-        if (numTrue>0 && ((double) numTrue/ (double) numPreds) < DminConf){
-            return nullptr;
-        }
-        return std::move(ruled);
+        throw std::runtime_error("Should not reach this in create rule D");
     } else {
         return nullptr;
     }
 }
-
 
 
 void RuleFactory::parseAtom(const std::string& input, strAtom& atom) {
