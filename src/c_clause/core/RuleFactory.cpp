@@ -20,6 +20,10 @@ std::unique_ptr<Rule> RuleFactory::parseUcRule(std::vector<std::string> headBody
 
     size_t length = headBody.size()-1;
 
+    if (!createRuleC){
+        return nullptr;
+    }
+
     if (CmaxLength>0 && length>CmaxLength){
             return nullptr;
     }
@@ -458,67 +462,8 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
             }
         }else{
             ruleType = "RuleC";
-            symAtom checkHeadAtom;
-            parseSymAtom(headAtom, checkHeadAtom);
-            if (!checkHeadAtom.containsConstant){
-                throw std::runtime_error("Expected a head constant but didnt get one in parsing.");
-            }
-            // assign head constant
-            constants[0] = checkHeadAtom.constant;
-            leftC = checkHeadAtom.leftC;
 
-            if (length==1){
-                relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-                parseSymAtom(bodyAtoms[0], checkBodyAtom);
-                constants[1] = checkBodyAtom.constant;
-                if (leftC==checkBodyAtom.leftC){
-                    directions.push_back(true);
-                }else{
-                    directions.push_back(false);
-                }
-
-            // we need to do this manually for leftC=true AnyTime Format is (length=2)
-            // P530(Q142,Y) <= P530(A,Y), P495(Q368674,A)
-            // whereas our representation; which  leads to rel and dir is
-            // P530(Q142,Y) <= P495(Q368674,A), P530(A,Y)
-            } else if (length==2 && leftC){
-                relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
-                relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-                // start with the second atom which is the first atom in our representation
-                parseSymAtom(bodyAtoms[1], checkBodyAtom);
-                constants[1] = checkBodyAtom.constant;
-                if (checkBodyAtom.leftC == leftC){
-                    directions.push_back(true);
-                }else{
-                    directions.push_back(false);
-                }
-                //second var of first atom
-                if (bodyAtoms[0][2][0]==lastVar){
-                    directions.push_back(true);
-                }else{
-                    directions.push_back(false);
-                }   
-
-            // we need to do this manually for leftC=false AnyTime Format is (length=2)
-            // P3373(X,Q13129708) <= P3373(A,X), P3373(A,Q4530046)
-            // which is in line with our format
-            }else if (length==2 && !leftC){
-                relations.push_back(index->getIdOfRelationstring(bodyAtoms[0][0]));
-                relations.push_back(index->getIdOfRelationstring(bodyAtoms[1][0]));
-                //first var of body atom (char)
-                if (bodyAtoms[0][1][0]==firstVar){
-                    directions.push_back(true);
-                }else{
-                    directions.push_back(false);
-                }
-                parseSymAtom(bodyAtoms[1], checkBodyAtom);
-                constants[1] = checkBodyAtom.constant;
-                if (checkBodyAtom.leftC == leftC){
-                    directions.push_back(true);
-                }else{
-                    directions.push_back(false);
-                }
-            }
+            return parseUcRule(headBody, numPreds, numTrue);
         }
     } 
     // create rules
@@ -546,26 +491,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
         return std::move(ruleb); 
 
     } else if (ruleType=="RuleC" && createRuleC){
-
-        if (CmaxLength>0 && directions.size()>CmaxLength){
-            return nullptr;
-        }
-
-        std::unique_ptr<RuleC> rulec = std::make_unique<RuleC>(relations, directions, leftC, constants);
-        rulec->setNumUnseen(CnumUnseen);
-
-        if (numPreds>0 && CminPreds > numPreds){
-            return nullptr;
-        }
-        if (numTrue>0 && CminCorrect > numTrue){
-            return nullptr;
-        }
-        // doesnt matter which param we check
-        if (numTrue>0 && ((double) numTrue/ (double) numPreds) < CminConf){
-            return nullptr;
-        }
-
-        return std::move(rulec);
+        throw std::runtime_error("Should not reach this in create rule C");
     }else if(ruleType=="RuleD" && createRuleD){
 
         if (DmaxLength>0 && directions.size()>DmaxLength){
