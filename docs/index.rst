@@ -48,7 +48,8 @@ The workflow of PyClause allows to:
    :caption: Preparation
    
    data/config
-   data/loading
+   data/loading_data
+   data/loading_rules
    
    
 
