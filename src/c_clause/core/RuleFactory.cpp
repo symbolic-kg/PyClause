@@ -18,16 +18,9 @@ std::unique_ptr<Rule> RuleFactory::parseUcRule(std::vector<std::string> headBody
     strAtom headAtom;
     parseAtom(headBody[0], headAtom);
 
-    size_t length = headBody.size()-1;
-
     if (!createRuleC){
         return nullptr;
     }
-
-    if (CmaxLength>0 && length>CmaxLength){
-            return nullptr;
-    }
-
     if (numPreds>0 && CminPreds > numPreds){
             return nullptr;
         }
@@ -58,6 +51,12 @@ std::unique_ptr<Rule> RuleFactory::parseUcRule(std::vector<std::string> headBody
     bool leftC = checkHeadAtom.leftC;
 
     std::vector<std::string> bodyAtomsStr = util::splitString(headBody[1], _cfg_prs_atomSeparator);
+
+    size_t length = bodyAtomsStr.size();
+
+    if (CmaxLength>0 && length>CmaxLength){
+            return nullptr;
+    }
     
     for (int i=0; i<length; i++){
         strAtom bodyAtom;
@@ -462,7 +461,6 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
             }
         }else{
             ruleType = "RuleC";
-
             return parseUcRule(headBody, numPreds, numTrue);
         }
     } 
