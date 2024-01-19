@@ -41,7 +41,6 @@ void QAHandler::setOptions(std::map<std::string, std::string> options){
 
 }
 
-
 //calculate query answers, queries are (sourceEntity, relation)
 void QAHandler::calculate_answers(std::vector<std::pair<std::string, std::string>>& queries, std::shared_ptr<Loader> dHandler, std::string headOrTail){
     std::vector<std::pair<int, int>> intQueries(queries.size());
@@ -123,6 +122,38 @@ void QAHandler::calculate_answers(std::vector<std::pair<int, int>>& queries, std
             queryRules.at(i) = candOrderRules;
         }
     }
+}
+
+
+
+//calculate query answers, queries are (sourceEntity, relation)
+void QAHandler::calculate_answers(std::string& queries, std::shared_ptr<Loader> dHandler, std::string headOrTail){
+    std::vector<std::pair<std::string, std::string>> stringQueries;
+    std::string line;
+	std::ifstream file(queries);
+	if (file.is_open())
+	{
+		while (!util::safeGetline(file, line).eof())
+		{
+            std::vector<std::string> results = util::split(line, '\t');
+			if (results.size() == 2) {
+                // rules with stats
+                stringQueries.push_back(std::make_pair(results[0], results[1]));
+            } else {
+				std::cout << 
+                    "Unsupported Filetype, please make sure that every line either \
+                    contains a properly formatted rule string or num_pred\tsupport\tconf\truleString" 
+                << std::endl;
+                exit(-1);
+            }
+		}
+		file.close();
+	}
+	else {
+		std::cout << "Unable to open file " << queries << std::endl;
+		exit(-1);
+	}
+    calculate_answers(stringQueries, dHandler, headOrTail);
 }
 
 

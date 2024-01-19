@@ -66,6 +66,11 @@ PYBIND11_MODULE(c_clause, m) {
             py::arg("queries"), py::arg("loader"), py::arg("direction") 
         )
         .def(
+            "calculate_answers",
+            py::overload_cast<std::string&, std::shared_ptr<Loader>, std::string>(&QAHandler::calculate_answers),
+            py::arg("queries"), py::arg("loader"), py::arg("direction") 
+        )
+        .def(
             "get_answers",
             [](QAHandler& self, bool return_strings)->py::object{
                 if (return_strings){
