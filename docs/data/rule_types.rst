@@ -1,105 +1,143 @@
 
 Rule Types and Syntax 
 =====================
-PyClause uses rule type names and rule formatting from `this publication <https://link.springer.com/article/10.1007/s00778-023-00800-5>`_
+PyClause uses conventions for type names and rule formatting from `this publication <https://link.springer.com/article/10.1007/s00778-023-00800-5>`_ .
 
 
 Rule Syntax
 ~~~~~~~~~~~
-To load rule strings they have to be represented in a particular format. An example B-rule string looks as follows:
+
+To load rules with the ``c_clause.Loader``  they must be represented in a structured syntax. An illustrative example of a B-rule string is as follows:
 
 .. code-block:: bash
 
    has_part(X,Y) <= member_meronym(X,A), hypernym(A,B), derivationally_related_form(Y,B)
 
-First note that head and body are separated by **" <= "** (spaces are required). The head consists of one atom **rel(X,Y)** where **rel** is a relation string in the knowledge graph.
-The head atom always contains **X** in the left slot and **Y** in the right slot. Alternatively for some rule types **X** or **Y** (not both) can be substituted with an entity string.
+The **head** and the **body** of a rule are distinguished by the " <= " delimiter, with spaces required on both sides.
+
+**Head**
+
+The head contains a single atom in the format **rel(X,Y)**, where **rel** is a relation string in the knowledge graph.
+The head atom always has **X** on the left and **Y** on the right. In some cases, depending on the rule type, **X** or **Y** —but not both— might be replaced with an entity string.
+
+**Body**
+
+Atoms within the body are divided using a comma ", " with a required space after it. The variables in the atoms can be inferred by the following heuristic:
+
+Given the ordering,
+
+.. code-block:: python
+
+   variables = ["A", "B", "C", "D", "E", "F", "G", "H", "I", ...],
+
+the following holds for the variables in the body atoms:
+
+- The atom at position **i=0** contains **variables[0]** and either **X** or **Y**.
+- Intermediate atoms, where **0<i<length-1** (with **length** being the total number of body atoms), include **variables[i-1]** and **variables[i]**.
+- The final atom, at position **i=length-1**, involves **variable[i-1]** and an entity string or **Y**.
+
+Note that the ordering **within** a particular **body atom** is free and changing the positions will result in a distinct rule. Moreover, the head relation is allowed to be included in the body atoms:
+
+.. code-block:: python
+
+  rel1(X,Y) <= rel2(X,A), rel1(A,Y)
+  rel1(X,Y) <= rel2(A,X), rel1(Y,A)
+
+  rel1(X, ent_1) <= rel2(X, ent_2)
+  rel1(X, ent_1) <= rel2(ent_2, X)
+
+  rel1(X,Y) <= rel2(Y,X)
+  rel1(X,Y) <= rel2(X,Y)
+
+  rel1(X,Y) <= rel1(Y,X)
 
 
-The atoms in the body are separated by **", "** (space required).
 
 Supported Rule Types
 ~~~~~~~~~~~~~~~~~~~~
 
-Let ``h, b1, b2, b3`` be relation tokens (strings).
-Let ``cc,dd`` be entity tokens (strings).
+Let ``rel1, rel2, rel3, rel4`` be relation strings.
+Let ``cc, dd`` be entity strings.
 Let ``X A B C D E F G H .. Y`` be variables.
 
-**B Rules**
+**B-Rules**
 
-Examples:
+The head together with the body form a cycle. Examples:
 
 .. code-block:: bash
 
-   h(X,Y) <= b1(X,A), b2(A,Y)
-   h(X,Y) <= b1(A,X), b2(A,Y)
-   h(X,Y) <= b1(X,A), b2(A,B), b3(B,Y)
+   rel1(X,Y) <= rel1(Y,X)
+   rel1(X,Y) <= rel1(X,A), rel1(A,Y)
+   rel1(X,Y) <= rel2(X,A), rel3(A,Y)
+   rel1(X,Y) <= rel2(A,X), rel3(A,Y)
+   rel1(X,Y) <= rel2(X,A), rel3(A,B), rel4(B,Y)
 
 **U_c Rules**
 
-Examples:
+One entity constant in the head and one in the body (either for **X** or **Y**). Note that **Y** is contained in the first atom if **X** is substituted. It is allowed that **cc** and **dd** are the same entity. Examples:
 
 .. code-block:: bash
 
-   h(X,cc) <= b1(X,dd)
-   h(cc,Y) <= b1(Y,cc)
-   h(cc,Y) <= b1(cc,Y)
+   rel1(X,cc) <= rel2(X,dd)
+   rel1(cc,Y) <= rel2(Y,cc)
+   rel1(cc,Y) <= rel2(cc,Y)
 
-   h(X,cc) <= b1(A,X), b2(A,dd)
-   h(cc,Y) <= b1(Y,A), b2(dd,A)
-   h(cc,Y) <= b1(A,Y), b2(A,dd)
+   rel1(X,cc) <= rel2(A,X), rel3(A,dd)
+   rel1(cc,Y) <= rel2(Y,A), rel3(dd,A)
+   rel1(cc,Y) <= rel1(A,Y), rel2(A,dd)
 
-   h(cc,Y) <= b1(A,Y), b2(A,B), b3(B,dd)
-
-Note that it is allowed that **cc** is the same entity as **dd**.
+   rel1(cc,Y) <= rel2(A,Y), rel3(A,B), rel4(B,dd)
 
 **U_d Rules**
 
+One entity constant in the head no entity constant in the body. Note that the variables in the body follow the generic heuristic above without having a **Y** or entitiy in the last atom. Examples:
+
+.. code-block:: bash
+
+   rel1(X,cc) <= rel2(X,A)
+   rel1(cc,Y) <= rel2(Y,A)
+   rel1(cc,Y) <= rel2(A,Y)
+
+   rel1(X,cc) <= rel2(A,X), rel3(A,B)
+   rel1(cc,Y) <= rel2(Y,A), rel3(B,A)
+   rel1(cc,Y) <= rel2(A,Y), rel3(A,B)
+
+   rel1(c,Y) <= rel2(A,Y), rel3(A,B), rel4(B,C)
+
+
+
+**Zero (Z)-Rules**
+
+This rule type is directed. The first rule only makes prediction in tail direction given a head=X and vice versa for the second rule. It can not be used for triple scoring.
+
 Examples:
 
 .. code-block:: bash
 
-   h(X,cc) <= b1(X,A)
-   h(cc,Y) <= b1(Y,A)
-   h(cc,Y) <= b1(A,Y)
-
-   h(X,cc) <= b1(A,X), b2(A,B)
-   h(cc,Y) <= b1(Y,A), b2(B,A)
-   h(cc,Y) <= b1(A,Y), b2(A,B)
-
-   h(c,Y) <= b1(A,Y), b2(A,B), b3(B,C)
-
-
-
-**Zero (Z) Rules**
-This rule type is used directed. The first rule only makes prediction in tail direction given a head=X and vice versa for the second rule.
-
-Examples:
-
-.. code-block:: bash
-
-   h(X,cc) <= 
-   h(cc,Y) <= 
+   rel1(X,cc) <= 
+   rel1(cc,Y) <= 
 
 **U_xxc Rules**
+
 This rule type only has one body atom.
 
 Examples:
 
 .. code-block:: bash
 
-   h(X,X) <= b1(X,dd) 
-   h(X,X) <= b1(dd,X) 
+   rel1(X,X) <= rel2(X,dd) 
+   rel1(X,X) <= rel2(dd,X) 
 
 **U_xxd Rules**
+
 This rule type only has one body atom.
 
 Examples:
 
 .. code-block:: bash
 
-   h(X,X) <= b1(X,A) 
-   h(X,X) <= b1(A,X) 
+   rel1(X,X) <= rel2(X,A) 
+   rel1(X,X) <= rel2(A,X) 
 
 
 
