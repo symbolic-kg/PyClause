@@ -66,6 +66,11 @@ PYBIND11_MODULE(c_clause, m) {
             py::arg("queries"), py::arg("loader"), py::arg("direction") 
         )
         .def(
+            "calculate_answers",
+            py::overload_cast<std::string&, std::shared_ptr<Loader>, std::string>(&QAHandler::calculate_answers),
+            py::arg("queries"), py::arg("loader"), py::arg("direction") 
+        )
+        .def(
             "get_answers",
             [](QAHandler& self, bool return_strings)->py::object{
                 if (return_strings){
@@ -76,6 +81,7 @@ PYBIND11_MODULE(c_clause, m) {
             },
             py::arg("as_string")
         )
+        .def("write_answers", &QAHandler::writeAnswers, py::arg("path"), py::arg("as_string") = true)
         .def(
             "get_rules",
             [](QAHandler& self, bool return_strings)->py::object{
@@ -87,6 +93,7 @@ PYBIND11_MODULE(c_clause, m) {
             },
             py::arg("as_string")
         )
+        .def("write_rules", &QAHandler::writeRules, py::arg("path"), py::arg("as_string") = true)
         .def("set_options", &QAHandler::setOptions)
     ; //class end
     // RulesHandler()
