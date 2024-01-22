@@ -145,7 +145,7 @@ void QAHandler::calculate_answers(std::string& queries, std::shared_ptr<Loader> 
             } else {
 				std::cout << 
                     "Unsupported Filetype, please make sure that every line either \
-                    contains a properly formatted rule string or num_pred\tsupport\tconf\truleString" 
+                    contains a properly formatted query: node\trelation" 
                 << std::endl;
                 exit(-1);
             }
@@ -179,7 +179,6 @@ std::vector<std::vector<std::pair<int, double>>> QAHandler::getIdxAnswers(){
 
 
 void QAHandler::writeAnswers(std::string outputPath, bool strings){
-    std::vector<std::vector<std::pair<int, double>>> answers = getIdxAnswers();
 
     if (this->queries.size() == 0){
         throw std::runtime_error(
