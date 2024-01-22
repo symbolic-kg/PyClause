@@ -50,6 +50,7 @@ The workflow of PyClause allows to:
    data/config
    data/loading_data
    data/loading_rules
+   data/rule_types
    
    
 

@@ -54,8 +54,8 @@ void QAHandler::calculate_answers(std::vector<std::pair<std::string, std::string
         }
         catch(const std::exception& e){
             throw std::runtime_error(
-                "An entity or relation in a query is not known, i.e., not loaded with the data"
-                "You can only calculate answers for queries where all elements are known: "
+                "An entity or relation in a query is not known, i.e., not loaded with the data."
+                " You can only calculate answers for queries where all elements are known: "
                 + queries[i].first + " " + queries[i].second
             );
        }

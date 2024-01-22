@@ -72,6 +72,12 @@ Rule Application/ Making Predictions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We can use rules and their confidences to make predictions regarding new triples or queries.
 
+.. note::
+
+   Rule application in our context is understood in the context of association rules for handling large datasets. It neither infers model theoretic entailment nor does it perform probabilistic reasoning. Instead, it exclusively involves "grounding the rules once" given a KG.
+   In a logic programming context it can be described by using the immediate consequence operator.      
+
+
 **Triple Classification/Scoring**
 
 Assume we are given a KG, a rule, and the unseen target triple **isCitizenOf(marta,italy)**. We use the first rule from the start example:

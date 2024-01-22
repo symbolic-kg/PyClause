@@ -3,7 +3,7 @@ Loading Data
 ============
 
 
-The ``c_clause.Loader`` class loads datasets (knowledge graphs) and rulesets. At first data has to be loaded which creates an internal index that maps entity and relation string tokens to indices.
+The ``c_clause.Loader`` class loads datasets (knowledge graphs) and rulesets. The first thing to do when using PyClause is loading at least one dataset into the Loader which creates an internal index that maps entity and relation string tokens to intgeger idx's.
 
 
 Input datasets
@@ -17,11 +17,14 @@ The loader is initialized with a dict from the options key "loader" and the ``Lo
    from c_clause import Loader
 
    opts = Options()
-   loader = Loader(opts.get("loader"))
+   loader = Loader(options=opts.get("loader"))
 
-Any of the three will work.
+Any of the three will work:
 
 .. code-block:: python
+
+   loader2 = Loader(options=opts.get("loader"))
+   loader3 = Loader(options=opts.get("loader"))
 
    # data is the the base KG where rules will be applied on for all handlers
    # often also termed and used as 'train'
@@ -62,10 +65,12 @@ There are three possibilities of how to specify the input datasets. From path (a
 
 .. note::
 
-   For the previous two methods the loader will create an internal index that maps entity and relation strings to integer indices.
-   If you have such a mapping already and later want to work with indices according to this mapping you can force the loader to use your index. Simply execute before loading data **loader.set_entity_index(index)** and **loader.set_relation_index(index)**. The argument index is a list of strings that maps idx's to strings by list[i]=string.
+   **Using your own entity and relation index.** For the previous two methods the loader will create an internal index that maps entity and relation strings to integer indices.
+   If you have such a mapping already and later want to work with indices according to this mapping you can force the loader to use your index. Simply execute before loading data **loader.set_entity_index(index)** and **loader.set_relation_index(index)**.
+   The argument index is a list of strings that maps idx's to strings by **list[idx]=string**. The index does not need to be complete you can still load data with new entities and relations.
 
 **3) From Python as indices**
+
 It is also possible to use lists or numpy arrays containing indices. PyClause will, however, always need an internal index that  maps indices to token strings. Even if the user works with indices, PyClause always allows to output results in human readable string representations.
 
 .. code-block:: python
@@ -93,13 +98,23 @@ It is also possible to use lists or numpy arrays containing indices. PyClause wi
 
    # (lisa knows max)
    # (max likes john)
-   triples = np.array(
+   dataset = np.array(
        [
            [0, 0, 1],
            [1, 1, 2]
        ]
    )
-   loader.load_data(dat=triples)
+   # know yourself
+   filter_set = np.array(
+       [
+           [0, 0, 0],
+           [1, 0, 1],
+           [2, 0, 2],
+       ]
+   )
+   loader.load_data(data=dataset, filter=filter_set)
+
+In this case, you can only load data containing idx's that already exist in the entity and relation index. E.g., ``loader.load_data(data=[[0,3,1]])`` would throw an error in the example above.
 
 
 
