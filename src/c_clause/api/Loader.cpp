@@ -50,6 +50,7 @@ void Loader::loadRules(std::vector<std::string> ruleStrings){
     loadedRules = true;
 }
 
+
 void Loader::loadRules(std::vector<std::string> ruleStrings, std::vector<std::pair<int,int>> ruleStats){
     rules->clearAll();
      if (!loadedData){
@@ -57,15 +58,14 @@ void Loader::loadRules(std::vector<std::string> ruleStrings, std::vector<std::pa
     }
     rules->readAnyTimeFromVecs(ruleStrings, ruleStats, false);
     loadedRules = true;
-
-
-
 }
 
 
 std::unordered_map<std::string, int>& Loader::getNodeToIdx(){
     return index->getNodeToIdx();
 }
+
+
 std::unordered_map<std::string, int>& Loader::getRelationToIdx(){
     return index->getRelationToIdx();
 }
@@ -79,11 +79,7 @@ void Loader::subsRelationStrings(std::map<std::string, std::string>& newNames){
         index->subsRelationStrings(newNames);
     }
 
-
-
 void Loader::setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory){
-    
-
     // rule options:  individual rule options and options of which rules to use
      struct OptionHandler {
         std::string name;
@@ -168,13 +164,15 @@ std::vector<std::string> Loader::getRuleIdx(){
 TripleStorage& Loader::getData(){
     return *data;
 }
+
 TripleStorage& Loader::getFilter(){
     return *filter;
 }
+
 TripleStorage& Loader::getTarget(){
     return *target;
-
 }
+
 RuleStorage& Loader::getRules(){
     return *rules;
 }

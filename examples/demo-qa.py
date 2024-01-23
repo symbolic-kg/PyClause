@@ -20,12 +20,12 @@ loader.load_rules(rules)
 
 # leave off for efficiency if not needed
 options.set("qa_handler.collect_rules", True)
-# output only a few candidate
-options.set("qa_handler.topk", 5)
+# output only a few candidates
+options.set("qa_handler.topk", 20)
 qa_handler = QAHandler(options=options.get("qa_handler"))
 
 
-# ** 1) QA with string inputs - tail queries (answer tail given head, rel**
+# ** 1) QA with string inputs - tail queries (answer tail given head, rel)**
 
 # e.g.,  ("12184337","_hypernym", ?)
 tail_queries_str = [
@@ -49,7 +49,6 @@ qa_handler.write_rules("tail-query-rules.jsonl", as_string=as_string)
 # rules and answers for first query
 print(answers[0])
 print(rules[0])
-
 
 
 # ** 2) QA with idx inputs -  head queries (answer heads given tail, rel) **
@@ -78,10 +77,44 @@ head_queries_idx = np.array(head_queries_idx)
 qa_handler.calculate_answers(queries=head_queries_idx, loader=loader, direction="head")
 
 # do all the stuff from above..
+print(qa_handler.get_answers(as_string=False))
+
+
+# ** 3) QA with additional entity names  **
+
+# assume we are given an additional mapping with entity/relation names
+# that differ from the original data but is easier to understand
+
+# maps original entity strings to new entity strings
+entity_names = {}
+
+entity_names_f = f"{get_base_dir()}/data/wnrr/entity_strings.txt"
+with open(entity_names_f, 'r') as file:
+    for line in file:
+        key, value = line.strip().split('\t')
+        entity_names[key] = value
+
+# we look up entity "08801678" from above
+# returns: italy
+entity_names["08801678"]
+
+# let the loader substitute the old entity strings with the new ones
+loader.replace_ent_strings(entity_names)
+
+queries = [("italy", "_has_part")]
+
+# turn off filtering true answers from data
+# note we still filter with the filterset which was loaded
+options.set("qa_handler.filter_w_train", False)
+qa_handler.set_options(options.get("qa_handler"))
+
+qa_handler.calculate_answers(queries=queries, loader=loader, direction="head")
+
+# do alll the stuff from above, write to file return as (new) strings, as idx's etc
 print(qa_handler.get_answers(as_string=True))
 
+qa_handler.write_answers("answers-replaced.jsonl", as_string=True)
 
-# ** 3) QA with readable entity names - tail queries **
 
 
 
