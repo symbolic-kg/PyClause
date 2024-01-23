@@ -1,48 +1,66 @@
-import c_clause
 from c_clause import QAHandler, Loader
 import numpy as np
-from clause.config.options import Options
+from clause import Options
 from clause.util.utils import get_base_dir
 
+# *** Example for query answering on WNRR ***
+
+
+# ** Preparation **
 
 train = f"{get_base_dir()}/data/wnrr/train.txt"
 filter_set = f"{get_base_dir()}/data/wnrr/valid.txt"
-target = f"{get_base_dir()}/data/wnrr/test.txt"
 
 rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
-
-
 options = Options()
 
 loader = Loader(options.get("loader"))
 loader.load_data(train, filter_set)
 loader.load_rules(rules)
 
-
+# leave off for efficiency if not needed
 options.set("qa_handler.collect_rules", True)
+# output only a few candidate
+options.set("qa_handler.topk", 5)
 qa_handler = QAHandler(options=options.get("qa_handler"))
 
 
+# ** QA with string inputs - tail queries**
 
-## string inputs mode
-## input queries:
-## list of tuples with 2 strings (or list of list)
-## the first element of the tuple is the source entity the second element is the relation
-queries = [("12184337","_hypernym"), ("12184337","_verb_group")]
+# e.g.,  ("12184337","_hypernym", ?)
+tail_queries_str = [
+    ("08801678","_has_part")
+    ("12184337","_hypernym"),
+]
 
-## input args: queries (see above), string: "head" or "tail" the query type
-## head: the query rel(?, sourceEnt) will be answered
-## tail: the query rel(sourceEnt, ?) will be answered
-##
-## output: list[list[tuple[string,float]]] 
-## e.g. output[0] contains a list with the answers for the first query
-## note that output[i] does not have same length as output[k] as different queries have different amounts of answers
-qa_handler.calculate_answers(queries=queries, loader=loader, direction="tail")
-as_string = True
+# queries: alternatively specify file path with lines "source\trelation"
+qa_handler.calculate_answers(queries=tail_queries_str, loader=loader, direction="tail")
+
+# you can output entity/rule idx's or entity/rule strings independent of input type
+# set as_string to True to retrieve rule strings/entity strings
+as_string = False
 answers = qa_handler.get_answers(as_string=as_string)
-rules = qa_handler.get_rules(as_string=False)
-print(answers)
-print(rules)
+rules = qa_handler.get_rules(as_string=as_string)
+
+# write to disk
+qa_handler.write_answers("tail-query-answers.jsonl", as_string=as_string)
+qa_handler.write_rules("tail-query-rules.jsonl", as_string=as_string)
+
+# rules and answers for first query
+print(answers[0])
+print(rules[0])
+
+exit()
+
+
+# ** QA with idx inputs -  head queries **
+
+# we did not provide our own entity/relation index
+# we use the one constructed from the loader
+# dict: str->idx
+entity_index = loader.get_entity_index()()
+relation_index = loader.relation_map()
+
 
 
 ### idx input mode

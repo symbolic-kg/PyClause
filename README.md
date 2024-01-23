@@ -92,7 +92,7 @@ print(qa.get_answers(as_string=True)[0])
 
 ```
 
-## Run tests (for developers)
+## Run tests (for developers, linux)
 
 
 Download [this](https://www.dropbox.com/scl/fi/75py3esgpsn6f370ap7q5/test-data.zip?rlkey=7i136d7d7194x2tvoxqsv0e36&dl=0), unpack, and put the folders into data/ <br>
