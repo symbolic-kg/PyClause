@@ -25,11 +25,11 @@ options.set("qa_handler.topk", 5)
 qa_handler = QAHandler(options=options.get("qa_handler"))
 
 
-# ** QA with string inputs - tail queries**
+# ** 1) QA with string inputs - tail queries (answer tail given head, rel**
 
 # e.g.,  ("12184337","_hypernym", ?)
 tail_queries_str = [
-    ("08801678","_has_part")
+    ("08801678","_has_part"),
     ("12184337","_hypernym"),
 ]
 
@@ -37,8 +37,8 @@ tail_queries_str = [
 qa_handler.calculate_answers(queries=tail_queries_str, loader=loader, direction="tail")
 
 # you can output entity/rule idx's or entity/rule strings independent of input type
-# set as_string to True to retrieve rule strings/entity strings
-as_string = False
+# set as_string to False to retrieve rule/entity idx's
+as_string = True
 answers = qa_handler.get_answers(as_string=as_string)
 rules = qa_handler.get_rules(as_string=as_string)
 
@@ -50,35 +50,41 @@ qa_handler.write_rules("tail-query-rules.jsonl", as_string=as_string)
 print(answers[0])
 print(rules[0])
 
-exit()
 
 
-# ** QA with idx inputs -  head queries **
+# ** 2) QA with idx inputs -  head queries (answer heads given tail, rel) **
 
-# we did not provide our own entity/relation index
-# we use the one constructed from the loader
+# we could also provide our own relation/index before loading data
+# here, we use the one constructed from the loader
 # dict: str->idx
 entity_index = loader.get_entity_index()
 relation_index = loader.get_relation_index()
 
+# retrieve idx's 
+rel_idx = relation_index["_has_part"]
+ent1_idx = entity_index["09477567"]
+ent2_idx = entity_index["08780881"]
+
+# note that the queries are (?, rel, tail) but the source entity 
+# still needs to be located at the first position
+head_queries_idx = [
+    [ent1_idx, rel_idx],
+    [ent2_idx, rel_idx],
+]
+# pass it as is or as numpy array
+# 2d np.Array
+head_queries_idx = np.array(head_queries_idx)
+
+qa_handler.calculate_answers(queries=head_queries_idx, loader=loader, direction="head")
+
+# do all the stuff from above..
+print(qa_handler.get_answers(as_string=True))
 
 
-### idx input mode
-### input: queries, string
-### queries list of tuples with two integer, the integer are the idx's 
-### or Nx2 np.array where N is the number of queries, first column are source entity ids second are relation ids
-### output: the output remains a list[list[tuple[int,float]]] as different queries have different amounts of answers
-### each set i of answers can be converted to np.array with np.array(output[i])
-queries = np.array([(4,5), (0,1)])
+# ** 3) QA with readable entity names - tail queries **
 
-# answers to first query
 
-qa_handler.calculate_answers(queries, loader, "tail")
-answers = qa_handler.get_answers(not as_string)
-answer_set = np.array(answers[0], dtype=object)
-# print idx answers
-print(answer_set[:,0])
-# print confidences
-print(answer_set[:,1])
+
+
 
 
