@@ -58,8 +58,8 @@ exit()
 # we did not provide our own entity/relation index
 # we use the one constructed from the loader
 # dict: str->idx
-entity_index = loader.get_entity_index()()
-relation_index = loader.relation_map()
+entity_index = loader.get_entity_index()
+relation_index = loader.get_relation_index()
 
 
 

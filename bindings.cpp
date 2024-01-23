@@ -159,8 +159,8 @@ PYBIND11_MODULE(c_clause, m) {
             [](Loader &self, const TripleSet &data, const TripleSet &filter, const TripleSet &target) { return self.loadData<TripleSet>(data, filter, target); }, 
             py::arg("data"), py::arg("filter") = TripleSet(), py::arg("target") = TripleSet()
         )
-        .def("entity_map", &Loader::getNodeToIdx)
-        .def("relation_map", &Loader::getRelationToIdx)
+        .def("get_entity_index", &Loader::getNodeToIdx)
+        .def("get_relation_index", &Loader::getRelationToIdx)
         .def("replace_ent_tokens", &Loader::subsEntityStrings, py::arg("new_tokens"))
         .def("replace_rel_tokens", &Loader::subsRelationStrings, py::arg("new_tokens"))
         .def("set_entity_index",  &Loader::setNodeIndex, py::arg("index"))

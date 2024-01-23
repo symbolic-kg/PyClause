@@ -22,8 +22,8 @@ def test_rules_handler():
     loader = c_clause.Loader(options)
     loader.load_data(data)
 
-    entities = loader.entity_map()
-    relations = loader.relation_map()
+    entities = loader.get_entity_index()
+    relations = loader.get_relation_index()
 
     rules_list = [
         "_derivationally_related_form(05755883,Y) <= ",
@@ -349,8 +349,8 @@ def test_qa_handler():
 
     qa_handler = c_clause.QAHandler(options.get("qa_handler"))
 
-    ent_map = loader.entity_map()
-    rel_map = loader.relation_map()
+    ent_map = loader.get_entity_index()
+    rel_map = loader.get_relation_index()
 
     # tail query example where we know that one true answer is in train 
     t_q_source = "00037919"
@@ -514,22 +514,22 @@ def test_loader():
     triples = [[1, 0, num_ent-1], [1, num_rel-1, 3], [1,0,num_ent-2], [1, num_rel-2, 3]]
     loader.load_data(triples)
     
-    assert len(loader.entity_map()) == num_ent
-    assert len(loader.relation_map()) == num_rel
-    for key, val in loader.entity_map().items():
+    assert len(loader.get_entity_index()) == num_ent
+    assert len(loader.get_relation_index()) == num_rel
+    for key, val in loader.get_entity_index().items():
         assert int(key) == val
         assert val < num_ent
         
-    assert len(loader.relation_map()) == num_rel
-    for key, val in loader.relation_map().items():
+    assert len(loader.get_relation_index()) == num_rel
+    for key, val in loader.get_relation_index().items():
         assert int(key) == val
         assert val < num_rel
     
     loader = c_clause.Loader(options.get("loader"))
     triples = [["a", "r1", "b"], ["a", "r1", "c"], ["c", "r2", "d"]]
     loader.load_data(triples)
-    assert len(loader.entity_map()) == 4
-    assert len(loader.relation_map()) == 2
+    assert len(loader.get_entity_index()) == 4
+    assert len(loader.get_relation_index()) == 2
     
     # test behaviour of unseen entities (e, f in test, g in valid)
     train = [["a", "r1", "b"], ["a", "r1", "c"], ["c", "r2", "d"]]
@@ -537,12 +537,12 @@ def test_loader():
     valid = [["g", "r1", "a"]]
     loader = c_clause.Loader(options.get("loader"))
     loader.load_data(data=train, target=test)
-    assert len(loader.entity_map()) == 6
-    assert len(loader.relation_map()) == 2
+    assert len(loader.get_entity_index()) == 6
+    assert len(loader.get_relation_index()) == 2
     loader = c_clause.Loader(options.get("loader"))
     loader.load_data(data=train, filter=valid, target=test)
-    assert len(loader.entity_map()) == 7
-    assert len(loader.relation_map()) == 2
+    assert len(loader.get_entity_index()) == 7
+    assert len(loader.get_relation_index()) == 2
     
     print("Test for loading idx's successful")
 
@@ -826,7 +826,7 @@ def test_noisy_or():
     qa_ALL.calculate_answers(tail_queries, loader, "tail")
     tail_answers_ALL = qa_ALL.get_answers(False)
 
-    entity_map = loader.entity_map()
+    get_entity_index = loader.get_entity_index()
 
 
     for i in range(len(scores_all)):
@@ -852,11 +852,11 @@ def test_noisy_or():
 
         # scores from triple scoring must match score of true cand from qa
         if score_5>0:
-            assert(score_5 == tail_cand_5[entity_map[triples[i][2]]])
-            assert(score_5 == head_cand_5[entity_map[triples[i][0]]])
+            assert(score_5 == tail_cand_5[get_entity_index[triples[i][2]]])
+            assert(score_5 == head_cand_5[get_entity_index[triples[i][0]]])
         if score_ALL>0:
-            assert(score_ALL == tail_cand_ALL[entity_map[triples[i][2]]])
-            assert(score_ALL == head_cand_ALL[entity_map[triples[i][0]]])
+            assert(score_ALL == tail_cand_ALL[get_entity_index[triples[i][2]]])
+            assert(score_ALL == head_cand_ALL[get_entity_index[triples[i][0]]])
         else:
             assert(score_ALL==score_5)
     print("Test noisy-or successful.")
@@ -903,8 +903,8 @@ def test_explanation_tracking():
 
     rule_idx = loader.rule_index()
 
-    entity_map = loader.entity_map()
-    relation_map = loader.relation_map()
+    get_entity_index = loader.get_entity_index()
+    get_relation_index = loader.get_relation_index()
 
 
 
@@ -934,9 +934,9 @@ def test_explanation_tracking():
                     triple = str_explanations[2][i][j][l][k]
 
                     ## check that every entity/relation string of every grounding triple maps back to the idx representation
-                    assert(entity_map[triple[0]] == idx_explanations[2][i][j][l][k][0])
-                    assert(relation_map[triple[1]] == idx_explanations[2][i][j][l][k][1])
-                    assert(entity_map[triple[2]] == idx_explanations[2][i][j][l][k][2])
+                    assert(get_entity_index[triple[0]] == idx_explanations[2][i][j][l][k][0])
+                    assert(get_relation_index[triple[1]] == idx_explanations[2][i][j][l][k][1])
+                    assert(get_entity_index[triple[2]] == idx_explanations[2][i][j][l][k][2])
     print("Test for explanation consistency successful")
 
 
@@ -971,8 +971,8 @@ def test_rules_collecting():
 
 
     rule_index = loader.rule_index()
-    entity_map = loader.entity_map()
-    relation_map = loader.relation_map()
+    get_entity_index = loader.get_entity_index()
+    get_relation_index = loader.get_relation_index()
 
 
     headRanking_idx = ranker.get_ranking("head", False)
@@ -1021,8 +1021,8 @@ def test_rules_collecting():
         source_str = tail_queries[i][0]
         rel_str = tail_queries[i][1]
 
-        source_idx = entity_map[source_str]
-        rel_idx = relation_map[rel_str]
+        source_idx = get_entity_index[source_str]
+        rel_idx = get_relation_index[rel_str]
 
         for c in range(len(tail_answers_idx[i])):
             cand_idx = tail_answers_idx[i][c][0]
@@ -1053,8 +1053,8 @@ def test_rules_collecting():
         source_str = head_queries[i][0]
         rel_str = head_queries[i][1]
 
-        source_idx = entity_map[source_str]
-        rel_idx = relation_map[rel_str]
+        source_idx = get_entity_index[source_str]
+        rel_idx = get_relation_index[rel_str]
 
         for c in range(len(head_answers_idx[i])):
             cand_idx = head_answers_idx[i][c][0]

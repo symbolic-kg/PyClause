@@ -18,12 +18,12 @@ By exclusively using Python, with PyClause you can:
 - Retrieve the target rules that predicted triples or candidates with ``c_clause.QAHandler``, ``c_clause.PredictionHandler`` or ``c_clause.RankingHandler``
 - Evaluate ranking files for knowledge graph completion
 
-The workflow of PyClause allows to:
+Possible workflows with PyClause allow to:
 
 - load data KGs and rules solely from Python and serialize the results back to Python
 - load data KGs and rules from disk and write back the results to disk for efficiency
 - handle KG data and inputs as indexes, e.g., from numpy arrays, or with string names for the generation of readable examples
-- work with and store userd defined configuration files, based on a `default-configuration file <https://github.com/symbolic-kg/PyClause/blob/master/clause/config-default.yaml>`_
+- work with and store user defined configuration files, based on a `default-configuration file <https://github.com/symbolic-kg/PyClause/blob/master/clause/config-default.yaml>`_
 
 
 .. toctree::
