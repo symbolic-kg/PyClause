@@ -21,6 +21,7 @@ Additionally, rules need to be assigned with their support and number of body gr
 
    opts = Options()
    loader = Loader(options=opts.get("loader"))
+
    dataset = [["lisa", "knows", "max"], ["max", "likes", "john"]]
    loader.load_data(data=dataset)
 
@@ -77,17 +78,19 @@ The identical line format of a rule file can also be directly passed from Python
 
 Loading Options
 ~~~~~~~~~~~~~~~
+
+**Loading constraints**
+
 By using the ``Loader`` options the loader can be configured to ignore certain rules and rule types. It can also modify the confidence computation of the rules.
+The full list of options can be found in the `config-default.yaml <https://github.com/symbolic-kg/PyClause/blob/master/clause/config-default.yaml>`_ .
+
 
 .. code-block:: python
 
     from c_clause import Loader
     from clause import Options
 
-    opts = Options()
-    loader = Loader(options=opts.get("loader"))
     dataset = [["lisa", "knows", "max"], ["max", "likes", "john"]]
-    loader.load_data(data=dataset)
 
     rules = [
         "knows(X,Y) <= knows(Y,X)",
@@ -101,10 +104,8 @@ By using the ``Loader`` options the loader can be configured to ignore certain r
        [25, 5],
 
     ]
-    # options can also be changed after intialization
-    # but they have to be passed to the loader
-
-    # ignores the first rule
+    opts = Options()
+    # ignores the first rule when loading
     opts.set("loader.load_b_rules", False)
 
     opts.set("loader.load_u_c_rules", True)
@@ -113,15 +114,37 @@ By using the ``Loader`` options the loader can be configured to ignore certain r
 
     # ignores the last rule as 5/25 is smaller than 0.3
     opts.set("loader.c_min_conf", 0.3)
-    # pass modified options to loader
-    loader.set_options(options=opts.get("loader"))
+    
+    loader = Loader(options=opts.get("loader"))
+    loader.load_data(data=dataset)
 
     loader.load_rules(rules=rules, stats=stats)
+
+**Resetting Options**
+
+Using the ``Loader.set_options(...)`` one can also, e.g., after loading data, reset the loader options. This will not affect the already loaded rules. But it can be used to load the same or another ruleset with different constraints.
+
+.. code-block:: python
+
+    ### 
+    ### construct loader with options, load data etc..
+    ###
+
+    loader.load_rules(rules=ruleset) ##load rules and do something with it
+
+    # change some options
+    opts.set("loader.load_u_c_rules", False)
+    opts.write("experiment2.yaml")
+    # change loader options
+    loader.set_options(opts.get("loader"))
+    # load new ruleset ignoring U_c rules; old ruleset in loader is deleted
+    loader.load_rules(rules=ruleset)
+
 
 Custom Rule Confidences
 ~~~~~~~~~~~~~~~~~~~~~~~
 PyClause internally re-computes rule confidences for each rule type as ``conf=support/ (num_preds+r_num_unseen)`` where **r_num_unseen** is a configurable option in config-default.yaml for some rule type **r**.
-The confidence specification in the file/input is not used. If you want to use your own custom confidence you either have to specifiy **num_predictions** and **support** when loading the rules. Note that **r_num_unseen** is 5 in the config-default for every rule type.
+The confidence specification in the file/input is not used. If you want to use your own custom confidence you have to specifiy **num_predictions** and **support** when loading the rules. Note that **r_num_unseen** is 5 in the config-default for every rule type.
 In cases, where you only have one custom confidence you can do it like in the following example:
 
 .. code-block:: python

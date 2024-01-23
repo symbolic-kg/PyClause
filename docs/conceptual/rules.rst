@@ -40,7 +40,7 @@ are the *rule bodies* and
 
 are the respective rule heads.
 
-A collection of rules is mostly associated with a knowlede graph (KG). We define a KG to be a collection of **(subject, rel, object)** triples, where *subject* and *object* are entities and *rel* is a relation. There is a direct correspondence between the atoms we used in the notation above and the KG triples, e.g., we can think of a ground atom **speaks(Anna, English)** as of a knowledge graph triple **(anna, speaks, english)** we will simply refer to *triples* for both notations. 
+A collection of rules is mostly associated with a knowlede graph (KG). We define a KG to be a collection of **(subject, rel, object)** triples, where *subject* and *object* are entities and *rel* is a relation. There is a direct correspondence between the atoms we used in the notation above and the KG triples, e.g., we can think of a ground atom **speaks(anna, english)** as of a knowledge graph triple **(anna, speaks, english)** we will simply refer to *triples* for both notations. 
 
 
 Rule Confidences
