@@ -45,7 +45,7 @@ options = {
 loader = c_clause.Loader(options)
 loader.load_data(train, filter_set)
 loader.load_rules(rules)
-loader.replace_ent_tokens(entity_names)
+loader.replace_ent_strings(entity_names)
 
 
 qa_handler = c_clause.QAHandler(options)
