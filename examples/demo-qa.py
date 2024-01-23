@@ -42,8 +42,8 @@ answers = qa_handler.get_answers(as_string=as_string)
 rules = qa_handler.get_rules(as_string=as_string)
 
 # write to disk
-qa_handler.write_answers(f"{get_base_dir()}/local/tail-query-answers.jsonl", as_string=as_string)
-qa_handler.write_rules(f"{get_base_dir()}/local/tail-query-rules.jsonl", as_string=as_string)
+qa_handler.write_answers(path=f"{get_base_dir()}/local/tail-query-answers.jsonl", as_string=as_string)
+qa_handler.write_rules(path=f"{get_base_dir()}/local/tail-query-rules.jsonl", as_string=as_string)
 
 # rules and answers for first query
 print(answers[0])
@@ -112,7 +112,7 @@ qa_handler.calculate_answers(queries=queries, loader=loader, direction="head")
 # do alll the stuff from above, write to file, return as (new) strings, as idx's etc
 print(qa_handler.get_answers(as_string=True))
 
-qa_handler.write_answers(f"{get_base_dir()}/local/head-query-italy.jsonl", as_string=True)
+qa_handler.write_answers(path=f"{get_base_dir()}/local/head-query-italy.jsonl", as_string=True)
 
 
 

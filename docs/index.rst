@@ -60,9 +60,9 @@ Possible workflows with PyClause allow to:
    :caption: Features
    
    feature/learning
+   feature/query_answering
    feature/triple_classification
    feature/triple_explanations
-   feature/query_answering
    feature/ranking_generation
    feature/rule_materialization
    feature/rule_confidence
