@@ -103,8 +103,8 @@ loader.replace_ent_strings(entity_names)
 
 queries = [("italy", "_has_part")]
 
-# turn off filtering true answers from data
-# note we still filter with the filterset which was loaded
+# turn off filtering answers that exist in data "train.txt"
+# note we still filter with the filterset which was loaded above
 options.set("qa_handler.filter_w_data", False)
 qa_handler.set_options(options.get("qa_handler"))
 
