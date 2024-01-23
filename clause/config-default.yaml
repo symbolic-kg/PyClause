@@ -133,7 +133,7 @@ ranking_handler:
   # recommended values: -1 under "maxplus"; 5 under "noisyor"
   num_top_rules: -1
 
-  filter_w_train: True
+  filter_w_data: True
   filter_w_target: True
   # choose between "random" / "frequency"
   tie_handling: "frequency"
@@ -157,7 +157,7 @@ qa_handler:
   hard_stop_at: -1 #-1 for off
   num_top_rules: -1
 
-  filter_w_train: True
+  filter_w_data: True
   # choose between "random" / "frequency"
   tie_handling: "frequency"
   # -1 for using ALL available threads

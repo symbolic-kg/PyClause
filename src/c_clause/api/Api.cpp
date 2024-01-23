@@ -27,7 +27,7 @@ void BackendHandler::setRankingOptions(std::map<std::string, std::string> option
         {"disc_at_least", [&ranker](std::string val) { ranker.setDiscAtLeast(std::stoi(val)); }},
         {"hard_stop_at", [&ranker](std::string val) { ranker.setNumPreselect(std::stoi(val)); }},
         {"num_top_rules", [&ranker](std::string val) {ranker.setScoreNumTopRules(std::stoi(val));}},
-        {"filter_w_train", [&ranker](std::string val) { ranker.setFilterWTrain(util::stringToBool(val)); }},
+        {"filter_w_data", [&ranker](std::string val) { ranker.setFilterWTrain(util::stringToBool(val)); }},
         {"filter_w_target", [&ranker](std::string val) { ranker.setFilterWtarget(util::stringToBool(val)); }},
         {"tie_handling", [&ranker](std::string val) { ranker.setTieHandling(val); }},
         {"num_threads", [&ranker](std::string val) { ranker.setNumThr(std::stoi(val)); }},

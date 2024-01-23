@@ -342,7 +342,7 @@ def test_qa_handler():
 
     options = Options()
 
-    options.set("qa_handler.filter_w_train", False)
+    options.set("qa_handler.filter_w_data", False)
     loader = c_clause.Loader(options.get("loader"))
     loader.load_data(train, filter)
     loader.load_rules(rules)
@@ -370,7 +370,7 @@ def test_qa_handler():
     assert(1==sum(np.array(t_answers_str[0])[:,0] == t_answer_in_train))
 
     ## after not filtering with train the true answer from train must not be contained
-    options.set("qa_handler.filter_w_train", True)
+    options.set("qa_handler.filter_w_data", True)
     qa_handler = c_clause.QAHandler(options.get("qa_handler"))
 
     qa_handler.calculate_answers([(t_q_source, t_q_rel)], loader, "tail")
@@ -390,7 +390,7 @@ def test_qa_handler():
         assert(t_answers_idx[0][i][1] == answer[1])
 
         
-    options.set("qa_handler.filter_w_train", False)    
+    options.set("qa_handler.filter_w_data", False)    
     qa_handler = c_clause.QAHandler(options.get("qa_handler"))
     h_q_source = "01051956"
     h_q_rel = "_also_see"
@@ -404,7 +404,7 @@ def test_qa_handler():
     assert(1==sum(np.array(answers_str[0])[:,0]==h_q_answer_in_train))
     assert (1==sum(np.array(answers_idx[0])[:,0]==ent_map[h_q_answer_in_train]))
 
-    options.set("qa_handler.filter_w_train", True)    
+    options.set("qa_handler.filter_w_data", True)    
     qa_handler = c_clause.QAHandler(options.get("qa_handler"))
 
     qa_handler.calculate_answers([[ent_map[h_q_source], rel_map[h_q_rel]]], loader, "head")

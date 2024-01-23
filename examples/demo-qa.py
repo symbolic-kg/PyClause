@@ -33,7 +33,7 @@ tail_queries_str = [
     ("12184337","_hypernym"),
 ]
 
-# queries: alternatively specify file path with lines "source\trelation"
+# queries: alternatively specify file path with lines "source_entity\trelation" for head queries as well as tail queries
 qa_handler.calculate_answers(queries=tail_queries_str, loader=loader, direction="tail")
 
 # you can output entity/rule idx's or entity/rule strings independent of input type
@@ -105,15 +105,15 @@ queries = [("italy", "_has_part")]
 
 # turn off filtering true answers from data
 # note we still filter with the filterset which was loaded
-options.set("qa_handler.filter_w_train", False)
+options.set("qa_handler.filter_w_data", False)
 qa_handler.set_options(options.get("qa_handler"))
 
 qa_handler.calculate_answers(queries=queries, loader=loader, direction="head")
 
-# do alll the stuff from above, write to file return as (new) strings, as idx's etc
+# do alll the stuff from above, write to file, return as (new) strings, as idx's etc
 print(qa_handler.get_answers(as_string=True))
 
-qa_handler.write_answers("answers-replaced.jsonl", as_string=True)
+qa_handler.write_answers("head-query-italy.jsonl", as_string=True)
 
 
 

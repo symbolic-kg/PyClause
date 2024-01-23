@@ -26,7 +26,7 @@ options = {
     "aggregation_function": "maxplus",
     "num_preselect": "10000000",
     "topk": "100",
-    "filter_w_train": "false",
+    "filter_w_data": "false",
     "filter_w_target": "false",
     "disc_at_least":"100", ## -1 for off, must not be bigger than topk
     # rule options 
