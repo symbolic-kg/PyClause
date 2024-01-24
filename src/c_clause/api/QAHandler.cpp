@@ -217,6 +217,9 @@ void QAHandler::writeAnswers(std::string outputPath, bool strings){
 
 
 std::vector<std::vector<std::vector<int>>> QAHandler::getIdxRules(){
+    if (!collectRules){
+        throw std::runtime_error("Please set 'qa_handler.collect_rules' to true before you calculate answers");
+    }
     std::vector<std::vector<std::vector<int>>> out;
 
     for (int q=0; q<queryRules.size(); q++){
@@ -233,6 +236,9 @@ std::vector<std::vector<std::vector<int>>> QAHandler::getIdxRules(){
 }
 
 std::vector<std::vector<std::vector<std::string>>> QAHandler::getStrRules(){
+    if (!collectRules){
+        throw std::runtime_error("Please set 'qa_handler.collect_rules' to true before you calculate answers");
+    }
     std::vector<std::vector<std::vector<std::string>>> out;
 
     for (int q=0; q<queryRules.size(); q++){

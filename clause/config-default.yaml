@@ -198,7 +198,7 @@ io:
   rule_format: "PyClause"
 learning:
   # chose betweeen:
-  # "anyburl" / "hybrid" (mixing anyburl any nanytorm) / "nanytorm" / "amie"
+  # "anyburl" / "hybrid" (mixing anyburl any torm) / "torm" / "amie"
   mode: "amie"  
   anyburl:
     time: 60
@@ -214,7 +214,7 @@ learning:
       minhc: 0.0001
       minpca: 0.0001
   torm:
-    # if set to false, rules that do not make any wrong prediction are surpressed
+    # if set to false, rules that do not make any wrong prediction are suppressed
     tautology: False 
     b:
       active: True

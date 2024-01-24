@@ -33,6 +33,8 @@ public:
     void loadRules(std::string rulePath);
     void loadRules(std::vector<std::string> ruleStatsStrings);
     void loadRules(std::vector<std::string> ruleStrings, std::vector<std::pair<int,int>> ruleStats);
+
+    void writeRules(std::string path);
     
     std::unordered_map<std::string, int>& getNodeToIdx();
 	std::unordered_map<std::string, int>& getRelationToIdx();
@@ -40,11 +42,12 @@ public:
     void subsRelationStrings(std::map<std::string, std::string>& newNames);
     std::vector<std::string> getRuleIdx();
 
-    //TODO probably remove, too complicated
     void setOptions(std::map<std::string, std::string> options);
-    void setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory);
+
+    
 
     // internal
+    void setRuleOptions(std::map<std::string, std::string> options, RuleFactory& ruleFactory);
     TripleStorage& getData();
     TripleStorage& getFilter();
     TripleStorage& getTarget();

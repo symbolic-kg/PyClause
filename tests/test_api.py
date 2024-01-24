@@ -234,6 +234,10 @@ def test_uc_b_zero_ranking():
     loader.set_options(options.get("loader"))
     loader.load_rules(rules_path)
 
+    # write and load subset
+    loader.write_rules(testing_dir + "/written_rules")
+    loader.load_rules(testing_dir + "/written_rules")
+
     ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
     ranker.write_ranking(ranking_path, loader)

@@ -4,9 +4,10 @@ Loading Data
 
 
 The ``c_clause.Loader`` class loads datasets (knowledge graphs) and rulesets. The first thing to do when using PyClause is loading at least one dataset into the Loader which creates an internal index that maps entity and relation string tokens to intgeger idx's.
+The loader will later be passed to the respective handler classes which can work on the specified data and rulesets.
 
 
-Input datasets
+Input Datasets
 ~~~~~~~~~~~~~~~
 
 The loader is initialized with a dict from the options key "loader" and the ``Loader.load_data(..)`` function takes up to three possible arguments.
@@ -66,7 +67,7 @@ There are three possibilities of how to specify the input datasets. From path (a
 .. note::
 
    **Using your own entity and relation index.** For the previous two methods the loader will create an internal index that maps entity and relation strings to integer indices.
-   If you have such a mapping already and later want to work with indices according to this mapping you can force the loader to use your index. Simply execute before loading data **loader.set_entity_index(index)** and **loader.set_relation_index(index)**.
+   If you have such a mapping already and later want to specify handler inputs as idx's according to this mapping you can force the loader to use your index. Simply execute before loading data **loader.set_entity_index(index)** and **loader.set_relation_index(index)**.
    The argument index is a list of strings that maps idx's to strings by **list[idx]=string**. The index does not need to be complete, one can still load data with new entities and relations.
 
 **3) From Python as indices**

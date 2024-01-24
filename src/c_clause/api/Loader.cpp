@@ -61,6 +61,28 @@ void Loader::loadRules(std::vector<std::string> ruleStrings, std::vector<std::pa
 }
 
 
+void Loader::writeRules(std::string path){
+    if (!loadedRules){
+        throw std::runtime_error("You have to load rules first before you can write them.");
+    }
+
+    std::ofstream file(path);
+    if (!file.is_open()) {
+        throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + path);
+    }
+
+    std::vector<std::unique_ptr<Rule>>& loadedRules = this->rules->getRules();
+    for (int i=0; i<loadedRules.size(); i++){
+        std::array<int, 2> stats = loadedRules[i]->getStats();
+        int numPreds = stats[0];
+        int numTrue = stats[1];
+        double conf = (double) numTrue / (double) numPreds;
+        file << numPreds << "\t" << numTrue << "\t" << conf << "\t" << loadedRules[i]->computeRuleString(index.get()) << std::endl;
+    }
+    std::cout<<"Written rules to:  " + path<<std::endl;
+}
+
+
 std::unordered_map<std::string, int>& Loader::getNodeToIdx(){
     return index->getNodeToIdx();
 }
