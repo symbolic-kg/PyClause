@@ -194,28 +194,44 @@ prediction_handler:
 
 ## clause options ############################################################
 
-io:
-  rule_format: "PyClause"
-learning:
-  # chose betweeen:
-  # "anyburl" / "hybrid" (mixing anyburl any torm) / "torm" / "amie"
+### Learns rules with AnyBURL or Amie
+learner:
+  # chose betweeen: "anyburl" / "amie"
   mode: "amie"  
   anyburl:
+    # learning time in seconds for AnyBURL
     time: 60
-    # you can set any raw options supported by AnyBURL
+    # any raw option supported by AnyBURL
+    # can be set under 'raw' 
     raw:
+      # max length of B-rules
       MAX_LENGTH_CYCLIC: 3
+      # don't learn rules with support < 2
       THRESHOLD_CORRECT_PREDICTIONS: 2
+      # dont learn rules with confidence smaller 0.0001
       THRESHOLD_CONFIDENCE: 0.0001
   amie:
-    raw: # the -symbol infront of each param is added automatically
+    # any raw option supported by Amie can be set under raw
+    raw:
       mins: 2
       maxad: 4 # number of atoms = 1 head atom + body atoms
       minhc: 0.0001
       minpca: 0.0001
+
+
+### An experimental rule miner that efficiently mines rules simultaneously
+### it is very efficient for mining all U_c rules; less efficient for cyclical rules (B-rules)
+torm_learner:
+  # choose betweeen "hybrid" / "torm"
+  # 'hybrid' calculates rule confidences for cyclical rules (B-Rules)
+  #  with AnyBURL confidence sampling; when selected hybrid
+  #  torm options and learner.anyburl options apply; use anyburl.time for learning time of B-rules
+  # 'torm' calculates rule confidences for B-rules with c_clause.RulesHandler materialization
+  mode: "torm"  
   torm:
     # if set to false, rules that do not make any wrong prediction are suppressed
     tautology: False 
+    # rule type options
     b:
       active: True
       confidence: 0.0001
@@ -242,3 +258,6 @@ learning:
       active: True
       confidence: 0.0001
       support: 2
+
+io:
+  rule_format: "PyClause"

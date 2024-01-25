@@ -9,7 +9,7 @@ Feature Overview
 
 By exclusively using Python, with PyClause you can:
 
-- Learn rules with **AMIE**, **AnyBURL**, or our custom mining module **Torm** (``clause.Miner``)
+- Learn rules with **AMIE**, **AnyBURL**, or our custom mining module **Torm** (``clause.Learner``)
 - Calculate explanations for a given triple prediction (``c_clause.PredictionHandler``)
 - Calculate query answering on the fly (``c_clause.QAHandler``)
 - Perform triple scoring/classification on the fly (``c_clause.PredictionHandler``)

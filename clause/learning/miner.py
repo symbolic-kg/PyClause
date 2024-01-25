@@ -13,7 +13,50 @@ import math
 
 import multiprocessing as mp
 
-class Miner():
+
+class Learner():
+    """Learns rules with Amie or AnyBURL."""
+
+    def __init__(self, options):
+        self.options = options
+
+    def learn_rules(self, path_data, path_output):
+        """Starts rule learning.
+
+        :param path_data: Path to the KG where rules are learned, e.g., train.txt.
+        :param path_output: Output file where rules are stored.
+
+        """
+
+        anyburl_options = {key.replace("anyburl.", ""): val for key, val in self.options.items() if key.startswith("anyburl.")}
+        amie_options = {key.replace("amie.", ""): val for key, val in self.options.items() if key.startswith("amie.")}
+
+        if self.options.get('mode') == "anyburl": 
+            arule_path = anyburl_wrapper.learn(
+                path_data,
+                anyburl_options["time"],
+                anyburl_options,
+                path_output
+            )
+            os.rename(f"{path_output}-{anyburl_options['time']}", path_output) 
+            print(">>> renamed file and stored the rules here: " + path_output)
+        elif self.options.get('mode') == "amie":  
+            arule_path = amie_wrapper.learn(
+                path_data,
+                amie_options,
+                path_output
+            )
+            print(">>> Amie stored the mined rules here: " + path_output)
+            return
+        else:
+            print(">> could not understand learner.mode please specify 'amie' or 'anyburl'")
+            exit()
+
+          
+      
+
+class TormLearner():
+    """Experimental rule mining system."""
 
     def __init__(self, options, targets, triples):
         self.options = options
@@ -32,7 +75,7 @@ class Miner():
 
     def mine_z_rules(self):
         print(">>> mining z-rules ...")
-        toptions = self.options.flat('learning.torm')
+        toptions = self.options.flat('torm_learner.torm')
         for hr in self.triples.rels:
             for sub in self.triples.r2_sub[hr]:
                 num_obj = len(self.triples.sub_rel_2_obj[sub][hr])
@@ -53,7 +96,7 @@ class Miner():
 
     def mine_ud_rules(self):
         print(">>> mining ud-rules ...")
-        toptions = self.options.flat('learning.torm')
+        toptions = self.options.flat('torm_learner.torm')
         for br in self.triples.rels:
             if len(self.triples.r2_obj[br]) >= toptions["ud.support"]:
                 preds = len(self.triples.r2_obj[br])
@@ -70,7 +113,7 @@ class Miner():
 
     def mine_uc_rules(self):
         print(">>> mining uc-rules ...")
-        toptions = self.options.flat('learning.torm')
+        toptions = self.options.flat('torm_learner.torm')
         current_time = time.time()
         bc_count = 0
         for bc in self.triples.sub_rel_2_obj:
@@ -139,7 +182,7 @@ class Miner():
 
     def mine_xx_uc_rules(self):
         print(">>> mining xx-rules (with uc bodies) ...")
-        toptions = self.options.flat('learning.torm')
+        toptions = self.options.flat('torm_learner.torm')
         for bc in self.triples.sub_rel_2_obj:
             for br in self.triples.sub_rel_2_obj[bc]:
                 if len(self.triples.sub_rel_2_obj[bc][br]) >= toptions["xx_uc.support"]:
@@ -156,7 +199,7 @@ class Miner():
 
     def mine_xx_ud_rules(self):
         print(">>> mining xx-rules (with ud bodies) ...")
-        toptions = self.options.flat('learning.torm')
+        toptions = self.options.flat('torm_learner.torm')
         for br in self.triples.rels:
             if len(self.triples.r2_obj[br]) >= toptions["xx_ud.support"]:
                 preds = len(self.triples.r2_obj[br])
@@ -203,7 +246,6 @@ class Miner():
         current = time.time()
         for target in self.targets:
             count += 1
-            # print(">>> [" + str(count) + "] constructing b-rules for " + str(id2to[target]) + " ... so far " +  str(len(candidates.rules)) + " > " + str(time.time()))
             if time.time() - 10 > current:
                 current = time.time()
                 print(">>> ... still constructing b-rule candidates, " + str(count) + " out of " + str(len(self.targets)) + " relations processed so far ...") 
@@ -294,38 +336,13 @@ class Miner():
 
     def mine_rules(self, path_rules_output = None):
 
-        anyburl_options = self.options.flat('learning.anyburl')
-        amie_options = self.options.flat('learning.amie')
-        toptions = self.options.flat('learning.torm')
+        toptions = self.options.flat('torm_learner.torm')
+        anyburl_options = self.options.flat('learner.anyburl')
        
         # ***********************************
         start = time.time()
 
-        if self.options.options['learning']['mode'] == "anyburl": 
-            if path_rules_output == None:
-                print("!!! execution interrupted")
-                print("!!! running in anyburl mode requires to specify an output path for the rules") 
-                exit()
-            arule_path = anyburl_wrapper.learn(
-                self.triples.path,
-                anyburl_options['time'],
-                anyburl_options,
-                True,
-                path_rules_output
-            )
-        if self.options.options['learning']['mode'] == "amie": 
-            if path_rules_output == None:
-                print("!!! execution interrupted")
-                print("!!! running in amie mode requires to specify an output path for the rules") 
-                exit()
-            arule_path = amie_wrapper.learn(
-                self.triples.path,
-                amie_options,
-                path_rules_output
-            )
-
-
-        if self.options.options['learning']['mode'] == "hybrid": 
+        if self.options.options['torm_learner']['mode'] == "hybrid": 
             arule_path = anyburl_wrapper.learn(
                 self.triples.path,
                 anyburl_options['time'],
@@ -338,7 +355,7 @@ class Miner():
             rules_b.retainOnly("B")
             self.rules.add_ruleset(rules_b)
 
-        if self.options.options['learning']['mode'] == "torm": 
+        if self.options.options['torm_learner']['mode'] == "torm": 
             if toptions['b.active']:
                 print(">>> mining b-rules ...")
                 candidates = self.mine_b_rule_candidates(toptions['b.length'])
@@ -375,15 +392,6 @@ class Miner():
             end = time.time()
             print(">>> elapsed time for materialization of " + str(self.rules.size()) + " b-rules: " + str(math.floor(end-start)) + "s") 
 
-        # anyburl case
-        if self.options.options['learning']['mode'] == "anyburl":
-            os.rename(f"{path_rules_output}-{self.options.flat('learning.anyburl')['time']}", path_rules_output) 
-            print(">>> renamed and stored the mined rules here: " + path_rules_output)
-            return
-                # anyburl case
-        if self.options.options['learning']['mode'] == "amie": 
-            print(">>> amie stored the mined rules here: " + path_rules_output)
-            return
         # torm and hybrid case
         if toptions['uc.active']:
             start = time.time()

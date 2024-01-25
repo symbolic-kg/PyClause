@@ -24,6 +24,6 @@ c_clause Handlers
 Rule Learning
 ~~~~~~~~~~~~~
 
-.. autoclass:: clause.Miner
+.. autoclass:: clause.Learner
    :members:
    :undoc-members:

@@ -1,47 +1,31 @@
-import sys
+
 import os
-sys.path.append(os.getcwd())
-import multiprocessing
-
-from clause.util.utils import get_ab_dir, get_base_dir, join_u
-
 from os import path
 from subprocess import CalledProcessError, Popen, PIPE
 
+from clause.util.utils import get_ab_dir, join_u
 
 
-def learn(train_path, time, options, all_rules, path_rules_output = None):
 
-    base_dir = "."
-    learn_dir = join_u(base_dir, "anyburl-learn")
+
+
+
+def learn(train_path, time, options, path_rules_output):
+
+    # keep it simple: anyburl log + config is written to the folder 
+    # of the specified rule file
+    learn_dir = os.path.dirname(path_rules_output)
 
     if not path.isdir(learn_dir):
         os.mkdir(learn_dir)
 
-    if path_rules_output == None:
-        rule_path = join_u(learn_dir, "anyburl-rules")
-    else:
-        rule_path = path_rules_output
-
     conf_path = join_u(learn_dir, "config-learn.properties")
-
-    cpu_count = multiprocessing.cpu_count()
-    # cpu_count = cpu_count - 1
-    cpu_count = 1 if cpu_count <= 1 else cpu_count - 1
 
     learn_config = [
         "PATH_TRAINING = "  + train_path,
-        "PATH_OUTPUT   = " + rule_path,
+        "PATH_OUTPUT   = " + path_rules_output,
         "SNAPSHOTS_AT = " +  str(time),
-        "WORKER_THREADS = " + str(cpu_count),
-        ]
-    if all_rules == False:
-        learn_config.extend([
-            "ZERO_RULES_ACTIVE = false",
-            "MAX_LENGTH_ACYCLIC = 0",
-            "MAX_LENGTH_GROUNDED_CYCLIC = 0",
-            "EXCLUDE_AC2_RULES = true",
-        ])
+    ]
 
     param_list = []
     for param in options:
@@ -63,4 +47,4 @@ def learn(train_path, time, options, all_rules, path_rules_output = None):
     if p.returncode != 1:
         raise CalledProcessError(p.returncode, p.args)
     
-    return rule_path + "-" + str(time)
+    return path_rules_output + "-" + str(time)

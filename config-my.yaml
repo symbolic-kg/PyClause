@@ -1,14 +1,14 @@
 # ************************************************************
-# *** SPECIFIC CONFIGURATION: EXAMPLE                      ***
+# *** CUSTOM CONFIGURATION EXAMPLE ***************************
 # *** values specified here will overwrite default values  ***
-# *** other default values are kept                        ***
-# *** see clause/config-default.yaml for all options       ***
+# *** other default values are kept **************************
+# *** see clause/config-default.yaml for all options *********
 # ************************************************************
 
 # usage:
-# from clause.config.options import Options
+# from clause import Options
 # opts = Options("path/to/config-my.yaml")
 
 
-learning:
+learner:
   mode: "anyburl" 
