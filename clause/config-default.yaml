@@ -213,10 +213,10 @@ learner:
   amie:
     # any raw option supported by Amie can be set under raw
     raw:
-      mins: 2
-      maxad: 4 # number of atoms = 1 head atom + body atoms
-      minhc: 0.0001
-      minpca: 0.0001
+      mins: 10
+      maxad: 3 # number of atoms = 1 head atom + body atoms
+      minhc: 0.1
+      minpca: 0.1
 
 
 ### An experimental rule miner that efficiently mines rules simultaneously

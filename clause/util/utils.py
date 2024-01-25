@@ -69,7 +69,7 @@ def get_ab_dir():
 def get_amie_dir():
     """Returns file path to AMIE binary"""
     package = "clause.bin"
-    resource = "AMIE-dev.jar"
+    resource = "amie-anyburl-integration.jar"
     try:
         with pkg_resources.path(package, resource) as p:
             return str(p)
