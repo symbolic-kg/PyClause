@@ -11,8 +11,6 @@ from subprocess import CalledProcessError, Popen, PIPE
 
 def learn(train_path, options, path_rules_output):
 
-    # keep it simple: anyburl log + config is written to the folder 
-    # of the specified rule file
     learn_dir = os.path.dirname(path_rules_output)
 
     if not path.isdir(learn_dir):
