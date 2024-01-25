@@ -12,14 +12,13 @@ path_rules_output = f"{get_base_dir()}/local/myrules/rules-wn18rr.txt"
 options = Options(f"{get_base_dir()}/config-my.yaml")
 
 # set "amie" or "anyburl" and define specifc arguments
-
 # AMIE
-# due to these params AMIE is w.r.t language bias and output format compatibel to AnyBURL
-options.set("learner.amie.raw.bias", "amie.mining.assistant.pyclause.AnyBurlMiningAssistant") # BETTER NOT CHANGE
-options.set("learner.amie.raw.ofmt", "anyburl") # BETTER NOT CHANGE
-# these are examples of some other changes, which are fine 
 options.set("learner.mode", "amie")
-options.set("learner.amie.raw.maxad", 2)
+options.set("learner.amie.raw.maxad", 3)
+options.set("learner.amie.raw.minc", 0.001)
+options.set("learner.amie.raw.minpca", 0.001)
+options.set("learner.amie.raw.minhc", 0.001)
+options.set("learner.amie.raw.mins", 10)
 
 # AnyBURL
 # options.set("learner.mode", "anyburl")

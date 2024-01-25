@@ -213,10 +213,15 @@ learner:
   amie:
     # any raw option supported by Amie can be set under raw
     raw:
+      # for PyClause support, don't modify "bias"
+      # and don't modify "oftm"
+      bias: amie.mining.assistant.pyclause.AnyBurlMiningAssistant
+      ofmt: anyburl
       mins: 10
       maxad: 3 # number of atoms = 1 head atom + body atoms
       minhc: 0.1
       minpca: 0.1
+      
 
 
 ### An experimental rule miner that efficiently mines rules simultaneously
