@@ -6,10 +6,6 @@ from subprocess import CalledProcessError, Popen, PIPE
 from clause.util.utils import get_ab_dir, join_u
 
 
-
-
-
-
 def learn(train_path, time, options, path_rules_output):
 
     # keep it simple: anyburl log + config is written to the folder 

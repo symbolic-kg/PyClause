@@ -9,7 +9,6 @@ from os import path
 from subprocess import CalledProcessError, Popen, PIPE
 
 
-
 def learn(train_path, options, path_rules_output):
 
     learn_dir = os.path.dirname(path_rules_output)
