@@ -10,6 +10,7 @@ import numpy as np
 
 ## ** Preparation **
 
+# ensure that the data is downloaded
 data = f"{get_base_dir()}/data/yago3-10/train.txt"
 rules = f"{get_base_dir()}/data/yago3-10/anyburl-rules-small.txt"
 opts = Options()
