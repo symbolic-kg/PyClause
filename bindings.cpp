@@ -160,7 +160,7 @@ PYBIND11_MODULE(c_clause, m) {
             py::arg("data"), py::arg("filter") = TripleSet(), py::arg("target") = TripleSet()
         )
         .def("get_entity_index", &Loader::getNodeToIdx)
-        .def("write_rules", &Loader::writeRules, py::arg("path"), R"pbdoc(Writes rules after loading. Can be used with filtering rules while loading to store a rule subset)pbdoc")
+        .def("write_rules", &Loader::writeRules, py::arg("path"), R"pbdoc(Writes rules after loading. Can be used to store subsets, e.g., load rules ignoring B-rules and then write.)pbdoc")
         .def("get_relation_index", &Loader::getRelationToIdx)
         .def("replace_ent_strings", &Loader::subsEntityStrings, py::arg("new_tokens"))
         .def("replace_rel_strings", &Loader::subsRelationStrings, py::arg("new_tokens"))
