@@ -26,11 +26,12 @@ options.set("learner.amie.raw.mins", 10)
 # options.set("learner.anyburl.raw.MAX_LENGTH_CYCLIC", 5)
 
 
-
 learner = Learner(options=options.get("learner"))
 learner.learn_rules(path_data=path_train, path_output=path_rules_output)
 
 # directly load the rules into c_clause
+options.set("loader.c_max_length", 4)
+
 loader = Loader(options.get("loader"))
 loader.load_data(data=path_train)
 loader.load_rules(rules=path_rules_output)
