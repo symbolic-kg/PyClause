@@ -222,10 +222,10 @@ learner:
 ### An experimental rule miner that efficiently mines rules simultaneously
 ### it is very efficient for mining all U_c rules; less efficient for cyclical rules (B-rules)
 torm_learner:
-  # choose betweeen "hybrid" / "torm"
-  # 'hybrid' calculates rule confidences for cyclical rules (B-Rules)
-  #  with AnyBURL confidence sampling; when selected hybrid
-  #  torm options and learner.anyburl options apply; use anyburl.time for learning time of B-rules
+  #  choose betweeen "hybrid" / "torm"
+  # 'hybrid' calculates rule confidences for cyclical rules (B-Rules) with AnyBURL confidence sampling;
+  #  when selected hybrid then torm options and learner.anyburl options apply; use anyburl.time 
+  #  for the learning time of B-rules
   # 'torm' calculates rule confidences for B-rules with c_clause.RulesHandler materialization
   mode: "torm"  
   torm:
