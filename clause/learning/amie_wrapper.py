@@ -25,12 +25,14 @@ def learn(train_path, options, path_rules_output):
     for param in options:
         if param.startswith("raw."):
             token = param.split(".")
-            amie_params_options.append("-" + token[1] + " " + str(options[param]))
+            v = str(options[param])
+            if str(options[param]) == "*flag*": v = ""
+            amie_params_options.append("-" + token[1] + " " + v)
 
     amie_params.extend(amie_params_options)
     amie_params_string = " ".join(amie_params)
 
-    cmd_call = f"java -jar {get_amie_dir()} " + amie_params_string + " -const "
+    cmd_call = f"java -jar {get_amie_dir()} " + amie_params_string + " "
     print("-> amie call: " + cmd_call)
     with Popen(cmd_call, shell=True, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
         for line in p.stdout:

@@ -14,17 +14,19 @@ options = Options(f"{get_base_dir()}/config-my.yaml")
 # set "amie" or "anyburl" and define specifc arguments
 # AMIE
 options.set("learner.mode", "amie")
-options.set("learner.amie.raw.maxad", 3)
-options.set("learner.amie.raw.minc", 0.001)
-options.set("learner.amie.raw.minpca", 0.001)
-options.set("learner.amie.raw.minhc", 0.001)
-options.set("learner.amie.raw.mins", 10)
+# we are choosing a parameter setting here, which works well for the KBC scenario
+options.set("learner.amie.raw.maxad", 4)
+options.set("learner.amie.raw.minc", 0.0001)
+options.set("learner.amie.raw.minpca", 0.0001)
+options.set("learner.amie.raw.minhc", 0.0001)
+options.set("learner.amie.raw.mins", 2)
+options.set("learner.amie.raw.const", "*flag*")
+options.set("learner.amie.raw.maxadc", 2) 
 
 # AnyBURL
 # options.set("learner.mode", "anyburl")
 # options.set("learner.anyburl.time", 30)
 # options.set("learner.anyburl.raw.MAX_LENGTH_CYCLIC", 5)
-
 
 learner = Learner(options=options.get("learner"))
 learner.learn_rules(path_data=path_train, path_output=path_rules_output)
