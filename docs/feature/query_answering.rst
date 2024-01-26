@@ -6,7 +6,7 @@ The ``c_clause.QAHandler`` can be used to answer head queries of the form **(?, 
 output for each candidate entity, the rules that predicted the candidate.
 
 
-We assume in the following a loader was created and data and rules are loaded:
+We assume in the following a loader is created and data and rules are loaded:
 
 .. code-block:: python
 
@@ -68,7 +68,7 @@ at the second position (see above)
 
 3. **From Python as idx's**: **queries** can be a list or 2d np.array of idx's queries. This requires the user to know
 the relation and entity index. Either by retrieving them from the loader **after** data is loaded or by setting them **before** data is loaded. See also in the section :doc:`../data/loading_data`.
-The following example sets the entity and relation index before loading loading data and rules.
+The following example sets the entity and relation index before loading data and rules.
 
 
 .. code-block:: python
@@ -115,12 +115,12 @@ The following example sets the entity and relation index before loading loading 
 Retrieving Results
 ~~~~~~~~~~~~~~~~~~
 
-The handler caches the results, but they will be deleted and overwritten when the ``calculate_answers(..)`` is invoked again.
-The QAHandler can output the calculated candidates and their aggregated scores, depending on the selected aggregation function.
+The handler caches the results until the ``calculate_answers(..)`` function is invoked again.
+The QAHandler can output the calculated candidates and their aggregated scores, depending on the selected aggregation function with ``qa_handler.aggregation_function`` .
 It can also output, for each candidate answer, the rules that predicted the candidate.
 
 
-Independent of how data was loaded and how queries were defined (strs or idx's), outputs can be written to file or obtained in Python and they be formatted as idx's or strings.
+Independent of how data was loaded and how queries were defined (strs or idx's), outputs can be written to a file or obtained in Python and they can be formatted as idx's or strings.
 
 **Outputting candidates and scores**
 
