@@ -129,7 +129,7 @@ outputs can be written to a file or obtained in Python and they can be formatted
     # writes TAB-separated lines: head relation tail score
     scorer.write_scores(path="scores_str.tx", as_string=True)
     # write to file as idx; as above only as idx's
-    scorer.write_scorer(path="scores_idx.tx", as_string=False)
+    scorer.write_scores(path="scores_idx.tx", as_string=False)
 
 
 Triple Explanations
