@@ -20,7 +20,7 @@ options.set("learner.amie.raw.minc", 0.0001)
 options.set("learner.amie.raw.minpca", 0.0001)
 options.set("learner.amie.raw.minhc", 0.0001)
 options.set("learner.amie.raw.mins", 2)
-options.set("learner.amie.raw.const", "*flag*")
+options.set("learner.amie.raw.const", "*flag*") # special syntax for enforcing -const to be used as flag without value
 options.set("learner.amie.raw.maxadc", 2) 
 
 # AnyBURL
