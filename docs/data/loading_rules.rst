@@ -75,6 +75,11 @@ The identical line format of a rule file can also be directly passed from Python
    **Loading a new ruleset.** While data can only be loaded once, when you want to load a new ruleset you can invoke the ``load_rules()`` function again. The old ruleset is deleted.
 
 
+**Writing rules**
+
+The loader can also write back the ruleset to a file with  ``loader.write_rules(path)``. This can be used to store subsets of rules. For instance, the loader could only load one parcticular rule type (see below)
+and subsequently writing the rules will only contain this rule type in the output file. 
+
 
 Loading Options
 ~~~~~~~~~~~~~~~

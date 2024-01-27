@@ -67,8 +67,13 @@ There are three possibilities of how to specify the input datasets. From path (a
 .. note::
 
    **Using your own entity and relation index.** For the previous two methods the loader will create an internal index that maps entity and relation strings to integer indices.
-   If you have such a mapping already and later want to specify handler inputs as idx's according to this mapping you can force the loader to use your index. Simply execute before loading data **loader.set_entity_index(index)** and **loader.set_relation_index(index)**.
+   If you have such a mapping already and later want to specify handler inputs as idx's according to this mapping you can force the loader to use your index. Simply execute **before** loading data ``loader.set_entity_index(index)`` and ``loader.set_relation_index(index)``.
    The argument index is a list of strings that maps idx's to strings by **list[idx]=string**. The index does not need to be complete, one can still load data with new entities and relations.
+
+.. note::
+
+   **Retrieving the index from the loader.** When data is loaded with strings the loader can return the constructed entity and relation index if it is desired to continue with idx's.
+   Simply execute ``loader.get_entity_index()`` and ``loader.get_relation_index()`` for a mapping from strings to idx's.
 
 **3) From Python as indices**
 
