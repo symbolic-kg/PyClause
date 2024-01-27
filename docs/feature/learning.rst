@@ -6,7 +6,8 @@ PyClause provides nevertheless wrapper functionalities that allows to access the
 The learned rules can be readily loaded with the ``c_clause.Loader``. Both learners can be fully configured with their original parameters by the PyClause config files or from Python with the ``clause.Options`` class.
 
 
-PyClause ships the respective ``AnyBURL`` and ``Amie`` binaries. If you have any trouble with using the rule learning module, read under **Java requirements** below.
+PyClause ships the respective ``AnyBURL`` and ``Amie`` binaries (.jars). If you have any trouble with using the rule learning module, read under **Java requirements** below. Additionally, the
+binaries can also be used readily independent of PyClause, they are located in **clause/bin**.
 
 
 Rule Learning from Python
