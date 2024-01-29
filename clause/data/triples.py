@@ -1,4 +1,5 @@
 import sys
+import re
 
 
 
@@ -207,20 +208,30 @@ class TripleSet:
       rel_1to1 = min(sub_per_obj, obj_per_sum)
       return rel_1to1
    
-   def write_masked(self, outpath):
+   def write_masked(self, outpath, replace_non_alpha_numeric = True):
       f = None
       if self.encod == None: f = open(outpath, "w")
       else: f = open(outpath, "w", encoding=self.encod)
 
-      
+
       for triple in self.triples:
-         sub = self.index.id2to[triple.sub].replace(',','~')
-         rel = self.index.id2to[triple.rel].replace(',','~')
-         obj = self.index.id2to[triple.obj].replace(',','~')
-         sub = sub.replace("(", "[")
-         sub = sub.replace(")", "]")
-         obj = obj.replace("(", "[")
-         obj = obj.replace(")", "]")
+         sub = triple.index.id2to[triple.sub]
+         rel = triple.index.id2to[triple.rel]
+         obj = triple.index.id2to[triple.obj]
+         if replace_non_alpha_numeric:
+            sub = re.sub('[^0-9a-zA-Z\-\_]+', '*', sub)
+            rel = re.sub('[^0-9a-zA-Z\-\_]+', '*', rel)
+            obj = re.sub('[^0-9a-zA-Z\-\_]+', '*', obj)
+         else:
+            sub = sub.replace(',','~')
+            rel = rel.replace(',','~')
+            obj = obj.replace(',','~')
+
+            sub = sub.replace("(", "[")
+            sub = sub.replace(")", "]")
+            obj = obj.replace("(", "[")
+            obj = obj.replace(")", "]")
+
          ts = "e" + sub + "\tr" + rel + "\te" + obj
          f.write(ts + "\n")
       f.close()
