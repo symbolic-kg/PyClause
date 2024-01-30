@@ -35,6 +35,7 @@ public:
     void loadRules(std::vector<std::string> ruleStrings, std::vector<std::pair<int,int>> ruleStats);
 
     void writeRules(std::string path);
+    std::vector<std::string> getRuleLines();
     
     std::unordered_map<std::string, int>& getNodeToIdx();
 	std::unordered_map<std::string, int>& getRelationToIdx();

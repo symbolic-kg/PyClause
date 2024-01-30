@@ -82,6 +82,25 @@ void Loader::writeRules(std::string path){
     std::cout<<"Written rules to:  " + path<<std::endl;
 }
 
+std::vector<std::string> Loader::getRuleLines(){
+    if (!loadedRules){
+        throw std::runtime_error("You have to load rules first before you can write them.");
+    }
+
+    std::vector<std::unique_ptr<Rule>>& loadedRules = this->rules->getRules();
+    std::vector<std::string> ret;
+    for (int i=0; i<loadedRules.size(); i++){
+        std::array<int, 2> stats = loadedRules[i]->getStats();
+        int numPreds = stats[0];
+        int numTrue = stats[1];
+        double conf = (double) numTrue / (double) numPreds;
+        std::string ruleLine = "";
+        ruleLine +=  std::to_string(numPreds) + "\t" + std::to_string(numTrue) + "\t" +
+                     std::to_string(conf)     + "\t" + loadedRules[i]->computeRuleString(index.get());
+        ret.push_back(ruleLine);
+    }
+}
+
 
 std::unordered_map<std::string, int>& Loader::getNodeToIdx(){
     return index->getNodeToIdx();
