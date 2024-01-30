@@ -1,12 +1,9 @@
-import sys
+
 import os
-
-import multiprocessing
-
-from clause.util.utils import get_amie_dir, get_base_dir, join_u
-
 from os import path
-from subprocess import CalledProcessError, Popen, PIPE
+from subprocess import CalledProcessError, Popen, PIPE, STDOUT
+
+from clause.util.utils import get_amie_dir
 
 
 def learn(train_path, options, path_rules_output):
@@ -34,11 +31,13 @@ def learn(train_path, options, path_rules_output):
 
     cmd_call = f"java -jar {get_amie_dir()} " + amie_params_string + " "
     print("-> amie call: " + cmd_call)
-    with Popen(cmd_call, shell=True, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
+    with Popen(cmd_call, shell=True, stdout=PIPE, stderr=STDOUT, bufsize=1, universal_newlines=True) as p:
         for line in p.stdout:
             print("-> amie call: " + line, end='') # process line here
 
     if p.returncode != 0:
+        print("Amie exited with error, see error msg above.")
+        exit(0)
         raise CalledProcessError(p.returncode, p.args)
     
     return path_rules_output

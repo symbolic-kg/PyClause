@@ -1,7 +1,7 @@
 
 import os
 from os import path
-from subprocess import CalledProcessError, Popen, PIPE
+from subprocess import CalledProcessError, Popen, PIPE, STDOUT
 
 from clause.util.utils import get_ab_dir, join_u
 
@@ -36,11 +36,12 @@ def learn(train_path, time, options, path_rules_output):
     f.close()
 
 
-    with Popen(f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Learn {conf_path}", shell=True, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
+    with Popen(f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Learn {conf_path}", shell=True, stdout=PIPE, stderr=STDOUT, bufsize=1, universal_newlines=True) as p:
         for line in p.stdout:
             print("-> anyburl call: " + line, end='') # process line here
 
-    if p.returncode != 1:
-        raise CalledProcessError(p.returncode, p.args)
+    if p.returncode != 0:
+        print("AnyBURL exited with error, see error msg above.")
+        exit(0)
     
     return path_rules_output + "-" + str(time)
