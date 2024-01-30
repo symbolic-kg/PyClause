@@ -38,6 +38,4 @@ def learn(train_path, options, path_rules_output):
     if p.returncode != 0:
         print("Amie exited with error, see error msg above.")
         exit(0)
-        raise CalledProcessError(p.returncode, p.args)
-    
     return path_rules_output

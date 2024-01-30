@@ -40,7 +40,7 @@ def learn(train_path, time, options, path_rules_output):
         for line in p.stdout:
             print("-> anyburl call: " + line, end='') # process line here
 
-    if p.returncode != 0:
+    if p.returncode != 1:
         print("AnyBURL exited with error, see error msg above.")
         exit(0)
     
