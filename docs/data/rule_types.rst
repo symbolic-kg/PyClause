@@ -33,7 +33,7 @@ Given the ordering,
 
 the following holds for the body atoms:
 
-- The atom at position **i=0** contains **variables[0]** and either **X** or **Y**.
+- The atom at position **i=0** contains **variables[0]** and **X** or **Y**.
 - Intermediate atoms, where **0<i<length-1** (**length** being the number of **body atoms**), include **variables[i-1]** and **variables[i]**.
 - The final atom, at position **i=length-1**, involves **variables[i-1]** and an entity string or **Y**.
 
