@@ -99,6 +99,7 @@ std::vector<std::string> Loader::getRuleLines(){
                      std::to_string(conf)     + "\t" + loadedRules[i]->computeRuleString(index.get());
         ret.push_back(ruleLine);
     }
+    return ret;
 }
 
 
