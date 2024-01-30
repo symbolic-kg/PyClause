@@ -78,7 +78,7 @@ The head together with the body form a cycle. Any length supported. Examples:
 
 **U_c Rules**
 
-One entity constant in the head and one in the body (either for **X** or **Y**). Note that **Y** is contained in the first atom if **X** is substituted. It is allowed that **cc** and **dd** are the same entity. Any length supported. Examples:
+One entity constant in the head and one in the body (either for **X** or **Y**). Note that **Y** *must* be contained in the first atom if **X** is substituted. It is allowed that **cc** and **dd** are the same entity. Any length supported. Examples:
 
 .. code-block:: bash
 
