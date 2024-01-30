@@ -161,6 +161,7 @@ PYBIND11_MODULE(c_clause, m) {
         )
         .def("get_entity_index", &Loader::getNodeToIdx)
         .def("write_rules", &Loader::writeRules, py::arg("path"), R"pbdoc(Writes rules after loading. Can be used to store subsets, e.g., load rules ignoring B-rules and then write.)pbdoc")
+        .def("get_rules", &Loader::getRuleLines, R"pbdoc(Returns rules after loading. Returns a list of strings: 'num_preds\t\support\tconf\trulestring'.)pbdoc")
         .def("get_relation_index", &Loader::getRelationToIdx)
         .def("replace_ent_strings", &Loader::subsEntityStrings, py::arg("new_tokens"))
         .def("replace_rel_strings", &Loader::subsRelationStrings, py::arg("new_tokens"))
