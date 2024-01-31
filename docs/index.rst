@@ -66,6 +66,8 @@ Possible workflows with PyClause allow to:
    feature/ranking_generation
    feature/rule_materialization
    feature/rule_confidence
+   feature/constraints
+   
 
 .. toctree::
    :maxdepth: 2

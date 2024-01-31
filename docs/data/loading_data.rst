@@ -73,7 +73,7 @@ There are three possibilities of how to specify the input datasets. From path (a
 .. note::
 
    **Retrieving the index from the loader.** When data is loaded with strings the loader can return the constructed entity and relation index if it is desired to continue with idx's.
-   Simply execute ``loader.get_entity_index()`` and ``loader.get_relation_index()`` for a mapping from strings to idx's.
+   Simply execute ``loader.get_entity_index()`` and ``loader.get_relation_index()`` for obtaining a mapping from strings to idx's.
 
 **3) From Python as indices**
 

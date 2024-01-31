@@ -1,5 +1,6 @@
 
 import os
+import sys
 from os import path
 from subprocess import CalledProcessError, Popen, PIPE, STDOUT
 
@@ -37,5 +38,5 @@ def learn(train_path, options, path_rules_output):
 
     if p.returncode != 0:
         print("Amie exited with error, see error msg above.")
-        exit(0)
+        sys.exit(0)
     return path_rules_output

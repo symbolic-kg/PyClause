@@ -2,6 +2,7 @@
 import os
 from os import path
 from subprocess import CalledProcessError, Popen, PIPE, STDOUT
+import sys
 
 from clause.util.utils import get_ab_dir, join_u
 
@@ -42,6 +43,6 @@ def learn(train_path, time, options, path_rules_output):
 
     if p.returncode != 1:
         print("AnyBURL exited with error, see error msg above.")
-        exit(0)
+        sys.exit(0)
     
     return path_rules_output + "-" + str(time)

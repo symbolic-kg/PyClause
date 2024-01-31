@@ -210,6 +210,8 @@ learner:
       THRESHOLD_CORRECT_PREDICTIONS: 2
       # dont learn rules with confidence smaller 0.0001
       THRESHOLD_CONFIDENCE: 0.0001
+      # for learning rules with only particular relations in the head
+      # use SINGLE_RELATIONS: rel1,rel2
   amie:
     # any raw option supported by Amie can be set under raw
     raw:
