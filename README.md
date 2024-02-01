@@ -2,7 +2,16 @@
 # <img src="https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png" width="171" height="57" style="margin-right: 10px;" alt="PyClause">
 
 
-PyClause is a library for easy and efficient usage and learning of symbolic rules for knowledge graphs.
+PyClause is a library for easy and efficient usage and learning of symbolic knowledge graph rules of the following form.
+
+```bash
+
+citizienOf(X,Y) <= bornIn(X,A), locatedIn(A,Y)
+speaks(X,english) <= lives(X,london)
+
+```
+
+
 
 ## Documentation
 Documentation of library and features can be found [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
