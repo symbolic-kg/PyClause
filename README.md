@@ -6,7 +6,7 @@ PyClause is a library for easy and efficient usage and learning of symbolic know
 
 ```bash
 
-citizienOf(X,Y) <= bornIn(X,A), locatedIn(A,Y)
+citizenOf(X,Y) <= bornIn(X,A), locatedIn(A,Y)
 speaks(X,english) <= lives(X,london)
 
 ```
