@@ -32,6 +32,7 @@ public:
     // writes to e.g. this->headQueryResults[rel][head].aggrCand
     void makeRanking(TripleStorage& target, TripleStorage& train, RuleStorage& rules, TripleStorage& addFilter);
     void writeRanking(TripleStorage& target, std::string path);
+    void writeRules(TripleStorage& target, std::string path, std::string direction, bool strings);
 
     std::unordered_map<int,std::unordered_map<int, NodeToPredRules>>& getHeadQcandsRules();
     std::unordered_map<int,std::unordered_map<int, CandidateConfs>>&  getHeadQcandsConfs();

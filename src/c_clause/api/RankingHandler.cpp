@@ -58,6 +58,10 @@ void RankingHandler::writeRanking(std::string writePath, std::shared_ptr<Loader>
 
 }
 
+void RankingHandler::writeRules(std::string writePath, std::shared_ptr<Loader> dHandler, std::string direction, bool strings){
+    ranker.writeRules(dHandler->getTarget(), writePath, direction, strings);
+}
+
 
 std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> RankingHandler::getRanking(std::string headOrTail){
     if (headOrTail=="head"){
