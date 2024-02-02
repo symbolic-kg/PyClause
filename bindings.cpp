@@ -27,6 +27,7 @@ PYBIND11_MODULE(c_clause, m) {
         .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
         .def("calculate_ranking", &RankingHandler::calculateRanking, py::arg("loader"))
         .def("write_ranking", &RankingHandler::writeRanking, py::arg("path"), py::arg("loader"))
+        .def("write_rules", &RankingHandler::writeRules, py::arg("path"), py::arg("loader"), py::arg("direction") = "tail", py::arg("as_string") = true)
         .def("set_options", &RankingHandler::setOptionsFrontend, py::arg("options"))
         .def(
             "get_ranking",

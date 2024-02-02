@@ -402,6 +402,63 @@ void ApplicationHandler::writeRanking(TripleStorage& target, std::string filepat
     std::cout<<"Ranking file written to:  " + filepath <<std::endl; 
 }
 
+// query results must have been calculated before and aggregated
+void ApplicationHandler::writeRules(TripleStorage& target, std::string filepath, std::string direction, bool strings){
+    
+    if ((this->headQcandsRules.size() == 0 && this->tailQcandsRules.size() == 0) || !saveCandidateRules){
+        throw std::runtime_error(
+            "Please calculate answers using calculate_ranking() and set in the options ranking_handler.collect_rules to true first."
+        );
+    }
+
+    Index* index = target.getIndex();
+    std::ofstream file(filepath);
+    if (!file.is_open()) {
+        throw  std::runtime_error("Failed to create file. Please check if the paths are correct: " + filepath );
+    }
+
+    auto& data = (direction == "head") ? this->headQcandsRules : this->tailQcandsRules;
+
+    for (auto& relQueries: data){
+        int relation = relQueries.first;
+        std::string relationStr = strings ? "\"" + index->getStringOfRelId(relation) + "\"" : std::to_string(relation);
+        for (auto& srcQueries: relQueries.second){
+            int src = srcQueries.first;
+            std::string srcStr = strings ? "\"" + index->getStringOfNodeId(src) + "\"" : std::to_string(src);
+        
+            // Collect answers and rules
+            std::string answers = "";
+            std::string rules = "";
+
+            auto itr = srcQueries.second.begin();
+            for(; itr != srcQueries.second.end(); itr++){
+                int to = itr->first;
+                std::string toStr = strings ? "\"" + index->getStringOfNodeId(to) + "\"" : std::to_string(to);
+                answers += toStr;
+                if (std::next(itr) != srcQueries.second.end()) {
+                    answers += ",";
+                }
+
+                std::string ruleset = "[";
+                for(int ridx = 0; ridx < itr->second.size(); ridx++){
+                    ruleset += strings ? "\"" + itr->second[ridx]->computeRuleString(index) + "\"" : std::to_string(itr->second[ridx]->getID());
+                    if (ridx < itr->second.size() - 1){
+                        ruleset += ",";
+                    }
+                }
+                ruleset += "]";
+                rules += ruleset;
+                if (std::next(itr) != srcQueries.second.end()) {
+                    rules += ",";
+                }
+            }
+            file << "{\"query\": [" << srcStr << "," << relationStr << "], \"answers\": [" << answers << "], \"rules\": [" << rules << "]}" << std::endl;
+        }
+    }
+    file.close();
+    std::cout<<"Rules file written to:  " + filepath <<std::endl; 
+}
+
 void ApplicationHandler::scoreMaxPlus(
     const NodeToPredRules& candToRules, std::vector<std::pair<int, double>>& aggrCand, TripleStorage& train
      ){

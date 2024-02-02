@@ -22,6 +22,7 @@ public:
     void setCollectRules(bool ind);
     // exposed functions
     void writeRanking(std::string writePath, std::shared_ptr<Loader> dHandler);
+    void writeRules(std::string writePath, std::shared_ptr<Loader> dHandler, std::string direction, bool strings);
     void calculateRanking(std::shared_ptr<Loader> dHandler);
     std::unordered_map<int,std::unordered_map<int,std::vector<std::pair<int, double>>>> getRanking(std::string headOrTail);
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::pair<std::string, double>>>> getStrRanking(std::string headOrTail);
