@@ -68,7 +68,7 @@ void PredictionHandler::scoreTriples(std::vector<std::array<std::string, 3>> tri
             idxTriples.at(i) = {head, rel , tail};
        } catch(const std::exception& e){
             throw std::runtime_error(
-                "An entity or relation in a triple is not known, i.e., not loaded with the data"
+                "An entity or relation in a triple is not known, i.e., not loaded with the data. "
                 "You can only calculate scores for triples where all elements are known: "
                 + triples[i][0] + " " + triples[i][1] +  " " + triples[i][2]
             );
