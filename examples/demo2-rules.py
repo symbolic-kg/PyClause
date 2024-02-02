@@ -5,8 +5,8 @@ sys.path.append(os.getcwd())
 from clause.data.triples import TripleSet
 from clause.util.utils import get_base_dir
 
-from clause.rules import RuleSet
-from clause.ruleparser import RuleReader
+from clause.rule.rules import RuleSet
+from clause.rule.ruleparser import RuleReader
 
 
 if __name__ == '__main__':

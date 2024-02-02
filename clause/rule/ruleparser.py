@@ -147,17 +147,3 @@ class RuleReader:
                         rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
                     return rule
             return None
-
-
-
-if __name__ == '__main__':
-    triples = TripleSet("E:/code/eclipse-workspace/AnyBURL/data/wn18rr/train.txt")
-    rules = RuleSet(triples.index)
-    rr = RuleReader(rules)
-
-    rr.read_file("data/wnrr/anyburl-rules-c5-3600")
-
-    for rule in rules.rules:
-        # print(str(rule))
-        if type(rule) is RuleXXud or type(rule) is RuleXXuc:
-            print(str(rule))

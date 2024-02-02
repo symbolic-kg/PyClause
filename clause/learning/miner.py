@@ -1,7 +1,7 @@
 
 from clause.data.triples import TripleSet, TripleIndex
-from clause.rules import RuleZ, RuleXXuc, RuleXXud, RuleUc, RuleUd, RuleB, RuleSet
-from clause.ruleparser import RuleReader
+from clause.rule.rules import RuleZ, RuleXXuc, RuleXXud, RuleUc, RuleUd, RuleB, RuleSet
+from clause.rule.ruleparser import RuleReader
 from clause.learning import anyburl_wrapper, amie_wrapper
 import c_clause
 
