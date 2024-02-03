@@ -30,7 +30,7 @@ class Options():
     def set(self, param, value):
         """Overwrites an entry in the options.
 
-        They key is specified in e.g. the format 'torm.rules.b'.
+        They key is specified in e.g. the format 'learner.mode'.
         A value can be anything (that has a string representation). It is not possible to add new keys
         that do not exist in the default options. An exception is the parent key "raw". Under this
         key, new key, val pairs can be set. For instance, options.set("learning.amie.raw.notexistingkey", val).
@@ -104,7 +104,7 @@ class Options():
         """Returns a flat dictionary or a value for a given key.
             Args:
             key: The key for which to retrieve the value.
-            as_string (bool): If True, returns the value as a string (needed for backend options);
+            as_string (bool): If True, returns the value as a string;
             otherwise, the type is preserved.
         """
         if as_string:

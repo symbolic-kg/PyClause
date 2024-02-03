@@ -29,10 +29,10 @@ class RuleTranslator():
 
     def translate_b_rules(self, relations, directions):
         """Translates B-rules in idx format to string format.
-            Args:
-            relations  (list of lists): head and body relations
-            directions (list of lists of bools): provides the direction within an atom.
-                        First element must be 1.
+
+            param: (list[list[int]]) relations: head and body relations
+            param: (list[list[bool]]) directions: provides the direction within an atom. First element must be 1.
+
         """
         
         if not len(relations)==len(directions):
@@ -63,12 +63,12 @@ class RuleTranslator():
 
     def translate_c_rules(self, relations, directions, constants, leftC):
         """Translates Uc-rules in idx format to string format.
-            Args:
-            relations:  (list of lists) head and body relations
-            directions: (list of lists of bools) provides the direction within an atom.
-                        First element must be 1.
-            constants: (list of lists) each list contains 2 entity idx's the first el corresponds to head constant, second to body constant
-            leftC: (list of bool) denotes if the left (X) or right (Y) variable of the head is grounded
+
+            :param (list[list[int]]) relations: head and body relations
+            :param (list[list[bool]]) directions: provides the direction within an atom. First element must be 1.
+            :param (list[list[int, int]]) constants: each list contains 2 entity idx's the first el corresponds to head constant, second to body constant
+            :param (list[bool]) leftC: denotes if the left (X) or right (Y) variable of the head is grounded
+
         """
         if not len(relations)==len(directions)==len(leftC)==len(constants):
             raise Exception("All inputs needs to have same length.")
@@ -107,12 +107,12 @@ class RuleTranslator():
 
     def translate_d_rules(self, relations, directions, constants, leftC):
         """Translates Ud-rules from idx format to string format.
-            Args:
-            relations:  (list of lists) head and body relations
-            directions: (list of lists of bools) provides the direction within an atom.
-                        First element must be 1.
-            constants: (list of integer) head constants
-            leftC: (list of bool) denotes if the left (X) or right (Y) variable of the head is grounded
+
+            :param (list[list[int]]) relations: head and body relations
+            :param (list[list[bool]]) directions: provides the direction within an atom. First element must be 1.
+            :param (list[int]) constants: head constants
+            :param (list[bool]) leftC: denotes if the left (X) or right (Y) variable of the head is grounded
+
         """
         if not len(relations)==len(directions)==len(leftC)==len(constants):
             raise Exception("All inputs needs to have same length.")
@@ -147,10 +147,11 @@ class RuleTranslator():
 
     def translate_z_rules(self, relations, constants, leftC):
         """Translates zero-rules from idx format to string format.
-            Args:
-            relations  (list of ints): head relations
-            constants (list of ints): head constants
-            leftC: (list of bool) denotes if the left (X) or right (Y) variable of the head is grounded
+
+            :param (list[int]) relations: head relations
+            :param (list[int]) constants: head constants
+            :param  (list[bool]) leftC: denotes if the left (X) or right (Y) variable of the head is grounded
+
         """
 
         if not len(relations)==len(leftC)==len(constants):
@@ -173,9 +174,10 @@ class RuleTranslator():
 
     def translate_u_xxd_rules(self, relations, directions):
         """Translates u_xxd rules from idx format to string format.
-            Args:
-            relations (list of lists with 2 integers): head and body relations
-            directions (list of lists with 2 bools): first bool must be true, second is body atom direction
+
+            :param (list[list[int,int]]) relations: head and body relations
+            :param (list[list[bool,bool]]) directions: first bool must be true, second is body atom direction
+
         """
 
         if not len(relations)==len(directions):
@@ -203,10 +205,11 @@ class RuleTranslator():
 
     def translate_u_xxc_rules(self, relations, directions, constants):
         """Translates u_xxc rules from idx format to string format.
-            Args:
-            relations (list of lists with 2 integers): head and body relations
-            directions (list of lists with 2 bools): first bool must be true, second is body atom direction
-            constants (list of ints): the body constants
+
+            :param (list[list[int,int]]) relations: head and body relations
+            :param (list[list[bool, bool]]) directions: first bool must be true, second is body atom direction
+            :param (list[int]) constants: the body constants
+
         """
 
         if not len(relations)==len(directions):
@@ -231,14 +234,6 @@ class RuleTranslator():
                     self._make_atom(head_rel, self.vars[0], self.vars[0]) + self.h_b_sep + self._make_atom(body_rel, const, self.vars[0])
                 )
         return rule_strings
-
-            
-
-
-
-
-
-
 
 
 # remove from a list the entities wigth index 0, 3, 6, ...

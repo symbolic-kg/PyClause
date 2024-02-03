@@ -11,6 +11,7 @@ Load Rules into Loader
 
 There exist three possibilities of loading rules into the the loader with the ``Loader.load_rules(...)`` function. All of them require rules to be represented in a human understandable string format.
 Additionally, rules need to be assigned with their support and number of body groundings (num_predictions) and in two cases also with their confidence.
+If the rules are only given in integer idx form, PyClause provides a Python utility to translate them into their string format. 
 
 **1) Loading from list of rule strings and list of stats**
 
@@ -75,10 +76,39 @@ The identical line format of a rule file can also be directly passed from Python
    **Loading a new ruleset.** While data can only be loaded once, when you want to load a new ruleset you can invoke the ``load_rules()`` function again. The old ruleset is deleted.
 
 
-**Writing rules**
+**Rules in idx representation**
+
+
+Translating rules from idx's to string format requires an entity and relation index that maps integers to strings.
+See an example below for translating B-rules. An example for all rule types is given `here <https://github.com/symbolic-kg/PyClause/blob/master/examples/demo-idx-rules.py>`_ .
+
+.. code-block:: python
+
+   from clause import RuleTranslator
+
+   entity_index = ["ent_1", "ent_2", "ent_3"]
+   relation_index = ["rel_1", "rel_2", "rel_3", "rel_4", "rel_5", "rel_6"]
+
+   translator = RuleTranslator(idx_to_ent=entity_index, idx_to_rel=relation_index)
+
+   # specify 2 cyclical (b-rules) rules
+   b_rels = [[0,1,2,3], [3,2]]
+   # first direction element is always True
+   b_dirs = [[True, False, False, False], [True, False]]
+
+   rules = translator.translate_b_rules(relations=b_rels, directions=b_dirs)
+   print(rules)
+   # out:
+   # ['rel_1(X,Y) <= rel_2(A,X), rel_3(B,A), rel_4(Y,B)', 'rel_4(X,Y) <= rel_3(Y,X)']
+   
+
+
+
+
+**Writing/Obtaining rules**
 
 The loader can also write back the ruleset to a file with  ``loader.write_rules(path)``. This can be used to store subsets of rules. For instance, the loader could only load one parcticular rule type (see below)
-and subsequently writing the rules will only contain this rule type in the output file. 
+and subsequently writing the rules will only contain this rule type in the output file. Likewise ``loader.get_rules()`` returns the loaded rulset, it can be processed and loaded back with the loader.
 
 
 Loading Options

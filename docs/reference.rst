@@ -27,3 +27,15 @@ Rule Learning
 .. autoclass:: clause.Learner
    :members:
    :undoc-members:
+
+
+clause Utilities
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: clause.RuleTranslator
+   :members:
+   :undoc-members:
+
+.. autoclass:: clause.Options
+   :members:
+   :undoc-members:
