@@ -82,10 +82,19 @@ void RuleStorage::readAnyTimeFromVecs(std::vector<std::string>& ruleStrings, std
 bool RuleStorage::addAnyTimeRuleLine(std::string ruleLine, int id , bool exact){
     // expects a line: predicted\t cpredicted\tconf\trulestring
 	std::vector<std::string> splitline = util::split(ruleLine, '\t');
-    std::string ruleString = splitline[3];
+
+    if (splitline.size()==1){
+        int numPreds = 1;
+        int numTrue = 1;
+        std::cout<<"Warning: could not find num preds and support for input line " + splitline[0]<<std::endl;
+        std::cout<<" Setting both to 1. Expect random ordering for rules and predictions, confidence scores will all be 1."<<std::endl;
+        return addAnyTimeRuleWithStats(splitline[0], id, numPreds, numTrue, exact);
+    }
+
     if (splitline.size()!=4){
         throw std::runtime_error("Could not parse this rule because of format: " + ruleLine);
     }
+    std::string ruleString = splitline[3];
     int numPreds = std::stoi(splitline[0]);
     int numTrue = std::stoi(splitline[1]);
 

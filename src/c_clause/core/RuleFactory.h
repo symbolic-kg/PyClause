@@ -55,53 +55,53 @@ private:
     // ***Rule options***
     bool createRuleZ = true;
     double ZconfWeight = 1.0;
-    int ZnumUnseen = 5;
+    int ZnumUnseen = 0;
 
 
     bool createRuleB = true;
     int BbranchingFactor = -1;
-    int BnumUnseen = 5;
+    int BnumUnseen = 0;
 
     bool createRuleC = true;
-    int CnumUnseen = 5;
+    int CnumUnseen = 0;
 
     bool createRuleD = true;
     double DconfWeight = 1.0;
     int DbranchingFactor = -1;
-    int DnumUnseen = 5;
+    int DnumUnseen = 0;
 
 
     bool createRuleXXd = true;
-    int XXDnumUnseen = 5;
+    int XXDnumUnseen = 0;
 
     bool createRuleXXc = true;
-    int XXCnumUnseen = 5;
+    int XXCnumUnseen = 0;
 
-    int ZminCorrect = 2;
-    int BminCorrect = 2;
-    int CminCorrect = 2;
-    int DminCorrect = 2;
-    int XXDminCorrect = 2;
-    int XXCminCorrect = 2;
+    int ZminCorrect = 1;
+    int BminCorrect = 1;
+    int CminCorrect = 1;
+    int DminCorrect = 1;
+    int XXDminCorrect = 1;
+    int XXCminCorrect = 1;
 
-    int ZminPreds = 2;
-    int BminPreds = 2;
-    int CminPreds = 2;
-    int DminPreds = 2;
-    int XXDminPreds = 2;
-    int XXCminPreds = 2;
+    int ZminPreds = 1;
+    int BminPreds = 1;
+    int CminPreds = 1;
+    int DminPreds = 1;
+    int XXDminPreds = 1;
+    int XXCminPreds = 1;
 
     int BmaxLength = -1;
     int CmaxLength = -1;
     int DmaxLength = -1;
 
 
-    double ZminConf = 0.0001;
-    double BminConf = 0.0001;
-    double CminConf = 0.0001;
-    double DminConf = 0.0001;
-    double XXDminConf = 0.0001;
-    double XXCminConf = 0.0001;
+    double ZminConf = 0.00001;
+    double BminConf = 0.00001;
+    double CminConf = 0.00001;
+    double DminConf = 0.00001;
+    double XXDminConf = 0.00001;
+    double XXCminConf = 0.00001;
 };
 
 
