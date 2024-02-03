@@ -3,7 +3,6 @@ import sys
 import os
 import re
 
-
 from clause.rule.rules import Rule, RuleUc, RuleB, RuleUd, RuleXXuc, RuleXXud, RuleZ, RuleSet
 from clause.data.triples import TripleSet
 
