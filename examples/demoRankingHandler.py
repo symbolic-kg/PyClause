@@ -15,6 +15,7 @@ options = Options()
 options.set("ranking_handler.disc_at_least", 10)
 options.set("ranking_handler.aggregation_function", "maxplus")
 options.set("ranking_handler.num_top_rules", -1)
+options.set("ranking_handler.adapt_topk", False)
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()
