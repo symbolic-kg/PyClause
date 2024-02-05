@@ -95,7 +95,8 @@ loader:
   xxd_min_conf: 0.0001
 
 
-# calculates rankings based on the target set loaded into DataLoader
+# calculates rankings based on the "target" KG loaded into DataLoader
+# e.g. target argument from loader.load_data(data=.., filter=.., target=..)
 ranking_handler:
   # whether to cache the rules that predicted the query candidates,
   # can be retrieved with handler.get_rules(bool, string: "head" or "tail")
@@ -137,9 +138,19 @@ ranking_handler:
   filter_w_target: True
   # choose between "random" / "frequency"
   tie_handling: "frequency"
-  adapt_topk: False
   # -1 for using ALL available threads
   num_threads: -1 
+  # if True, checks how many true answers (num_true) in "target" exists for a query
+  # and sets new_top_k = topk + num_true
+  # this is helpful when calculating ranking on large target files to not loose
+  # true answers by topk; say you have topk=100 but you have 150 true anwers
+  # the rule application module does not filter with "target" during the application
+  # therefore, you would never be able to calculate 50 of the true answers
+  # of course, during the application it is not checked if an answer is true
+  # e.g. you might end up with 250 false answers
+  # same effect is achieved by setting topk globally to a higher value (but slower)
+  adapt_topk: True
+
 
 # calculates answer candidates and scores based on 
 # questions (h, r, ?) and (?, r, t)

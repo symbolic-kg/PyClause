@@ -1,10 +1,60 @@
 from clause.util.utils import get_ab_dir, get_base_dir, join_u
-from clause.config.options import Options
+from clause import Options
 import c_clause
 
 import os
 from os import path
 from subprocess import Popen, PIPE
+
+
+def test_adaptive_top_k():
+    from c_clause import Loader, RankingHandler
+    data = [
+        ["aaa", "sp", "EE"],
+        ["bbb", "sp", "EE"],
+        ["ccc", "sp", "EE"],
+        ["ddd", "sp", "EE"],
+        ["eee", "sp", "EE"],
+
+        ["aaa", "li", "lo"],
+        ["bbb", "li", "lo"],
+        ["ccc", "li", "we"],
+        ["ddd", "li", "we"],
+        ["eee", "li", "we"],
+    ]
+
+    rules = [
+        "sp(X,EE) <= li(X,lo)",
+        "sp(X,EE) <= li(X,we)"
+    ]
+
+    opts = Options()
+    opts.set("ranking_handler.topk", 2)
+    opts.set("ranking_handler.adapt_topk", False)
+    opts.set("ranking_handler.filter_w_data", False)
+    loader = Loader(options=opts.get("loader"))
+    ranker = RankingHandler(options=opts.get("ranking_handler"))
+
+    loader.load_data(data=data, filter=[], target=data)
+    loader.load_rules(rules=rules, stats=[[5,5], [2,2]])
+    ranker.calculate_ranking(loader=loader)
+    head_ranking = ranker.get_ranking(direction="head", as_string=True)
+
+    answers = dict(head_ranking["sp"]["EE"])
+    assert("ccc" not in answers)
+    assert("ddd" not in answers)
+    assert("eee" not in answers)
+
+    opts.set("ranking_handler.adapt_topk", True)
+    ranker.set_options(opts.get("ranking_handler"))
+    ranker.calculate_ranking(loader=loader)
+    head_ranking = ranker.get_ranking(direction="head", as_string=True)
+    answers = dict(head_ranking["sp"]["EE"])
+    assert("ccc" in answers)
+    assert("ddd" in answers)
+    assert("eee" in answers)
+
+    print("Test adaptive topk successful.")
 
 
 def test_rules_handler():
@@ -320,9 +370,9 @@ def test_237_all_ranking():
     hAt10 = str(stdout)[-18:-12]
     hA1 = str(stdout)[-36:-30]
 
-    expectMRR = "0.3317"
+    expectMRR = "0.3319"
     expecth1 =  "0.2466"
-    expecth10 = "0.5048"
+    expecth10 = "0.5053"
 
     check_all = all([mrr_result==expectMRR, hA1==expecth1, hAt10==expecth10])
     if (not check_all):
