@@ -168,7 +168,9 @@ If you want to output the predicting rules for every candidate you have to first
     qa.write_rules(path="tail-answers_idx.jsonl", as_string=False)
 
 Here **rules_str** and **rules_idx** are lists of lists where **rules_str[i][j][k]** returns the k'th rule (idx or str, sorted according to confidences) for the j'th candidate answer
-of the i'th query.
+of the i'th query. Note that the lengths of the candidate and rule lists are not identical.
+
+When the rule are returned with their idx, the mapping can be retrieved from the loader with ``loader.rule_index()``.
 
 The files are in **jsonl** format and can be read as described above.
 

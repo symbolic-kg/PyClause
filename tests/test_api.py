@@ -145,7 +145,7 @@ def test_rules_handler():
 
 
 def test_rule_loading():
-    from clause.ruleparser import RuleReader, RuleSet
+    from clause.rule.ruleparser import RuleReader, RuleSet
     from clause.data.triples import TripleSet
     print(get_ab_dir())
 
