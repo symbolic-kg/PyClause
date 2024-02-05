@@ -98,6 +98,16 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
         std::cout<<"Starting materialization of "<<numRules<< " rules."<<std::endl;
     }
 
+    std::vector<std::unique_ptr<Rule>> parsed_rules;
+    for (int i=0; i<numRules; i++){
+        std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(stringRules[i]);
+        rule->setTrackInMaterialize(collectStats);
+        if (!rule){
+            throw std::runtime_error("Error in parsing rule:" + stringRules[i]);
+        }
+        parsed_rules.push_back(std::move(rule));
+    }
+
     #pragma omp parallel num_threads(num_thr)
     {
         TripleStorage& data = dHandler->getData();
@@ -108,13 +118,8 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
             if (i>0 && verbose && i%outEvery==0){
                 std::cout<<"Materialized rule " << i << " from " << numRules << " ..."<<std::endl;
             }
-            std::unique_ptr<Rule> rule = ruleFactory->parseAnytimeRule(stringRules[i]);
-            rule->setTrackInMaterialize(collectStats);
-            if (!rule){
-                throw std::runtime_error("Error in parsing rule:" + stringRules[i]);
-            }
             std::unordered_set<Triple> outputs;
-            rule->materialize(data, outputs);
+            parsed_rules[i]->materialize(data, outputs);
             #pragma omp critical
             {   
                 if (collectPredictions){
@@ -123,7 +128,7 @@ void RulesHandler::calcRulesPredictions(std::vector<std::string>& stringRules, s
                 }
 
                 if (collectStats){
-                    stats.at(i) = rule->getStats(true);
+                    stats.at(i) = parsed_rules[i]->getStats(true);
                 }    
             } 
         }
