@@ -146,7 +146,7 @@ private:
     // then it allows potentially to calculate 15 true answers and 10 false answers
     // it also ensures that the number of candidates is correct
     // when filtering with target, what we always do for KBC
-    bool adapt_topk = true;
+    bool adapt_topk = false;
 
 
     //***triple scoring options***

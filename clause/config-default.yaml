@@ -137,6 +137,7 @@ ranking_handler:
   filter_w_target: True
   # choose between "random" / "frequency"
   tie_handling: "frequency"
+  adapt_topk: False
   # -1 for using ALL available threads
   num_threads: -1 
 

@@ -3,11 +3,11 @@ from c_clause import RankingHandler, Loader
 from clause.util.utils import get_base_dir
 from clause import Options
 
-train = f"{get_base_dir()}/data/wnrr/train.txt"
-filter_set = f"{get_base_dir()}/data/wnrr/valid.txt"
-target = f"{get_base_dir()}/data/wnrr/test.txt"
+train = f"{get_base_dir()}/data/fb15k-237/train.txt"
+filter_set = f"{get_base_dir()}/data/fb15k-237/valid.txt"
+target = f"{get_base_dir()}/data/fb15k-237/test.txt"
 
-rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
+rules = f"{get_base_dir()}/data/fb15k-237/anyburl-rules-c3-3600"
 
 ranking_file = f"{get_base_dir()}/local/ranking-file.txt"
 
@@ -35,6 +35,8 @@ serializeTime = time.time()
 print(f"all time: {serializeTime-start}")
 print(f"ranking time: {rankingtime-start}")
 print(f"serialize time: {serializeTime-rankingtime}")
+
+exit()
 
 
 # you can change the loader rules options and load a different rule set 

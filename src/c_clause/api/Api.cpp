@@ -31,6 +31,7 @@ void BackendHandler::setRankingOptions(std::map<std::string, std::string> option
         {"filter_w_target", [&ranker](std::string val) { ranker.setFilterWtarget(util::stringToBool(val)); }},
         {"tie_handling", [&ranker](std::string val) { ranker.setTieHandling(val); }},
         {"num_threads", [&ranker](std::string val) { ranker.setNumThr(std::stoi(val)); }},
+        {"adapt_topk", [&ranker](std::string val) { ranker.setAdaptTopK(util::stringToBool(val)); }},
 
     };
 
