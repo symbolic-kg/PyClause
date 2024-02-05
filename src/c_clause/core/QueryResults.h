@@ -37,6 +37,8 @@ public:
     void setNumTopRules(int num);
     void setPerformAggregation(bool ind);
 
+    void setAddTopK(int topk);
+
     
 
 

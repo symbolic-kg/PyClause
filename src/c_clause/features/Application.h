@@ -56,6 +56,8 @@ public:
     void setScoreNumTopRules(int num);
     void setScoreCollectGroundings(bool ind);
     bool getScoreCollectGroundings();
+    void setAdaptTopK(bool ind);
+
 
     //triple scoring
     void calculateTripleScores(std::vector<Triple> triples, TripleStorage& train, RuleStorage& rules);
@@ -135,6 +137,16 @@ private:
     bool verbose = true;
     // set to -1 for all possible threads
     int num_thr = omp_get_max_threads();
+
+    // based on the target set
+    // if true topk of query results will be set as
+    // topk = rank_topk + num_true_answers
+    // note there is of course no answer filtering based on correctness
+    // but say rank_topk=10 and there are 15 correct answers
+    // then it allows potentially to calculate 15 true answers and 10 false answers
+    // it also ensures that the number of candidates is correct
+    // when filtering with target, what we always do for KBC
+    bool adapt_topk = true;
 
 
     //***triple scoring options***

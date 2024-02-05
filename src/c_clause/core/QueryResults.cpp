@@ -161,3 +161,7 @@ void QueryResults::setNumTopRules(int num){
 void QueryResults::setPerformAggregation(bool ind){
     performAggregation = ind;
 }
+
+void QueryResults::setAddTopK(int topk){
+    addTopK = topk;
+}

@@ -158,6 +158,9 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 dirIsTail ? target.getTforHR(source, rel, begin, length) : target.getHforTR(source, rel, begin, length);
                 // query exists
                 if (length>0){
+                    if (adapt_topk){
+                        qResults.setAddTopK(rank_topk+length);
+                    }
                     ctr+=1;
                     if (verbose && ctr%chunk==0 && dirIsTail){
                         std::cout<<"Calculated "<< (ctr/chunk) * chunk <<" tail queries..."<<std::endl;
@@ -229,23 +232,6 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                                 writeResults[rel][source] = sortedCandScores;
                         }
                     }
-
-                    // left here for reference for the vanilla approach to calculate max-plus 
-                    // together with this->scoreMaxPlus()
-                    // #pragma omp critical
-                    // {  
-                    //     if (performAggregation){
-                    //             auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
-                    //             if (rank_aggrFunc=="maxplus"){
-                    //                 // tail/headQcandsConfs is filled here
-                    //                 scoreMaxPlus(qResults.getCandRules(), writeResults[rel][source], train);
-                    //             }
-                    //             else{
-                    //                 throw std::runtime_error("Aggregation function is not recognized in calculate ranking.");
-                    //             }
-                    //     }
-                    // }
-                    
                     qResults.clear();
                     filter.clear();
                 }
@@ -600,5 +586,8 @@ void ApplicationHandler::setNumThr(int num){
     }else{
         num_thr = num;
     }
-   
+}
+
+void ApplicationHandler::setAdaptTopK(bool ind){
+    adapt_topk = ind;
 }
