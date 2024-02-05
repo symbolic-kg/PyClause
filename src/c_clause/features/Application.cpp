@@ -140,7 +140,6 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
     int numNodes = train.getIndex()->getNodeSize();
     int numRel = train.getIndex()->getRelSize();
     // size is num triples not queries 
-
     int chunk = std::min(10000, std::max(1000, (target.getSize())/50));
 
     int ctr=0;
@@ -191,7 +190,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                         if (rank_numPreselect>0 && currSize>=rank_numPreselect){
                             break;
                         }
-                        // TODO possibly optimize
+                        // possibly can be optimized
                         // checking for discrimination after every rule had no noticeable overhead
                         if (currSize>=rank_topk){
                             if (rank_discAtLeast>0){
@@ -207,8 +206,6 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                             }
                         }
                     }
-
-
 
                     std::vector<std::pair<int, double>> sortedCandScores;
                     // tie handling, final processing, sorting
@@ -258,8 +255,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
 }
 
 void ApplicationHandler::sortAndProcessNoisy(std::vector<std::pair<int,double>>& candScoresToSort, QueryResults& qResults, TripleStorage& data){
-    //TODO add here noisy-or processing and tie handling
-
+    // noisyor scoring is already performed in QueryResults
 
    std::unordered_map<int, double>& candScores = qResults.getCandScores();
    candScoresToSort.assign(candScores.begin(), candScores.end()); 

@@ -98,7 +98,7 @@ loader:
 # calculates rankings based on the target set loaded into DataLoader
 ranking_handler:
   # whether to cache the rules that predicted the query candidates,
-  # can be retrieved with handler.get_rules(bool, string:headOrTailRanking)
+  # can be retrieved with handler.get_rules(bool, string: "head" or "tail")
   # turn off for efficiency.
   collect_rules: False
   # number of candidates to calculate
