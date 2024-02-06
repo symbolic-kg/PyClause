@@ -142,6 +142,22 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
     // size is num triples not queries 
     int chunk = std::min(10000, std::max(1000, (target.getSize())/50));
 
+
+    std::vector<std::tuple<int,int,int>> tasks;
+
+    for (int rel=0; rel<numRel; rel++){
+        for (int source=0; source<numNodes; source++){
+                int* begin;
+                int length;
+                dirIsTail ? target.getTforHR(source, rel, begin, length) : target.getHforTR(source, rel, begin, length);
+                if (length>0){
+                    tasks.emplace_back(rel, source, length);
+                }
+        }
+    }
+
+
+
     int ctr=0;
     #pragma omp parallel num_threads(num_thr)
     {
@@ -150,92 +166,90 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
         qResults.setAggrFunc(rank_aggrFunc);
         qResults.setNumTopRules(score_numTopRules);
         ManySet filter;
-        #pragma omp for collapse(2) schedule(dynamic)
-        for (int rel=0; rel<numRel; rel++){
-            for (int source=0; source<numNodes; source++){
-                int* begin;
-                int length;
-                dirIsTail ? target.getTforHR(source, rel, begin, length) : target.getHforTR(source, rel, begin, length);
-                // query exists
-                if (length>0){
-                    if (adapt_topk){
-                        qResults.setAddTopK(rank_topk+length);
-                    }
-                    ctr+=1;
-                    if (verbose && ctr%chunk==0 && dirIsTail){
-                        std::cout<<"Calculated "<< (ctr/chunk) * chunk <<" tail queries..."<<std::endl;
-                    }else if (verbose && ctr%chunk==0){
-                        std::cout<<"Calculated "<< (ctr/chunk) * chunk <<" head queries..."<<std::endl;
-                    }
-                    auto& relRules = rules.getRelRules(rel);
-                    // filtering for train and additionalFilter
-                    if (rank_filterWtrain){
-                        Nodes* trainFilter = nullptr;
-                        trainFilter = (!dirIsTail) ? train.getHforTR(source, rel) : train.getTforHR(source, rel);
-                        if (trainFilter){
-                            filter.addSet(trainFilter);
-                        }   
+        #pragma omp for schedule(dynamic)
+        for (int i=0; i<tasks.size(); i++){
+            int rel = std::get<0>(tasks[i]);
+            int source = std::get<1>(tasks[i]);
+            int length = std::get<2>(tasks[i]);
+
+
+               
+                
+            if (adapt_topk){
+                qResults.setAddTopK(rank_topk+length);
+            }
+            ctr+=1;
+            if (verbose && ctr%chunk==0 && dirIsTail){
+                std::cout<<"Calculated "<< (ctr/chunk) * chunk <<" tail queries..."<<std::endl;
+            }else if (verbose && ctr%chunk==0){
+                std::cout<<"Calculated "<< (ctr/chunk) * chunk <<" head queries..."<<std::endl;
+            }
+            auto& relRules = rules.getRelRules(rel);
+             // filtering for train and additionalFilter
+            if (rank_filterWtrain){
+                Nodes* trainFilter = nullptr;
+                trainFilter = (!dirIsTail) ? train.getHforTR(source, rel) : train.getTforHR(source, rel);
+                if (trainFilter){
+                    filter.addSet(trainFilter);
+                }   
                         
-                    }
-                    // always filter with additionalFilter (can be empty)
-                    Nodes* naddFilter = nullptr;
-                    naddFilter = (!dirIsTail) ? addFilter.getHforTR(source, rel) : addFilter.getTforHR(source, rel);
-                    if (naddFilter){
-                        filter.addSet(naddFilter);
-                    }
-                    // perform rule application
-                    int ctr = 0;
-                    int currSize = 0;
-                    for (Rule* rule : relRules){
-                        ctr += 1;
-                        (rule->*predictHeadOrTail)(source, train, qResults, filter);
-                        currSize = qResults.size();
-                        if (rank_numPreselect>0 && currSize>=rank_numPreselect){
+            }
+            // always filter with additionalFilter (can be empty)
+            Nodes* naddFilter = nullptr;
+            naddFilter = (!dirIsTail) ? addFilter.getHforTR(source, rel) : addFilter.getTforHR(source, rel);
+            if (naddFilter){
+                filter.addSet(naddFilter);
+            }
+            // perform rule application
+            int ctr = 0;
+            int currSize = 0;
+            for (Rule* rule : relRules){
+                ctr += 1;
+                (rule->*predictHeadOrTail)(source, train, qResults, filter);
+                currSize = qResults.size();
+                if (rank_numPreselect>0 && currSize>=rank_numPreselect){
+                    break;
+                }
+                // possibly can be optimized
+                // checking for discrimination after every rule had no noticeable overhead
+                if (currSize>=rank_topk){
+                    if (rank_discAtLeast>0){
+                         if (qResults.checkDiscrimination()){
                             break;
-                        }
-                        // possibly can be optimized
-                        // checking for discrimination after every rule had no noticeable overhead
-                        if (currSize>=rank_topk){
-                            if (rank_discAtLeast>0){
-                                if (qResults.checkDiscrimination()){
-                                    break;
-                                }
-                            }
-                            if (score_numTopRules>0){
-                                if (qResults.checkNumTopRules()){
-                                    break;
-                                }
-
-                            }
+                         }
+                    }
+                    if (score_numTopRules>0){
+                        if (qResults.checkNumTopRules()){
+                             break;
                         }
                     }
+                 }
+            }
 
-                    std::vector<std::pair<int, double>> sortedCandScores;
-                    // tie handling, final processing, sorting
-                    if (performAggregation){
-                        (this->*sortAndProcess)(sortedCandScores, qResults, train);
-                    }
+            std::vector<std::pair<int, double>> sortedCandScores;
+            // tie handling, final processing, sorting
+            if (performAggregation){
+                (this->*sortAndProcess)(sortedCandScores, qResults, train);
+            }
                     
 
-                    #pragma omp critical
-                    {   
-                        if (saveCandidateRules){
-                            // TODO when needed could prevent copy here by using shared pointer
-                            if (dirIsTail){
-                                tailQcandsRules[rel][source] = qResults.getCandRules();
-                            }else{
-                                headQcandsRules[rel][source] = qResults.getCandRules();
-                            }
-                        }
-                        if (performAggregation){
-                                auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
-                                writeResults[rel][source] = sortedCandScores;
-                        }
+            #pragma omp critical
+            {   
+                if (saveCandidateRules){
+                    // TODO when needed could prevent copy here by using shared pointer
+                    if (dirIsTail){
+                        tailQcandsRules[rel][source] = qResults.getCandRules();
+                    }else{
+                        headQcandsRules[rel][source] = qResults.getCandRules();
                     }
-                    qResults.clear();
-                    filter.clear();
+                }
+                if (performAggregation){
+                        auto& writeResults = (dirIsTail) ? tailQcandsConfs : headQcandsConfs;
+                        writeResults[rel][source] = sortedCandScores;
                 }
             }
+            qResults.clear();
+            filter.clear();
         } 
     } //pragma
 }
