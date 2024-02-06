@@ -22,6 +22,8 @@ public:
     // ruleLine is num_pred /t support /t conf /t ruleString
     bool addAnyTimeRuleLine(std::string ruleLine, int id, bool exact);
 
+    void readAnyTimeParFormat(std::string path, bool exact, int numThreads);
+
     bool addAnyTimeRuleWithStats(std::string ruleString, int id, int numPred, int numTrue, bool exact);
     std::vector<std::unique_ptr<Rule>>& getRules();
     std::set<Rule*, compareRule>& getRelRules(int relation);
@@ -30,7 +32,6 @@ public:
 
 private:
     // rules owns the rule objects
-    // TODO unclear atm if we need both rules and RelToRules, but it seems useful to access rules globally by index
     // RelToRules keeps the rules sorted due to the set, iterating over all the rules would
     // be faster with a vector, though
     // accessing rules by relation and index needs to be hacked also, let's see

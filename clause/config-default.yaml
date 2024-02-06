@@ -17,6 +17,7 @@
 
 ###  Loader loads rulesets and datasets
 ###  the options can be used to filter/ignore some rules
+###  and to modifiy some of the loaded rule behavior
 
 # 'r_num_unseen' option:
 # laplace smoothing applied to rule type 'r' for calculating confidence
@@ -28,7 +29,11 @@
 # 'r_min_confidence': as above; note: confidence here is without laplace smooting
 # 'r_max_length' option: as above; length refers to the number of body atoms
 loader:
-
+  # only has effect when rules are loaded from disk
+  # if -1 (all threads) or >1 then rules will be first loaded and subsequently
+  # parsed by multiple threads; set to 1 to turn off
+  num_threads: -1
+  ### Rule options
   ## B rules
   # parsable example: "h(X,Y) <= b1(A,X), b2(A,Y)"
   load_b_rules: True

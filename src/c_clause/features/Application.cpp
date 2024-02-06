@@ -155,9 +155,6 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 }
         }
     }
-
-
-
     int ctr=0;
     #pragma omp parallel num_threads(num_thr)
     {

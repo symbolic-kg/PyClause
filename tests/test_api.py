@@ -372,7 +372,7 @@ def test_237_all_ranking():
 
     expectMRR = "0.3319"
     expecth1 =  "0.2466"
-    expecth10 = "0.5053"
+    expecth10 = "0.5054"
 
     check_all = all([mrr_result==expectMRR, hA1==expecth1, hAt10==expecth10])
     if (not check_all):

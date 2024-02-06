@@ -57,6 +57,7 @@ public:
     std::shared_ptr<Index> getIndex();
     bool getLoadedData();
     bool getLoadedRules();
+    void setNumThreads(int threads);
 
     //load a triple dataset (tab separated, 3 elements per line) conisting of tokens/strings into a std::vector<Triple> (Triple is std::array<int,3>)
     // note that all the strings need to be in the index already
@@ -78,6 +79,8 @@ private:
     bool loadedData = false;
 
     bool verbose = true;
+
+    int numThr=1;
 };
 
 template<class T>

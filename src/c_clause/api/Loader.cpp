@@ -36,7 +36,11 @@ void Loader::loadRules(std::string path){
     if (!loadedData){
          throw std::runtime_error("Please load the data first with the the Handlers load data functionality.");
     }
-    rules->readAnyTimeFormat(path, false);
+    if (this->numThr==1){
+        rules->readAnyTimeFormat(path, false);
+    }else{
+        rules->readAnyTimeParFormat(path, false, this->numThr);
+    }
     loadedRules = true;
 }
 
@@ -172,6 +176,8 @@ void Loader::setRuleOptions(std::map<std::string, std::string> options, RuleFact
         {"xxd_min_support", [&ruleFactory](std::string val) {ruleFactory.setMinCorrect(std::stoi(val), "xxd");}},
         {"xxd_min_preds", [&ruleFactory](std::string val) {ruleFactory.setMinPred(std::stoi(val), "xxd");}},
         {"xxd_min_conf", [&ruleFactory](std::string val) {ruleFactory.setMinConf(std::stod(val), "xxd");}},
+        // other
+        {"num_threads", [this](std::string val) {this->setNumThreads(std::stoi(val));}},
         
     };
 
@@ -278,6 +284,14 @@ void Loader::setRelIndex(std::vector<std::string>& idxToRel){
         throw std::runtime_error("You can only set a relation index before you loaded data.");
     }
     index->setRelIndex(idxToRel);
+}
+
+void Loader::setNumThreads(int num){
+    if (num==-1){
+        numThr = omp_get_max_threads();
+    }else{
+        numThr = num;
+    }
 }
 
 
