@@ -124,9 +124,6 @@ protected:
 		int targetEntity, std::vector<int>& rels, std::vector<bool>& dirs, std::vector<Triple>& currentGroundings,
 		RuleGroundings* groundings, bool& reachedTarget, bool invertGrounding=false
 	);
-
-
-	
 	int targetRel;
 
 	
@@ -140,7 +137,8 @@ inline bool compareRule::operator()(Rule* lhs, Rule* rhs) const {
     if (lconf != rconf) {
         return lconf > rconf;
     }else{
-		return lhs->getRuleString() > rhs->getRuleString();
+		//alternatively use hash based on relation vec
+		return lhs->getID() < rhs->getID(); 
 	}
 }
 

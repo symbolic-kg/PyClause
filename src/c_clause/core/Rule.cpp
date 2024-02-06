@@ -66,8 +66,9 @@ void Rule::setTrackInMaterialize(bool val){
 }
 
 std::string Rule::getRuleString(){
-   return rulestring;
+    throw std::runtime_error("Use computeString instead.");
 }
+
 long long Rule::getBodyHash(){
     throw std::runtime_error("Not implemented yet");
 

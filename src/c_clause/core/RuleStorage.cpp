@@ -25,10 +25,9 @@ void RuleStorage::readAnyTimeFormat(std::string path, bool exact){
         std::cout << "Loading rules from " + path << std::endl;
     }
 
-    std::ios_base::sync_with_stdio(false);  // Disable sync with C-style IO
+    std::ios_base::sync_with_stdio(false); 
     
-    // Create a larger input buffer
-    constexpr size_t bufferSize =  256 * 1024;  // Example buffer size, adjust based on your needs
+    constexpr size_t bufferSize =  256 * 1024; 
     char buffer[bufferSize];
     file.rdbuf()->pubsetbuf(buffer, bufferSize);
 
@@ -115,7 +114,6 @@ bool RuleStorage::addAnyTimeRuleWithStats(std::string ruleString, int id, int nu
     if (rule){
         rule->setID(id);
         rule->setStats(numPred, numTrue, exact);
-        rule->setRuleString(ruleString);
         relToRules[rule->getTargetRel()].insert(rule.get());
         rules.push_back(std::move(rule));
         return true;
