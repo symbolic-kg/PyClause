@@ -12,10 +12,11 @@ rules = f"{get_base_dir()}/data/fb15k-237/anyburl-rules-c3-3600"
 ranking_file = f"{get_base_dir()}/local/ranking-file.txt"
 
 options = Options()
-options.set("ranking_handler.disc_at_least", 10)
+options.set("ranking_handler.disc_at_least", 100)
 options.set("ranking_handler.aggregation_function", "maxplus")
 options.set("ranking_handler.num_top_rules", -1)
 options.set("ranking_handler.adapt_topk", False)
+options.set("ranking_handler.num_threads", -1)
 
 #### Calculate a ranking and serialize / use in python
 start = time.time()

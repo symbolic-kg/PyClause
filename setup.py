@@ -35,8 +35,8 @@ def cpp_flag(compiler):
 class BuildExt(build_ext):
 
   c_opts = {
-    "msvc": ["/EHsc"],
-    "unix": [],
+    "msvc": ["/EHsc", "/O2"],
+    "unix": ["-O3", "-march=native"],
   }
 
   def build_extensions(self):
