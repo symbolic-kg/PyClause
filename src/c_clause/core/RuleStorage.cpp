@@ -16,28 +16,37 @@ RuleStorage::RuleStorage(std::shared_ptr<Index> index, std::shared_ptr<RuleFacto
 
 // reads format outputted by AnyBURL
 void RuleStorage::readAnyTimeFormat(std::string path, bool exact){
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        throw std::ios_base::failure("Could not open rule file: " + path + " is the path correct?");
+    }
+
+    if (verbose){
+        std::cout << "Loading rules from " + path << std::endl;
+    }
+
+    std::ios_base::sync_with_stdio(false);  // Disable sync with C-style IO
+    
+    // Create a larger input buffer
+    constexpr size_t bufferSize =  256 * 1024;  // Example buffer size, adjust based on your needs
+    char buffer[bufferSize];
+    file.rdbuf()->pubsetbuf(buffer, bufferSize);
+
+    std::string line;
     int currID = 0;
     int currLine = 0;
-	std::string line;
-	std::ifstream file(path);
-    if (verbose){
-        std::cout<<"Loading rules from " + path <<std::endl;
-    }
-	if (file.is_open()) {
-		while (!util::safeGetline(file, line).eof()){
-            if (currLine%1000000==0 && verbose && currLine>0){
-                std::cout<<"...parsed "<<currLine<<" rules "<<std::endl;
-            }
-            bool added = addAnyTimeRuleLine(line, currID, false);
-            if (added){
-                currID += 1;
-            }
-            currLine += 1;
+    
+    while (!util::safeGetline(file, line).eof()){
+        if (currLine % 1000000 == 0 && verbose && currLine > 0){
+            std::cout << "...parsed " << currLine << " rules " << std::endl;
         }
-        std::cout<<"Loaded "<<currID<<" rules."<<std::endl;
-    }else{
-         throw std::ios_base::failure("Could not open rule file: " + path + " is the path correct?");
+        bool added = addAnyTimeRuleLine(line, currID, false);
+        if (added){
+            currID += 1;
+        }
+        currLine += 1;
     }
+    std::cout << "Loaded " << currID << " rules." << std::endl;
 }
 
 // ruleStrings is a line num_pred/t support/t conf/t ruleString

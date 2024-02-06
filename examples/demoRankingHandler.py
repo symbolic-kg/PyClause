@@ -27,6 +27,8 @@ loader = Loader(options=options.get("loader"))
 loader.load_data(data=train, filter=filter_set, target=target)
 loader.load_rules(rules=rules)
 loading = time.time()
+print(f"loading {loading-start}")
+exit()
 
 
 ranker = RankingHandler(options=options.get("ranking_handler"))
