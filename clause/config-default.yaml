@@ -119,6 +119,7 @@ ranking_handler:
   # of the best candidates are fully discriminated, i.e, they are pairwise distinct in regard
   # to their predicting rules
   # recommended values: 10 or 20 under topk=100 and maxplus
+  # the peformance improvement decreases when using more threads
   disc_at_least: 10 # -1 for off, must not be bigger than topk
 
   # stop rule application for a query as soon as hard_stop_at candidates
