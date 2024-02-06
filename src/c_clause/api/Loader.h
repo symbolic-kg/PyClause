@@ -19,6 +19,7 @@
 #include <array>
 #include <vector>
 #include <string>
+#include <omp.h>
 
 
 
