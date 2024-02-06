@@ -110,7 +110,7 @@ ranking_handler:
   # rules confidences lexicographically
   # noisyor scores and ranking is based on sorting the noisy-or product
   # the noisy-or sorting is based on -\sum_i(log(1-conf_i)) and transformed
-  # berfore outputted; this mitigates floating point considerations 
+  # before outputted; this mitigates floating point considerations 
   aggregation_function: "maxplus"
 
   ### stopping criteria for rule application

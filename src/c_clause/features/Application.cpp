@@ -171,10 +171,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
             int rel = std::get<0>(tasks[i]);
             int source = std::get<1>(tasks[i]);
             int length = std::get<2>(tasks[i]);
-
-
                
-                
             if (adapt_topk){
                 qResults.setAddTopK(rank_topk+length);
             }
