@@ -10,14 +10,6 @@ num_tests = 0
 """Used in development for fast debugging of tests."""
 
 try:
-    test_multi_thr_rule_loading()
-    count_true +=1
-    num_tests +=1
-except Exception as e:
-    num_tests+=1
-    print(e)
-exit()
-try:
     test_uc_b_zero_ranking()
     count_true +=1
     num_tests +=1
@@ -30,6 +22,14 @@ try:
     num_tests +=1
 except Exception as e:
     num_tests +=1
+    print(e)
+exit()
+try:
+    test_multi_thr_rule_loading()
+    count_true +=1
+    num_tests +=1
+except Exception as e:
+    num_tests+=1
     print(e)
 try:
     test_rules_handler()

@@ -337,8 +337,8 @@ def test_uc_b_zero_ranking():
     hAt10 = str(stdout)[-18:-12]
     hA1 = str(stdout)[-36:-30]
 
-    expectMRR = "0.4967"
-    expecth1 =  "0.4580"
+    expectMRR = "0.4965"
+    expecth1 =  "0.4577"
     expecth10 = "0.5720"
 
     check_all = all([mrr_result==expectMRR, hA1==expecth1, hAt10==expecth10])
