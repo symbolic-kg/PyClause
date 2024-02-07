@@ -2,13 +2,21 @@ import time
 import c_clause
 from tests.test_api import test_uc_b_zero_ranking, test_237_all_ranking, test_qa_handler,\
 test_loader, test_triple_scoring, test_explanation_tracking, test_triple_scoring_B_237, test_rule_loading, test_rules_handler,\
-test_rules_collecting, test_noisy_triple_scoring, test_noisy_or
+test_rules_collecting, test_noisy_triple_scoring, test_noisy_or, test_multi_thr_rule_loading
 
 count_true = 0
 num_tests = 0
 
 """Used in development for fast debugging of tests."""
 
+try:
+    test_multi_thr_rule_loading()
+    count_true +=1
+    num_tests +=1
+except Exception as e:
+    num_tests+=1
+    print(e)
+exit()
 try:
     test_uc_b_zero_ranking()
     count_true +=1
@@ -23,7 +31,6 @@ try:
 except Exception as e:
     num_tests +=1
     print(e)
-exit()
 try:
     test_rules_handler()
     count_true +=1

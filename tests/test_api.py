@@ -229,6 +229,39 @@ def test_rule_loading():
         
     print("Test for rule loading successful.")
 
+def test_multi_thr_rule_loading():
+    from clause import Options
+    from c_clause import Loader
+
+    base_dir = get_base_dir()
+    train_path = join_u(base_dir, join_u("data", "fb15k-237", "train.txt"))
+    rules_path = join_u(base_dir, join_u("data", "fb15k-237", "anyburl-rules-c3-3600"))
+
+    opts = Options()
+    opts.set("loader.num_threads", 1)
+     # discard one rule type to check if indexing is correct
+    opts.set("loader.load_b_rules", False)
+    loader = Loader(options=opts.get("loader"))
+
+    loader.load_data(train_path)
+    loader.load_rules(rules=rules_path)
+
+    rules_idx_single = loader.rule_index()
+    rules_single = loader.get_rules()
+
+    opts.set("loader.num_threads", -1)
+   
+    
+    loader.set_options(options=opts.get("loader"))
+    loader.load_rules(rules=rules_path)
+
+    rules_idx_multi = loader.rule_index()
+    rules_multi = loader.get_rules()
+
+    assert(rules_idx_single==rules_idx_multi)
+    assert(rules_single==rules_multi)
+
+    print("Test loading multithreaded successful.")
 
 def test_uc_b_zero_ranking():
     print(get_ab_dir())
