@@ -286,9 +286,12 @@ void Loader::setRelIndex(std::vector<std::string>& idxToRel){
     index->setRelIndex(idxToRel);
 }
 
+// number of threads for parallel rule parsing (from disc)
 void Loader::setNumThreads(int num){
     if (num==-1){
-        numThr = omp_get_max_threads();
+        // one parsing operation is cheap, to many threads create
+        // too much overhead
+        numThr = std::min(5, omp_get_max_threads());
     }else{
         numThr = num;
     }

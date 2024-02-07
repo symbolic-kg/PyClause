@@ -30,8 +30,8 @@
 # 'r_max_length' option: as above; length refers to the number of body atoms
 loader:
   # only has effect when rules are loaded from disk
-  # if -1 (all threads) or >1 then rules will be first loaded and subsequently
-  # parsed by multiple threads; set to 1 to turn off
+  # if set >1 then rules will be first loaded and then parsed by multiple threads;
+  # if set to -1 then min{5, all_available_threads} is used; set to 1 to turn off
   num_threads: -1
   ### Rule options
   ## B rules
@@ -61,7 +61,8 @@ loader:
   # "h(X,c) <= b1(X,A)"
   load_u_d_rules: True
   # weight that is multiplied with the confidence
-  d_weight: 0.01
+  # we use AnyBURL default here
+  d_weight: 0.1
   d_max_branching_factor: -1 #-1 for off
   d_num_unseen: 5
   d_min_support: -1
@@ -75,7 +76,8 @@ loader:
   # has always length 1
   load_zero_rules: True
   # weight that is multiplied with the confidence
-  z_weight: 0.1
+  # we use AnyBURL default here
+  z_weight: 0.01
   z_num_unseen: 5
   z_min_support: -1
   z_min_preds: -1
