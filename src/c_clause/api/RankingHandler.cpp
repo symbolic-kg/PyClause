@@ -59,7 +59,11 @@ void RankingHandler::writeRanking(std::string writePath, std::shared_ptr<Loader>
 }
 
 void RankingHandler::writeRules(std::string writePath, std::shared_ptr<Loader> dHandler, std::string direction, bool strings){
-    ranker.writeRules(dHandler->getTarget(), writePath, direction, strings);
+    if (collectRules){
+        ranker.writeRules(dHandler->getTarget(), writePath, direction, strings);
+    }else{
+        throw std::runtime_error("Please set 'ranking_handler.collect_rules' to true when you want to write the rules.");
+    }
 }
 
 

@@ -27,7 +27,7 @@ PYBIND11_MODULE(c_clause, m) {
         .def(py::init<std::map<std::string, std::string>>(), py::arg("options"))
         .def("calculate_ranking", &RankingHandler::calculateRanking, py::arg("loader"))
         .def("write_ranking", &RankingHandler::writeRanking, py::arg("path"), py::arg("loader"))
-        .def("write_rules", &RankingHandler::writeRules, py::arg("path"), py::arg("loader"), py::arg("direction") = "tail", py::arg("as_string") = true)
+        .def("write_rules", &RankingHandler::writeRules, py::arg("path"), py::arg("loader"), py::arg("direction"), py::arg("as_string"))
         .def("set_options", &RankingHandler::setOptionsFrontend, py::arg("options"))
         .def(
             "get_ranking",
@@ -82,7 +82,7 @@ PYBIND11_MODULE(c_clause, m) {
             },
             py::arg("as_string")
         )
-        .def("write_answers", &QAHandler::writeAnswers, py::arg("path"), py::arg("as_string") = true)
+        .def("write_answers", &QAHandler::writeAnswers, py::arg("path"), py::arg("as_string"))
         .def(
             "get_rules",
             [](QAHandler& self, bool return_strings)->py::object{
@@ -94,7 +94,7 @@ PYBIND11_MODULE(c_clause, m) {
             },
             py::arg("as_string")
         )
-        .def("write_rules", &QAHandler::writeRules, py::arg("path"), py::arg("as_string") = true)
+        .def("write_rules", &QAHandler::writeRules, py::arg("path"), py::arg("as_string"))
         .def("set_options", &QAHandler::setOptions)
     ; //class end
     // RulesHandler()

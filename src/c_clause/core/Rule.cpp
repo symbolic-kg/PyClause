@@ -258,29 +258,29 @@ void RuleB::materialize(TripleStorage& triples, std::unordered_set<Triple>& pred
     }else{
          relNtoN =  &triples.getRelTailToHeads();
     }
-     // first body relation
+    // first body relation
     auto it = relNtoN->find(relations[1]);
     if (!(it==relNtoN->end())){
         NodeToNodes& NtoN = it->second;
-         // start branches of the DFS search
-         // every entity e that satisfies b1(e,someY) [or b1(someX, e)]
-         for (auto const& pair: NtoN){
-                const int& e = pair.first;
-                Nodes closingEntities;
-                std::set<int> substitutions = {e};
-                searchCurrGroundings(1, e, substitutions, triples, closingEntities, relations, directions);
-                for (const int& cEnt:  closingEntities){
-                    Triple triple = {e, targetRel, cEnt};
-                    auto isNew = preds.insert(triple);
-                    // add to count if this triple is predicted for the first time
-                    if (trackInMaterialize && isNew.second){
-                        predicted+=1;
-                        if (triples.contains(triple[0], triple[1], triple[2])){
-                            cpredicted += 1;
-                        }
+        // start branches of the DFS search
+        // every entity e that satisfies b1(e,someY) [or b1(someX, e)]
+        for (auto const& pair: NtoN){
+            const int& e = pair.first;
+            Nodes closingEntities;
+            std::set<int> substitutions = {e};
+            searchCurrGroundings(1, e, substitutions, triples, closingEntities, relations, directions);
+            for (const int& cEnt:  closingEntities){
+                Triple triple = {e, targetRel, cEnt};
+                auto isNew = preds.insert(triple);
+                // add to count if this triple is predicted for the first time
+                if (trackInMaterialize && isNew.second){
+                    predicted+=1;
+                    if (triples.contains(triple[0], triple[1], triple[2])){
+                        cpredicted += 1;
                     }
                 }
             }
+        }
     }
 }
 
