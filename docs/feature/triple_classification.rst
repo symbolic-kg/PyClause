@@ -2,7 +2,7 @@
 Triple Scoring
 ===============
 
-The ``c_clause.PredictionHandler`` can be used to calculate scores to triple predictions of the form **(head, relation, tail)**.
+The ``c_clause.PredictionHandler`` can be used to calculate scores for triples of the form **(head, relation, tail)**.
 We assume in the following a loader is created and data and rules are loaded:
 
 .. code-block:: python
@@ -33,7 +33,7 @@ We assume in the following a loader is created and data and rules are loaded:
 
 
 Calculating Triple Scores
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 The handler is initialized with options and scores are calculated with ``PredictionHandler.calculate_scores(triples, loader)``. The calculated scores
 depend on the handler options and the selected aggregation function ``aggregation_function`` under the prediction handler options.
 If a triple is not predicted by any rule, the calculated score will be 0. The function takes as arguments the triples input and the loader.

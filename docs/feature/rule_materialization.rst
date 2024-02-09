@@ -4,7 +4,7 @@ Rule Materialization
 
 The ``c_clause.RulesHandler`` can be used to calculate the materialization of given input rules and to calculate their statistics, that is,
 the support and the number of predictions (body groundings in data). Note that the rules do not need to be loaded with the loader but are directly
-passed as handler input. The loader only needs to load data:
+passed as handler input. The loader only needs to load data. The materialization will be based on the **data** argument of the loader.
 
 .. code-block:: python
 
