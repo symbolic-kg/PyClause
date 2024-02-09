@@ -9,6 +9,7 @@ relation_index = ["rel_1", "rel_2", "rel_3", "rel_4", "rel_5", "rel_6"]
 loader = Loader(options={})
 
 # you don't need to this when you load proper data
+# but you need to know the index
 loader.set_relation_index(relation_index)
 loader.set_entity_index(entity_index)
 loader.load_data(data=[["ent_1", "rel_1", "ent_2"]])
@@ -18,6 +19,9 @@ translator = RuleTranslator(idx_to_ent=entity_index, idx_to_rel=relation_index)
 all_rules = []
 
 # specify 2 cyclical (b-rules) rules
+# e.g. [0,1,2,3] -> 0 is relation of head atom, 1,2,3 are body atom relations
+# [True, False, False, False] variable ordering in atoms
+# first element needs to be True
 b_rels = [[0,1,2,3], [3,2]]
 b_dirs = [[True, False, False, False], [True, False]]
 
