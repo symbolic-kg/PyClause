@@ -22,6 +22,7 @@ options.set("learner.amie.raw.minhc", 0.0001)
 options.set("learner.amie.raw.mins", 2)
 options.set("learner.amie.raw.const", "*flag*") # special syntax for enforcing -const to be used as flag without value
 options.set("learner.amie.raw.maxadc", 2) 
+options.set("learner.amie.java_options", ["-Dfile.encoding=UTF-8", "-Xmx6g"])
 
 # AnyBURL
 # options.set("learner.mode", "anyburl")

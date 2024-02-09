@@ -219,10 +219,13 @@ learner:
   # chose betweeen: "anyburl" / "amie"
   mode: "amie"  
   anyburl:
+    # add any java VM parameters as list elements
+    # e.g. in config: java_options: ["-Dfile.encoding=UTF-8", "-Xmx6g"]
+    # or opts.set("learner.anyburl.java_options", ["-Dfile.encoding=UTF-8", "-Xmx6g"])
+    java_options: []
     # learning time in seconds for AnyBURL
     time: 60
-    # any raw option supported by AnyBURL
-    # can be set under 'raw' 
+    # any raw key,val option supported by AnyBURL can be set under raw
     raw:
       # max length of B-rules
       MAX_LENGTH_CYCLIC: 3
@@ -231,9 +234,13 @@ learner:
       # dont learn rules with confidence smaller 0.0001
       THRESHOLD_CONFIDENCE: 0.0001
       # for learning rules with only particular relations in the head
-      # use SINGLE_RELATIONS: rel1,rel2
+      # use, e.g., SINGLE_RELATIONS: rel1,rel2
   amie:
-    # any raw option supported by Amie can be set under raw
+    # add any java VM parameters as list elements
+    # e.g. in config, java_options: ["-Dfile.encoding=UTF-8", "-Xmx6g"]
+    # or opts.set("learner.amie.java_options", ["-Dfile.encoding=UTF-8", "-Xmx6g"])
+    java_options: []
+    # any raw key,val option supported by Amie can be set under raw
     raw:
       # for PyClause support, don't modify "bias"
       # and don't modify "oftm"

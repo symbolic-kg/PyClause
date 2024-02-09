@@ -3,6 +3,7 @@ import os
 from os import path
 from subprocess import CalledProcessError, Popen, PIPE, STDOUT
 import sys
+import ast
 
 from clause.util.utils import get_ab_dir, join_u
 
@@ -36,8 +37,14 @@ def learn(train_path, time, options, path_rules_output):
         f.write("\n".join(learn_config))
     f.close()
 
+    java_options = ast.literal_eval(options.get("java_options"))
+    java_options = " ".join(java_options)
 
-    with Popen(f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Learn {conf_path}", shell=True, stdout=PIPE, stderr=STDOUT, bufsize=1, universal_newlines=True) as p:
+    cmd_call = f"java {java_options} -cp {get_ab_dir()} de.unima.ki.anyburl.Learn {conf_path}"
+    cmd_call = cmd_call.replace("  ", " ")
+
+    print("-> anyburl call: " + cmd_call)
+    with Popen(cmd_call, shell=True, stdout=PIPE, stderr=STDOUT, bufsize=1, universal_newlines=True) as p:
         for line in p.stdout:
             print("-> anyburl call: " + line, end='') # process line here
 
