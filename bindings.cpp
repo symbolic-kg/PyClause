@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "src/c_clause/api/Api.h"
+#include "src/c_clause/api/Handler.h"
 #include "src/c_clause/api/RulesHandler.h"
 #include "src/c_clause/api/RankingHandler.h"
 #include "src/c_clause/api/QAHandler.h"

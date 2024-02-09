@@ -1,7 +1,7 @@
 #ifndef RANKING_HANDLER_H
 #define RANKING_HANDLER_H
 
-#include "Api.h"
+#include "Handler.h"
 #include "Loader.h"
 #include "../core/Index.h"
 #include "../core/TripleStorage.h"
