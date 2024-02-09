@@ -104,12 +104,19 @@ loader:
 
 # calculates rankings based on the "target" KG loaded into DataLoader
 # e.g. target argument from loader.load_data(data=.., filter=.., target=..)
+# candidate rankings are calculated for every query (s, p, ?) and (?, p, o)
+# of every triple (s, p, o) from "target" 
 ranking_handler:
   # whether to cache the rules that predicted the query candidates,
   # can be retrieved with handler.get_rules(bool, string: "head" or "tail")
   # turn off for efficiency.
   collect_rules: False
-  # number of candidates to calculate
+  # number of candidates to calculate for every query
+  # the actual number of returned candidates will often deviate
+  # it might be less because no more candidates exist
+  # it might be more because we do not cut predictions of rules
+  # e.g., when there are 90 candidates already calculated and the next
+  # rule predicts 30 new candidates, we allow a maximum of 120 candidates
   topk: 100
   # select from "maxplus" / "noisyor"
   # maxplus scores of a ranking will be of the highest predicting rule
@@ -166,7 +173,8 @@ qa_handler:
   # same as ranking_handler; can be retrieved with handler.get_rules(bool)
   # see documentation for data strucuture
   collect_rules: False
-    # number of candidates to calculate
+  # number of candidates to calculate for a query
+  # see ranking_handler for detailed description, it behaves identical
   topk: 100
   # select from "maxplus" / "noisyor"; see ranking handler
   aggregation_function: "maxplus"
