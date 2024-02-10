@@ -97,18 +97,19 @@ void Loader::loadData(T data, T filter, T target){
     if (this->loadedData){
         throw std::runtime_error("Please load the data only once or use a new data handler.");
     }
+
+    this->data->read(data, false);
+
     if (target.size() > 0) {
         this->target->read(target, false);
     }
     if (filter.size() > 0) {
-        this->filter->read(filter, false);
+        this->filter->read(filter, true); // all data is loaded, we can start loading CSR here
     }
-    this->data->read(data, true);
+
+    this->data->loadCSR();
     if (target.size() > 0) {
         this->target->loadCSR();
-    }
-    if (filter.size() > 0) {
-        this->filter->loadCSR();
     }
     this->loadedData = true;
 

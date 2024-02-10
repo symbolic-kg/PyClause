@@ -25,17 +25,12 @@ options = Options()
 options.set("ranking_handler.aggregation_function", "maxplus")
 options.set("ranking_handler.num_top_rules", -1) # reset to -1
 options.set("ranking_handler.topk", 100)
-options.set("loader.load_u_d_rules", False)
+
+options.set("ranking_handler.disc_at_least", 100)
 options.set("loader.load_u_d_rules", False)
 options.set("loader.load_u_xxc_rules", False)
 options.set("loader.load_u_xxd_rules", False)
-options.set("ranking_handler.disc_at_least", 100)
 
-
-# to speed up the ranking generation for this example, we set the parameters rather restrictive
-# options.set("loader.b_min_conf", 0.1)
-# options.set("loader.load_u_c_rules", False)
-# options.set("loader.load_u_d_rules", False)
 
 #### Calculate a ranking
 loader = Loader(options=options.get("loader"))
