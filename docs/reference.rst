@@ -39,3 +39,11 @@ clause Utilities
 .. autoclass:: clause.Options
    :members:
    :undoc-members:
+
+.. autoclass:: clause.TripleSet
+   :members:
+   :undoc-members:
+
+.. autoclass:: clause.Ranking
+   :members:
+   :undoc-members:
