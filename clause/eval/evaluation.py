@@ -259,7 +259,7 @@ class Ranking():
         The head or the tail ranking can be set to None. In this case empty lists of predictions for the
         head/tail cases are created within the ranking.
         """
-        if target_triples == None: target_triples = testset.triples
+        if not target_triples: target_triples = testset.triples
         for triple in target_triples:
             s = triple.get_head_token()
             r = triple.get_relation_token()
