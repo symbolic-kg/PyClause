@@ -7,7 +7,7 @@ from clause.util.utils import get_config_default_dir
 
 class Options():
 
-    def __init__(self, path_config_extra=None):
+    def __init__(self, path=None):
         """Creates an option object that contains all parameters in their default value."""
         self.options = {}
         self.default_options = {}
@@ -16,10 +16,10 @@ class Options():
             self.options  = yaml.safe_load(file)
             self.default_options = copy.deepcopy(self.options)
 
-        if path_config_extra != None:
+        if path:
             options_extra = {}
-            with open(path_config_extra, 'r') as file:
-                print(">>> using options in " + path_config_extra + " to overwrite some default options")
+            with open(path, 'r') as file:
+                print(">>> using options in " + path + " to overwrite some default options")
                 options_extra  = yaml.safe_load(file)
 
             options_extra_flat = dict(flatdict.FlatDict(options_extra, delimiter='.'))

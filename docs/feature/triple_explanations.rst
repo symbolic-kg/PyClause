@@ -62,7 +62,8 @@ Subsequently, we define the target triples and we call the scoring function that
 
 Retrieving Explanations
 ~~~~~~~~~~~~~~~~~~~~~~~
-The handler caches the results until the ``calculate_scores(...)`` function is invoked again. The explanations can be retrieved with ``PredictionHandler.get_explanations(as_string)``.
+The handler caches the results until the ``calculate_scores(...)`` function is invoked again. The explanations can be retrieved with ``PredictionHandler.get_explanations(as_string)`` or written to disk
+with ``PredictionHandler.write_explanations(as_string)``.
 The argument **as_string**, as for the other features, is a bool and decides if entities and relations are represented as strings or integer idx's. The output is a tuple containing three lists.
 
 .. code-block:: python
@@ -77,7 +78,7 @@ For input target triple **i**
 - **pred_rules[i][j][k]** gives the **k'th** grounding for the **j'th** rule predicting target **i**. A grounding is itself a list of triples. Note that the number of groundings per rule as well as the grounding length varies over different rules.
 
 
-In our example each target was only predicted by one rule:
+In our example, each target was only predicted by one rule:
 
 .. code-block:: python
 
@@ -105,3 +106,19 @@ In our example each target was only predicted by one rule:
     print(groundings[1][0][0])
     # out:
     # [['bernd', 'teaches', 'english'], ['english', 'languageOf', 'england']]
+
+
+The explanations can also be written to disk directly from the handler. The output is a **jsonl** file where each line contains
+a valid json. Each line contains a target triple, the predicting rules and the groundings.
+
+.. code-block:: python
+
+    from clause.util.utils import read_jsonl
+    
+    scorer.write_explanations(path="my-exp.txt", as_string=True)
+    # list of dicts
+    read_jsonl("my-exp.txt")
+
+
+
+

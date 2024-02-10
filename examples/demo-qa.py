@@ -8,6 +8,8 @@ from clause.util.utils import get_base_dir
 # ** Preparation **
 
 train = f"{get_base_dir()}/data/wnrr/train.txt"
+# if a filter set is loaded candidates forming true answers to a respective query
+# in the filter set KG, then they are discarded
 filter_set = f"{get_base_dir()}/data/wnrr/valid.txt"
 
 rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
