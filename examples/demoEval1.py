@@ -26,9 +26,11 @@ options.set("ranking_handler.aggregation_function", "maxplus")
 options.set("ranking_handler.num_top_rules", -1) # reset to -1
 options.set("ranking_handler.topk", 100)
 options.set("loader.load_u_d_rules", False)
+options.set("loader.load_u_d_rules", False)
 options.set("loader.load_u_xxc_rules", False)
 options.set("loader.load_u_xxd_rules", False)
 options.set("ranking_handler.disc_at_least", 100)
+
 
 # to speed up the ranking generation for this example, we set the parameters rather restrictive
 # options.set("loader.b_min_conf", 0.1)
@@ -51,15 +53,11 @@ ranking = Ranking(k=100)
 # then a rankingr equired for a standard evaluation
 # morever, the are not filtered by the testset
 # the conversion and testset-filtering is done in the following line
-
-
-#ranking.convert_handler_ranking(headRanking, tailRanking, testset)
-
-ranking.convert_handler_ranking({"_hypernym": headRanking["_hypernym"]}, {"_hypernym": tailRanking["_hypernym"]}, testset)
+ranking.convert_handler_ranking(headRanking, tailRanking, testset)
 ranking.compute_scores(testset.triples)
 
 print("*** EVALUATION RESULTS ****")
-print()
+print("Num triples: " + str(len(testset.triples)))
 print("MRR     " + '{0:.6f}'.format(ranking.hits.get_mrr()))
 print("hits@1  " + '{0:.6f}'.format(ranking.hits.get_hits_at_k(1)))
 print("hits@3  " + '{0:.6f}'.format(ranking.hits.get_hits_at_k(3)))
@@ -68,11 +66,12 @@ print()
 
 # now some code to some nice overview on the different relations and directions
 # the loop interates over all relations in the test set
-print("relation".ljust(25) + "\t" + "MRR-h" + "\t" + "MRR-t")
+print("relation".ljust(25) + "\t" + "MRR-h" + "\t" + "MRR-t" + "\t" + "Num triples")
 for rel in testset.rels:
    rel_token = testset.index.id2to[rel]
    # store all triples that use the current relation rel in rtriples
    rtriples = list(filter(lambda x: x.rel == rel, testset.triples))
+
    # compute scores in head direction ...
    ranking.compute_scores(rtriples, True, False)
    (mrr_head, h1_head) = (ranking.hits.get_mrr(), ranking.hits.get_hits_at_k(1))
@@ -80,12 +79,12 @@ for rel in testset.rels:
    ranking.compute_scores(rtriples, False, True)
    (mrr_tail, h1_tail) = (ranking.hits.get_mrr(), ranking.hits.get_hits_at_k(1))
    # print the resulting scores
-   print(rel_token.ljust(25) +  "\t" + '{0:.3f}'.format(mrr_head) + "\t" + '{0:.3f}'.format(mrr_tail))
+   print(rel_token.ljust(25) +  "\t" + '{0:.3f}'.format(mrr_head) + "\t" + '{0:.3f}'.format(mrr_tail) + "\t" + str(len(rtriples)))
 
 
 # finally, write the ranking to a file, there are two ways to to this, both reults into the same ranking
 # 1) use the ranking object
 ranking.write(ranking_file)
 
-# 2) ask the ranker to write the raning directly
-# ranker.write_ranking(path=ranking_file, loader=loader)
+# 2) ask the ranker to write the ranking directly
+ranker.write_ranking(path=ranking_file, loader=loader)

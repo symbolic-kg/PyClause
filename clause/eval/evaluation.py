@@ -66,7 +66,7 @@ class Hits():
             hk_prev = hk
         return mrr
     
-    def get_mrr_head(self):
+    def get_mrr_tail(self):
         """
         Computes and returns the tail MRR.
         """
@@ -247,7 +247,7 @@ class Ranking():
     def convert_handler_ranking(self, head_ranking, tail_ranking, testset, target_triples = None):
         """
         This function converts the internal rankings computed by PyClause into a ranking
-        that can be evaluted using the standard evaluatiobn protocol.
+        that can be evaluted using the standard evaluation protocol.
         It is assumed that the rankings of the ranking handler are already filtered against valid and train.
         The additional filtering against the testset is done in this method.
 
