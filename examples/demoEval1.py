@@ -51,7 +51,11 @@ ranking = Ranking(k=100)
 # then a rankingr equired for a standard evaluation
 # morever, the are not filtered by the testset
 # the conversion and testset-filtering is done in the following line
-ranking.convert_handler_ranking(headRanking, tailRanking, testset)
+
+
+#ranking.convert_handler_ranking(headRanking, tailRanking, testset)
+
+ranking.convert_handler_ranking({"_hypernym": headRanking["_hypernym"]}, {"_hypernym": tailRanking["_hypernym"]}, testset)
 ranking.compute_scores(testset.triples)
 
 print("*** EVALUATION RESULTS ****")

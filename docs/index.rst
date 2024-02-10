@@ -66,7 +66,6 @@ Possible workflows with PyClause allow to:
    feature/ranking_generation
    feature/rule_materialization
    feature/rule_confidence
-   feature/constraints
    
 
 .. toctree::
@@ -74,8 +73,6 @@ Possible workflows with PyClause allow to:
    :hidden:
    :caption: Special Topics
    
-   advanced/rules_from_predictions
-   advanced/idx_vs_string
    advanced/entity_relation_names
    advanced/evaluation
    

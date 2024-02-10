@@ -1,3 +1,3 @@
 
-Using Entity and Relation Names
-===============================
+Using External Entity/Relation Names
+====================================
