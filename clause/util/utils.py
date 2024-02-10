@@ -3,6 +3,7 @@ from os import path
 import sys
 import importlib.resources as pkg_resources
 
+
 def read_jsonl(path):
     """Reads a json-line file and return a list of dicts"""
     import json
@@ -84,6 +85,15 @@ def list_from_idx_file(filename):
             category_type = line.split('\t')[1].strip()
             outlist.append(category_type)
     return outlist
+
+
+def read_map(path):
+    map = {}
+    with open(path, 'r') as file:
+        for line in file:
+            key, value = line.strip().split('\t')
+            map[key] = value
+    return map
 
 
 
