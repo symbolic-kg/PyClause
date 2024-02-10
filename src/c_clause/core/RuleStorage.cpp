@@ -94,10 +94,10 @@ void RuleStorage::readAnyTimeParFormat(std::string path, bool exact, int numThre
             std::vector<std::string> splitline = util::split(ruleLine, '\t');
 
             if (splitline.size()==1){
-                int numPreds = 1;
-                int numTrue = 1;
+                int numPreds = 100;
+                int numTrue = 100;
                 std::cout<<"Warning: could not find num preds and support for input line " + splitline[0]<<std::endl;
-                std::cout<<" Setting both to 1. Expect random ordering for rules and predictions, confidence scores will all be 1."<<std::endl;
+                std::cout<<" Setting both to 100. Expect random ordering for rules and predictions, confidence scores will all be 1."<<std::endl;
             }
 
             if (splitline.size()!=4){
@@ -187,10 +187,10 @@ bool RuleStorage::addAnyTimeRuleLine(std::string ruleLine, int id , bool exact){
 	std::vector<std::string> splitline = util::split(ruleLine, '\t');
 
     if (splitline.size()==1){
-        int numPreds = 1;
-        int numTrue = 1;
+        int numPreds = 100;
+        int numTrue = 100;
         std::cout<<"Warning: could not find num preds and support for input line " + splitline[0]<<std::endl;
-        std::cout<<" Setting both to 1. Expect random ordering for rules and predictions, confidence scores will all be 1."<<std::endl;
+        std::cout<<" Setting both to 100. Expect random ordering for rules and predictions, confidence scores will all be 1."<<std::endl;
         return addAnyTimeRuleWithStats(splitline[0], id, numPreds, numTrue, exact);
     }
 

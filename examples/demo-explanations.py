@@ -39,6 +39,10 @@ loader.get_relation_index()
 idx_explanations = scorer.get_explanations(as_string=False)
 str_explanations = scorer.get_explanations(as_string=True)
 
+# retrieve string of rule with idx i as rule_index[i]
+# when you use integer format.
+rule_index = loader.rules_index()
+
 targets_str, pred_rules_str, groundings_str = str_explanations
 
 for i in range(len(targets_str)):

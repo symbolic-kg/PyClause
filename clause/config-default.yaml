@@ -127,6 +127,28 @@ ranking_handler:
   # before outputted; this mitigates floating point considerations 
   aggregation_function: "maxplus"
 
+  # dont add candidate proposals c for queries (h, r, ?) or (?, r, t) if
+  # (h, r, c) or (c, r, t) exists in the KG given by the "data" argument of the loader
+  filter_w_data: True
+  # same as above but this only has effect for ranker.write_ranking()
+  # all other results remain query based, e.g. (h, r, ?) with candidates [c_1, c_2, c_3]
+  # independent of what true answers are on target for the the query
+  filter_w_target: True
+  # choose between "random" / "frequency"
+  tie_handling: "frequency"
+  # -1 for using ALL available threads
+  num_threads: -1 
+  # if True, checks how many true answers (num_true) in "target" exists for a query
+  # and sets new_top_k = topk + num_true
+  # this is helpful when calculating rankings on large target files to not loose
+  # true answers by topk; say you have topk=100 but you have 150 true anwers
+  # the rule application module does not filter with "target" during the application
+  # therefore, you would never be able to calculate 50 of the true answers
+  # of course, during the application it is not checked if an answer is true
+  # e.g. you might end up with 250 false answers
+  # same effect is achieved by setting topk globally to a higher value (but slower)
+  adapt_topk: True
+
   ### stopping criteria for rule application
 
   # stop rule application for a query if topk candidates are calculated AND at least disc_at_least
@@ -149,23 +171,6 @@ ranking_handler:
   # recommended values: -1 under "maxplus"; 5 under "noisyor"
   num_top_rules: -1
 
-  filter_w_data: True
-  filter_w_target: True
-  # choose between "random" / "frequency"
-  tie_handling: "frequency"
-  # -1 for using ALL available threads
-  num_threads: -1 
-  # if True, checks how many true answers (num_true) in "target" exists for a query
-  # and sets new_top_k = topk + num_true
-  # this is helpful when calculating ranking on large target files to not loose
-  # true answers by topk; say you have topk=100 but you have 150 true anwers
-  # the rule application module does not filter with "target" during the application
-  # therefore, you would never be able to calculate 50 of the true answers
-  # of course, during the application it is not checked if an answer is true
-  # e.g. you might end up with 250 false answers
-  # same effect is achieved by setting topk globally to a higher value (but slower)
-  adapt_topk: True
-
 
 # calculates answer candidates and scores based on 
 # questions (h, r, ?) and (?, r, t)
@@ -179,17 +184,19 @@ qa_handler:
   # select from "maxplus" / "noisyor"; see ranking handler
   aggregation_function: "maxplus"
 
-  ### stopping criteria for rule application
-  # see ranking_handler for description
-  disc_at_least: 10 # -1 for off, must not be bigger than topk
-  hard_stop_at: -1 #-1 for off
-  num_top_rules: -1
-
+  # dont add candidate proposals c for queries (h, r, ?) or (?, r, t) if
+  # (h, r, c) or (c, r, t) exists in the KG given by the "data" argument of the loader
   filter_w_data: True
   # choose between "random" / "frequency"
   tie_handling: "frequency"
   # -1 for using ALL available threads
   num_threads: -1 
+
+  ### stopping criteria for rule application
+  # see ranking_handler for detailed description
+  disc_at_least: 10 # -1 for off, must not be bigger than topk
+  hard_stop_at: -1 #-1 for off
+  num_top_rules: -1
 
 # given input rules, calculates materialization (predictions)
 # and stats (num_pred, num_true_preds)
