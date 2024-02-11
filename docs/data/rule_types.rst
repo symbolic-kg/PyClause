@@ -66,7 +66,7 @@ We show below the supported rule types. The examples follow the correct syntax, 
 
 **B-Rules**
 
-The head together with the body form a cycle. Any length supported. Examples:
+The head together with the body form a cycle when directions within the atoms are ignored. Any length supported. Examples:
 
 .. code-block:: bash
 

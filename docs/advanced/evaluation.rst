@@ -4,7 +4,7 @@ Evaluation for KGC
 
 The ``clause`` packe provides two utility classes ``TripleSet`` and ``Ranking`` that can be used to calculate ranking-based evaluation metrics
 such as MRR or hits@k . They also allow to perform finegrained evaluations, e.g., relation-wise or for particular triple subsets. We show a complete example here,
-that creates from a ranking file which was stored with ``RankingHandler.write_ranking(..)`` the full MRR and relation-wise and direction-wise MRRs.
+that loads a ranking file which was stored with ``RankingHandler.write_ranking(..)``. It displays global MRR evaluations as well as relation and direction-wise results.
 
 
 .. code-block:: python

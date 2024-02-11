@@ -1,40 +1,42 @@
 
 Learning Rules
 ==============
-The rules that can be processed with PyClause can originate from anywhere as long as they follow the corresponding syntax for rule loading.
-PyClause provides nevertheless wrapper functionalities that allows to access the ``Amie`` and ``AnyBURL`` rule miner/learner from Python.
-The learned rules can be readily loaded with the ``c_clause.Loader``. Both learners can be fully configured with their original parameters by the PyClause config files or from Python with the ``clause.Options`` class.
+The rules that can be processed with PyClause can originate from anywhere as long as they follow the corresponding syntax.
+PyClause provides nevertheless wrapper functionalities that allow to access ``AMIE`` and ``AnyBURL`` from Python.
+The learned rules can be readily loaded with the ``c_clause.Loader``.
+Both learners can be fully configured with their original parameters by the PyClause config files or from Python with the ``clause.Options`` class.
 
 
-PyClause ships the respective ``AnyBURL`` and ``Amie`` binaries (.jars). If you have any trouble with using the rule learning module, read under **Java requirements** below. Additionally, the
-binaries can also be used readily independent of PyClause, they are located in **clause/bin**.
+PyClause ships the respective ``AnyBURL`` and ``AMIE`` binaries (.jars) which are compiled under Java 8. Alternatively, they can be built from source and they can
+also be used simply from the command line. We provide a special release for AMIE, see defails below.
 
 
-Rule Learning from Python
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Rule Mining with AMIE
+~~~~~~~~~~~~~~~~~~~~~~~
+For AMIE, we provide a special release version that uses some additional parameters which are set in the PyClause `default config <https://github.com/symbolic-kg/PyClause/blob/master/clause/config-default.yaml>`_ .
+Documentation and compile instructions for the release can be found `here <https://github.com/dig-team/amie/tree/pyclause>`_ .
 
-**Amie example**
+
+**Rule learning with PyClause**
 
 .. code-block:: python
 
     from clause import Learner, Options
-    from clause.util.utils import get_base_dir
     from c_clause import Loader
 
     path_train = f"path/to/train.txt"
     path_rules_output = f"path/rule-file.txt"
 
     options = Options()
-
     options.set("learner.mode", "amie")
-    # example parameters - choose any supported AMIE parameter under "...raw."
+
+    ## example parameters - choose any supported AMIE options under key "raw"
+    # rule length (head+body atom)
     options.set("learner.amie.raw.maxad", 4)
-    options.set("learner.amie.raw.minc", 0.0001)
-    options.set("learner.amie.raw.minpca", 0.0001)
-    options.set("learner.amie.raw.minhc", 0.0001)
     options.set("learner.amie.raw.mins", 2)
-    # special syntax for enforcing -const to be used as flag without value
+    # special syntax for enforcing -const to be used as flag
     options.set("learner.amie.raw.const", "*flag*")
+    # rule length for rules with constants
     options.set("learner.amie.raw.maxadc", 2) 
 
     learner = Learner(options=options.get("learner"))
@@ -46,12 +48,35 @@ Rule Learning from Python
     loader.load_rules(rules=path_rules_output)
 
 
-**AnyBURL example**
+**Outputs and confidences**
+
+The output rule file stored by AMIE complies with the format of PyClause. Note that opposed to the AnyBURL output, the statistics are based on the PCA confidence computations.
+Therefore, the numbers will be in general different for the same rules.
+
+
+**Language bias**
+
+The language bias for the used AMIE version within PyClause differs slightly from its original language bias. Consider the following rule:
+
+.. code-block:: bash
+
+   citizenOf(X,Y) <= hasChild(A,X), lives(X,Y), livesIn(A,Y)
+
+This rule can potentially be mined with the standard AMIE version but not with the version used for PyClause. The difference to the syntax of the B-rules within PyClause
+(see :doc:`../data/rule_types`) is that there exists two paths from **X** to **Y** within the body of the rule: A direct path and one path going throug **A**.  
+
+
+Rule Learning with AnyBURL
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+For AnyBURL we use the most recent AnyBURL release, AnyBURL-23-1. More information can be found on the official `homepage <https://web.informatik.uni-mannheim.de/AnyBURL/>`_ .
+
+
+**Rule learning with PyClause**
+
 
 .. code-block:: python
 
     from clause import Learner, Options
-    from clause.util.utils import get_base_dir
     from c_clause import Loader
 
     path_train = f"path/to/train.txt"
@@ -65,6 +90,9 @@ Rule Learning from Python
     # set any raw AnyBURL parameter under "... .raw"
     # max body atoms of B-rules
     options.set("learner.anyburl.raw.MAX_LENGTH_CYCLIC", 5)
+    # num threads
+     options.set("learner.anyburl.raw.WORKER_THREADS", 3)
+
 
     learner = Learner(options=options.get("learner"))
     learner.learn_rules(path_data=path_train, path_output=path_rules_output)
@@ -74,14 +102,3 @@ Rule Learning from Python
     loader.load_data(data=path_train)
     loader.load_rules(rules=path_rules_output)
 
-
-Config .yaml Example
-~~~~~~~~~~~~~~~~~~~~
-
-
-Java Requirements
-~~~~~~~~~~~~~~~~~
-
-
-Amie vs AnyBURL Rule types
-~~~~~~~~~~~~~~~~~~~~~~~~~~

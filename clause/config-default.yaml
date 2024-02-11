@@ -248,6 +248,8 @@ learner:
       THRESHOLD_CORRECT_PREDICTIONS: 2
       # dont learn rules with confidence smaller 0.0001
       THRESHOLD_CONFIDENCE: 0.0001
+      # num threads
+      WORKER_THREADS: 3
       # for learning rules with only particular relations in the head
       # use, e.g., SINGLE_RELATIONS: rel1,rel2
   amie:

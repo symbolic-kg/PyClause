@@ -21,7 +21,8 @@ The first rule can be understood as: If somebody is born at a city which is the 
 
 .. note::
 
-   From a predicate logic viewpoint, rule variables are assumed to be universally quantified. Furthermore, PyClause treats all terms implicitly under full object identity, i.e., :math:`X \neq A \neq Y` for the first rule and for the second :math:`X \neq london` and :math:`X \neq english`.
+   From a predicate logic viewpoint, rule variables are assumed to be universally quantified.
+   Furthermore, all the rule application modules in PyClause treat all terms implicitly under full object identity, i.e., :math:`X \neq A \neq Y` for the first rule and for the second :math:`X \neq london` and :math:`X \neq english`.
 
 
 We say that 
