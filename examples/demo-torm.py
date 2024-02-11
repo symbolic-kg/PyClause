@@ -4,17 +4,17 @@ from clause.util.utils import get_base_dir
 
 from c_clause import Loader
 
-# *** Example for rule mining  ***
+# *** Example for rule mining with the experimental module TORM  ***
 
 # ensure you have downloaded the dataset
-path_train = f"{get_base_dir()}/data/yago3-10/train.txt"
-path_rules_output = f"{get_base_dir()}/local/rules-yago3-10-torm.txt"
+path_train = f"{get_base_dir()}/data/fb15k-237/train.txt"
+path_rules_output = f"{get_base_dir()}/local/rules-fb15k-237-torm.txt"
 
 # load a triple set from a file and display some meta info about it
 triples = TripleSet(path_train)
 
 options = Options()
-options.set("torm_learner.mode", "torm")
+options.set("torm_learner.mode", "hybrid")
 
 ## some example options
 options.set("torm_learner.torm.b.length", 1)

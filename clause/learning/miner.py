@@ -49,8 +49,6 @@ class Learner():
             exit()
 
           
-      
-
 class TormLearner():
     """Experimental rule mining system."""
 
@@ -330,10 +328,10 @@ class TormLearner():
             #rule = RuleB(candidates, relations[0], relations[1:], pattern)
 
 
-    def mine_rules(self, path_rules_output = None):
+    def mine_rules(self, path_rules_output):
 
         toptions = self.options.flat('torm_learner.torm')
-        anyburl_options = self.options.flat('learner.anyburl')
+        anyburl_options = {key.replace("anyburl.", ""): val for key, val in self.options.get("learner").items() if key.startswith("anyburl.")}
        
         # ***********************************
         start = time.time()
@@ -343,7 +341,7 @@ class TormLearner():
                 self.triples.path,
                 anyburl_options['time'],
                 anyburl_options,
-                False
+                path_rules_output=path_rules_output
             )
             rules_b = RuleSet(self.triples.index)
             rule_reader = RuleReader(rules_b)
@@ -432,9 +430,7 @@ class TormLearner():
         print(">>> ~~~ DONE with mining rules! ~~~")
         print(">>> rules collected " +  str(self.rules.size()))
 
-        # write rules if output path has been sepcified and the mode is not anyburl
-        if path_rules_output != None:
-            rule_format = self.options.options['io']['rule_format']
-            self.rules.write(path_rules_output, rule_format)
+        rule_format = self.options.options['io']['rule_format']
+        self.rules.write(path_rules_output, rule_format)
 
 

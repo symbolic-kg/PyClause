@@ -275,9 +275,8 @@ learner:
       # maxadc: 2 # number of atoms in rules with constants = 1 head atom + body atoms
       
 
-
 ### An experimental rule miner that efficiently mines rules simultaneously
-### it is very efficient for mining all U_c rules; less efficient for cyclical rules (B-rules)
+### it is very efficient for mining all U_c rules of length 1; less efficient for cyclical rules (B-rules)
 torm_learner:
   #  choose betweeen "hybrid" / "torm"
   # 'hybrid' calculates rule confidences for cyclical rules (B-Rules) with AnyBURL confidence sampling;
@@ -288,7 +287,11 @@ torm_learner:
   torm:
     # if set to false, rules that do not make any wrong prediction are suppressed
     tautology: False 
-    # rule type options
+    # rule mining options
+    # all options are min requirements
+    # e.g. confidence: 0.1 means learn only rules with confidence 0.1 or higher 
+    # only b rules of lenght>1 are supported 
+    # all other rule types are of length 1
     b:
       active: True
       confidence: 0.0001

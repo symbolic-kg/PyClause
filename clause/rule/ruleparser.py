@@ -1,10 +1,6 @@
-
-import sys
-import os
 import re
 
-from clause.rule.rules import Rule, RuleUc, RuleB, RuleUd, RuleXXuc, RuleXXud, RuleZ, RuleSet
-from clause.data.triples import TripleSet
+from clause.rule.rules import RuleUc, RuleB, RuleUd, RuleXXuc, RuleXXud, RuleZ
 
 
 class RuleTranslator():
@@ -292,7 +288,6 @@ class RuleReader:
         return rules
 
             
-
     def read_line(self, line):
         # print("reading: " + line)
         token = line.split("\t")
@@ -311,14 +306,11 @@ class RuleReader:
             rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
             return rule
         else:
-            # if not(re.search("\(X,X\)", hb[0])) and not(re.search("\(X, X\)", hb[0])) and not(re.search("me_myself_i", hb[0])):
             htoken = re.split("\(|,|\)",hb[0])
-            # print("htoken: " + str(htoken))
             target = htoken[0]
             # *************** RuleZ ***********************
             if (len(hb) == 1 or (len(hb) == 2 and len(hb[1]) < 2)):
                 if re.search("me_myself_i", hb[0]): return None           
-                # print(line)
                 if (htoken[1] == "X"):
                     rule = RuleZ(self.rules, target, htoken[2], True)
                 else:

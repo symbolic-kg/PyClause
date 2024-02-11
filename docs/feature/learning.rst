@@ -7,8 +7,8 @@ The learned rules can be readily loaded with the ``c_clause.Loader``.
 Both learners can be fully configured with their original parameters by the PyClause config files or from Python with the ``clause.Options`` class.
 
 
-PyClause ships the respective ``AnyBURL`` and ``AMIE`` binaries (.jars) which are compiled under Java 8. Alternatively, they can be built from source and they can
-also be used simply from the command line. We provide a special release for AMIE, see defails below.
+PyClause ships the respective ``AnyBURL`` and ``AMIE`` binaries (.jars) which are compiled under Java 8. After installing PyClause the code examples below can 
+be used immediately. Alternatively, the jar files can be built from source and they can also be used directly from the command line. We provide a special release for AMIE, see defails below.
 
 
 Rule Mining with AMIE
@@ -17,7 +17,7 @@ For AMIE, we provide a special release version that uses some additional paramet
 Documentation and compile instructions for the release can be found `here <https://github.com/dig-team/amie/tree/pyclause>`_ .
 
 
-**Rule learning with PyClause**
+**Using AMIE with PyClause**
 
 .. code-block:: python
 
@@ -71,7 +71,7 @@ Rule Learning with AnyBURL
 For AnyBURL we use the most recent AnyBURL release, AnyBURL-23-1. More information can be found on the official `homepage <https://web.informatik.uni-mannheim.de/AnyBURL/>`_ .
 
 
-**Rule learning with PyClause**
+**Using AnyBURL with PyClause**
 
 
 .. code-block:: python
@@ -91,7 +91,7 @@ For AnyBURL we use the most recent AnyBURL release, AnyBURL-23-1. More informati
     # max body atoms of B-rules
     options.set("learner.anyburl.raw.MAX_LENGTH_CYCLIC", 5)
     # num threads
-     options.set("learner.anyburl.raw.WORKER_THREADS", 3)
+     options.set("learner.anyburl.raw.WORKER_THREADS", 2)
 
 
     learner = Learner(options=options.get("learner"))
@@ -102,3 +102,43 @@ For AnyBURL we use the most recent AnyBURL release, AnyBURL-23-1. More informati
     loader.load_data(data=path_train)
     loader.load_rules(rules=path_rules_output)
 
+
+Rule Mining with TORM
+~~~~~~~~~~~~~~~~~~~~~
+TORM is an **experimental** mining module that is built with the goal to efficiently mine short rules with constants. As it is currently in experimental state,
+its usage behavior deviates slightly from the remaining parts of the library. Usable options can be found in the `default config <https://github.com/symbolic-kg/PyClause/blob/master/clause/config-default.yaml>`_ .
+
+
+.. code-block:: python
+
+    from clause import TormLearner, Options
+    from clause import TripleSet
+   
+    path_train = "train.txt"
+    path_rules_output = "torm-rules.txt"
+
+    
+    triples = TripleSet(path_train)
+
+    options = Options()
+    options.set("torm_learner.mode", "hybrid")
+
+    ## some example options
+    options.set("torm_learner.torm.b.length", 1)
+    options.set("torm_learner.torm.uc.support", 15)
+    options.set("torm_learner.torm.xx_ud.support", 15)
+    options.set("torm_learner.torm.xx_uc.support", 15)
+    options.set("torm_learner.torm.ud.support", 15)
+    options.set("torm_learner.torm.z.support", 15)
+
+    learner = TormLearner(options=options, targets=triples.rels, triples=triples)
+
+    # mine rules
+    learner.mine_rules(path_rules_output)
+
+    # write the rules that have been mined to a file
+    learner.rules.write(path_rules_output)
+
+    loader = Loader(options.get("loader"))
+    loader.load_data(data=path_train)
+    loader.load_rules(rules=path_rules_output)
