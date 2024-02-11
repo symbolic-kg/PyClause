@@ -34,6 +34,7 @@ Possible workflows with PyClause allow to:
    Overview<self>
    start/installation
    start/quickstart
+   start/downloads
 
 .. toctree::
    :maxdepth: 2
