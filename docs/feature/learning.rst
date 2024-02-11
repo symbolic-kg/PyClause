@@ -51,7 +51,7 @@ Documentation and compile instructions for the release can be found `here <https
 **Outputs and confidences**
 
 The output rule file stored by AMIE complies with the format of PyClause. Note that opposed to the AnyBURL output, the statistics are based on the PCA confidence computations.
-Therefore, the numbers will be in general different for the same rules.
+Therefore, the statistics and confidences will be different from the ones calculated with AnyBURL.
 
 
 **Language bias**
