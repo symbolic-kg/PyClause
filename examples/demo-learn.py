@@ -21,13 +21,16 @@ options.set("learner.amie.raw.minpca", 0.0001)
 options.set("learner.amie.raw.minhc", 0.0001)
 options.set("learner.amie.raw.mins", 2)
 options.set("learner.amie.raw.const", "*flag*") # special syntax for enforcing -const to be used as flag without value
-options.set("learner.amie.raw.maxadc", 2) 
-options.set("learner.amie.java_options", ["-Dfile.encoding=UTF-8", "-Xmx6g"])
+options.set("learner.amie.raw.maxadc", 2)
+# you can also add java vm params like so: 
+options.set("learner.amie.java_options", ["-Dfile.encoding=UTF-8"])
 
 # AnyBURL
 # options.set("learner.mode", "anyburl")
 # options.set("learner.anyburl.time", 30)
 # options.set("learner.anyburl.raw.MAX_LENGTH_CYCLIC", 5)
+# you can also add java vm params like so: 
+#options.set("learner.anyburl.java_options", ["-Dfile.encoding=UTF-8"])
 
 learner = Learner(options=options.get("learner"))
 learner.learn_rules(path_data=path_train, path_output=path_rules_output)
