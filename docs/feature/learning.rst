@@ -36,8 +36,8 @@ Documentation and compile instructions for the release can be found `here <https
     options.set("learner.amie.raw.mins", 2)
     # special syntax for enforcing -const to be used as flag
     options.set("learner.amie.raw.const", "*flag*")
-    # rule length for rules with constants
-    options.set("learner.amie.raw.maxadc", 2) 
+    # rule length (head+body atom) for rules with constants
+    options.set("learner.amie.raw.maxadc", 3) 
 
     learner = Learner(options=options.get("learner"))
     learner.learn_rules(path_data=path_train, path_output=path_rules_output)
