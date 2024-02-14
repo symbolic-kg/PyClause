@@ -11,6 +11,8 @@ A complete ranking for the target KG is defined as follows. For each triple **(h
 two queries are formed **(head, relation, ?)** and **(?, relation, tail)**. The ranking contains for each of the queries a ranked list of candidate proposals
 sorted according to a heuristic based on the aggregation function specified.
 
+First we define data and rules.
+
 .. code-block:: python
 
     from c_clause import RankingHandler, Loader
@@ -47,24 +49,28 @@ sorted according to a heuristic based on the aggregation function specified.
         [21, 1],
     ]
 
-   
-The loader can load an additional filter set (commonly the valid split of a KG). If it is not empty proposed candidates will be filtered always with this filter set.
+Loading Data and Rules
+~~~~~~~~~~~~~~~~~~~~~~
+
+For calculating rankings all three arguments of the  ``load_data(data, filter, target)`` function of the loader have to be used.
+The loader can load a filter set (commonly the valid split of a KG). If it is not empty proposed candidates will be filtered always with this filter set.
 In our example,  **enrico**  will not be provided as answer to the query **(?, citizenOf, italy)** even if it is predicted by one or more rules. Also see the other filter options
 for data and target in the `config-default.yaml <https://github.com/symbolic-kg/PyClause/blob/master/clause/config-default.yaml>`_ .
 
-
-Calculating and Retrieving Rankings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
     opts = Options()
     loader = Loader(opts.get("loader"))
+    # set filter to "" if not required
     loader.load_data(data=data, fiter=valid, target=test)
     loader.load_rules(rules=rules, stats=stats)
 
 
-The ranking handler calculates a ranking with the ``RankingHandler.calculate_ranking(loader)`` function. The results are cached until the function
+Calculating and Retrieving Rankings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ranking handler calculates a ranking with the ``RankingHandler.calculate_ranking(loader)`` function for the KG specified with **target** while rules are applied on **data**. The results are cached until the function
 is invoked again.
 
 .. code-block:: python

@@ -195,7 +195,8 @@ def test_rules_handler():
 
 
 def test_rule_loading():
-    from clause.rule.ruleparser import RuleReader, RuleSet
+    from clause.rule.ruleparser import RuleReader
+    from clause.rule.rules import RuleSet
     from clause.data.triples import TripleSet
     print(get_ab_dir())
 
@@ -666,13 +667,11 @@ def test_triple_scoring():
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
-
     scorer = c_clause.PredictionHandler(options.get("prediction_handler"))
     scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
-
 
     ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
@@ -749,25 +748,15 @@ def test_noisy_triple_scoring():
 
 
     options = Options()
-
-
     options.set("ranking_handler.topk", 40000)
 
     # both set to -1 to not apply any stopping critertion (otherwise scores might vary a bit)
     options.set("ranking_handler.disc_at_least", -1)
     options.set("prediction_handler.num_top_rules", -1)
-
-
-
     options.set("ranking_handler.aggregation_function", "noisyor")
     options.set("prediction_handler.aggregation_function", "noisyor")
-
-
-
     options.set("prediction_handler.collect_explanations", True)
     
-
-
     options.set("loader.load_u_xxd_rules", False)
     options.set("loader.load_u_xxc_rules", False)
     options.set("loader.load_zero_rules", False)
@@ -776,13 +765,11 @@ def test_noisy_triple_scoring():
     loader.load_data(train, filter, target)
     loader.load_rules(rules)
 
-
     scorer = c_clause.PredictionHandler(options.get("prediction_handler"))
     scorer.calculate_scores(target, loader)
 
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
-
 
     ranker = c_clause.RankingHandler(options.get("ranking_handler"))
     ranker.calculate_ranking(loader)
@@ -817,7 +804,6 @@ def test_noisy_triple_scoring():
     idx_scores = scorer.get_scores(False)
     str_scores = scorer.get_scores(True)
 
-
     for i in range(len(idx_scores)):
         # same scores; string scores are rounded to 6 decimals in backend
         assert(round(idx_scores[i][3], 6)==float(str_scores[i][3]))
@@ -825,7 +811,6 @@ def test_noisy_triple_scoring():
         rel = idx_scores[i][1]
         tail = idx_scores[i][2]
 
-        
         # the score must match when calculated in a ranking from queries
         if (idx_scores[i][3]!=0):
             tail_ranking = tails[rel][head]

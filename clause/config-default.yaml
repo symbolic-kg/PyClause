@@ -37,12 +37,16 @@ loader:
   ## B rules
   # parsable example: "h(X,Y) <= b1(A,X), b2(A,Y)"
   load_b_rules: True
-  b_max_branching_factor: -1 #-1 for off
   b_num_unseen: 5
   b_min_support: -1
   b_min_preds: -1
   b_min_conf: 0.0001
   b_max_length: -1
+  # this value is per default set in AnyBURL for rule application of B-rules
+  # during rule grounding, whenever a new branch of the DFS leads to more
+  # than max_branching_factor entities, the branch is not visited
+  # note that this will only have effect for large KGs such as Wd5m
+  b_max_branching_factor: 1000 #-1 for off
  
   ## U_c rules
   # parsable examples (c and d being entities in the graph):
