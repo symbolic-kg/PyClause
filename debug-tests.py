@@ -9,6 +9,16 @@ num_tests = 0
 
 """Used in development for fast debugging of tests."""
 
+
+try:
+    test_triple_scoring_B_237()
+    count_true += 1
+    num_tests +=1
+except Exception as e:
+    print("Test triple_scoring B 237 failed")
+    num_tests +=1
+    print(e)
+exit()
 try:
     test_rule_loading()
     count_true += 1
@@ -17,7 +27,6 @@ except Exception as e:
     num_tests +=1
     print(e)
     print("Test Rule loading failed.")
-exit()
 try:
     test_uc_b_zero_ranking()
     count_true +=1

@@ -32,7 +32,6 @@ double Rule::getConfidence(int nUnseen, bool exact){
     
 }
 
-
 double Rule::getConfidence(bool exact){
     if (exact){
         return confWeight * ((double) cpredicted/((double) predicted + (double)numUnseen)); 
@@ -40,6 +39,14 @@ double Rule::getConfidence(bool exact){
         return confWeight *((double) sampledCpredicted/((double) sampledPredicted + (double)numUnseen)); 
     }
     
+}
+
+int Rule::getBranchingFactor(){
+    return branchingFactor;
+}
+
+void Rule::setBranchingFactor(int val){
+    branchingFactor = val;
 }
 
 
@@ -178,6 +185,9 @@ void Rule::searchCurrTargetGroundings(
             }
         }
     }else{
+        if (branchingFactor>0 && length>branchingFactor){
+            return;
+        }
         //next entities
         for (int i=0; i<length; i++){
             int ent = begin[i];
@@ -314,8 +324,6 @@ bool RuleB::predictHeadQuery(int tail, TripleStorage& triples, QueryResults& hea
     return madePred;
 }
 
-
-
 // recursive DFS from a startpoint currEntity, one substitution of the first body atom
 void RuleB::searchCurrGroundings(
 			int currAtomIdx, int currEntity, std::set<int>& substitutions, TripleStorage& triples,
@@ -350,7 +358,6 @@ void RuleB::searchCurrGroundings(
         }
     }
 }
-
 
 bool RuleB::predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings)
 {   

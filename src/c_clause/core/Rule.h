@@ -34,7 +34,8 @@ public:
 		rulestring(""),
 		trackInMaterialize(false),
 		confWeight(1.0),
-		numUnseen(5)
+		numUnseen(5),
+		branchingFactor(-1)
 	{
     std::ostringstream ss;
     ss << static_cast<const void*>(this);
@@ -74,11 +75,12 @@ public:
 		int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings
 	);
 
-
 	void setTrackInMaterialize(bool val);
 	void setConfWeight(double weight);
 	void setRuleString(std::string str);
 	void setNumUnseen(int val);
+	void setBranchingFactor(int val);
+	int getBranchingFactor();
 
 	// only used for Uxxd Uxxc rules when particularly parsed from Anyburl rule files
 	virtual void setPredictHead(bool ind);
@@ -113,6 +115,8 @@ protected:
 	// see child classes
 	std::vector<int> relations;
 	std::vector<bool> directions;
+
+	int branchingFactor;
 
 
 	// recursive DFS step with optional grounding tracking and a target closing entity (for scoring triples)
@@ -156,18 +160,11 @@ public:
 	bool predictHeadQuery(int tail, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& headResults, ManySet filterSet=ManySet());
 
-
-	int branchingFactor = -1;
-
 	// predict triple and optionally tracks grounding
 	// uses searchCurrTargetGroundings()
 	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
 
 	std::string computeRuleString(Index* index);
-
-
-
-
 
 private:
 	// this->relations and this->directions uniquely identifies a rule
@@ -221,9 +218,6 @@ public:
 
 	std::string computeRuleString(Index* index);
 	
-
-
-
 private:
 	// this->relations, this->directions, this->leftC, this->constants, uniquely identify a C (U_c) rule
 	// e.g. relations = [r1, r2, r3]
@@ -298,9 +292,6 @@ public:
 	bool predictTailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 	bool predictL1TailQuery(int head, TripleStorage& triples, QueryResults& tailResults, ManySet filterSet=ManySet());
 
-	int branchingFactor=-1;
-
-
 	// predict triple and optionally tracks grounding
 	// uses searchCurrTargetGroundings()
 	bool predictTriple(int head, int tail, TripleStorage& triples, QueryResults& qResults, RuleGroundings* groundings);
@@ -351,9 +342,6 @@ private:
 	int constant;
 
 };
-
-
-
 #endif // RULE_H
 
 

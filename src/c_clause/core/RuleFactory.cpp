@@ -80,7 +80,7 @@ std::unique_ptr<Rule> RuleFactory::parseUdRule(std::vector<std::string> headBody
     std::unique_ptr<RuleD> ruled = std::make_unique<RuleD>(relations, directions, leftC, headConstants);
     ruled->setNumUnseen(DnumUnseen);
     ruled->setConfWeight(DconfWeight);
-    ruled->branchingFactor = DbranchingFactor;
+    ruled->setBranchingFactor(DbranchingFactor);
     return std::move(ruled);
 }
 
@@ -468,7 +468,7 @@ std::unique_ptr<Rule> RuleFactory::parseAnytimeRule(std::string rule, int numPre
 
         std::unique_ptr<RuleB> ruleb = std::make_unique<RuleB>(relations, directions);
         ruleb->setNumUnseen(BnumUnseen);
-        ruleb->branchingFactor = BbranchingFactor;
+        ruleb->setBranchingFactor(BbranchingFactor); 
 
         if (numPreds>0 && BminPreds > numPreds){
             return nullptr;

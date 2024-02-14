@@ -44,7 +44,7 @@ loader:
   b_max_length: -1
   # this value is per default set in AnyBURL for rule application of B-rules
   # during rule grounding, whenever a new branch of the DFS leads to more
-  # than max_branching_factor entities, the branch is not visited
+  # than max_branching_factor new nodes (entities), the branch is not visited
   # note that this will only have effect for large KGs such as Wd5m
   b_max_branching_factor: 1000 #-1 for off
  
