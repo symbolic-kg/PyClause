@@ -8,6 +8,11 @@
 
 
  Loader::Loader(std::map<std::string, std::string> options){
+    auto verb = options.find("verbose");
+    if (verb!=options.end()){
+        this->verbose = util::stringToBool(verb->second);
+    }
+
     index = std::make_shared<Index>();
     data = std::make_unique<TripleStorage>(index);
     target = std::make_unique<TripleStorage>(index);
@@ -188,6 +193,7 @@ void Loader::setRuleOptions(std::map<std::string, std::string> options, RuleFact
                 std::cout<< "Setting option "<<handler.name<<" to: "<<opt->second<<std::endl;
             }
             handler.setter(opt->second);
+           
         }
     }
 }

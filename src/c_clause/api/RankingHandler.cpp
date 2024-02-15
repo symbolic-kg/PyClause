@@ -7,6 +7,10 @@
 
 
 RankingHandler::RankingHandler(std::map<std::string, std::string> options): BackendHandler(){
+    auto verb = options.find("verbose");
+    if (verb!=options.end()){
+        this->verbose = util::stringToBool(verb->second);
+    }
     setRankingOptions(options, ranker);
     setOptions(options);
 }

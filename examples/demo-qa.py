@@ -9,12 +9,13 @@ from clause.util.utils import get_base_dir
 
 train = f"{get_base_dir()}/data/wnrr/train.txt"
 # if a filter set is loaded candidates forming true answers to a respective query
-# in the filter set KG, then they are discarded
+# in the filter set KG are discarded
 filter_set = f"{get_base_dir()}/data/wnrr/valid.txt"
 
 rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
 options = Options()
 
+options.set("loader.verbose", False)
 loader = Loader(options.get("loader"))
 loader.load_data(train, filter_set)
 loader.load_rules(rules)
@@ -23,6 +24,7 @@ loader.load_rules(rules)
 options.set("qa_handler.collect_rules", True)
 # output only a few candidates
 options.set("qa_handler.topk", 20)
+options.set("qa_handler.verbose", False)
 qa_handler = QAHandler(options=options.get("qa_handler"))
 
 
@@ -50,7 +52,6 @@ qa_handler.write_rules(path=f"{get_base_dir()}/local/tail-query-rules.jsonl", as
 # rules and answers for first query
 print(answers[0])
 print(rules[0])
-
 
 # ** 2) QA with idx inputs -  head queries (answer heads given tail, rel) **
 

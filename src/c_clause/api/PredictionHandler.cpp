@@ -5,6 +5,10 @@
 #include "../core/Types.h"
 
 PredictionHandler::PredictionHandler(std::map<std::string, std::string> options){
+    auto verb = options.find("verbose");
+    if (verb!=options.end()){
+        this->verbose = util::stringToBool(verb->second);
+    }
     setOptions(options, scorer);    
 }
 
