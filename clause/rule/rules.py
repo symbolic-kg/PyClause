@@ -68,19 +68,6 @@ class RuleXXuc(Rule):
             self.hashcode = hash(str(self))
         return self.hashcode
 
-    def materialize(self, triples, predictions): # TODO XXX
-        x_r_2_y = triples.obj_rel_2_sub if self.bc_right else triples.sub_rel_2_obj
-        predicted_sub_obj = []
-        for value in x_r_2_y[self.bc][self.rel]:
-            self.pred += 1
-            predicted_sub_obj.append((value,value))
-            if triples.is_known(value, self.target, value):
-                self.cpred += 1
-        if self.get_confidence() < options.rules['uxx']['confidence']: return False
-        if self.cpred < options.rules['uxx']['support']: return False
-        for predicted in predicted_sub_obj:
-            predictions.add_prediction(predicted[0], self.target, predicted[1], self)
-        return True
     
 class RuleXXud(Rule):
     """
@@ -120,19 +107,6 @@ class RuleXXud(Rule):
             self.hashcode = hash(str(self))
         return self.hashcode
 
-    def materialize(self, triples, predictions): # TODO XXX
-        x_r_2_y = triples.obj_rel_2_sub if self.bc_right else triples.sub_rel_2_obj
-        predicted_sub_obj = []
-        for value in x_r_2_y[self.bc][self.rel]:
-            self.pred += 1
-            predicted_sub_obj.append((value,value))
-            if triples.is_known(value, self.target, value):
-                self.cpred += 1
-        if self.get_confidence() < options.rules['uxx']['confidence']: return False
-        if self.cpred < options.rules['uxx']['support']: return False
-        for predicted in predicted_sub_obj:
-            predictions.add_prediction(predicted[0], self.target, predicted[1], self)
-        return True 
 
 class RuleZ(Rule):
     """
@@ -173,10 +147,6 @@ class RuleZ(Rule):
             self.hashcode += self.target if self.hc_right else -self.target
         return self.hashcode
     
-    def materialize(self, triples, predictions):
-        # todo, implement if required
-        pass
-
 
 class RuleUd(Rule):
     """
@@ -307,34 +277,11 @@ class RuleUc(Rule):
             self.hashcode += self.bc
         return self.hashcode
 
-    # still required ... ???
-    #def materialize(self, triples, predictions):
-    #    if (self.target == self.rel and self.hc == self.bc and self.hc_right == self.bc_right):
-    #        return False
-    #    x_r_2_y = triples.obj_rel_2_sub if self.bc_right else triples.sub_rel_2_obj
-    #    predicted_sub_obj = []
-    #    for value in x_r_2_y[self.bc][self.rel]:
-    #        self.pred += 1
-    #        (x,y) = (value,self.hc) if self.hc_right else (self.hc,value)
-    #        predicted_sub_obj.append((x,y))
-    #        if triples.is_known(x, self.target, y):
-    #            self.cpred += 1
-    #    if self.get_confidence() < config.rules['uc']['confidence']: return False
-    #    if self.cpred < config.rules['uc']['support']: return False
-    #    for predicted in predicted_sub_obj:
-    #        predictions.add_prediction(predicted[0], self.target, predicted[1], self)
-    #    return True
 
 class RuleB(Rule):
     """
     A binary rule of the form h(X,Y) <= b1(X,A), b2(A,B), b3(B,Y). This rule can have between one and seven body atoms.
     """
-
-
-    #branches_at_zero     = config.rules["b"]["branches_per_level"][0][0]
-    #branches_at_zero_rev = config.rules["b"]["branches_per_level"][1][0]
-    #branches_per_level     = config.rules["b"]["branches_per_level"][0][1]
-    #branches_per_level_rev = config.rules["b"]["branches_per_level"][1][1]
 
 
     def __init__(self, ruleset, target, rels, dirs):
@@ -516,18 +463,13 @@ class RuleSet:
         #self.id2rules[rule.id] = rule
         self.rules.append(rule)
 
-
     def add_ruleset(self, other):
         for orule in other.rules:
            self.add_rule(orule) 
 
-
     def add_rules(self, myrules):
         for myrule in myrules:
             self.add_rule(myrule)
-
-    #def get_rule_by_id(self, id):
-    #    return self.id2rules[id]
 
     def size(self):
         return len(self.rules)
@@ -547,27 +489,6 @@ class RuleSet:
                 retained_rules.append(rule)
         print(">>> reduced size of ruleset from " + str(len(self.rules)) + " to " + str(len(retained_rules)) + " rules")
         self.rules = retained_rules
-
-
-
-    #def transfer_prediction_data(self, pid, prediction_data, candidates):
-    #    for index,rindex in enumerate(prediction_data[::3]):
-    #        if rindex == 0: break
-    #        i0 = index*3
-    #        i1,i2 = i0+1, i0+2
-    #        if rindex < 0:
-    #            rule = candidates.get_rule_by_id(-rindex)
-    #            rule.pred = prediction_data[i1]
-    #            rule.cpred = prediction_data[i2]
-    #            rule.aconfidence = rule.cpred / (rule.pred + config.hyperparams["uce"])
-    #            self.rules.append(rule)
-    #        else:
-    #            rule = candidates.get_rule_by_id(rindex)
-    #            rel = rule.target
-    #            sub = prediction_data[i1]
-    #            obj = prediction_data[i2]
-    #            self.add_prediction(sub, rel, obj, rule)
-    #    prediction_data[0] = 0   
 
     def write(self, path, output_format="PyClause"):
         f = open(path, "w")

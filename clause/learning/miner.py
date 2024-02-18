@@ -322,10 +322,7 @@ class TormLearner():
             if not(pattern[index-1]) and pattern[index]: r2r = self.triples.r2r_ss[r]
             if not(pattern[index-1]) and not(pattern[index]): r2r = self.triples.r2r_so[r]
         for r_next in r2r:
-            #if self.triples.get_1to1_score(r_next) < 0.05:
-            #    continue
             self.search(candidates, (*relations, r_next), index+1, pattern)
-            #rule = RuleB(candidates, relations[0], relations[1:], pattern)
 
 
     def mine_rules(self, path_rules_output):
