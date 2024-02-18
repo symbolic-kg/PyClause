@@ -2,7 +2,6 @@ import sys
 import re
 
 
-
 class Triple:
    """
    A triple from a knowledge graph which consist of subject, relation, object.
@@ -50,8 +49,6 @@ class Triple:
 
    def get_relation_token(self):
       return self.index.id2to[self.rel]
-
-
 
 
 class TripleSet:
@@ -121,7 +118,6 @@ class TripleSet:
       self.__index_paths()
       self.__index_sub_obj()
       print(">>> ... read and indexed " +  str(len(self.triples)) + " triples.")
-
 
    def __index_sub_obj(self):
       """

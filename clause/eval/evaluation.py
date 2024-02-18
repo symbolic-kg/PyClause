@@ -4,7 +4,6 @@ import os
 from clause.data.triples import TripleSet
 
 
-
 class Hits():
     """
     Used to compute MRR and Hits@k metrics.

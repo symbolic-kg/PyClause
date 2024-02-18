@@ -5,8 +5,10 @@ from random import sample
 
 class Rule:
 
-    var_symbols = (("X","Y"), ("X","A","Y"), ("X","A","B","Y"), ("X","A","B","C","Y"), ("X","A","B","C","D","Y"), ("X","A","B","C","D","E","Y"), ("X","A","B","C","D","E","F","Y"))
-
+    var_symbols = (
+                    ("X","Y"), ("X","A","Y"), ("X","A","B","Y"), ("X","A","B","C","Y"), ("X","A","B","C","D","Y"),
+                    ("X","A","B","C","D","E","Y"), ("X","A","B","C","D","E","F","Y")
+    )
 
     id_counter = 0
 

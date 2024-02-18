@@ -257,7 +257,6 @@ def get_dir_and_rels_of_body_atoms(atoms, is_brule):
             dirs.append(atoken[1].startswith(vars[counter]) or atoken[1].startswith(vars[-1]))
         else:
             dirs.append(atoken[1].startswith(vars[counter]))
-            # print(str(vars[counter]) + " :  " + str(atoken[1])  + " : " + str(atoken[1].startswith(vars[counter])))
         counter += 1
     return (brels, dirs)
 
@@ -282,14 +281,11 @@ class RuleReader:
             if not(rule == None):
                 rule.store()
                 count_rules += 1
-                # rules.append(rule)
         print(">>> read  " + str(count_rules) + " rules from file " + filepath)
         file.close()
-        return rules
 
             
     def read_line(self, line):
-        # print("reading: " + line)
         token = line.split("\t")
         if len(token) != 4: return None
         pred = int(token[0])
@@ -361,4 +357,3 @@ class RuleReader:
                             rule = RuleUc(self.rules, target, rels, dirs, htoken[1], False, b_const)
                         rule.cpred, rule.pred, rule.conf  = cpred, pred, conf
                     return rule
-            return None
