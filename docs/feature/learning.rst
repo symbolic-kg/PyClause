@@ -37,7 +37,9 @@ Documentation and compile instructions for the release can be found `here <https
     # special syntax for enforcing -const to be used as flag
     options.set("learner.amie.raw.const", "*flag*")
     # rule length (head+body atom) for rules with constants
-    options.set("learner.amie.raw.maxadc", 3) 
+    options.set("learner.amie.raw.maxadc", 3)
+    # you can also add java vm params like so: 
+    # options.set("learner.amie.java_options", ["-Dfile.encoding=UTF-8"]) # add options to list
 
     learner = Learner(options=options.get("learner"))
     learner.learn_rules(path_data=path_train, path_output=path_rules_output)
@@ -91,8 +93,9 @@ For AnyBURL we use the most recent AnyBURL release, AnyBURL-23-1. More informati
     # max body atoms of B-rules
     options.set("learner.anyburl.raw.MAX_LENGTH_CYCLIC", 5)
     # num threads
-     options.set("learner.anyburl.raw.WORKER_THREADS", 2)
-
+    options.set("learner.anyburl.raw.WORKER_THREADS", 2)
+    # you can also add java vm params like so: 
+    # options.set("learner.anyburl.java_options", ["-Dfile.encoding=UTF-8"]) # add options to list
 
     learner = Learner(options=options.get("learner"))
     learner.learn_rules(path_data=path_train, path_output=path_rules_output)

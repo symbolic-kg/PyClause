@@ -1,4 +1,4 @@
-from c_clause import QAHandler, Loader
+from c_clause import QAHandler, Loader, RankingHandler
 from clause.util.utils import get_base_dir, read_map
 from clause import Options
 
@@ -6,12 +6,13 @@ from clause import Options
 
 entity_names_f = f"{get_base_dir()}/data/wnrr/entity_strings.txt"
 train = f"{get_base_dir()}/data/wnrr/train.txt"
+test = f"{get_base_dir()}/data/wnrr/test.txt"
 rules = f"{get_base_dir()}/data/wnrr/anyburl-rules-c5-3600"
 entity_names = read_map(entity_names_f)
 
 opts = Options()
 loader = Loader(options=opts.get("loader"))
-loader.load_data(train)
+loader.load_data(data=train, filter="", target=test)
 loader.load_rules(rules)
 loader.replace_ent_strings(entity_names)
 # if a relation map is also provided
@@ -31,3 +32,11 @@ for i in range(len(answers)):
 
 # note: you now cannot load the ruleset with the loader anymore
 # as it is based on the raw strings of the data
+    
+
+# now save a ranking file on the test split with nice and readable strings
+ranker = RankingHandler(opts.get("ranking_handler"))
+ranker.calculate_ranking(loader=loader)
+ranker.write_ranking(path=f"{get_base_dir()}/local/ranking-nice.txt", loader=loader)
+
+    

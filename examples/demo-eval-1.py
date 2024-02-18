@@ -23,10 +23,7 @@ ranking_file = f"{get_base_dir()}/local/ranking-wnrr.txt"
 
 options = Options()
 options.set("ranking_handler.aggregation_function", "maxplus")
-options.set("ranking_handler.num_top_rules", -1) # reset to -1
 options.set("ranking_handler.topk", 100)
-
-options.set("ranking_handler.disc_at_least", 100)
 options.set("loader.load_u_d_rules", False)
 options.set("loader.load_u_xxc_rules", False)
 options.set("loader.load_u_xxd_rules", False)
@@ -77,8 +74,4 @@ for rel in testset.rels:
 
 
 # finally, write the ranking to a file, there are two ways to to this, both reults into the same ranking
-# 1) use the ranking object
-ranking.write(ranking_file)
-
-# 2) ask the ranker to write the ranking directly
-# ranker.write_ranking(path=ranking_file, loader=loader)
+ranker.write_ranking(path=ranking_file, loader=loader)

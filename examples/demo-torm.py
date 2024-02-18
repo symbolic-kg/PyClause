@@ -6,27 +6,27 @@ from c_clause import Loader
 
 # *** Example for rule mining with the experimental module TORM  ***
 
-# ensure you have downloaded the dataset
-path_train = f"{get_base_dir()}/data/fb15k-237/train.txt"
-path_rules_output = f"{get_base_dir()}/local/rules-fb15k-237-torm.txt"
+path_train = f"{get_base_dir()}/data/wnrr/train.txt"
+path_rules_output = f"{get_base_dir()}/local/myrules/rules-torm.txt"
 
 # load a triple set from a file and display some meta info about it
 triples = TripleSet(path_train)
 
 options = Options()
-options.set("torm_learner.mode", "hybrid")
+options.set("torm_learner.mode", "torm")
 
 ## some example options
-options.set("torm_learner.torm.b.length", 1)
-options.set("torm_learner.torm.uc.support", 15)
-options.set("torm_learner.torm.xx_ud.support", 15)
-options.set("torm_learner.torm.xx_uc.support", 15)
-options.set("torm_learner.torm.ud.support", 15)
-options.set("torm_learner.torm.z.support", 15)
+options.set("torm_learner.torm.b.active", False)
+options.set("torm_learner.torm.uc.support", 10)
+options.set("torm_learner.torm.xx_ud.support", 10)
+options.set("torm_learner.torm.xx_uc.support", 10)
+options.set("torm_learner.torm.ud.support", 10)
+options.set("torm_learner.torm.z.support", 10)
 
-# create a miner object; as rule mining is always against a specific dataset, the index of the dataset is used
-# we choose all relations in the datasets as targets to learn rules for
-# instead of that, a specific list of target relations can be set as first argument
+# create a miner object; as rule mining is always against a specific dataset,
+# the index of the dataset is used;  we choose all relations in the datasets
+# as targets to learn rules for instead of that, a specific list of target
+# relations can be set as first argument
 # e.g.,  learner = TormLearner(options, [triples.index.to2id["_also_see"]], triples)
 
 learner = TormLearner(options=options, targets=triples.rels, triples=triples)

@@ -5,12 +5,12 @@ from clause.util.utils import get_base_dir
 import numpy as np
 
 
-## *** Example for triple ccoring on Yago3-10 ***
+## *** Example for triple ccoring on Yago3-10 **
 
 
 ## ** Preparation **
 
-# ensure that the data is downloaded
+# ensure that the data is downloaded from the data downloads on read the docs
 data = f"{get_base_dir()}/data/yago3-10/train.txt"
 rules = f"{get_base_dir()}/data/yago3-10/anyburl-rules-small.txt"
 opts = Options()

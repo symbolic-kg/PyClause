@@ -68,7 +68,7 @@ class Options():
     def flat(self, key = None):
         """Returns a flat dictionary representation (or value) of the dictionary referred to by the given key.
         
-        All nested / structured keys below that key are mapped to strings as e.g. 'torm.rules.b'.
+        All nested / structured keys below that key are mapped to strings separated by dots '.' .
         If a key is not specified all options are returned in the flat dictionary representation.
         """
         if key == None:
@@ -90,8 +90,8 @@ class Options():
         """Returns a flat dictionary representation (or value) of the dictionary referred to by the given key,
         where all values are converted to strings.
          
-        All nested / structured keys below that key are mapped to strings
-        as e.g. 'torm.rules.b'. If a key is not specified all options are returned in the flat dictionary representation.
+        All nested / structured keys below that key are mapped to strings separated by dots '.'.
+        If a key is not specified all options are returned in the flat dictionary representation.
         """
         fd = self.flat(key)
         try:

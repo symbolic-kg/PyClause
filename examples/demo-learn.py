@@ -23,9 +23,10 @@ options.set("learner.amie.raw.mins", 2)
 options.set("learner.amie.raw.const", "*flag*") # special syntax for enforcing -const to be used as flag without value
 options.set("learner.amie.raw.maxadc", 2)
 # you can also add java vm params like so: 
-options.set("learner.amie.java_options", ["-Dfile.encoding=UTF-8"])
+# options.set("learner.amie.java_options", ["-Dfile.encoding=UTF-8"])
 
-# AnyBURL
+# rule learning with AnyBURL works similar
+
 # options.set("learner.mode", "anyburl")
 # options.set("learner.anyburl.time", 30)
 # options.set("learner.anyburl.raw.MAX_LENGTH_CYCLIC", 5)

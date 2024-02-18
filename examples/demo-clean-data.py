@@ -6,6 +6,7 @@ from clause.util.utils import get_base_dir
 # ** Example: Removing special characters from input KGs to avoid parsing problems **
 #  use this if you have problems with special characters in your dataset when, e.g., loading rules
 #  or when you have problems with the windows default en/decoding 
+#  on the raw splits of yago3-10 for example AMIE has problems with some of the characters
 
 path_train = f"{get_base_dir()}/data/yago3-10/train.txt"
 path_valid = f"{get_base_dir()}/data/yago3-10/valid.txt"
