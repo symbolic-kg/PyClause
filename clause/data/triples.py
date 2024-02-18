@@ -183,20 +183,15 @@ class TripleSet:
 
    def is_true(self, sub_token, rel_token, obj_token):
       '''
-      Used to check in constant time if a triple (token forrmat) exists within the dataset, i.e. if the triple is known.
+      Used to check in constant time if a triple (token format) exists within the dataset, i.e. if the triple is known.
       '''
-      # print("is true: " + str((sub_token, rel_token, obj_token)))
       if rel_token in self.index.to2id and obj_token in self.index.to2id and sub_token in self.index.to2id:
          return self.is_known(self.index.to2id[sub_token], self.index.to2id[rel_token], self.index.to2id[obj_token])
       else:
-         # print(">>> index not found")
          # this can occur ...
          return False
    
    def get_1to1_score(self, rel):
-      '''
-      Not sure if this method is still in use. Its prupose was to measure the degree of being a 1:1 relation.
-      '''
       num_obj = len(self.r2_obj[rel])
       num_sub = len(self.r2_sub[rel])
       sub_per_obj = num_sub / num_obj
