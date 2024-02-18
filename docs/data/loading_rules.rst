@@ -105,11 +105,13 @@ See an example below for translating B-rules. An example for all rule types is g
 
 
 
-**Writing/Obtaining rules**
+Writing Rules and Retrieving Rule Index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 The loader can also write back the ruleset to a file with  ``loader.write_rules(path)``. This can be used to store subsets of rules. For instance, the loader could only load one parcticular rule type (see below)
 and subsequently writing the rules will only contain this rule type in the output file. Likewise ``loader.get_rules()`` returns the loaded rulset with the rule statistics. It can be processed and loaded back with the loader.
-The function ``loader.rule_index()`` provides a mapping that assigns each string rule a numeric idx. Both function can be used to obtain the global index that assigns inter idx's to string rules.
+The function ``loader.rule_index()`` provides a mapping that assigns each string rule a numeric idx. Both function can be used to obtain the global index that assigns inter idx's to string rules, i.e., the ordering is the same.
 
 Loading Options
 ~~~~~~~~~~~~~~~

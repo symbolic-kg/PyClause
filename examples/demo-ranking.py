@@ -49,7 +49,7 @@ ranker.write_rules(path="local/rule-feats_tail.txt", loader=loader, direction="t
 
 # list of dicts
 # note that the candidates are not sorted anymore
-# as in 'head_ranking
+# as in 'head_ranking'
 rule_feats_head = read_jsonl("local/rule-feats_head.txt")
 
 
