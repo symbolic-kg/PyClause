@@ -127,7 +127,8 @@ ranking_handler:
   # select from "maxplus" / "noisyor"
   # maxplus scores of a ranking will be of the highest predicting rule
   # candidate discrimination is based on comparing the sequences of predicting
-  # rules confidences lexicographically
+  # rules confidences lexicographically; note that the outputed scores
+  # are only the ones of the rule with the highest confidence 
   # noisyor scores and ranking is based on sorting the noisy-or product
   # the noisy-or sorting is based on -\sum_i(log(1-conf_i)) and transformed
   # before outputted; this mitigates floating point considerations 
@@ -141,6 +142,10 @@ ranking_handler:
   # independent of what true answers are on target for the the query
   filter_w_target: True
   # choose between "random" / "frequency"
+  # frequency: if two candidates can not be discriminated because they are predicted
+  # by exactly the same rules; discriminate them according to their number of appearances
+  # in the 'data' argument KG (e.g., the train data)
+  # random: random tie handling
   tie_handling: "frequency"
   # -1 for using ALL available threads
   num_threads: -1 
@@ -196,7 +201,7 @@ qa_handler:
   # dont add candidate proposals c for queries (h, r, ?) or (?, r, t) if
   # (h, r, c) or (c, r, t) exists in the KG given by the "data" argument of the loader
   filter_w_data: True
-  # choose between "random" / "frequency"
+  # choose between "random" / "frequency", see ranking_handler
   tie_handling: "frequency"
   # -1 for using ALL available threads
   num_threads: -1
