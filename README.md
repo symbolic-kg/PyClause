@@ -10,7 +10,7 @@ citizenOf(X,Y) <= bornIn(X,A), locatedIn(A,Y)
 speaks(X,english) <= lives(X,london)
 
 ```
-
+PyClause is maintained by the groups that developed the rule miners [AMIE](https://github.com/dig-team/amie) and [AnyBURL](https://web.informatik.uni-mannheim.de/AnyBURL/).
 
 
 ## Documentation
