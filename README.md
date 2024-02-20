@@ -14,7 +14,7 @@ PyClause is maintained by the groups that developed the rule miners [AMIE](https
 
 
 ## Documentation
-Documentation of library and features can be found [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
+Documentation of library and features as well as **data** downloads can be found [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
 All usable default options for the configuration files can be found in [clause/config-default.yaml](clause/config-default.yaml) 
 
 
