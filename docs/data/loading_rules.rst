@@ -111,7 +111,8 @@ Writing Rules and Retrieving Rule Index
 
 The loader can also write back the ruleset to a file with  ``loader.write_rules(path)``. This can be used to store subsets of rules. For instance, the loader could only load one parcticular rule type (see below)
 and subsequently writing the rules will only contain this rule type in the output file. Likewise ``loader.get_rules()`` returns the loaded rulset with the rule statistics. It can be processed and loaded back with the loader.
-The function ``loader.rule_index()`` provides a mapping that assigns each string rule a numeric idx. Both function can be used to obtain the global index that assigns inter idx's to string rules, i.e., the ordering is the same.
+The function ``loader.rule_index()`` provides a mapping that assigns each string rule a numeric idx. Both function can be used to obtain the global index that assigns integer idx's to string rules, i.e., the ordering is the same.
+
 
 Loading Options
 ~~~~~~~~~~~~~~~
@@ -119,7 +120,9 @@ Loading Options
 **Loading constraints**
 
 By using the ``Loader`` options the loader can be configured to ignore certain rules and rule types. It can also modify the confidence computation of the rules.
+It is likewise possible to subset/modify an already loaded ruleset by updating the options with ``loader.set_options(..)`` and subsequently invoking ``loader.update_rules()``.
 The full list of options can be found in the `config-default.yaml <https://github.com/symbolic-kg/PyClause/blob/master/clause/config-default.yaml>`_ .
+
 
 
 .. code-block:: python
@@ -157,9 +160,10 @@ The full list of options can be found in the `config-default.yaml <https://githu
 
     loader.load_rules(rules=rules, stats=stats)
 
-**Resetting Options**
+**Resetting options**
 
 Using the ``Loader.set_options(...)`` one can also, e.g., after loading data, reset the loader options. This will not affect the already loaded rules. But it can be used to load the same or another ruleset with different constraints.
+For updating the **currently** loaded ruleset based on the newly set loader options read below.
 
 .. code-block:: python
 
@@ -177,6 +181,39 @@ Using the ``Loader.set_options(...)`` one can also, e.g., after loading data, re
     # load new ruleset ignoring U_c rules; old ruleset in loader is deleted
     loader.load_rules(rules=ruleset)
 
+**Updating the currently loaded ruleset after resetting options**
+
+After the loader options are changed, the updated options can directly applied to the currently loaded rule set. With the ``Loader.update_rules()``.
+This will update/filter the currently loaded ruleset in regard to rule application performed with the different handlers. It allows to only load the rules once
+but to perform multiple experiments with different rulesets. The original rule set is retrieved, it is also possible to go back to the original rule set
+by modifying the options accordingly.
+
+.. code-block:: python
+
+    ### 
+    ### construct loader with options, load data etc..
+    ###
+
+    loader.load_rules(rules=ruleset)
+
+    # now do something, e.g., calculate a ranking with RankingHandler and the loader
+    # see feature section
+
+    # change some option
+    opts.set("loader.load_u_c_rules", False)
+    opts.set("loader.b_num_unseen", 100)
+    loader.set_options(opts.get("loader"))
+    # update the rules
+    # this will modify b-rules and ignore c-rules when the loader is used for application
+    loader.update_rules()
+   
+   # now calculate a ranking with RankingHandler, which is calculated without c-rules
+
+
+.. note::
+
+   Writing the rules and retrieving the rules with ``Loader.get_rules()`` or ``Loader.rule_index()`` will always be based on the full rule set that has been loaded independent of the updating.
+   Also the inter idx's of the rules when not outputting strings are based on the global index.
 
 Custom Rule Confidences
 ~~~~~~~~~~~~~~~~~~~~~~~

@@ -264,6 +264,97 @@ def test_multi_thr_rule_loading():
 
     print("Test loading multithreaded successful.")
 
+
+def test_update_rules():
+    print(get_ab_dir())
+
+    base_dir = get_base_dir()
+    train_path = join_u(base_dir, join_u("data", "wnrr", "train.txt"))
+    filter_path = join_u(base_dir, join_u("data", "wnrr", "valid.txt"))
+
+    test_path = join_u(base_dir, join_u("data", "wnrr", "test.txt"))
+    rules_path = join_u(base_dir, join_u("data", "wnrr", "anyburl-rules-c5-3600"))
+
+    testing_dir = join_u(base_dir, join_u("local", "testing"))
+
+    if not path.isdir(testing_dir):
+        os.mkdir(testing_dir)
+
+    ranking_path = join_u(testing_dir, "test-ranking")
+
+    conf_path = join_u(testing_dir, "testing-conf")
+
+    eval_config = [
+        f"PATH_TRAINING = {train_path}",
+        f"PATH_TEST = {test_path}",
+        f"PATH_VALID = {filter_path}",
+        f"PATH_PREDICTIONS = {ranking_path}"
+        ]
+    
+    with open(conf_path, "w") as f:
+        f.write("\n".join(eval_config))
+    f.close()
+
+    options = Options()
+
+
+    options.set("ranking_handler.disc_at_least", 100)
+
+    loader = c_clause.Loader(options.get("loader"))
+    # only before data is loaded
+    loader.set_entity_index(["mustnotbreakanything"])
+    loader.set_relation_index(["mustnotbreaktoo"])
+    loader.load_data(train_path, filter_path, test_path)
+
+    # load rules twice to test interference
+    options.set("loader.load_b_rules", False)
+    loader.set_options(options.get("loader"))
+    loader.load_rules(rules_path)
+
+    options.set("loader.load_b_rules", True)
+    loader.set_options(options.get("loader"))
+    loader.load_rules(rules_path)
+
+    # all rules have been loaded, now subset
+    options.set("loader.load_u_d_rules", False)
+    options.set("loader.load_u_d_rules", False)
+    options.set("loader.load_u_xxc_rules", False)
+    options.set("loader.load_u_xxd_rules", False)
+
+    loader.set_options(options.get("loader"))
+    loader.update_rules()
+
+    # write and load subset
+    loader.write_rules(testing_dir + "/written_rules")
+    loader.load_rules(testing_dir + "/written_rules")
+
+    ranker = c_clause.RankingHandler(options.get("ranking_handler"))
+    ranker.calculate_ranking(loader)
+    ranker.write_ranking(ranking_path, loader)
+
+    p = Popen(
+        f"java -cp {get_ab_dir()} de.unima.ki.anyburl.Eval {conf_path}",
+        shell=True,
+        stdout=PIPE,
+        stderr=PIPE
+        )
+    stdout, stderr = p.communicate()
+
+    mrr_result = str(stdout)[-9:-3]
+    hAt10 = str(stdout)[-18:-12]
+    hA1 = str(stdout)[-36:-30]
+
+    expectMRR = "0.4958"
+    expecth1 =  "0.4569"
+    expecth10 = "0.5718"
+
+    check_all = all([mrr_result==expectMRR, hA1==expecth1, hAt10==expecth10])
+    if (not check_all):
+        raise Exception(f"Update rules test: Expected test ranking results are {[expecth1, expecth10, expectMRR]} but i found {[hA1, hAt10, mrr_result]}")
+        
+    print(f"Test of update rules was successful expected: {[expecth1, expecth10, expectMRR]}")
+    print(f"Calculated {[hA1, hAt10, mrr_result]}")
+
 def test_uc_b_zero_ranking():
     print(get_ab_dir())
 

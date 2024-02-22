@@ -542,7 +542,7 @@ void RuleFactory::parseAtom(const std::string& input, strAtom& atom) {
 // note that rules remains unchanged e.g. the global ruleset is the one from initial rule loading
 void RuleFactory::updateRules(std::vector<std::unique_ptr<Rule>>& rules, std::unordered_map<int, std::set<Rule*,compareRule>>& relToRules){
     relToRules.clear();
-    int numNew;
+    int numNew = 0;
 
     for (std::unique_ptr<Rule>& r : rules){
         const char* type = r->type;
@@ -670,7 +670,7 @@ void RuleFactory::updateRules(std::vector<std::unique_ptr<Rule>>& rules, std::un
         }
     }
 
-    std::cout<<"From the global rule set loaded (Loader.get_rules()), " <<numNew<<" rules will be used for application." <<std::endl;
+    std::cout<<"From the global rule set loaded (Loader.get_rules()) with size " <<rules.size()<< ", " <<numNew<<" of them will be used for application." <<std::endl;
 }
 
 void RuleFactory::parseSymAtom(strAtom& inputAtom, symAtom& symAt){
