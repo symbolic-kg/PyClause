@@ -170,6 +170,15 @@ PYBIND11_MODULE(c_clause, m) {
         .def("set_relation_index",  &Loader::setRelIndex, py::arg("index"))
         .def("rule_index",  &Loader::getRuleIdx)
         .def("set_options", &Loader::setOptions, py::arg("options"))
+        .def(
+            "update_rules",
+             &Loader::updateRules,
+            R"pbdoc(
+              Updates rules according to new options set with loader.set_options(new_options). \n If, e.g.,  in new_options load_b_rules=False
+              then these rules will not be used in rule application when the loader is passed to any handler. It can be used for all the options of the loader.
+              Note, however, the global rule index obtained with loader.get_rules() maintains the same. Each rule keeps its original idx from initially loading the rules. 
+            )pbdoc"
+        )
     ; // class end
 
     // PredictionHandler()

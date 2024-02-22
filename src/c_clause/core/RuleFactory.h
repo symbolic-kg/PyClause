@@ -27,7 +27,10 @@ public:
     void parseAtom(const std::string& input, strAtom& atom);
     void parseSymAtom(strAtom& inputAtom, symAtom& symA);
 
-   
+    // updates relToRules based on the set rule options and rules; rules is unchanged
+    void updateRules(std::vector<std::unique_ptr<Rule>>& rules, std::unordered_map<int, std::set<Rule*,compareRule>>& relToRules);
+
+    
     void setCreateRuleB(bool ind);
     void setCreateRuleC(bool ind);
     void setCreateRuleZ(bool ind);

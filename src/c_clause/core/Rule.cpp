@@ -232,6 +232,7 @@ RuleB::RuleB(std::vector<int>& relations, std::vector<bool>& directions) {
     this->_directions = directions;
     std::reverse(_directions.begin(), _directions.end());
     _directions.flip();   
+    type = "b";
 }
 
 std::string RuleB::computeRuleString(Index* index){
@@ -394,7 +395,8 @@ RuleC::RuleC(std::vector<int>& relations, std::vector<bool>& directions, bool& l
     std::reverse(_relations.begin()+1, _relations.end());
     this->_directions = directions;
     std::reverse(_directions.begin(), _directions.end());
-    _directions.flip();   
+    _directions.flip();
+    type = "c";   
 }
 
 
@@ -746,14 +748,12 @@ void RuleC::searchCurrGroundings(
 
 
 // ***RuleZ implementation*** 
-
-
-
 RuleZ::RuleZ(int& relation, bool& leftC, int& constant) {
     this->relation=relation;
     this->targetRel=relation;
     this->leftC = leftC;
     this->constant = constant;
+    type = "z";
 }
 
 std::string RuleZ::computeRuleString(Index* index){
@@ -867,7 +867,8 @@ RuleD::RuleD(std::vector<int>& relations, std::vector<bool>& directions, bool& l
     std::reverse(_relations.begin()+1, _relations.end());
     this->_directions = directions;
     std::reverse(_directions.begin(), _directions.end());
-    _directions.flip();   
+    _directions.flip();
+    type = "d";   
 }
 
 std::string RuleD::computeRuleString(Index* index){
@@ -1300,6 +1301,8 @@ RuleXXd::RuleXXd(std::vector<int>& relations, std::vector<bool>& directions) {
     // only used and set after a rule is contructed and parsed from AnyBURL rule files
     this->predictHead = true;
     this->predictHead = true;
+
+    type = "xxd";
 }
 
 void RuleXXd::setPredictHead(bool ind){
@@ -1428,6 +1431,8 @@ RuleXXc::RuleXXc(std::vector<int>& relations, std::vector<bool>& directions, int
     // only used and set after a rule is contructed and parsed from AnyBURL rule files
     this->predictHead = true;
     this->predictHead = true;
+
+    type = "xxc";
 }
 
 std::string RuleXXc::computeRuleString(Index* index){

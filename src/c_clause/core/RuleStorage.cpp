@@ -222,7 +222,9 @@ std::set<Rule*, compareRule>&  RuleStorage::getRelRules(int relation){
     return relToRules[relation];
 }
 
-
+std::unordered_map<int, std::set<Rule*,compareRule>>& RuleStorage::getRelToRules(){
+    return relToRules;
+}
 
 std::vector<std::unique_ptr<Rule>>& RuleStorage::getRules(){
     return rules;

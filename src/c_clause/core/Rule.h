@@ -41,6 +41,7 @@ public:
     ss << static_cast<const void*>(this);
     rulestring = ss.str();
 	};
+	virtual ~Rule() = default;
 	void setID(int ID);
 	void print();
 	//Getter
@@ -88,6 +89,7 @@ public:
 
 	bool predictHead;
 	bool predictTail;
+	const char* type;
 	
 protected:
 	int ID;

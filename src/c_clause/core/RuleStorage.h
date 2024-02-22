@@ -26,6 +26,7 @@ public:
 
     bool addAnyTimeRuleWithStats(std::string ruleString, int id, int numPred, int numTrue, bool exact);
     std::vector<std::unique_ptr<Rule>>& getRules();
+    std::unordered_map<int, std::set<Rule*,compareRule>>& getRelToRules();
     std::set<Rule*, compareRule>& getRelRules(int relation);
     void clearAll();
     
@@ -33,9 +34,11 @@ public:
 private:
     // rules owns the rule objects
     // RelToRules keeps the rules sorted due to the set, iterating over all the rules would
-    // be faster with a vector, though
-    // accessing rules by relation and index needs to be hacked also, let's see
+    // rules defines the global index but should never be used for application features
+    // e.g. from python side user may want to subset rules which will only affect relToRules
+    // as we need to be able to come back to larger sets after subsetting
     std::vector<std::unique_ptr<Rule>> rules;
+    // from here rule application is performed; application is always based on a target relation
     std::unordered_map<int, std::set<Rule*,compareRule>> relToRules;
     std::shared_ptr<Index> index;
     // TODO you dont really need a shared pointer here; but at least options should be global 

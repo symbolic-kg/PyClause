@@ -198,6 +198,10 @@ void Loader::setRuleOptions(std::map<std::string, std::string> options, RuleFact
     }
 }
 
+void Loader::updateRules(){
+    ruleFactory->updateRules(rules->getRules(), rules->getRelToRules());
+}
+
 std::vector<std::string> Loader::getRuleIdx(){
     if (!loadedRules){
         throw std::runtime_error("You cannot obtain a rule index before you loaded rules into the laoder.");

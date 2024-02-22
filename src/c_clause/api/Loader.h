@@ -45,6 +45,7 @@ public:
     std::vector<std::string> getRuleIdx();
 
     void setOptions(std::map<std::string, std::string> options);
+    void updateRules();
 
     
 

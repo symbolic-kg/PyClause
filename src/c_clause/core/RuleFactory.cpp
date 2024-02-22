@@ -1,9 +1,11 @@
 
 #include <string>
+#include <cstring>
 
 #include "RuleFactory.h"
 #include "Globals.h"
 #include "Types.h"
+
 
 
 
@@ -534,6 +536,141 @@ void RuleFactory::parseAtom(const std::string& input, strAtom& atom) {
             throw std::runtime_error("Error when parsing string in parseAtom unexpected format:" + input);
         }
     }
+}
+
+// update (create new) relToRules based on options and all rules in rules
+// note that rules remains unchanged e.g. the global ruleset is the one from initial rule loading
+void RuleFactory::updateRules(std::vector<std::unique_ptr<Rule>>& rules, std::unordered_map<int, std::set<Rule*,compareRule>>& relToRules){
+    relToRules.clear();
+    int numNew;
+
+    for (std::unique_ptr<Rule>& r : rules){
+        const char* type = r->type;
+        std::array<int, 2> stats = r->getStats();
+        int numPred = stats[0];
+        int truePred = stats[1];
+        int length = r->getRelations().size()-1;
+        if (strcmp(type, "b")==0){
+            if (!createRuleB){
+                continue;
+            }
+            if (BmaxLength>0 && length>BmaxLength){
+                continue;
+            }
+            if (BminPreds>numPred){
+                continue;
+            }
+            if (BminCorrect>truePred){
+                continue;
+            }
+            if (BminConf >((double) truePred/ (double) numPred) ){
+                continue;
+            }
+            r->setBranchingFactor(BbranchingFactor);
+            r->setNumUnseen(BnumUnseen);
+            relToRules[r->getTargetRel()].insert(r.get());
+            numNew += 1;
+
+        } else if ((strcmp(type, "c")==0)){
+            if (!createRuleC){
+                continue;
+            }
+            if (CmaxLength>0 && length>CmaxLength){
+                continue;
+            }
+            if (CminPreds>numPred){
+                continue;
+            }
+            if (CminCorrect>truePred){
+                continue;
+            }
+            if (CminConf > ((double) truePred/ (double) numPred) ){
+                continue;
+            }           
+            r->setBranchingFactor(DbranchingFactor);
+            r->setNumUnseen(CnumUnseen);
+            relToRules[r->getTargetRel()].insert(r.get());
+            numNew += 1;
+
+        } else if ((strcmp(type, "d")==0)){
+             if (!createRuleD){
+                continue;
+            }
+            if (DmaxLength>0 && length>DmaxLength){
+                continue;
+            } 
+            if (DminPreds>numPred){
+                continue;
+            }   
+            if (DminCorrect>truePred){
+                continue;
+            }
+            if (DminConf > ((double) truePred/ (double) numPred) ){
+                continue;
+            }   
+            r->setConfWeight(DconfWeight);
+            r->setNumUnseen(DnumUnseen);
+            relToRules[r->getTargetRel()].insert(r.get());
+            numNew += 1;
+
+        } else if ((strcmp(type, "z")==0)){
+             if (!createRuleZ){
+                continue;
+            }
+            if (ZminPreds>numPred){
+                continue;
+            }
+            if (ZminCorrect>truePred){
+                continue;
+            }
+            if (ZminConf > ((double) truePred/ (double) numPred) ){
+                continue;
+            }      
+            r->setConfWeight(ZconfWeight);
+            r->setNumUnseen(ZnumUnseen);
+            relToRules[r->getTargetRel()].insert(r.get());
+            numNew += 1;
+
+        } else if ((strcmp(type, "xxd")==0)){
+            if (!createRuleXXd){
+                continue;
+            }
+            if (XXDminPreds>numPred){
+                continue;
+            }   
+            if (XXDminCorrect>truePred){
+                continue;
+            }
+            if (XXDminConf > ((double) truePred/ (double) numPred) ){
+                continue;
+            }     
+            r->setNumUnseen(XXDnumUnseen);
+            relToRules[r->getTargetRel()].insert(r.get());
+            numNew += 1;
+
+        } else if ((strcmp(type, "xxc")==0)){
+             if (!createRuleXXc){
+                continue;
+            }
+            if (XXCminPreds>numPred){
+                continue;
+            }
+            if (XXCminCorrect>truePred){
+                continue;
+            } 
+            if (XXCminConf > ((double) truePred/ (double) numPred) ){
+                continue;
+            }         
+            r->setNumUnseen(XXCnumUnseen);
+            relToRules[r->getTargetRel()].insert(r.get());
+            numNew += 1;
+
+        } else {
+            throw std::runtime_error("Did not recognize rule type in updating. This should never happen.");
+        }
+    }
+
+    std::cout<<"From the global rule set loaded (Loader.get_rules()), " <<numNew<<" rules will be used for application." <<std::endl;
 }
 
 void RuleFactory::parseSymAtom(strAtom& inputAtom, symAtom& symAt){
