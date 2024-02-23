@@ -44,14 +44,3 @@ loader.set_options(Options().get("loader"))
 loader.update_rules()
 # calculate ranking with all rules
 ranker.calculate_ranking(loader=loader)
-
-    
-
-
-
-
-
-
-
-
-
