@@ -22,7 +22,7 @@ class RelationalCSR {
         }
 
         ~RelationalCSR(){
-            for (int rel=0; rel < this->numRelations; rel++){
+            for (int rel=0; rel < this->numRelations*2; rel++){
                 delete csrs[rel]->colInd;
                 delete csrs[rel]->rowPtr;
                 delete csrs[rel];

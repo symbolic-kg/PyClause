@@ -25,12 +25,7 @@ public:
     
     void setOptions(std::map<std::string, std::string> options);
     void setOptionsFrontend(std::map<std::string, std::string> options);
-    
-
     void setCollectRules(bool ind);
-
-   
-
 
 private:
     ApplicationHandler ranker;

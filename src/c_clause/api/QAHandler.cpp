@@ -45,6 +45,7 @@ void QAHandler::setOptions(std::map<std::string, std::string> options){
 
 }
 
+
 //calculate query answers, queries are (sourceEntity, relation)
 void QAHandler::calculate_answers(std::vector<std::pair<std::string, std::string>>& queries, std::shared_ptr<Loader> dHandler, std::string headOrTail){
     std::vector<std::pair<int, int>> intQueries(queries.size());
@@ -69,7 +70,6 @@ void QAHandler::calculate_answers(std::vector<std::pair<std::string, std::string
 
 
 void QAHandler::calculate_answers(std::vector<std::pair<int, int>>& queries, std::shared_ptr<Loader> dHandler, std::string headOrTail){
-
     this->queries = queries; // cache queries
 
     if (!dHandler->getLoadedData()){
@@ -130,7 +130,6 @@ void QAHandler::calculate_answers(std::vector<std::pair<int, int>>& queries, std
         }
     }
 }
-
 
 
 //calculate query answers, queries are (sourceEntity, relation)
