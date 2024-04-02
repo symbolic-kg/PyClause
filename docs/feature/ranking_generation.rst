@@ -92,6 +92,7 @@ The explanations for the tail direction are identical and the dicts are always a
 
 
 The complete ranking can also be written to a file. The output format is the same as the AnyBURL ranking files. This function only supports string outputs.
+
 .. code-block:: python
 
     ranker.write_ranking(path=out, loader=loader)
