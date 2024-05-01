@@ -168,9 +168,11 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
             int rel = std::get<0>(tasks[i]);
             int source = std::get<1>(tasks[i]);
             int length = std::get<2>(tasks[i]);
-               
+
+            int adapted_topk = rank_topk;   
             if (adapt_topk){
-                qResults.setAddTopK(rank_topk+length);
+                adapted_topk = rank_topk + length;
+                qResults.setAddTopK(adapted_topk);
             }
             ctr+=1;
             if (verbose && ctr%chunk==0 && dirIsTail){
@@ -206,7 +208,7 @@ void ApplicationHandler::calculateQueryResults(TripleStorage& target, TripleStor
                 }
                 // possibly can be optimized
                 // checking for discrimination after every rule had no noticeable overhead
-                if (currSize>=rank_topk){
+                if (currSize>=adapted_topk){
                     if (rank_discAtLeast>0){
                          if (qResults.checkDiscrimination()){
                             break;

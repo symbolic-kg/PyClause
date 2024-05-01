@@ -495,9 +495,9 @@ def test_237_all_ranking():
     hAt10 = str(stdout)[-18:-12]
     hA1 = str(stdout)[-36:-30]
 
-    expectMRR = "0.3318"
+    expectMRR = "0.3322"
     expecth1 =  "0.2465"
-    expecth10 = "0.5055"
+    expecth10 = "0.5062"
 
     check_all = all([mrr_result==expectMRR, hA1==expecth1, hAt10==expecth10])
     if (not check_all):

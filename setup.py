@@ -31,7 +31,7 @@ def cpp_flag(compiler):
   raise RuntimeError("Unsupported compiler: at least C++14 support is needed")
 
 
-# (c) Sylvain Corlay, https://github.com/pybind/python_example
+# adapted from (c) Sylvain Corlay, https://github.com/pybind/python_example
 class BuildExt(build_ext):
 
   c_opts = {
@@ -46,7 +46,7 @@ class BuildExt(build_ext):
       opts.append('-DVERSION_INFO="%s"' % self.distribution.get_version())
       opts.append(cpp_flag(self.compiler))
       opts.append("-fopenmp") # assumes openmp is supported
-      # opts.append("-w") # uncommment to suppress warnings
+      # opts.append("-w") # uncommment for warnings
     elif ct == "msvc":
       opts.append('/DVERSION_INFO=\\"%s\\"' % self.distribution.get_version())
       opts.append("/openmp")
@@ -70,6 +70,7 @@ ext_modules = [
 
 setup(
   name                  = "PyClause",
+  version               = "0.0.1",
   ext_modules           = ext_modules,
   install_requires      = ["pybind11>=2.2.0", "numpy", "flatdict", "pyyaml"],
   cmdclass              = {"build_ext": BuildExt},
