@@ -50,6 +50,14 @@ class Hits():
             hk_prev = hk
         return mrr
     
+    def get_mr(self, num_of_entities):
+        """
+        Computes and returns the mean rank.
+        miss_k determines the assumed position of a
+        candidate that was not found in the ranking.
+        """
+        return (self.get_mr_head(num_of_entities) + self.get_mr_tail(num_of_entities)) / 2
+    
     def get_mrr_head(self):
         """
         Computes and returns the head MRR.
@@ -65,6 +73,25 @@ class Hits():
             hk_prev = hk
         return mrr
     
+    def get_mr_head(self, num_of_entities):
+        """
+        Computes and returns the head mean rank.
+        num_of_entities determines the assumed position of a
+        candidate that was not found in the ranking.
+        """
+        mr = 0.0
+        rank_sum = 0
+        counter_found = 0
+        previous = 0
+        for k in range(self.ATKMAX):
+            current = self.hits_ad_n_head[k] - previous
+            rank_sum = rank_sum + current * (k+1)
+            counter_found = counter_found + current
+            previous = self.hits_ad_n_head[k]
+        if counter_found != self.counter_head:
+            rank_sum = rank_sum + (self.counter_head - counter_found) * num_of_entities
+        return rank_sum / self.counter_head
+    
     def get_mrr_tail(self):
         """
         Computes and returns the tail MRR.
@@ -79,6 +106,26 @@ class Hits():
             mrr += hk_diff * (1.0 / (k+1))
             hk_prev = hk
         return mrr
+    
+
+    def get_mr_tail(self, num_of_entities):
+        """
+        Computes and returns the tail mean rank.
+        num_of_entities determines the assumed position of a
+        candidate that was not found in the ranking.
+        """
+        mr = 0.0
+        rank_sum = 0
+        counter_found = 0
+        previous = 0
+        for k in range(self.ATKMAX):
+            current = self.hits_ad_n_tail[k] - previous
+            rank_sum = rank_sum + current * (k+1)
+            counter_found = counter_found + current
+            previous = self.hits_ad_n_tail[k]
+        if counter_found != self.counter_tail:
+            rank_sum = rank_sum + (self.counter_tail - counter_found) * num_of_entities
+        return rank_sum / self.counter_tail
 
     def get_hits_at_k(self, k):
         k = k -1
