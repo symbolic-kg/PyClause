@@ -1,5 +1,8 @@
+.. image:: https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png
+   :align: center
 
-PyClause: Symbolic Rules for Knowledge Graphs
+
+Symbolic Rules for Knowledge Graphs
 =============================================
 Welcome to the documentation of PyClause. PyClause allows you to use and learn symbolic rules (clauses) in a simple yet efficient manner by using Python. All usable options are well documented and can be stored in user defined configuration files. 
 
