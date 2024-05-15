@@ -1,5 +1,6 @@
 .. image:: https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png
    :align: center
+   :scale: 50%
 
 
 Symbolic Rules for Knowledge Graphs
