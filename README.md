@@ -112,10 +112,10 @@ Then, from the base directory run
 If you use PyClause, please cite <br>
 
 ```
-@article{galarraga2024pyclause,
+@inproceedings{betz2024pyclause,
   title={PyClause-Simple and Efficient Rule Handling for Knowledge Graphs},
   author={Betz, Patrick and Galarraga, Luis and Ott, Simon and Meilicke, Christian and Suchanek, Fabian M and Stuckenschmidt, Heiner},
-  journal={IJCAI, demo track},
+  booktitle={IJCAI, demo track},
   year={2024},
   publisher={Ijcai.org}
 }
