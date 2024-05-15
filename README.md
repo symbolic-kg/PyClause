@@ -10,13 +10,13 @@ citizenOf(X,Y) <= bornIn(X,A), locatedIn(A,Y)
 speaks(X,english) <= lives(X,london)
 
 ```
-PyClause is maintained by the groups that developed the rule miners [AMIE](https://github.com/dig-team/amie) and [AnyBURL](https://web.informatik.uni-mannheim.de/AnyBURL/).
 
+PyClause provides a wide range of rule application functionalities such as query answering and triple scoring. Rules from any system can be used as long as their syntax aligns. PyClause also provides wrappers to directly use and configure the rule miners [AMIE](https://github.com/dig-team/amie) and [AnyBURL](https://web.informatik.uni-mannheim.de/AnyBURL/) from Python.  
 
-## Documentation
-Documentation of library and features as well as **data** downloads can be found [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
-All usable default options for the configuration files can be found in [clause/config-default.yaml](clause/config-default.yaml) 
-
+## Documentation and Examples
+Documentation of the library and all features, rule syntax, data downloads, and a tutorial about rules can be found [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
+All usable default options for the configuration files can be found in [clause/config-default.yaml](clause/config-default.yaml) <br>
+We provide runnable examples in [examples](examples/). <br>
 
 ## Installation
 PyClause only uses a few lightweight Python dependencies and runs under Windows and Linux systems. Linux users need to have a c++ (14) compiler installed. Windows users need to have C++ build tools installed. PyClause requires Microsoft Visual C++ 14.0 or newer. <br>
@@ -107,6 +107,20 @@ print(qa.get_answers(as_string=True)[0])
 Download [this](https://www.dropbox.com/scl/fi/75py3esgpsn6f370ap7q5/test-data.zip?rlkey=7i136d7d7194x2tvoxqsv0e36&dl=0), unpack, and put the folders into data/ <br>
 Then, from the base directory run
 ```pytest -s```.
+
+## How to cite
+If you use PyClause, please cite <br>
+
+```
+@article{galarraga2024pyclause,
+  title={PyClause-Simple and Efficient Rule Handling for Knowledge Graphs},
+  author={Betz, Patrick and Galarraga, Luis and Ott, Simon and Meilicke, Christian and Suchanek, Fabian M and Stuckenschmidt, Heiner},
+  journal={IJCAI, demo track},
+  year={2024},
+  publisher={Ijcai.org}
+}
+```
+If you use AMIE or AnyBURL from within PyClause, please refer to the publications as given on the respective webpages.
 
 
 ## Colophon
