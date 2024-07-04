@@ -4,8 +4,8 @@
 ## Table of contents
 1. [Documentation and Examples](#documentation-and-examples)
 2. [Installation](#installation)
-  1. [Install from codebase](#1-install-from-codebase)
-  2. [Install as a package](#2-install-as-a-package)
+    1. [Install from codebase](#1-install-from-codebase)
+    2. [Install as a package](#2-install-as-a-package)
 3. [Quickstart](#quickstart)
 4. [Results](#results)
 5. [Run tests (for developers, linux)](#run-tests-for-developers-linux)
