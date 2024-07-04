@@ -1,6 +1,17 @@
 
 # <img src="https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png" width="171" height="57" style="margin-right: 10px;" alt="PyClause">
 
+## Table of contents
+1. [Documentation and Examples](#documentation-and-examples)
+2. [Installation](#installation)
+  - [Install from codebase](#1-install-from-codebase)
+  - [Install as a package](#2-install-as-a-package)
+3. [Quickstart](#quickstart)
+4. [Results](#results)
+5. [Run tests (for developers, linux)](#run-tests-for-developers-linux)
+6. [How to cite](#how-to-cite)
+7. [Colophon](#colophon)
+
 
 PyClause is a library for easy and efficient usage and learning of symbolic knowledge graph rules of the following form.
 
@@ -100,6 +111,49 @@ qa.calculate_answers(queries=queries, loader=loader, direction="head")
 print(qa.get_answers(as_string=True)[0])
 
 ```
+## Results
+
+#### WN18RR 
+|     Approach |    MRR |  Hits@1 | Hits@10 |     Config file |
+|--------------|-------:|--------:|--------:|----------------:|
+|     Standard | 0.4957 |  0.4568 |  0.5712 | [config.yaml]() |
+|        Tuned | 0.4946 |  0.4560 |  0.5689 |               * |
+[wn18rr-ruleset]()
+
+#### FB15k-237
+
+|     Approach |    MRR |  Hits@1 | Hits@10 |     Config file |
+|--------------|-------:|--------:|--------:|----------------:|
+|     Standard | 0.3318 |  0.2466 |  0.5055 | [config.yaml]() |
+|        Tuned | 0.3476 |  0.2636 |  0.5165 |               * |
+[fb15k-237-ruleset]()
+
+#### Yago3-10 
+
+|     Approach |    MRR |  Hits@1 | Hits@10 |     Config file |
+|--------------|-------:|--------:|--------:|----------------:|
+|     Standard | 0.5675 |  0.4995 |  0.6944 | [config.yaml]() |
+|        Tuned | 0.5821 |  0.5157 |  0.7025 |               * |
+[yago3-10-ruleset]()
+
+#### Wikidata5M
+
+|     Approach |    MRR |  Hits@1 | Hits@10 |     Config file |
+|--------------|-------:|--------:|--------:|----------------:|
+|     Standard | 0.3535 |  0.3127 |  0.4328 | [config.yaml]() |
+|        Tuned | 0.3573 |  0.3154 |  0.4374 |               * |
+[wikidata5m-ruleset]()
+
+#### CoDEx-M
+
+|     Approach |    MRR |  Hits@1 | Hits@10 |     Config file |
+|--------------|-------:|--------:|--------:|----------------:|
+|     Standard | 0.3195 |  0.2488 |  0.4559 | [config.yaml]() |
+|        Tuned | 0.3240 |  0.2556 |  0.4587 |               * |
+[codex-m-ruleset]()
+
+*In this approach we searched for the best setting of the $p_c$ value and the aggregation function on the validation set for each query direction of each relation in the data set. We searched over the values $p_c \in \{0,1,5,10,25,50,100,500,1000,5000,10000\}$ and for the aggregation function over max+ and noisy-or. We then applied the best setting respectively on the test set.
+Note: the $p_c$ value appears in the denominator in the modified confidence, in AnyBURL.
 
 ## Run tests (for developers, linux)
 
