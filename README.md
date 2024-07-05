@@ -1,19 +1,20 @@
 
 # <img src="https://raw.githubusercontent.com/symbolic-kg/PyClause/master/docs/logo/PyClause/proc/PyClause.png" width="171" height="57" style="margin-right: 10px;" alt="PyClause">
 
+PyClause is a library for easy and efficient usage and learning of symbolic knowledge graph rules of the following form.
+
 ## Table of contents
 1. [Documentation and Examples](#documentation-and-examples)
 2. [Installation](#installation)
     1. [Install from codebase](#1-install-from-codebase)
     2. [Install as a package](#2-install-as-a-package)
 3. [Quickstart](#quickstart)
-4. [Results](#results)
+4. [Knowledge Graph Completion Results ](#knowledge-graph-completion-results)
 5. [Run tests (for developers, linux)](#run-tests-for-developers-linux)
 6. [How to cite](#how-to-cite)
 7. [Colophon](#colophon)
 
 
-PyClause is a library for easy and efficient usage and learning of symbolic knowledge graph rules of the following form.
 
 ```bash
 
@@ -111,13 +112,15 @@ qa.calculate_answers(queries=queries, loader=loader, direction="head")
 print(qa.get_answers(as_string=True)[0])
 
 ```
-## Results
+## Knowledge Graph Completion Results 
+
+Here we present ranking-based evaluation results for the test sets of various datasets calculated with PyClause. The results are calculated with the RankingHandler under commit [short commit hash](url to commit).
 
 #### WN18RR 
 |     Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
 |--------------|-------:|--------:|--------:|------------------------------:|
-|     Standard | 0.4957 |  0.4568 |  0.5712 |       [config-default.yaml]() |
-|     NO top-5 | 0.4975 |  0.4576 |  0.5750 | [config-noisyor-top-5.yaml]() |
+|     Maxplus | 0.4957 |  0.4568 |  0.5712 |       [config-maxplus.yaml]() |
+|     Noisy-or top-5 | 0.4975 |  0.4576 |  0.5750 | [config-noisyor-top-5.yaml]() |
 |        Tuned | 0.4946 |  0.4560 |  0.5689 |                             * |
 
 [wn18rr-ruleset]()
@@ -126,8 +129,8 @@ print(qa.get_answers(as_string=True)[0])
 
 |     Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
 |--------------|-------:|--------:|--------:|------------------------------:|
-|     Standard | 0.3318 |  0.2466 |  0.5055 |       [config-default.yaml]() |
-|     NO top-5 | 0.3484 |  0.2612 |  0.5235 | [config-noisyor-top-5.yaml]() |
+|     Maxplus | 0.3318 |  0.2466 |  0.5055 |       [config-maxplus.yaml]() |
+|     Noisy-or top-5 | 0.3484 |  0.2612 |  0.5235 | [config-noisyor-top-5.yaml]() |
 |        Tuned | 0.3476 |  0.2636 |  0.5165 |                             * |
 
 [fb15k-237-ruleset]()
@@ -136,8 +139,8 @@ print(qa.get_answers(as_string=True)[0])
 
 |     Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
 |--------------|-------:|--------:|--------:|------------------------------:|
-|     Standard | 0.5675 |  0.4995 |  0.6944 |       [config-default.yaml]() |
-|     NO top-5 | 0.5625 |  0.4895 |  0.6972 | [config-noisyor-top-5.yaml]() |
+|     Maxplus | 0.5675 |  0.4995 |  0.6944 |       [config-maxplus.yaml]() |
+|     Noisy-or top-5 | 0.5625 |  0.4895 |  0.6972 | [config-noisyor-top-5.yaml]() |
 |        Tuned | 0.5821 |  0.5157 |  0.7025 |                             * |
 
 [yago3-10-ruleset]()
@@ -146,8 +149,8 @@ print(qa.get_answers(as_string=True)[0])
 
 |     Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
 |--------------|-------:|--------:|--------:|------------------------------:|
-|     Standard | 0.3535 |  0.3127 |  0.4328 |       [config-default.yaml]() |
-|     NO top-5 | 0.3561 |  0.3145 |  0.4371 | [config-noisyor-top-5.yaml]() |
+|     Maxplus | 0.3535 |  0.3127 |  0.4328 |       [config-maxplus.yaml]() |
+|     Noisy-or top-5 | 0.3561 |  0.3145 |  0.4371 | [config-noisyor-top-5.yaml]() |
 |        Tuned | 0.3573 |  0.3154 |  0.4374 |                             * |
 
 [wikidata5m-ruleset]()
@@ -156,8 +159,8 @@ print(qa.get_answers(as_string=True)[0])
 
 |     Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
 |--------------|-------:|--------:|--------:|------------------------------:|
-|     Standard | 0.3195 |  0.2488 |  0.4559 |       [config-default.yaml]() |
-|     NO top-5 | 0.3199 |  0.2444 |  0.4675 | [config-noisyor-top-5.yaml]() |
+|     Maxplus | 0.3195 |  0.2488 |  0.4559 |       [config-maxplus.yaml]() |
+|     Noisy-or top-5 | 0.3199 |  0.2444 |  0.4675 | [config-noisyor-top-5.yaml]() |
 |        Tuned | 0.3240 |  0.2556 |  0.4587 |                             * |
 
 [codex-m-ruleset]()
