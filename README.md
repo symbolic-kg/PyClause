@@ -117,51 +117,51 @@ print(qa.get_answers(as_string=True)[0])
 Here we present ranking-based evaluation results for the test sets of various datasets calculated with PyClause. The results are calculated with the RankingHandler under commit [short commit hash](url to commit).
 
 #### WN18RR 
-|     Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
-|--------------|-------:|--------:|--------:|------------------------------:|
-|     Maxplus | 0.4957 |  0.4568 |  0.5712 |       [config-maxplus.yaml]() |
-|     Noisy-or top-5 | 0.4975 |  0.4576 |  0.5750 | [config-noisyor-top-5.yaml]() |
-|        Tuned | 0.4946 |  0.4560 |  0.5689 |                             * |
+|       Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
+|----------------|-------:|--------:|--------:|------------------------------:|
+|        Maxplus | 0.4957 |  0.4568 |  0.5712 |       [config-maxplus.yaml]() |
+| Noisy-or top-5 | 0.4975 |  0.4576 |  0.5750 | [config-noisyor-top-5.yaml]() |
+|          Tuned | 0.4946 |  0.4560 |  0.5689 |                             * |
 
 [wn18rr-ruleset]()
 
 #### FB15k-237
 
-|     Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
-|--------------|-------:|--------:|--------:|------------------------------:|
-|     Maxplus | 0.3318 |  0.2466 |  0.5055 |       [config-maxplus.yaml]() |
-|     Noisy-or top-5 | 0.3484 |  0.2612 |  0.5235 | [config-noisyor-top-5.yaml]() |
-|        Tuned | 0.3476 |  0.2636 |  0.5165 |                             * |
+|       Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
+|----------------|-------:|--------:|--------:|------------------------------:|
+|        Maxplus | 0.3318 |  0.2466 |  0.5055 |       [config-maxplus.yaml]() |
+| Noisy-or top-5 | 0.3484 |  0.2612 |  0.5235 | [config-noisyor-top-5.yaml]() |
+|          Tuned | 0.3476 |  0.2636 |  0.5165 |                             * |
 
 [fb15k-237-ruleset]()
 
 #### Yago3-10 
 
-|     Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
-|--------------|-------:|--------:|--------:|------------------------------:|
-|     Maxplus | 0.5675 |  0.4995 |  0.6944 |       [config-maxplus.yaml]() |
-|     Noisy-or top-5 | 0.5625 |  0.4895 |  0.6972 | [config-noisyor-top-5.yaml]() |
-|        Tuned | 0.5821 |  0.5157 |  0.7025 |                             * |
+|       Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
+|----------------|-------:|--------:|--------:|------------------------------:|
+|        Maxplus | 0.5675 |  0.4995 |  0.6944 |       [config-maxplus.yaml]() |
+| Noisy-or top-5 | 0.5625 |  0.4895 |  0.6972 | [config-noisyor-top-5.yaml]() |
+|          Tuned | 0.5821 |  0.5157 |  0.7025 |                             * |
 
 [yago3-10-ruleset]()
 
 #### Wikidata5M
 
-|     Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
-|--------------|-------:|--------:|--------:|------------------------------:|
-|     Maxplus | 0.3535 |  0.3127 |  0.4328 |       [config-maxplus.yaml]() |
-|     Noisy-or top-5 | 0.3561 |  0.3145 |  0.4371 | [config-noisyor-top-5.yaml]() |
-|        Tuned | 0.3573 |  0.3154 |  0.4374 |                             * |
+|       Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
+|----------------|-------:|--------:|--------:|------------------------------:|
+|        Maxplus | 0.3535 |  0.3127 |  0.4328 |       [config-maxplus.yaml]() |
+| Noisy-or top-5 | 0.3561 |  0.3145 |  0.4371 | [config-noisyor-top-5.yaml]() |
+|          Tuned | 0.3573 |  0.3154 |  0.4374 |                             * |
 
 [wikidata5m-ruleset]()
 
 #### CoDEx-M
 
-|     Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
-|--------------|-------:|--------:|--------:|------------------------------:|
-|     Maxplus | 0.3195 |  0.2488 |  0.4559 |       [config-maxplus.yaml]() |
-|     Noisy-or top-5 | 0.3199 |  0.2444 |  0.4675 | [config-noisyor-top-5.yaml]() |
-|        Tuned | 0.3240 |  0.2556 |  0.4587 |                             * |
+|       Approach |    MRR |  Hits@1 | Hits@10 |                   Config file |
+|----------------|-------:|--------:|--------:|------------------------------:|
+|        Maxplus | 0.3195 |  0.2488 |  0.4559 |       [config-maxplus.yaml]() |
+| Noisy-or top-5 | 0.3199 |  0.2444 |  0.4675 | [config-noisyor-top-5.yaml]() |
+|          Tuned | 0.3240 |  0.2556 |  0.4587 |                             * |
 
 [codex-m-ruleset]()
 
