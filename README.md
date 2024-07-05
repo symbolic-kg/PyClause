@@ -3,6 +3,15 @@
 
 PyClause is a library for easy and efficient usage and learning of symbolic knowledge graph rules of the following form.
 
+```bash
+
+citizenOf(X,Y) <= bornIn(X,A), locatedIn(A,Y)
+speaks(X,english) <= lives(X,london)
+
+```
+
+PyClause provides a wide range of rule application functionalities such as query answering and triple scoring. Rules from any system can be used as long as their syntax aligns. PyClause also provides wrappers to directly use and configure the rule miners [AMIE](https://github.com/dig-team/amie) and [AnyBURL](https://web.informatik.uni-mannheim.de/AnyBURL/) from Python. 
+
 ## Table of contents
 1. [Documentation and Examples](#documentation-and-examples)
 2. [Installation](#installation)
@@ -13,17 +22,7 @@ PyClause is a library for easy and efficient usage and learning of symbolic know
 5. [Run tests (for developers, linux)](#run-tests-for-developers-linux)
 6. [How to cite](#how-to-cite)
 7. [Colophon](#colophon)
-
-
-
-```bash
-
-citizenOf(X,Y) <= bornIn(X,A), locatedIn(A,Y)
-speaks(X,english) <= lives(X,london)
-
-```
-
-PyClause provides a wide range of rule application functionalities such as query answering and triple scoring. Rules from any system can be used as long as their syntax aligns. PyClause also provides wrappers to directly use and configure the rule miners [AMIE](https://github.com/dig-team/amie) and [AnyBURL](https://web.informatik.uni-mannheim.de/AnyBURL/) from Python.  
+ 
 
 ## Documentation and Examples
 Documentation of the library and all features, rule syntax, data downloads, and a tutorial about rules can be found [here](https://pyclause.readthedocs.io/en/latest/index.html). <br>
