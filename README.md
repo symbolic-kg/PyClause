@@ -166,7 +166,7 @@ In the following tables, we present (filtered) ranking-based evaluation results 
 
 <hr/>
 
-*In this approach, for each relation and query direction (head or tail), we searched on the validation set for the best setting of the $num\_unseen$ parameter for the rules and the aggregation function. We searched over $num\_unseen \in \{0,1,5,10,25,50,100,500,1000,5000,10000\}$ and $aggregation\_function \in \{maxplus, noisyor\}$. We then applied the best setting on the test sets.
+*In this approach, for each relation and query direction (head or tail), we searched on the validation set for the best setting of the *num_unseen* parameter for the rules and the aggregation function. We searched over *num_unseen* in *{0,1,5,10,25,50,100,500,1000,5000,10000}* and *aggregation_function* in *{maxplus, noisyor}*. We then applied the best setting on the test sets.
 
 ## Run tests (for developers, linux)
 
