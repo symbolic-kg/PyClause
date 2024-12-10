@@ -46,7 +46,7 @@ A collection of rules is mostly associated with a knowlede graph (KG). We define
 
 Rule Confidences
 ~~~~~~~~~~~~~~~~
-From a given KG we can calculate the **confidence** of a particular rule, sometimes also termed precision. The vanilla confidence of a rule is defined as the number of body groundings resulting in a true head (support) divided by the number of all existing body groundings. 
+From a given KG we can calculate the **confidence** of a particular rule, sometimes also termed precision. The vanilla confidence of a rule based on a reference KG is defined as the number of distinct true head triples resulting from grounding the rule body with all triples (the support) divided by the number of all distinct head triples resulting from grounding the rule with all triples. In other words, the number of true predictions divided by the number of all predictions of the rule (see predictions below).
 
 For the second rule, assume the KG from which we want to calculate the confidence is given as:
 
